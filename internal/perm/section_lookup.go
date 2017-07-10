@@ -7,7 +7,7 @@
 
 package perm
 
-import "github.com/1and1/soma/lib/proto"
+import "github.com/mjolnir42/soma/lib/proto"
 
 // sectionLookup is the cache data structure for permission sections,
 // allowing lookup by ID or name

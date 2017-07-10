@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 
-	"github.com/1and1/soma/internal/stmt"
-	"github.com/1and1/soma/internal/tree"
+	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/internal/tree"
 )
 
 func (tk *treeKeeper) startupLoad() {

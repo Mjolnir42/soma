@@ -31,7 +31,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/1and1/soma/lib/auth"
+	"github.com/mjolnir42/soma/lib/auth"
 
 	"github.com/mjolnir42/scrypth64"
 	"github.com/satori/go.uuid"

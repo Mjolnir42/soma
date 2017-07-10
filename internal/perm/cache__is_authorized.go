@@ -5,13 +5,13 @@
  * that can be found in the LICENSE file.
  */
 
-package perm // import "github.com/1and1/soma/internal/perm"
+package perm // import "github.com/mjolnir42/soma/internal/perm"
 
 import (
 	"strings"
 
-	"github.com/1and1/soma/internal/msg"
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // isAuthorized implements Cache.IsAuthorized and checks if the

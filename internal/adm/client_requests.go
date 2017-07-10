@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/codegangsta/cli"
 	"gopkg.in/resty.v0"
 )

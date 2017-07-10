@@ -7,11 +7,11 @@ import (
 
 	"gopkg.in/resty.v0"
 
-	"github.com/1and1/soma/internal/adm"
-	"github.com/1and1/soma/internal/cmpl"
-	"github.com/1and1/soma/internal/help"
-	"github.com/1and1/soma/lib/auth"
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/internal/adm"
+	"github.com/mjolnir42/soma/internal/cmpl"
+	"github.com/mjolnir42/soma/internal/help"
+	"github.com/mjolnir42/soma/lib/auth"
+	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/codegangsta/cli"
 )
 

@@ -11,7 +11,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/1and1/soma/internal/adm"
+	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/codegangsta/cli"
 )
 

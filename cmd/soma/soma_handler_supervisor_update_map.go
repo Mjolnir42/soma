@@ -1,6 +1,6 @@
 package main
 
-import "github.com/1and1/soma/internal/msg"
+import "github.com/mjolnir42/soma/internal/msg"
 
 func (s *supervisor) update_map(q *msg.Request) {
 

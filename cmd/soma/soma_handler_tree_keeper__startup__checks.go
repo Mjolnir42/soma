@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/1and1/soma/internal/tree"
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/internal/tree"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 

@@ -10,7 +10,7 @@ package soma
 import (
 	"database/sql"
 
-	"github.com/1and1/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/Sirupsen/logrus"
 )
 

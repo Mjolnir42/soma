@@ -11,12 +11,12 @@
 //
 // It can be queried whether a given user is authorized to perform
 // an action.
-package perm // import "github.com/1and1/soma/internal/perm"
+package perm // import "github.com/mjolnir42/soma/internal/perm"
 
 import (
 	"sync"
 
-	"github.com/1and1/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/msg"
 )
 
 // Cache is a permission cache for the SOMA supervisor

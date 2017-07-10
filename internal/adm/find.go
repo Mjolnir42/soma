@@ -11,7 +11,7 @@ package adm
 import (
 	"fmt"
 
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // FindRepoPropSrcID fetches the source id of a locally set

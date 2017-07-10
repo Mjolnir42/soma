@@ -6,11 +6,11 @@
  */
 
 // Package rest implements the REST routes to access SOMA.
-package rest // import "github.com/1and1/soma/internal/rest"
+package rest // import "github.com/mjolnir42/soma/internal/rest"
 
 import (
-	"github.com/1and1/soma/internal/msg"
-	"github.com/1and1/soma/internal/soma"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/soma"
 )
 
 // Rest holds the required state for the REST interface

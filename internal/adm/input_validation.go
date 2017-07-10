@@ -17,7 +17,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/lib/proto"
 	resty "gopkg.in/resty.v0"
 )
 

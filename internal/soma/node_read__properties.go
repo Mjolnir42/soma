@@ -11,7 +11,7 @@ package soma
 import (
 	"database/sql"
 
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // oncallProperties adds the oncall properties of the node

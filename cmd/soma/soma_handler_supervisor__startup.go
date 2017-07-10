@@ -30,7 +30,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/1and1/soma/internal/stmt"
+	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/scrypth64"
 	uuid "github.com/satori/go.uuid"
 )

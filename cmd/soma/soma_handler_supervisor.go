@@ -10,10 +10,10 @@ package main
 import (
 	"database/sql"
 
-	"github.com/1and1/soma/internal/msg"
-	"github.com/1and1/soma/internal/perm"
-	"github.com/1and1/soma/internal/stmt"
-	"github.com/1and1/soma/lib/auth"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/perm"
+	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/lib/auth"
 	log "github.com/Sirupsen/logrus"
 )
 

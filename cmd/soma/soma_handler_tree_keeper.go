@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1and1/soma/internal/stmt"
-	"github.com/1and1/soma/internal/tree"
+	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/internal/tree"
 	log "github.com/Sirupsen/logrus"
 	metrics "github.com/rcrowley/go-metrics"
 	uuid "github.com/satori/go.uuid"

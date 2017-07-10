@@ -12,8 +12,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/1and1/soma/internal/rest"
-	"github.com/1and1/soma/internal/soma"
+	"github.com/mjolnir42/soma/internal/rest"
+	"github.com/mjolnir42/soma/internal/soma"
 	log "github.com/Sirupsen/logrus"
 	"github.com/asaskevich/govalidator"
 	"github.com/client9/reopen"

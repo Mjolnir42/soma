@@ -32,9 +32,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/1and1/soma/internal/msg"
-	"github.com/1and1/soma/internal/stmt"
-	"github.com/1and1/soma/lib/auth"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/lib/auth"
 )
 
 func (s *supervisor) issue_token(q *msg.Request) {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/1and1/soma/internal/adm"
+	"github.com/mjolnir42/soma/internal/adm"
 
 	"github.com/codegangsta/cli"
 	"github.com/mitchellh/go-homedir"

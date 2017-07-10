@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/1and1/soma/internal/msg"
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/lib/proto"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/satori/go.uuid"

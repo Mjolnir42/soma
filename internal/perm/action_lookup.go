@@ -5,9 +5,9 @@
  * that can be found in the LICENSE file.
  */
 
-package perm
+package perm // import "github.com/mjolnir42/soma/internal/perm"
 
-import "github.com/1and1/soma/lib/proto"
+import "github.com/mjolnir42/soma/lib/proto"
 
 // actionLookup is the cache data structure for permission actions,
 // allowing lookup by ID or name

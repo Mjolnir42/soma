@@ -8,7 +8,7 @@
 
 package msg
 
-import "github.com/1and1/soma/lib/proto"
+import "github.com/mjolnir42/soma/lib/proto"
 
 type Request struct {
 	Section    string

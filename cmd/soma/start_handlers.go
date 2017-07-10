@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/hex"
 
-	"github.com/1and1/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/msg"
 	log "github.com/Sirupsen/logrus"
 )
 

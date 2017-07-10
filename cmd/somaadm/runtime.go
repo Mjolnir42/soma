@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/1and1/soma/internal/adm"
-	"github.com/1and1/soma/lib/auth"
+	"github.com/mjolnir42/soma/internal/adm"
+	"github.com/mjolnir42/soma/lib/auth"
 
 	"gopkg.in/resty.v0"
 

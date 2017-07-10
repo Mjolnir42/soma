@@ -7,7 +7,7 @@
 
 package perm
 
-import "github.com/1and1/soma/internal/msg"
+import "github.com/mjolnir42/soma/internal/msg"
 
 // These are the methods used when an action can have variations.
 // Cache locking is performed by the action methods, tasks do not

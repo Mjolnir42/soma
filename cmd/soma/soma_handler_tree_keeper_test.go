@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/1and1/soma/internal/tree"
+	"github.com/mjolnir42/soma/internal/tree"
 	"github.com/satori/go.uuid"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 )

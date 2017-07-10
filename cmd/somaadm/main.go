@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/1and1/soma/internal/db"
+	"github.com/mjolnir42/soma/internal/db"
 	"github.com/codegangsta/cli"
 )
 

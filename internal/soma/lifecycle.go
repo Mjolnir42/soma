@@ -13,8 +13,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/1and1/soma/internal/stmt"
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/stmt"
 	"gopkg.in/resty.v0"
 )
 

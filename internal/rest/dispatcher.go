@@ -17,8 +17,8 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/1and1/soma/lib/auth"
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/lib/auth"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 func dispatchForbidden(w *http.ResponseWriter, err error) {

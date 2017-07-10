@@ -7,7 +7,7 @@
 
 package perm
 
-import "github.com/1and1/soma/internal/msg"
+import "github.com/mjolnir42/soma/internal/msg"
 
 // These are the per-Section methods used in Cache.Perform
 

@@ -12,7 +12,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/1and1/soma/internal/tree"
+	"github.com/mjolnir42/soma/internal/tree"
 )
 
 func (tk *treeKeeper) txProperty(a *tree.Action,

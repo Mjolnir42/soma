@@ -7,7 +7,7 @@
 
 package perm
 
-import "github.com/1and1/soma/lib/proto"
+import "github.com/mjolnir42/soma/lib/proto"
 
 // permissionMapping is the cache datastructure that keep track of
 // sections and actions mapped to a permission

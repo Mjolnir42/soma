@@ -30,7 +30,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
 	"github.com/satori/go.uuid"
 )

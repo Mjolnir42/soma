@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/1and1/soma/lib/auth"
+	"github.com/mjolnir42/soma/lib/auth"
 	"gopkg.in/resty.v0"
 )
 

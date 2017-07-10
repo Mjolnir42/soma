@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 
-	"github.com/1and1/soma/internal/tree"
+	"github.com/mjolnir42/soma/internal/tree"
 	uuid "github.com/satori/go.uuid"
 )
 

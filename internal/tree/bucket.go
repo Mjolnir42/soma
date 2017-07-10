@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/lib/proto"
 	log "github.com/Sirupsen/logrus"
 	uuid "github.com/satori/go.uuid"
 )

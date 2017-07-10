@@ -12,7 +12,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/1and1/soma/internal/stmt"
+	"github.com/mjolnir42/soma/internal/stmt"
 )
 
 func (tk *treeKeeper) startTx() (

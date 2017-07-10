@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/1and1/soma/internal/adm"
-	"github.com/1and1/soma/lib/proto"
+	"github.com/mjolnir42/soma/internal/adm"
+	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/codegangsta/cli"
 )
 

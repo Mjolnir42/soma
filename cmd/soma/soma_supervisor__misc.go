@@ -14,9 +14,9 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/1and1/soma/internal/msg"
-	"github.com/1and1/soma/internal/stmt"
-	"github.com/1and1/soma/lib/auth"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/lib/auth"
 )
 
 // TODO: timer, delete all expired key exchanges
