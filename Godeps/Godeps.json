@@ -172,6 +172,11 @@
 			"Rev": "9bb9f0998d48b31547d975974935ae9b48c7a03c"
 		},
 		{
+			"ImportPath": "gopkg.in/DATA-DOG/go-sqlmock.v1",
+			"Comment": "v1.1.3",
+			"Rev": "9958e5c69de03e97ec215b23f6fcae1f600c3fb6"
+		},
+		{
 			"ImportPath": "gopkg.in/asn1-ber.v1",
 			"Comment": "v1.1",
 			"Rev": "4e86f4367175e39f69d9358a5f17b4dda270378d"

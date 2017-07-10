@@ -35,8 +35,8 @@ type Repository struct {
 	Checks          map[string]Check
 	Children        map[string]RepositoryAttacher `json:"-"`
 	Action          chan *Action                  `json:"-"`
-	ordNumChildBck  int
-	ordChildrenBck  map[int]string
+	ordNumChildBck  int                           `json:"-"`
+	ordChildrenBck  map[int]string                `json:"-"`
 	log             *log.Logger
 }
 

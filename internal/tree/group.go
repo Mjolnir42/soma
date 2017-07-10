@@ -34,14 +34,14 @@ type Group struct {
 	Checks          map[string]Check
 	CheckInstances  map[string][]string
 	Instances       map[string]CheckInstance
-	Children        map[string]GroupAttacher `json:"-"`
-	loadedInstances map[string]map[string]CheckInstance
-	ordNumChildGrp  int
-	ordNumChildClr  int
-	ordNumChildNod  int
-	ordChildrenGrp  map[int]string
-	ordChildrenClr  map[int]string
-	ordChildrenNod  map[int]string
+	Children        map[string]GroupAttacher            `json:"-"`
+	loadedInstances map[string]map[string]CheckInstance `json:"-"`
+	ordNumChildGrp  int                                 `json:"-"`
+	ordNumChildClr  int                                 `json:"-"`
+	ordNumChildNod  int                                 `json:"-"`
+	ordChildrenGrp  map[int]string                      `json:"-"`
+	ordChildrenClr  map[int]string                      `json:"-"`
+	ordChildrenNod  map[int]string                      `json:"-"`
 	hasUpdate       bool
 	log             *log.Logger
 }

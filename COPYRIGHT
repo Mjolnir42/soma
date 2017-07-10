@@ -105,6 +105,9 @@ golang.org/x/crypto: 3-clause BSD
 golang.org/x/net: 3-clause BSD
   Copyright (c) 2009 The Go Authors
 
+gopkg.in/DATA-DOG/go-sqlmock.v1: 3-clause BSD
+  Copyright (c) 2013-2016, DATA-DOG team
+
 gopkg.in/asn1-ber.v1: 3-clause BSD
   Copyright (c) 2012 The Go Authors
 
