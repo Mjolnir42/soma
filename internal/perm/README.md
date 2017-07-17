@@ -1,7 +1,7 @@
 # perm
 
 ```
-package perm // import "github.com/1and1/soma/internal/perm"
+package perm // import "github.com/mjolnir42/soma/internal/perm"
 
 Package perm implements the permission cache module for the SOMA supervisor.
 It tracks which actions are mapped to permissions and which permissions have
