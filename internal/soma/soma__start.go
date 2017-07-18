@@ -10,7 +10,7 @@ package soma
 // Start launches all application handlers
 func (s *Soma) Start() {
 	// grimReaper and supervisor must run first
-	// TODO: start grimReaper completely
+	s.handlerMap.Add(`grimreaper`, newGrimReaper(1, s))
 	// TODO: start supervisor completely
 
 	s.handlerMap.Add(`bucket_r`, newBucketRead(s.conf.QueueLen))

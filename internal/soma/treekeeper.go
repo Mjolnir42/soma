@@ -684,6 +684,9 @@ bailout:
 /* Ops Access
  */
 func (tk *TreeKeeper) shutdownNow() {
+	if !tk.isStopped() {
+		tk.stopNow()
+	}
 	close(tk.Shutdown)
 }
 
