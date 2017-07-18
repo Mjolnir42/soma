@@ -13,6 +13,7 @@ func (s *Soma) Start() {
 	// TODO: start grimReaper completely
 	// TODO: start supervisor completely
 
+	s.handlerMap.Add(`bucket_r`, newBucketRead(s.conf.QueueLen))
 	s.handlerMap.Add(`capability_r`, newCapabilityRead(s.conf.QueueLen))
 	s.handlerMap.Add(`datacenter_r`, newDatacenterRead(s.conf.QueueLen))
 	s.handlerMap.Add(`mode_r`, newModeRead(s.conf.QueueLen))
