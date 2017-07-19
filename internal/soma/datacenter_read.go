@@ -78,9 +78,9 @@ func (r *DatacenterRead) process(q *msg.Request) {
 	msgRequest(r.reqLog, q)
 
 	switch q.Action {
-	case `list`, `sync`:
+	case msg.ActionList, msg.ActionSync:
 		r.list(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		r.show(q, &result)
 	default:
 		result.UnknownRequest(q)

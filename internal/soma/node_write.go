@@ -81,13 +81,13 @@ func (w *NodeWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case `add`:
+	case msg.ActionCreate:
 		w.add(q, &result)
-	case `remove`:
+	case msg.ActionDelete:
 		w.remove(q, &result)
-	case `update`:
+	case msg.ActionUpdate:
 		w.update(q, &result)
-	case `purge`:
+	case msg.ActionPurge:
 		w.purge(q, &result)
 	default:
 		result.UnknownRequest(q)

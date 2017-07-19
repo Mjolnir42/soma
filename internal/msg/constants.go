@@ -100,12 +100,14 @@ const (
 	ActionDeclare        = `declare`
 	ActionDelete         = `delete`
 	ActionGrant          = `grant`
+	ActionInsertNullID   = `insert-null`
 	ActionList           = `list`
 	ActionMemberAdd      = `member-add`
 	ActionMemberList     = `member-list`
 	ActionMemberRemove   = `member-remove`
 	ActionPropertyAdd    = `property-add`
 	ActionPropertyRemove = `property-remove`
+	ActionPurge          = `purge`
 	ActionRename         = `rename`
 	ActionRepoRebuild    = `rebuild-repository`
 	ActionRepoRestart    = `restart-repository`
@@ -113,6 +115,8 @@ const (
 	ActionRetry          = `retry`
 	ActionRevoke         = `revoke`
 	ActionSearch         = `search`
+	ActionSearchByAsset  = `search/asset`
+	ActionSearchByName   = `search/name`
 	ActionSet            = `set`
 	ActionShow           = `show`
 	ActionShowConfig     = `show-config`

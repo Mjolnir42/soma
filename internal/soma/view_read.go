@@ -77,9 +77,9 @@ func (r *ViewRead) process(q *msg.Request) {
 	msgRequest(r.reqLog, q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		r.list(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		r.show(q, &result)
 	default:
 		result.UnknownRequest(q)

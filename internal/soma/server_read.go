@@ -11,10 +11,10 @@ package soma
 import (
 	"database/sql"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/Sirupsen/logrus"
 )
 
 // ServerRead handles read requests for server
@@ -84,15 +84,15 @@ func (r *ServerRead) process(q *msg.Request) {
 	msgRequest(r.reqLog, q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		r.list(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		r.show(q, &result)
-	case `sync`:
+	case msg.ActionSync:
 		r.sync(q, &result)
-	case `search/name`:
+	case msg.ActionSearchByName:
 		r.searchByName(q, &result)
-	case `search/asset`:
+	case msg.ActionSearchByAsset:
 		r.searchByAssetID(q, &result)
 	default:
 		result.UnknownRequest(q)

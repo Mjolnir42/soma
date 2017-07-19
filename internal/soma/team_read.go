@@ -81,11 +81,11 @@ func (r *TeamRead) process(q *msg.Request) {
 	msgRequest(r.reqLog, q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		r.list(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		r.show(q, &result)
-	case `sync`:
+	case msg.ActionSync:
 		r.sync(q, &result)
 	default:
 		result.UnknownRequest(q)

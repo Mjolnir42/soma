@@ -94,13 +94,13 @@ func (w *UserWrite) process(q *msg.Request) {
 	}
 
 	switch q.Action {
-	case `add`:
+	case msg.ActionCreate:
 		w.add(q, &result)
-	case `update`:
+	case msg.ActionUpdate:
 		w.update(q, &result)
-	case `remove`:
+	case msg.ActionDelete:
 		w.remove(q, &result)
-	case `purge`:
+	case msg.ActionPurge:
 		w.purge(q, &result)
 	default:
 		result.UnknownRequest(q)

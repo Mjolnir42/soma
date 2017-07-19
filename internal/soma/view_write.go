@@ -78,11 +78,11 @@ func (w *ViewWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case `add`:
+	case msg.ActionCreate:
 		w.add(q, &result)
-	case `remove`:
+	case msg.ActionDelete:
 		w.remove(q, &result)
-	case `rename`:
+	case msg.ActionRename:
 		w.rename(q, &result)
 	default:
 		result.UnknownRequest(q)
