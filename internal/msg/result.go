@@ -28,6 +28,7 @@ type Result struct {
 	Bucket      []proto.Bucket
 	Capability  []proto.Capability
 	Category    []proto.Category
+	Cluster     []proto.Cluster
 	Datacenter  []proto.Datacenter
 	Entity      []proto.Entity
 	Environment []proto.Environment
@@ -113,6 +114,8 @@ func (r *Result) Clear(s string) {
 		r.Capability = []proto.Capability{}
 	case `category`:
 		r.Category = []proto.Category{}
+	case `cluster`:
+		r.Cluster = []proto.Cluster{}
 	case `datacenter`:
 		r.Datacenter = []proto.Datacenter{}
 	case `entity`:
