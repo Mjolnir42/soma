@@ -11,10 +11,10 @@ package soma
 import (
 	"database/sql"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/Sirupsen/logrus"
 )
 
 // NodeRead handles read requests for nodes
@@ -90,13 +90,13 @@ func (r *NodeRead) process(q *msg.Request) {
 	msgRequest(r.reqLog, q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		r.list(q, &result)
-	case `sync`:
+	case msg.ActionSync:
 		r.sync(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		r.show(q, &result)
-	case `show-config`:
+	case msg.ActionShowConfig:
 		r.showConfig(q, &result)
 	default:
 		result.UnknownRequest(q)

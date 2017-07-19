@@ -87,9 +87,9 @@ func (r *RepositoryRead) process(q *msg.Request) {
 	msgRequest(r.reqLog, q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		r.list(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		r.show(q, &result)
 	default:
 		result.UnknownRequest(q)
@@ -164,209 +164,25 @@ func (r *RepositoryRead) show(q *msg.Request, mr *msg.Result) {
 	// add properties
 	repo.Properties = &[]proto.Property{}
 
-	if err = r.propertyOncall(q, &repo); err != nil {
+	if err = r.oncallProperties(&repo); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
-	if err = r.propertyService(q, &repo); err != nil {
+	if err = r.serviceProperties(&repo); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
-	if err = r.propertySystem(q, &repo); err != nil {
+	if err = r.systemProperties(&repo); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
-	if err = r.propertyCustom(q, &repo); err != nil {
+	if err = r.customProperties(&repo); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
 
 	mr.Repository = append(mr.Repository, repo)
 	mr.OK()
-}
-
-// propertyOncall adds the oncall properties to a repository
-func (r *RepositoryRead) propertyOncall(q *msg.Request, o *proto.Repository) error {
-	var (
-		instanceID, sourceInstanceID string
-		view, oncallID, oncallName   string
-		rows                         *sql.Rows
-		err                          error
-	)
-
-	if rows, err = r.stmtPropOncall.Query(
-		q.Repository.Id,
-	); err != nil {
-		return err
-	}
-
-	for rows.Next() {
-		if err = rows.Scan(
-			&instanceID,
-			&sourceInstanceID,
-			&view,
-			&oncallID,
-			&oncallName,
-		); err != nil {
-			rows.Close()
-			return err
-		}
-		*o.Properties = append(*o.Properties,
-			proto.Property{
-				Type:             `oncall`,
-				RepositoryId:     q.Repository.Id,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
-				View:             view,
-				Oncall: &proto.PropertyOncall{
-					Id:   oncallID,
-					Name: oncallName,
-				},
-			},
-		)
-	}
-	if err = rows.Err(); err != nil {
-		return err
-	}
-	return nil
-}
-
-// propertyService adds the service properties to a repository
-func (r *RepositoryRead) propertyService(q *msg.Request, o *proto.Repository) error {
-	var (
-		instanceID, sourceInstanceID string
-		serviceName, view            string
-		rows                         *sql.Rows
-		err                          error
-	)
-
-	if rows, err = r.stmtPropService.Query(
-		q.Repository.Id,
-	); err != nil {
-		return err
-	}
-
-	for rows.Next() {
-		if err = rows.Scan(
-			&instanceID,
-			&sourceInstanceID,
-			&view,
-			&serviceName,
-		); err != nil {
-			rows.Close()
-			return err
-		}
-		*o.Properties = append(*o.Properties,
-			proto.Property{
-				Type:             `service`,
-				RepositoryId:     q.Repository.Id,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
-				View:             view,
-				Service: &proto.PropertyService{
-					Name: serviceName,
-				},
-			},
-		)
-	}
-	if err = rows.Err(); err != nil {
-		return err
-	}
-	return nil
-}
-
-// propertySystem adds the system properties to a repository
-func (r *RepositoryRead) propertySystem(q *msg.Request, o *proto.Repository) error {
-	var (
-		instanceID, sourceInstanceID, view string
-		systemProp, value                  string
-		rows                               *sql.Rows
-		err                                error
-	)
-
-	if rows, err = r.stmtPropSystem.Query(
-		q.Repository.Id,
-	); err != nil {
-		return err
-	}
-
-	for rows.Next() {
-		if err = rows.Scan(
-			&instanceID,
-			&sourceInstanceID,
-			&view,
-			&systemProp,
-			&value,
-		); err != nil {
-			rows.Close()
-			return err
-		}
-		*o.Properties = append(*o.Properties,
-			proto.Property{
-				Type:             `system`,
-				RepositoryId:     q.Repository.Id,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
-				View:             view,
-				System: &proto.PropertySystem{
-					Name:  systemProp,
-					Value: value,
-				},
-			},
-		)
-	}
-	if err = rows.Err(); err != nil {
-		return err
-	}
-	return nil
-}
-
-// propertyCustom adds the custom properties to a repository
-func (r *RepositoryRead) propertyCustom(q *msg.Request, o *proto.Repository) error {
-	var (
-		instanceID, sourceInstanceID, view string
-		customID, value, customProp        string
-		rows                               *sql.Rows
-		err                                error
-	)
-
-	if rows, err = r.stmtPropCustom.Query(
-		q.Repository.Id,
-	); err != nil {
-		return err
-	}
-
-	for rows.Next() {
-		if err = rows.Scan(
-			&instanceID,
-			&sourceInstanceID,
-			&view,
-			&customID,
-			&value,
-			&customProp,
-		); err != nil {
-			rows.Close()
-			return err
-		}
-		*o.Properties = append(*o.Properties,
-			proto.Property{
-				Type:             `custom`,
-				RepositoryId:     q.Repository.Id,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
-				View:             view,
-				Custom: &proto.PropertyCustom{
-					Id:    customID,
-					Name:  customProp,
-					Value: value,
-				},
-			},
-		)
-	}
-	if err = rows.Err(); err != nil {
-		return err
-	}
-	return nil
 }
 
 // shutdown signals the handler to shut down
