@@ -22,6 +22,7 @@ func (s *Soma) Start() {
 	s.handlerMap.Add(`predicate_r`, newPredicateRead(s.conf.QueueLen))
 	s.handlerMap.Add(`property_r`, newPropertyRead(s.conf.QueueLen))
 	s.handlerMap.Add(`provider_r`, newProviderRead(s.conf.QueueLen))
+	s.handlerMap.Add(`repository_r`, newRepositoryRead(s.conf.QueueLen))
 	s.handlerMap.Add(`server_r`, newServerRead(s.conf.QueueLen))
 	s.handlerMap.Add(`status_r`, newStatusRead(s.conf.QueueLen))
 	s.handlerMap.Add(`team_r`, newTeamRead(s.conf.QueueLen))

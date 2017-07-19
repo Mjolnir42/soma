@@ -44,6 +44,7 @@ type Result struct {
 	Predicate   []proto.Predicate
 	Property    []proto.Property
 	Provider    []proto.Provider
+	Repository  []proto.Repository
 	SectionObj  []proto.Section
 	Server      []proto.Server
 	State       []proto.State
@@ -144,6 +145,8 @@ func (r *Result) Clear(s string) {
 		r.Property = []proto.Property{}
 	case `provider`:
 		r.Provider = []proto.Provider{}
+	case `repository`:
+		r.Repository = []proto.Repository{}
 	case `section`:
 		r.SectionObj = []proto.Section{}
 	case `server`:
