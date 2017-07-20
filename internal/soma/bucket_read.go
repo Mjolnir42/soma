@@ -185,6 +185,10 @@ func (r *BucketRead) show(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err, q.Section)
 		return
 	}
+	if len(*bucket.Properties) == 0 {
+		// trigger ,omitempty in JSON export
+		bucket.Properties = nil
+	}
 
 	mr.Bucket = append(mr.Bucket, bucket)
 	mr.OK()

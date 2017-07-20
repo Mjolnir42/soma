@@ -249,24 +249,21 @@ func (r *NodeRead) show(q *msg.Request, mr *msg.Result) {
 	// fetch node properties
 	node.Properties = &[]proto.Property{}
 
-	// oncall properties
 	if err = r.oncallProperties(&node); err != nil {
 		goto fail
 	}
-
-	// service properties
 	if err = r.serviceProperties(&node); err != nil {
 		goto fail
 	}
-
-	// system properties
 	if err = r.systemProperties(&node); err != nil {
 		goto fail
 	}
-
-	// custom properties
 	if err = r.customProperties(&node); err != nil {
 		goto fail
+	}
+	if len(*node.Properties) == 0 {
+		// trigger ,omitempty in JSON export
+		node.Properties = nil
 	}
 
 	// add check configuration and instance information

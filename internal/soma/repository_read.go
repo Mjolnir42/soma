@@ -180,6 +180,10 @@ func (r *RepositoryRead) show(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err, q.Section)
 		return
 	}
+	if len(*repo.Properties) == 0 {
+		// trigger ,omitempty in JSON export
+		repo.Properties = nil
+	}
 
 	mr.Repository = append(mr.Repository, repo)
 	mr.OK()

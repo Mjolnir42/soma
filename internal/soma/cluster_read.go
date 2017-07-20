@@ -185,6 +185,10 @@ func (r *ClusterRead) show(q *msg.Request, mr *msg.Result) {
 	if err = r.customProperties(&cluster); err != nil {
 		goto fail
 	}
+	if len(*cluster.Properties) == 0 {
+		// trigger ,omitempty in JSON export
+		cluster.Properties = nil
+	}
 
 	// add check configuration and instance information
 	if tx, err = r.conn.Begin(); err != nil {
