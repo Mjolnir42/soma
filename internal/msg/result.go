@@ -33,6 +33,7 @@ type Result struct {
 	Entity      []proto.Entity
 	Environment []proto.Environment
 	Grant       []proto.Grant
+	Group       []proto.Group
 	Instance    []proto.Instance
 	Job         []proto.Job
 	Level       []proto.Level
@@ -124,6 +125,8 @@ func (r *Result) Clear(s string) {
 		r.Environment = []proto.Environment{}
 	case `grant`:
 		r.Grant = []proto.Grant{}
+	case `group`:
+		r.Group = []proto.Group{}
 	case `instance`:
 		r.Instance = []proto.Instance{}
 	case `job`:
