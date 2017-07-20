@@ -122,7 +122,7 @@ func (w *ModeWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (w *ModeWrite) shutdownNow() {
 	close(w.Shutdown)
 }

@@ -126,7 +126,7 @@ func (w *ValidityWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (w *ValidityWrite) shutdownNow() {
 	close(w.Shutdown)
 }

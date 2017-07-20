@@ -170,7 +170,7 @@ func (w *TeamWrite) update(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (w *TeamWrite) shutdownNow() {
 	close(w.Shutdown)
 }

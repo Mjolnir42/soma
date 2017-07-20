@@ -122,7 +122,7 @@ func (w *ProviderWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (w *ProviderWrite) shutdownNow() {
 	close(w.Shutdown)
 }

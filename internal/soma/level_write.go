@@ -124,7 +124,7 @@ func (w *LevelWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (w *LevelWrite) shutdownNow() {
 	close(w.Shutdown)
 }

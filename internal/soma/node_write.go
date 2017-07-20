@@ -185,7 +185,7 @@ func (w *NodeWrite) purge(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (w *NodeWrite) shutdownNow() {
 	close(w.Shutdown)
 }

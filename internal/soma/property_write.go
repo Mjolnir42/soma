@@ -418,7 +418,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 	mr.Property = append(mr.Property, q.Property)
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (w *PropertyWrite) shutdownNow() {
 	close(w.Shutdown)
 }

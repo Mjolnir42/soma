@@ -225,7 +225,7 @@ func (r *UserRead) sync(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (r *UserRead) shutdownNow() {
 	close(r.Shutdown)
 }

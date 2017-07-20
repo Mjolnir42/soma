@@ -149,7 +149,7 @@ func (r *OncallRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (r *OncallRead) shutdownNow() {
 	close(r.Shutdown)
 }

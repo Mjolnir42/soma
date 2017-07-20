@@ -145,7 +145,7 @@ func (r *LevelRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (r *LevelRead) shutdownNow() {
 	close(r.Shutdown)
 }

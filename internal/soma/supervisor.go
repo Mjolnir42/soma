@@ -43,7 +43,7 @@ func (s *Supervisor) run() {
 	// TODO required for Handler interface
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (s *Supervisor) shutdownNow() {
 	close(s.Shutdown)
 }

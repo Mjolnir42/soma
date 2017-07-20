@@ -141,7 +141,7 @@ func (r *ModeRead) show(q *msg.Request, mr *msg.Result) {
 	})
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (r *ModeRead) shutdownNow() {
 	close(r.Shutdown)
 }

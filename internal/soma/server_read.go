@@ -282,7 +282,7 @@ func (r *ServerRead) searchByAssetID(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (r *ServerRead) shutdownNow() {
 	close(r.Shutdown)
 }

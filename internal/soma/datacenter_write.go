@@ -144,7 +144,7 @@ func (w *DatacenterWrite) rename(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (w *DatacenterWrite) shutdownNow() {
 	close(w.Shutdown)
 }

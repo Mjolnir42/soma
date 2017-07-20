@@ -326,7 +326,7 @@ func (r *NodeRead) showConfig(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdown signals the handler to shut down
+// shutdownNow signals the handler to shut down
 func (r *NodeRead) shutdownNow() {
 	close(r.Shutdown)
 }
