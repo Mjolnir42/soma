@@ -17,6 +17,7 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
+// ClusterRead handles read requests for clusters
 type ClusterRead struct {
 	Input           chan msg.Request
 	Shutdown        chan struct{}
@@ -230,10 +231,6 @@ func (r *ClusterRead) memberList(q *msg.Request, mr *msg.Result) {
 	cluster.Members = &[]proto.Node{}
 
 	for rows.Next() {
-		if cluster.Members == nil {
-			cluster.Members = &[]proto.Node{}
-		}
-
 		if err = rows.Scan(
 			&memberNodeID,
 			&memberNodeName,
