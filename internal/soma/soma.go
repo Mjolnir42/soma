@@ -33,6 +33,7 @@ const (
 // Soma application struct
 type Soma struct {
 	handlerMap   *HandlerMap
+	logMap       *LogHandleMap
 	dbConnection *sql.DB
 	conf         *Config
 	appLog       *logrus.Logger
@@ -43,12 +44,14 @@ type Soma struct {
 // New returns a new SOMA application
 func New(
 	appHandlerMap *HandlerMap,
+	logHandleMap *LogHandleMap,
 	dbConnection *sql.DB,
 	conf *Config,
 	appLog, reqLog, errLog *logrus.Logger,
 ) *Soma {
 	s := Soma{}
 	s.handlerMap = appHandlerMap
+	s.logMap = logHandleMap
 	s.dbConnection = dbConnection
 	s.conf = conf
 	s.appLog = appLog

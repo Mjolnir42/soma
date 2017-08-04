@@ -35,6 +35,18 @@ func (h *HandlerMap) Get(key string) Handler {
 	return h.hmap[key]
 }
 
+// Exists checks if a handler exists. This function is only safe to
+// call if it is certain that the calling function is the only one
+// that adds or removes the searched handler
+func (h *HandlerMap) Exists(key string) bool {
+	h.RLock()
+	defer h.RUnlock()
+	if _, ok := h.hmap[key]; ok {
+		return true
+	}
+	return false
+}
+
 // Del removes a handler
 func (h *HandlerMap) Del(key string) {
 	h.Lock()

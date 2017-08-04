@@ -75,6 +75,7 @@ func main() {
 		lfhGlobal, lfhApp, lfhReq, lfhErr         *reopen.FileWriter
 		app                                       *soma.Soma
 		hm                                        soma.HandlerMap
+		lm                                        soma.LogHandleMap
 		rst                                       *rest.Rest
 	)
 
@@ -220,8 +221,9 @@ func main() {
 	go pingDatabase(errLog)
 
 	hm = soma.HandlerMap{}
+	lm = soma.LogHandleMap{}
 
-	app = soma.New(&hm, conn, &SomaCfg, appLog, reqLog, errLog)
+	app = soma.New(&hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog)
 	app.Start()
 
 	startHandlers(appLog, reqLog, errLog)

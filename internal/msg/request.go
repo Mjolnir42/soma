@@ -82,8 +82,10 @@ type UpdateData struct {
 }
 
 type Flags struct {
-	JobDetail bool
-	Unscoped  bool
+	JobDetail    bool
+	Unscoped     bool
+	Rebuild      bool
+	RebuildLevel string
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -35,6 +35,7 @@ func (s *Soma) Start() {
 	s.handlerMap.Add(`view_r`, newViewRead(s.conf.QueueLen))
 
 	if !s.conf.ReadOnly {
+		s.handlerMap.Add(`forest_custodian`, newForestCustodian(s.conf.QueueLen, s))
 		s.handlerMap.Add(`lifecycle`, newLifeCycle(s))
 
 		if !s.conf.Observer {
