@@ -15,6 +15,7 @@ func (s *Soma) Start() {
 
 	s.handlerMap.Add(`bucket_r`, newBucketRead(s.conf.QueueLen))
 	s.handlerMap.Add(`capability_r`, newCapabilityRead(s.conf.QueueLen))
+	s.handlerMap.Add(`checkconfig_r`, newCheckConfigurationRead(s.conf.QueueLen))
 	s.handlerMap.Add(`cluster_r`, newClusterRead(s.conf.QueueLen))
 	s.handlerMap.Add(`datacenter_r`, newDatacenterRead(s.conf.QueueLen))
 	s.handlerMap.Add(`group_r`, newGroupRead(s.conf.QueueLen))

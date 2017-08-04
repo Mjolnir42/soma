@@ -66,7 +66,7 @@ const (
 const (
 	CategoryRepository    = `repository`
 	SectionBucket         = `bucket`
-	SectionCheck          = `check`
+	SectionCheckConfig    = `check-config`
 	SectionCluster        = `cluster`
 	SectionGroup          = `group`
 	SectionInstance       = `instance`
