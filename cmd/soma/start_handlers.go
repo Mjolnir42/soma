@@ -3,12 +3,11 @@ package main
 import (
 	"encoding/hex"
 
-	"github.com/mjolnir42/soma/internal/msg"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
 )
 
 func startHandlers(appLog, reqLog, errLog *log.Logger) {
-	spawnGrimReaperHandler(appLog, reqLog, errLog)
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
 	spawnAttributeRead(appLog, reqLog, errLog)
@@ -28,9 +27,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnWorkflowReadHandler(appLog, reqLog, errLog)
 
 	if !SomaCfg.ReadOnly {
-		spawnForestCustodian(appLog, reqLog, errLog)
-		spawnGuidePost(appLog, reqLog, errLog)
-
 		if !SomaCfg.Observer {
 			spawnAttributeWrite(appLog, reqLog, errLog)
 			spawnDeploymentHandler(appLog, reqLog, errLog)
@@ -211,32 +207,6 @@ func spawnClusterReadHandler(appLog, reqLog, errLog *log.Logger) {
 	go clusterReadHandler.run()
 }
 
-func spawnForestCustodian(appLog, reqLog, errLog *log.Logger) {
-	var fC forestCustodian
-	fC.input = make(chan somaRepositoryRequest, 64)
-	fC.system = make(chan msg.Request, 32)
-	fC.shutdown = make(chan bool)
-	fC.conn = conn
-	fC.appLog = appLog
-	fC.reqLog = reqLog
-	fC.errLog = errLog
-	handlerMap["forestCustodian"] = &fC
-	go fC.run()
-}
-
-func spawnGuidePost(appLog, reqLog, errLog *log.Logger) {
-	var gP guidePost
-	gP.input = make(chan treeRequest, 4096)
-	gP.system = make(chan msg.Request, 32)
-	gP.shutdown = make(chan bool)
-	gP.conn = conn
-	gP.appLog = appLog
-	gP.reqLog = reqLog
-	gP.errLog = errLog
-	handlerMap["guidePost"] = &gP
-	go gP.run()
-}
-
 func spawnCheckConfigurationReadHandler(appLog, reqLog, errLog *log.Logger) {
 	var checkConfigurationReadHandler somaCheckConfigurationReadHandler
 	checkConfigurationReadHandler.input = make(chan somaCheckConfigRequest, 64)
@@ -326,17 +296,6 @@ func spawnOutputTreeHandler(appLog, reqLog, errLog *log.Logger) {
 	handler.errLog = errLog
 	handlerMap[`tree_r`] = &handler
 	go handler.run()
-}
-
-func spawnGrimReaperHandler(appLog, reqLog, errLog *log.Logger) {
-	var reaper grimReaper
-	reaper.system = make(chan msg.Request, 1)
-	reaper.conn = conn
-	reaper.appLog = appLog
-	reaper.reqLog = reqLog
-	reaper.errLog = errLog
-	handlerMap[`grimReaper`] = &reaper
-	go reaper.run()
 }
 
 func spawnInstanceReadHandler(appLog, reqLog, errLog *log.Logger) {

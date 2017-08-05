@@ -5,6 +5,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
 	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
@@ -61,6 +62,7 @@ type somaNodeResult struct {
 	ResultError error
 	Node        proto.Node
 }
+
 type somaOncallResult struct {
 	ResultError error
 	Oncall      proto.Oncall
@@ -239,6 +241,7 @@ type somaMetricWriteHandler struct {
 	reqLog       *log.Logger
 	errLog       *log.Logger
 }
+
 type somaMetricReadHandler struct {
 	input     chan somaMetricRequest
 	shutdown  chan bool
@@ -557,6 +560,7 @@ type somaUnitWriteHandler struct {
 	reqLog   *log.Logger
 	errLog   *log.Logger
 }
+
 type somaUserRequest struct {
 	action string
 	User   proto.User
@@ -721,6 +725,216 @@ func (tk *treeKeeper) isStopped() bool {
 }
 
 func (tk *treeKeeper) run() {
+}
+
+type somaBucketRequest struct {
+	action string
+	Bucket proto.Bucket
+	reply  chan somaResult
+}
+
+type somaBucketResult struct {
+	ResultError error
+	Bucket      proto.Bucket
+}
+
+type somaCheckConfigRequest struct {
+	action      string
+	CheckConfig proto.CheckConfig
+	reply       chan somaResult
+}
+
+type somaCheckConfigResult struct {
+	ResultError error
+	CheckConfig proto.CheckConfig
+}
+
+type somaClusterRequest struct {
+	action  string
+	Cluster proto.Cluster
+	reply   chan somaResult
+}
+
+type somaClusterResult struct {
+	ResultError error
+	Cluster     proto.Cluster
+}
+
+type somaGroupRequest struct {
+	action string
+	Group  proto.Group
+	reply  chan somaResult
+}
+
+type somaGroupResult struct {
+	ResultError error
+	Group       proto.Group
+}
+
+type somaRepositoryRequest struct {
+	action     string
+	remoteAddr string
+	user       string
+	rbLevel    string
+	rebuild    bool
+	Repository proto.Repository
+	reply      chan somaResult
+}
+
+type somaRepositoryResult struct {
+	ResultError error
+	Repository  proto.Repository
+}
+
+type somaRepositoryReadHandler struct {
+	input     chan somaRepositoryRequest
+	shutdown  chan bool
+	conn      *sql.DB
+	list_stmt *sql.Stmt
+	show_stmt *sql.Stmt
+	ponc_stmt *sql.Stmt
+	psvc_stmt *sql.Stmt
+	psys_stmt *sql.Stmt
+	pcst_stmt *sql.Stmt
+	appLog    *log.Logger
+	reqLog    *log.Logger
+	errLog    *log.Logger
+}
+
+func (r *somaRepositoryReadHandler) run() {
+}
+
+type somaBucketReadHandler struct {
+	input     chan somaBucketRequest
+	shutdown  chan bool
+	conn      *sql.DB
+	list_stmt *sql.Stmt
+	show_stmt *sql.Stmt
+	ponc_stmt *sql.Stmt
+	psvc_stmt *sql.Stmt
+	psys_stmt *sql.Stmt
+	pcst_stmt *sql.Stmt
+	appLog    *log.Logger
+	reqLog    *log.Logger
+	errLog    *log.Logger
+}
+
+func (r *somaBucketReadHandler) run() {
+}
+
+type somaClusterReadHandler struct {
+	input     chan somaClusterRequest
+	shutdown  chan bool
+	conn      *sql.DB
+	list_stmt *sql.Stmt
+	show_stmt *sql.Stmt
+	mbnl_stmt *sql.Stmt
+	ponc_stmt *sql.Stmt
+	psvc_stmt *sql.Stmt
+	psys_stmt *sql.Stmt
+	pcst_stmt *sql.Stmt
+	appLog    *log.Logger
+	reqLog    *log.Logger
+	errLog    *log.Logger
+}
+
+func (r *somaClusterReadHandler) run() {
+}
+
+type somaCheckConfigurationReadHandler struct {
+	input                 chan somaCheckConfigRequest
+	shutdown              chan bool
+	conn                  *sql.DB
+	list_stmt             *sql.Stmt
+	show_base             *sql.Stmt
+	show_threshold        *sql.Stmt
+	show_constr_custom    *sql.Stmt
+	show_constr_system    *sql.Stmt
+	show_constr_native    *sql.Stmt
+	show_constr_service   *sql.Stmt
+	show_constr_attribute *sql.Stmt
+	show_constr_oncall    *sql.Stmt
+	show_instance_info    *sql.Stmt
+	appLog                *log.Logger
+	reqLog                *log.Logger
+	errLog                *log.Logger
+}
+
+func (r *somaCheckConfigurationReadHandler) run() {
+}
+
+type somaGroupReadHandler struct {
+	input     chan somaGroupRequest
+	shutdown  chan bool
+	conn      *sql.DB
+	list_stmt *sql.Stmt
+	show_stmt *sql.Stmt
+	mbgl_stmt *sql.Stmt
+	mbcl_stmt *sql.Stmt
+	mbnl_stmt *sql.Stmt
+	ponc_stmt *sql.Stmt
+	psvc_stmt *sql.Stmt
+	psys_stmt *sql.Stmt
+	pcst_stmt *sql.Stmt
+	appLog    *log.Logger
+	reqLog    *log.Logger
+	errLog    *log.Logger
+}
+
+func (r *somaGroupReadHandler) run() {
+}
+
+type guidePost struct {
+	input              chan treeRequest
+	system             chan msg.Request
+	shutdown           chan bool
+	conn               *sql.DB
+	jbsv_stmt          *sql.Stmt
+	repo_stmt          *sql.Stmt
+	name_stmt          *sql.Stmt
+	node_stmt          *sql.Stmt
+	serv_stmt          *sql.Stmt
+	attr_stmt          *sql.Stmt
+	cthr_stmt          *sql.Stmt
+	cdel_stmt          *sql.Stmt
+	bucket_for_node    *sql.Stmt
+	bucket_for_cluster *sql.Stmt
+	bucket_for_group   *sql.Stmt
+	appLog             *log.Logger
+	reqLog             *log.Logger
+	errLog             *log.Logger
+}
+
+func (g *guidePost) run() {
+}
+
+type forestCustodian struct {
+	input     chan somaRepositoryRequest
+	system    chan msg.Request
+	shutdown  chan bool
+	conn      *sql.DB
+	add_stmt  *sql.Stmt
+	load_stmt *sql.Stmt
+	name_stmt *sql.Stmt
+	rbck_stmt *sql.Stmt
+	rbci_stmt *sql.Stmt
+	appLog    *log.Logger
+	reqLog    *log.Logger
+	errLog    *log.Logger
+}
+
+func (f *forestCustodian) run() {
+}
+
+type grimReaper struct {
+	system chan msg.Request
+	conn   *sql.DB
+	appLog *log.Logger
+	reqLog *log.Logger
+	errLog *log.Logger
+}
+
+func (grim *grimReaper) run() {
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
