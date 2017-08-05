@@ -14,10 +14,10 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 
 	var (
 		err                                                           error
-		instanceId, srcInstanceId, objectId, view, oncallId           string
-		inInstanceId, inObjectType, inObjId, oncallName, oncallNumber string
+		instanceID, srcInstanceID, objectID, view, oncallID           string
+		inInstanceID, inObjectType, inObjID, oncallName, oncallNumber string
 		inheritance, childrenOnly                                     bool
-		rows, instance_rows                                           *sql.Rows
+		rows, instanceRows                                            *sql.Rows
 	)
 
 	for loopType, loopStmt := range map[string]string{
@@ -41,11 +41,11 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 		// load all oncall properties defined directly on objects
 		for rows.Next() {
 			err = rows.Scan(
-				&instanceId,
-				&srcInstanceId,
-				&objectId,
+				&instanceID,
+				&srcInstanceID,
+				&objectID,
 				&view,
-				&oncallId,
+				&oncallID,
 				&inheritance,
 				&childrenOnly,
 				&oncallName,
@@ -68,29 +68,29 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 				Name:         oncallName,
 				Number:       oncallNumber,
 			}
-			prop.Id, _ = uuid.FromString(instanceId)
-			prop.OncallId, _ = uuid.FromString(oncallId)
+			prop.Id, _ = uuid.FromString(instanceID)
+			prop.OncallId, _ = uuid.FromString(oncallID)
 			prop.Instances = make([]tree.PropertyInstance, 0)
 
-			instance_rows, err = stMap[`LoadPropOncallInstance`].Query(
+			instanceRows, err = stMap[`LoadPropOncallInstance`].Query(
 				tk.meta.repoID,
-				srcInstanceId,
+				srcInstanceID,
 			)
 			if err != nil {
 				tk.startLog.Printf("TK[%s] Error loading %s oncall properties: %s", tk.meta.repoName, loopType, err.Error())
 				tk.status.isBroken = true
 				return
 			}
-			defer instance_rows.Close()
+			defer instanceRows.Close()
 
 		inproploop:
 			// load all all ids for properties that were inherited from the
 			// current oncall property so the IDs can be set correctly
-			for instance_rows.Next() {
-				err = instance_rows.Scan(
-					&inInstanceId,
+			for instanceRows.Next() {
+				err = instanceRows.Scan(
+					&inInstanceID,
 					&inObjectType,
-					&inObjId,
+					&inObjID,
 				)
 				if err != nil {
 					if err == sql.ErrNoRows {
@@ -101,18 +101,18 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 					return
 				}
 
-				var propObjectId, propInstanceId uuid.UUID
-				if propObjectId, err = uuid.FromString(inObjId); err != nil {
+				var propObjectID, propInstanceID uuid.UUID
+				if propObjectID, err = uuid.FromString(inObjID); err != nil {
 					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
-				if propInstanceId, err = uuid.FromString(inInstanceId); err != nil {
+				if propInstanceID, err = uuid.FromString(inInstanceID); err != nil {
 					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
-				if uuid.Equal(uuid.Nil, propObjectId) || uuid.Equal(uuid.Nil, propInstanceId) {
+				if uuid.Equal(uuid.Nil, propObjectID) || uuid.Equal(uuid.Nil, propInstanceID) {
 					continue inproploop
 				}
 				if inObjectType == "MAGIC_NO_RESULT_VALUE" {
@@ -120,9 +120,9 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 				}
 
 				pi := tree.PropertyInstance{
-					ObjectId:   propObjectId,
+					ObjectId:   propObjectID,
 					ObjectType: inObjectType,
-					InstanceId: propInstanceId,
+					InstanceId: propInstanceID,
 				}
 				prop.Instances = append(prop.Instances, pi)
 			}
@@ -130,7 +130,7 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 			// lookup the object and set the prepared property
 			tk.tree.Find(tree.FindRequest{
 				ElementType: loopType,
-				ElementId:   objectId,
+				ElementId:   objectID,
 			}, true).SetProperty(&prop)
 
 			// throw away all generated actions, we do this for every

@@ -10,8 +10,8 @@ package soma
 import (
 	"database/sql"
 
-	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
 )
 
 // XXX this is a stripped down bare-metal definition of the supervisor

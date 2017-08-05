@@ -15,27 +15,29 @@ import (
 )
 
 func (tk *TreeKeeper) addCheck(config *proto.CheckConfig) error {
-	if chk, err := tk.convertCheck(config); err == nil {
+	var err error
+	var chk *tree.Check
+	if chk, err = tk.convertCheck(config); err == nil {
 		tk.tree.Find(tree.FindRequest{
 			ElementType: config.ObjectType,
 			ElementId:   config.ObjectId,
 		}, true).SetCheck(*chk)
 		return nil
-	} else {
-		return err
 	}
+	return err
 }
 
 func (tk *TreeKeeper) rmCheck(config *proto.CheckConfig) error {
-	if chk, err := tk.convertCheckForDelete(config); err == nil {
+	var err error
+	var chk *tree.Check
+	if chk, err = tk.convertCheckForDelete(config); err == nil {
 		tk.tree.Find(tree.FindRequest{
 			ElementType: config.ObjectType,
 			ElementId:   config.ObjectId,
 		}, true).DeleteCheck(*chk)
 		return nil
-	} else {
-		return err
 	}
+	return err
 }
 
 func (tk *TreeKeeper) convertCheck(conf *proto.CheckConfig) (*tree.Check, error) {

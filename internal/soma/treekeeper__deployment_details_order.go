@@ -15,8 +15,8 @@ func (tk *TreeKeeper) orderDeploymentDetails() {
 		computed *sql.Rows
 		err      error
 	)
-	if computed, err = tk.stmt_GetComputed.Query(tk.meta.repoID); err != nil {
-		tk.treeLog.Println("tk.stmt_GetComputed.Query(): ", err)
+	if computed, err = tk.stmtGetComputed.Query(tk.meta.repoID); err != nil {
+		tk.treeLog.Println("tk.stmtGetComputed.Query(): ", err)
 		tk.status.isBroken = true
 		return
 	}
@@ -25,10 +25,10 @@ func (tk *TreeKeeper) orderDeploymentDetails() {
 deployments:
 	for computed.Next() {
 		var (
-			chkInstanceId                 string
-			currentChkInstanceConfigId    string
+			chkInstanceID                 string
+			currentChkInstanceConfigID    string
 			currentDeploymentDetailsJSON  string
-			previousChkInstanceConfigId   string
+			previousChkInstanceConfigID   string
 			previousVersion               string
 			previousStatus                string
 			previousDeploymentDetailsJSON string
@@ -36,20 +36,20 @@ deployments:
 			tx                            *sql.Tx
 		)
 		err = computed.Scan(
-			&chkInstanceId,
-			&currentChkInstanceConfigId,
+			&chkInstanceID,
+			&currentChkInstanceConfigID,
 			&currentDeploymentDetailsJSON,
 		)
 		if err == sql.ErrNoRows {
 			continue deployments
 		} else if err != nil {
-			tk.treeLog.Println("tk.stmt_GetComputed.Query().Scan(): ", err)
+			tk.treeLog.Println("tk.stmtGetComputed.Query().Scan(): ", err)
 			break deployments
 		}
 
 		// fetch previous deployment details for this check_instance_id
-		err = tk.stmt_GetPrevious.QueryRow(chkInstanceId).Scan(
-			&previousChkInstanceConfigId,
+		err = tk.stmtGetPrevious.QueryRow(chkInstanceID).Scan(
+			&previousChkInstanceConfigID,
 			&previousVersion,
 			&previousStatus,
 			&previousDeploymentDetailsJSON,
@@ -57,7 +57,7 @@ deployments:
 		if err == sql.ErrNoRows {
 			noPrevious = true
 		} else if err != nil {
-			tk.treeLog.Println("tk.stmt_GetPrevious.QueryRow(): ", err)
+			tk.treeLog.Println("tk.stmtGetPrevious.QueryRow(): ", err)
 			break deployments
 		}
 
@@ -88,7 +88,7 @@ deployments:
 			if _, err = txMap[`UpdateStatus`].Exec(
 				"awaiting_rollout",
 				"rollout_in_progress",
-				currentChkInstanceConfigId,
+				currentChkInstanceConfigID,
 			); err != nil {
 				goto bailout_noprev
 			}
@@ -96,8 +96,8 @@ deployments:
 			if _, err = txMap[`UpdateInstance`].Exec(
 				time.Now().UTC(),
 				true,
-				currentChkInstanceConfigId,
-				chkInstanceId,
+				currentChkInstanceConfigID,
+				chkInstanceID,
 			); err != nil {
 				goto bailout_noprev
 			}
@@ -118,7 +118,7 @@ deployments:
 		err = json.Unmarshal([]byte(currentDeploymentDetailsJSON), &curDetails)
 		if err != nil {
 			tk.treeLog.Printf("Error unmarshal/deploymentdetails %s: %s",
-				currentChkInstanceConfigId,
+				currentChkInstanceConfigID,
 				err.Error(),
 			)
 			err = nil
@@ -127,7 +127,7 @@ deployments:
 		err = json.Unmarshal([]byte(previousDeploymentDetailsJSON), &prvDetails)
 		if err != nil {
 			tk.treeLog.Printf("Error unmarshal/deploymentdetails %s: %s",
-				previousChkInstanceConfigId,
+				previousChkInstanceConfigID,
 				err.Error(),
 			)
 			err = nil
@@ -138,7 +138,7 @@ deployments:
 			// there is no change in deployment details, thus no point
 			// to sending the new deployment details as an update to the
 			// monitoring systems
-			tk.stmt_DelDuplicate.Exec(currentChkInstanceConfigId)
+			tk.stmtDelDuplicate.Exec(currentChkInstanceConfigID)
 			continue deployments
 		}
 
@@ -166,20 +166,20 @@ deployments:
 		if _, err = txMap[`UpdateStatus`].Exec(
 			"blocked",
 			"awaiting_rollout",
-			currentChkInstanceConfigId,
+			currentChkInstanceConfigID,
 		); err != nil {
 			goto bailout_withprev
 		}
 		if _, err = txMap[`UpdateExisting`].Exec(
 			time.Now().UTC(),
 			true,
-			chkInstanceId,
+			chkInstanceID,
 		); err != nil {
 			goto bailout_withprev
 		}
 		if _, err = txMap[`SetDependency`].Exec(
-			currentChkInstanceConfigId,
-			previousChkInstanceConfigId,
+			currentChkInstanceConfigID,
+			previousChkInstanceConfigID,
 			"deprovisioned",
 		); err != nil {
 			goto bailout_withprev

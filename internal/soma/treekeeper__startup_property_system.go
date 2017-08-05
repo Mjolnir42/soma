@@ -14,10 +14,10 @@ func (tk *TreeKeeper) startupSystemProperties(stMap map[string]*sql.Stmt) {
 
 	var (
 		err                                                       error
-		instanceId, srcInstanceId, objectId, view, systemProperty string
-		inInstanceId, inObjectType, inObjId, sourceType, value    string
+		instanceID, srcInstanceID, objectID, view, systemProperty string
+		inInstanceID, inObjectType, inObjID, sourceType, value    string
 		inheritance, childrenOnly                                 bool
-		rows, instance_rows                                       *sql.Rows
+		rows, instanceRows                                        *sql.Rows
 	)
 
 	for loopType, loopStmt := range map[string]string{
@@ -41,9 +41,9 @@ func (tk *TreeKeeper) startupSystemProperties(stMap map[string]*sql.Stmt) {
 		// load all system properties defined directly on objects
 		for rows.Next() {
 			err = rows.Scan(
-				&instanceId,
-				&srcInstanceId,
-				&objectId,
+				&instanceID,
+				&srcInstanceID,
+				&objectID,
 				&view,
 				&systemProperty,
 				&sourceType,
@@ -68,28 +68,28 @@ func (tk *TreeKeeper) startupSystemProperties(stMap map[string]*sql.Stmt) {
 				Key:          systemProperty,
 				Value:        value,
 			}
-			prop.Id, _ = uuid.FromString(instanceId)
+			prop.Id, _ = uuid.FromString(instanceID)
 			prop.Instances = make([]tree.PropertyInstance, 0)
 
-			instance_rows, err = stMap[`LoadPropSystemInstance`].Query(
+			instanceRows, err = stMap[`LoadPropSystemInstance`].Query(
 				tk.meta.repoID,
-				srcInstanceId,
+				srcInstanceID,
 			)
 			if err != nil {
 				tk.startLog.Printf("TK[%s] Error loading %s system properties: %s", tk.meta.repoName, loopType, err.Error())
 				tk.status.isBroken = true
 				return
 			}
-			defer instance_rows.Close()
+			defer instanceRows.Close()
 
 		inproploop:
 			// load all all ids for properties that were inherited from the
 			// current group system property so the IDs can be set correctly
-			for instance_rows.Next() {
-				err = instance_rows.Scan(
-					&inInstanceId,
+			for instanceRows.Next() {
+				err = instanceRows.Scan(
+					&inInstanceID,
 					&inObjectType,
-					&inObjId,
+					&inObjID,
 				)
 				if err != nil {
 					if err == sql.ErrNoRows {
@@ -100,18 +100,18 @@ func (tk *TreeKeeper) startupSystemProperties(stMap map[string]*sql.Stmt) {
 					return
 				}
 
-				var propObjectId, propInstanceId uuid.UUID
-				if propObjectId, err = uuid.FromString(inObjId); err != nil {
+				var propObjectID, propInstanceID uuid.UUID
+				if propObjectID, err = uuid.FromString(inObjID); err != nil {
 					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
-				if propInstanceId, err = uuid.FromString(inInstanceId); err != nil {
+				if propInstanceID, err = uuid.FromString(inInstanceID); err != nil {
 					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
-				if uuid.Equal(uuid.Nil, propObjectId) || uuid.Equal(uuid.Nil, propInstanceId) {
+				if uuid.Equal(uuid.Nil, propObjectID) || uuid.Equal(uuid.Nil, propInstanceID) {
 					continue inproploop
 				}
 				if inObjectType == "MAGIC_NO_RESULT_VALUE" {
@@ -119,16 +119,16 @@ func (tk *TreeKeeper) startupSystemProperties(stMap map[string]*sql.Stmt) {
 				}
 
 				pi := tree.PropertyInstance{
-					ObjectId:   propObjectId,
+					ObjectId:   propObjectID,
 					ObjectType: inObjectType,
-					InstanceId: propInstanceId,
+					InstanceId: propInstanceID,
 				}
 				prop.Instances = append(prop.Instances, pi)
 			}
 
 			// lookup the group and set the prepared property
 			tk.tree.Find(tree.FindRequest{
-				ElementId: objectId,
+				ElementId: objectID,
 			}, true).SetProperty(&prop)
 
 			// throw away all generated actions, we do this for every

@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/client9/reopen"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/internal/tree"
@@ -27,54 +26,54 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+// Metrics is the map of runtime metric registries
 var Metrics = make(map[string]metrics.Registry)
-var LogFileMap = make(map[string]*reopen.FileWriter)
 
 const rfc3339Milli string = "2006-01-02T15:04:05.000Z07:00"
 
 // TreeKeeper handles the repository tree structure
 type TreeKeeper struct {
-	Input                chan msg.Request
-	Shutdown             chan struct{}
-	Stop                 chan struct{}
-	errors               chan *tree.Error
-	actions              chan *tree.Action
-	conn                 *sql.DB
-	tree                 *tree.Tree
-	stmtGetView          *sql.Stmt
-	stmtStartJob         *sql.Stmt
-	stmt_CapMonMetric    *sql.Stmt
-	stmt_Check           *sql.Stmt
-	stmt_CheckConfig     *sql.Stmt
-	stmt_CheckInstance   *sql.Stmt
-	stmt_Cluster         *sql.Stmt
-	stmt_ClusterCustProp *sql.Stmt
-	stmt_ClusterOncall   *sql.Stmt
-	stmt_ClusterService  *sql.Stmt
-	stmt_ClusterSysProp  *sql.Stmt
-	stmt_DefaultDC       *sql.Stmt
-	stmt_DelDuplicate    *sql.Stmt
-	stmt_GetComputed     *sql.Stmt
-	stmt_GetPrevious     *sql.Stmt
-	stmt_Group           *sql.Stmt
-	stmt_GroupCustProp   *sql.Stmt
-	stmt_GroupOncall     *sql.Stmt
-	stmt_GroupService    *sql.Stmt
-	stmt_GroupSysProp    *sql.Stmt
-	stmt_List            *sql.Stmt
-	stmt_Node            *sql.Stmt
-	stmt_NodeCustProp    *sql.Stmt
-	stmt_NodeOncall      *sql.Stmt
-	stmt_NodeService     *sql.Stmt
-	stmt_NodeSysProp     *sql.Stmt
-	stmt_Pkgs            *sql.Stmt
-	stmt_Team            *sql.Stmt
-	stmt_Threshold       *sql.Stmt
-	stmt_Update          *sql.Stmt
-	appLog               *logrus.Logger
-	treeLog              *logrus.Logger
-	startLog             *logrus.Logger
-	meta                 struct {
+	Input               chan msg.Request
+	Shutdown            chan struct{}
+	Stop                chan struct{}
+	errors              chan *tree.Error
+	actions             chan *tree.Action
+	conn                *sql.DB
+	tree                *tree.Tree
+	stmtGetView         *sql.Stmt
+	stmtStartJob        *sql.Stmt
+	stmtCapMonMetric    *sql.Stmt
+	stmtCheck           *sql.Stmt
+	stmtCheckConfig     *sql.Stmt
+	stmtCheckInstance   *sql.Stmt
+	stmtCluster         *sql.Stmt
+	stmtClusterCustProp *sql.Stmt
+	stmtClusterOncall   *sql.Stmt
+	stmtClusterService  *sql.Stmt
+	stmtClusterSysProp  *sql.Stmt
+	stmtDefaultDC       *sql.Stmt
+	stmtDelDuplicate    *sql.Stmt
+	stmtGetComputed     *sql.Stmt
+	stmtGetPrevious     *sql.Stmt
+	stmtGroup           *sql.Stmt
+	stmtGroupCustProp   *sql.Stmt
+	stmtGroupOncall     *sql.Stmt
+	stmtGroupService    *sql.Stmt
+	stmtGroupSysProp    *sql.Stmt
+	stmtList            *sql.Stmt
+	stmtNode            *sql.Stmt
+	stmtNodeCustProp    *sql.Stmt
+	stmtNodeOncall      *sql.Stmt
+	stmtNodeService     *sql.Stmt
+	stmtNodeSysProp     *sql.Stmt
+	stmtPkgs            *sql.Stmt
+	stmtTeam            *sql.Stmt
+	stmtThreshold       *sql.Stmt
+	stmtUpdate          *sql.Stmt
+	appLog              *logrus.Logger
+	treeLog             *logrus.Logger
+	startLog            *logrus.Logger
+	meta                struct {
 		repoID   string
 		repoName string
 		teamID   string
@@ -110,22 +109,6 @@ func (tk *TreeKeeper) register(c *sql.DB, l ...*logrus.Logger) {
 	// TreeKeeper does not use the global error log
 }
 
-type treeRequest struct {
-	RequestType string          // Section
-	Action      string          // Action
-	AuthUser    string          // AuthUser
-	JobId       uuid.UUID       // JobID
-	Reply       chan msg.Result // Reply
-	/*
-		Repository  somaRepositoryRequest  // Repository
-		Bucket      somaBucketRequest      // Bucket
-		Group       somaGroupRequest       // Group
-		Cluster     somaClusterRequest     // Cluster
-		Node        somaNodeRequest        // Node
-		CheckConfig somaCheckConfigRequest // CheckConfig
-	*/
-}
-
 // run() is the method a treeKeeper executes in its background
 // go-routine. It checks and handles the input channels and reacts
 // appropriately.
@@ -155,9 +138,13 @@ func (tk *TreeKeeper) run() {
 
 	// close the startup logfile
 	func() {
-		fh := LogFileMap[fmt.Sprintf("startup_repository_%s",
-			tk.meta.repoName)]
-		delete(LogFileMap, fmt.Sprintf(
+		fh := tk.soma.logMap.Get(
+			fmt.Sprintf("startup_repository_%s", tk.meta.repoName),
+		)
+		if fh == nil {
+			return
+		}
+		tk.soma.logMap.Del(fmt.Sprintf(
 			"startup_repository_%s", tk.meta.repoName,
 		))
 		fh.Close()
@@ -165,8 +152,11 @@ func (tk *TreeKeeper) run() {
 
 	// deferred close the regular logfile
 	defer func() {
-		fh := LogFileMap[fmt.Sprintf("repository_%s", tk.meta.repoName)]
-		delete(LogFileMap, fmt.Sprintf("repository_%s", tk.meta.repoName))
+		fh := tk.soma.logMap.Get(fmt.Sprintf("repository_%s", tk.meta.repoName))
+		if fh == nil {
+			return
+		}
+		tk.soma.logMap.Del(fmt.Sprintf("repository_%s", tk.meta.repoName))
 		fh.Close()
 	}()
 
@@ -226,34 +216,34 @@ broken:
 
 	// prepare statements
 	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.TreekeeperDeleteDuplicateDetails:          tk.stmt_DelDuplicate,
-		stmt.TxDeployDetailClusterCustProp:             tk.stmt_ClusterCustProp,
-		stmt.TxDeployDetailClusterSysProp:              tk.stmt_ClusterSysProp,
-		stmt.TxDeployDetailDefaultDatacenter:           tk.stmt_DefaultDC,
-		stmt.TxDeployDetailNodeCustProp:                tk.stmt_NodeCustProp,
-		stmt.TxDeployDetailNodeSysProp:                 tk.stmt_NodeSysProp,
-		stmt.TxDeployDetailsCapabilityMonitoringMetric: tk.stmt_CapMonMetric,
-		stmt.TxDeployDetailsCheck:                      tk.stmt_Check,
-		stmt.TxDeployDetailsCheckConfig:                tk.stmt_CheckConfig,
-		stmt.TxDeployDetailsCheckConfigThreshold:       tk.stmt_Threshold,
-		stmt.TxDeployDetailsCheckInstance:              tk.stmt_CheckInstance,
-		stmt.TxDeployDetailsCluster:                    tk.stmt_Cluster,
-		stmt.TxDeployDetailsClusterOncall:              tk.stmt_ClusterOncall,
-		stmt.TxDeployDetailsClusterService:             tk.stmt_ClusterService,
-		stmt.TxDeployDetailsComputeList:                tk.stmt_List,
-		stmt.TxDeployDetailsGroup:                      tk.stmt_Group,
-		stmt.TxDeployDetailsGroupCustProp:              tk.stmt_GroupCustProp,
-		stmt.TxDeployDetailsGroupOncall:                tk.stmt_GroupOncall,
-		stmt.TxDeployDetailsGroupService:               tk.stmt_GroupService,
-		stmt.TxDeployDetailsGroupSysProp:               tk.stmt_GroupSysProp,
-		stmt.TxDeployDetailsNode:                       tk.stmt_Node,
-		stmt.TxDeployDetailsNodeOncall:                 tk.stmt_NodeOncall,
-		stmt.TxDeployDetailsNodeService:                tk.stmt_NodeService,
-		stmt.TxDeployDetailsProviders:                  tk.stmt_Pkgs,
-		stmt.TxDeployDetailsTeam:                       tk.stmt_Team,
-		stmt.TxDeployDetailsUpdate:                     tk.stmt_Update,
-		stmt.TreekeeperGetComputedDeployments:          tk.stmt_GetComputed,
-		stmt.TreekeeperGetPreviousDeployment:           tk.stmt_GetPrevious,
+		stmt.TreekeeperDeleteDuplicateDetails:          tk.stmtDelDuplicate,
+		stmt.TxDeployDetailClusterCustProp:             tk.stmtClusterCustProp,
+		stmt.TxDeployDetailClusterSysProp:              tk.stmtClusterSysProp,
+		stmt.TxDeployDetailDefaultDatacenter:           tk.stmtDefaultDC,
+		stmt.TxDeployDetailNodeCustProp:                tk.stmtNodeCustProp,
+		stmt.TxDeployDetailNodeSysProp:                 tk.stmtNodeSysProp,
+		stmt.TxDeployDetailsCapabilityMonitoringMetric: tk.stmtCapMonMetric,
+		stmt.TxDeployDetailsCheck:                      tk.stmtCheck,
+		stmt.TxDeployDetailsCheckConfig:                tk.stmtCheckConfig,
+		stmt.TxDeployDetailsCheckConfigThreshold:       tk.stmtThreshold,
+		stmt.TxDeployDetailsCheckInstance:              tk.stmtCheckInstance,
+		stmt.TxDeployDetailsCluster:                    tk.stmtCluster,
+		stmt.TxDeployDetailsClusterOncall:              tk.stmtClusterOncall,
+		stmt.TxDeployDetailsClusterService:             tk.stmtClusterService,
+		stmt.TxDeployDetailsComputeList:                tk.stmtList,
+		stmt.TxDeployDetailsGroup:                      tk.stmtGroup,
+		stmt.TxDeployDetailsGroupCustProp:              tk.stmtGroupCustProp,
+		stmt.TxDeployDetailsGroupOncall:                tk.stmtGroupOncall,
+		stmt.TxDeployDetailsGroupService:               tk.stmtGroupService,
+		stmt.TxDeployDetailsGroupSysProp:               tk.stmtGroupSysProp,
+		stmt.TxDeployDetailsNode:                       tk.stmtNode,
+		stmt.TxDeployDetailsNodeOncall:                 tk.stmtNodeOncall,
+		stmt.TxDeployDetailsNodeService:                tk.stmtNodeService,
+		stmt.TxDeployDetailsProviders:                  tk.stmtPkgs,
+		stmt.TxDeployDetailsTeam:                       tk.stmtTeam,
+		stmt.TxDeployDetailsUpdate:                     tk.stmtUpdate,
+		stmt.TreekeeperGetComputedDeployments:          tk.stmtGetComputed,
+		stmt.TreekeeperGetPreviousDeployment:           tk.stmtGetPrevious,
 		stmt.TreekeeperGetViewFromCapability:           tk.stmtGetView,
 		stmt.TreekeeperStartJob:                        tk.stmtStartJob,
 	} {

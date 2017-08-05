@@ -95,11 +95,11 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 	// handling
 	var (
 		err                                                          error
-		checkId, srcCheckId, srcObjType, srcObjId, configId          string
-		capabilityId, objId, objType, cfgName, cfgObjId, cfgObjType  string
-		externalId, predicate, threshold, levelName, levelShort      string
-		cstrType, value1, value2, value3, itemId, itemCfgId          string
-		monitoringId, cstrHash, cstrValHash, instSvc, instSvcCfgHash string
+		checkID, srcCheckID, srcObjType, srcObjID, configID          string
+		capabilityID, objID, objType, cfgName, cfgObjID, cfgObjType  string
+		externalID, predicate, threshold, levelName, levelShort      string
+		cstrType, value1, value2, value3, itemID, itemCfgID          string
+		monitoringID, cstrHash, cstrValHash, instSvc, instSvcCfgHash string
 		instSvcCfg, errLocation                                      string
 		levelNumeric, numVal, interval, version                      int64
 		isActive, hasInheritance, isChildrenOnly, isEnabled          bool
@@ -111,14 +111,14 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		ckTree                                                       *tree.Check
 		ckItem                                                       tree.CheckItem
 		ckOrder                                                      map[string]map[string]tree.Check
-		nullBucketId                                                 sql.NullString
+		nullBucketID                                                 sql.NullString
 	)
 	cfgMap = make(map[string]proto.CheckConfig)
 	ckOrder = make(map[string]map[string]tree.Check)
 
 	switch typ {
 	case "group":
-		if err, grOrder, grWeird = tk.orderGroups(stMap); err != nil {
+		if grOrder, grWeird, err = tk.orderGroups(stMap); err != nil {
 			goto fail
 		}
 	}
@@ -135,30 +135,30 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 	// load all checks and start the assembly line
 	for ckRows.Next() {
 		if err = ckRows.Scan(
-			&checkId,
-			&nullBucketId,
-			&srcCheckId,
+			&checkID,
+			&nullBucketID,
+			&srcCheckID,
 			&srcObjType,
-			&srcObjId,
-			&configId,
-			&capabilityId,
-			&objId,
+			&srcObjID,
+			&configID,
+			&capabilityID,
+			&objID,
 			&objType,
 		); err != nil {
 			goto fail
 		}
 		// save CheckConfig
 		victim = proto.CheckConfig{
-			Id:           configId,
+			Id:           configID,
 			RepositoryId: tk.meta.repoID,
-			CapabilityId: capabilityId,
-			ObjectId:     objId,
+			CapabilityId: capabilityID,
+			ObjectId:     objID,
 			ObjectType:   objType,
 		}
-		if nullBucketId.Valid {
-			victim.BucketId = nullBucketId.String
+		if nullBucketID.Valid {
+			victim.BucketId = nullBucketID.String
 		}
-		cfgMap[checkId] = victim
+		cfgMap[checkID] = victim
 	}
 	if ckRows.Err() != nil {
 		goto fail
@@ -166,46 +166,46 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 
 	// iterate over the loaded checks and continue assembly with values
 	// from the stored checkconfiguration
-	for checkId, _ = range cfgMap {
-		if err = stMap[`LoadConfig`].QueryRow(cfgMap[checkId].Id, tk.meta.repoID).Scan(
-			&nullBucketId,
+	for checkID = range cfgMap {
+		if err = stMap[`LoadConfig`].QueryRow(cfgMap[checkID].Id, tk.meta.repoID).Scan(
+			&nullBucketID,
 			&cfgName,
-			&cfgObjId,
+			&cfgObjID,
 			&cfgObjType,
 			&isActive,
 			&hasInheritance,
 			&isChildrenOnly,
-			&capabilityId,
+			&capabilityID,
 			&interval,
 			&isEnabled,
-			&externalId,
+			&externalID,
 		); err != nil {
 			// sql.ErrNoRows is fatal here, the check exists - there
 			// must be a configuration for it
 			goto fail
 		}
 
-		victim = cfgMap[checkId]
+		victim = cfgMap[checkID]
 		victim.Name = cfgName
 		victim.Interval = uint64(interval)
 		victim.IsActive = isActive
 		victim.IsEnabled = isEnabled
 		victim.Inheritance = hasInheritance
 		victim.ChildrenOnly = isChildrenOnly
-		victim.ExternalId = externalId
-		cfgMap[checkId] = victim
+		victim.ExternalId = externalID
+		cfgMap[checkID] = victim
 	}
 
 	// iterate over the loaded checks and continue assembly with values
 	// from the stored thresholds
-	for checkId, _ = range cfgMap {
-		if thrRows, err = stMap[`LoadThreshold`].Query(cfgMap[checkId].Id); err != nil {
+	for checkID = range cfgMap {
+		if thrRows, err = stMap[`LoadThreshold`].Query(cfgMap[checkID].Id); err != nil {
 			// sql.ErrNoRows is fatal here since a check without
 			// thresholds is rather useless
 			goto fail
 		}
 
-		victim = cfgMap[checkId]
+		victim = cfgMap[checkID]
 		victim.Thresholds = []proto.CheckConfigThreshold{}
 
 		// iterate over returned thresholds
@@ -241,28 +241,28 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		if err = thrRows.Err(); err != nil {
 			goto fail
 		}
-		cfgMap[checkId] = victim
+		cfgMap[checkID] = victim
 	}
 
 	// iterate over the loaded checks and continue assembly with values
 	// from the stored constraints
-	for checkId, _ = range cfgMap {
-		victim = cfgMap[checkId]
+	for checkID = range cfgMap {
+		victim = cfgMap[checkID]
 		victim.Constraints = []proto.CheckConfigConstraint{}
 		for _, cstrType = range []string{`custom`, `native`, `oncall`, `attribute`, `service`, `system`} {
 			switch cstrType {
 			case `custom`:
-				cstrRows, err = stMap[`LoadCustomCstr`].Query(cfgMap[checkId].Id)
+				cstrRows, err = stMap[`LoadCustomCstr`].Query(cfgMap[checkID].Id)
 			case `native`:
-				cstrRows, err = stMap[`LoadNativeCstr`].Query(cfgMap[checkId].Id)
+				cstrRows, err = stMap[`LoadNativeCstr`].Query(cfgMap[checkID].Id)
 			case `oncall`:
-				cstrRows, err = stMap[`LoadOncallCstr`].Query(cfgMap[checkId].Id)
+				cstrRows, err = stMap[`LoadOncallCstr`].Query(cfgMap[checkID].Id)
 			case `attribute`:
-				cstrRows, err = stMap[`LoadAttributeCstr`].Query(cfgMap[checkId].Id)
+				cstrRows, err = stMap[`LoadAttributeCstr`].Query(cfgMap[checkID].Id)
 			case `service`:
-				cstrRows, err = stMap[`LoadServiceCstr`].Query(cfgMap[checkId].Id)
+				cstrRows, err = stMap[`LoadServiceCstr`].Query(cfgMap[checkID].Id)
 			case `system`:
-				cstrRows, err = stMap[`LoadSystemCstr`].Query(cfgMap[checkId].Id)
+				cstrRows, err = stMap[`LoadSystemCstr`].Query(cfgMap[checkID].Id)
 			}
 			if err != nil {
 				goto fail
@@ -345,17 +345,17 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 				goto fail
 			}
 		}
-		cfgMap[checkId] = victim
+		cfgMap[checkID] = victim
 	}
 
 	// iterate over the checks, convert them to tree.Check. Then load
 	// the inherited IDs via loadItems and populate tree.Check.Items.
 	// Save in datastructure: ckOrder, map[string]map[string]tree.Check
-	//		objId -> checkId -> tree.Check
-	// this way it is possible to access the checks by objId, which is
+	//		objID -> checkID -> tree.Check
+	// this way it is possible to access the checks by objID, which is
 	// required to populate groups in the correct order.
-	for checkId, _ = range cfgMap {
-		victim = cfgMap[checkId]
+	for checkID = range cfgMap {
+		victim = cfgMap[checkID]
 		if ckOrder[victim.ObjectId] == nil {
 			ckOrder[victim.ObjectId] = map[string]tree.Check{}
 		}
@@ -366,25 +366,25 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		// correct UUID
 		ckItem = tree.CheckItem{ObjectType: victim.ObjectType}
 		ckItem.ObjectId, _ = uuid.FromString(victim.ObjectId)
-		ckItem.ItemId, _ = uuid.FromString(checkId)
+		ckItem.ItemId, _ = uuid.FromString(checkID)
 		ckTree.Items = []tree.CheckItem{ckItem}
 		tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, SrcCheckId=%s, CheckId=%s",
 			tk.meta.repoName,
 			`AssociateCheck`,
 			ckItem.ObjectType,
 			ckItem.ObjectId,
-			checkId,
+			checkID,
 			ckItem.ItemId,
 		)
 
-		if itRows, err = stMap[`LoadItems`].Query(tk.meta.repoID, checkId); err != nil {
+		if itRows, err = stMap[`LoadItems`].Query(tk.meta.repoID, checkID); err != nil {
 			goto fail
 		}
 
 		for itRows.Next() {
 			if err = itRows.Scan(
-				&itemId,
-				&objId,
+				&itemID,
+				&objID,
 				&objType,
 			); err != nil {
 				itRows.Close()
@@ -393,39 +393,39 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 
 			// create new object per iteration
 			ckItem := tree.CheckItem{ObjectType: objType}
-			ckItem.ObjectId, _ = uuid.FromString(objId)
-			ckItem.ItemId, _ = uuid.FromString(itemId)
+			ckItem.ObjectId, _ = uuid.FromString(objID)
+			ckItem.ItemId, _ = uuid.FromString(itemID)
 			ckTree.Items = append(ckTree.Items, ckItem)
 			tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, SrcCheckId=%s, CheckId=%s",
 				tk.meta.repoName,
 				`AssociateCheck`,
 				objType,
-				objId,
-				checkId,
-				itemId,
+				objID,
+				checkID,
+				itemID,
 			)
 		}
 		if err = itRows.Err(); err != nil {
 			goto fail
 		}
-		ckOrder[victim.ObjectId][checkId] = *ckTree
+		ckOrder[victim.ObjectId][checkID] = *ckTree
 	}
 
 	// apply all tree.Check object to the tree, special case
 	// groups due to their ordering requirements
 	//
-	// grOrder maps from a standalone groupId to an array of child groupIds
-	// ckOrder maps from a groupId to all source checks on it
+	// grOrder maps from a standalone groupID to an array of child groupIDs
+	// ckOrder maps from a groupID to all source checks on it
 	// ==> not every group has to have a check
 	// ==> groups can have more than one check
 	switch typ {
 	case "group":
-		for objKey, _ := range grOrder {
-			// objKey is a standalone groupId. Test if there are
+		for objKey := range grOrder {
+			// objKey is a standalone groupID. Test if there are
 			// checks for it
 			if _, ok := ckOrder[objKey]; ok {
 				// apply all checks for objKey
-				for ck, _ := range ckOrder[objKey] {
+				for ck := range ckOrder[objKey] {
 					tk.tree.Find(tree.FindRequest{
 						ElementType: cfgMap[ck].ObjectType,
 						ElementId:   cfgMap[ck].ObjectId,
@@ -458,11 +458,11 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 				}
 			}
 			// iterate through all childgroups of objKey
-			for pos, _ := range grOrder[objKey] {
+			for pos := range grOrder[objKey] {
 				// test if there is a check for it
 				if _, ok := ckOrder[grOrder[objKey][pos]]; ok {
 					// apply all checks for grOrder[objKey][pos]
-					for ck, _ := range ckOrder[objKey] {
+					for ck := range ckOrder[objKey] {
 						tk.tree.Find(tree.FindRequest{
 							ElementType: cfgMap[ck].ObjectType,
 							ElementId:   cfgMap[ck].ObjectId,
@@ -499,11 +499,11 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 			}
 		}
 		// iterate through all weird groups as well
-		for objKey, _ := range grWeird {
+		for objKey := range grWeird {
 			// Test if there are checks for it
 			if _, ok := ckOrder[objKey]; ok {
 				// apply all checks for objKey
-				for ck, _ := range ckOrder[objKey] {
+				for ck := range ckOrder[objKey] {
 					tk.tree.Find(tree.FindRequest{
 						ElementType: cfgMap[ck].ObjectType,
 						ElementId:   cfgMap[ck].ObjectId,
@@ -537,8 +537,8 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 			}
 		}
 	default:
-		for objKey, _ := range ckOrder {
-			for ck, _ := range ckOrder[objKey] {
+		for objKey := range ckOrder {
+			for ck := range ckOrder[objKey] {
 				tk.tree.Find(tree.FindRequest{
 					ElementType: cfgMap[ck].ObjectType,
 					ElementId:   cfgMap[ck].ObjectId,
@@ -589,8 +589,8 @@ directinstances:
 	for tckRows.Next() {
 		// load check information
 		if err = tckRows.Scan(
-			&checkId,
-			&objId,
+			&checkID,
+			&objID,
 		); err != nil {
 			tckRows.Close()
 			errLocation = `loadTypeChecks.Rows.Scan error`
@@ -598,16 +598,16 @@ directinstances:
 		}
 
 		// lookup instances for that check
-		if inRows, err = stMap[`LoadInstances`].Query(checkId); err != nil {
+		if inRows, err = stMap[`LoadInstances`].Query(checkID); err != nil {
 			tckRows.Close()
-			errLocation = fmt.Sprintf("Function=%s, repoId=%s, objType=%s, checkId=%s", `loadInstances.Query()`, tk.meta.repoID, typ, checkId)
+			errLocation = fmt.Sprintf("Function=%s, repoId=%s, objType=%s, checkID=%s", `loadInstances.Query()`, tk.meta.repoID, typ, checkID)
 			goto fail
 		}
 
 		for inRows.Next() {
 			if err = inRows.Scan(
-				&itemId,
-				&configId,
+				&itemID,
+				&configID,
 			); err != nil {
 				tckRows.Close()
 				inRows.Close()
@@ -616,10 +616,10 @@ directinstances:
 			}
 
 			// load configuration for check instance
-			if err = stMap[`LoadInstanceCfg`].QueryRow(itemId).Scan(
-				&itemCfgId,
+			if err = stMap[`LoadInstanceCfg`].QueryRow(itemID).Scan(
+				&itemCfgID,
 				&version,
-				&monitoringId,
+				&monitoringID,
 				&cstrHash,
 				&cstrValHash,
 				&instSvc,
@@ -630,7 +630,7 @@ directinstances:
 				// configuration
 				tckRows.Close()
 				inRows.Close()
-				errLocation = fmt.Sprintf("Function=%s, repoId=%s, objType=%s, checkId=%s, instanceId=%s", `loadInstConfig.QueryRow()`, tk.meta.repoID, typ, checkId, itemId)
+				errLocation = fmt.Sprintf("Function=%s, repoId=%s, objType=%s, checkID=%s, instanceId=%s", `loadInstConfig.QueryRow()`, tk.meta.repoID, typ, checkID, itemID)
 				goto fail
 			}
 
@@ -648,32 +648,32 @@ directinstances:
 				if err = json.Unmarshal([]byte(instSvcCfg), &ckInstance.InstanceServiceConfig); err != nil {
 					tckRows.Close()
 					inRows.Close()
-					errLocation = fmt.Sprintf("Function=%s, repoId=%s, objType=%s, checkId=%s, instanceId=%s, instCfgId=%s", `json.Unmarshal(InstanceServiceConfig)`, tk.meta.repoID, typ, checkId, itemId, itemCfgId)
+					errLocation = fmt.Sprintf("Function=%s, repoId=%s, objType=%s, checkID=%s, instanceId=%s, instCfgId=%s", `json.Unmarshal(InstanceServiceConfig)`, tk.meta.repoID, typ, checkID, itemID, itemCfgID)
 					goto fail
 				}
 			}
-			ckInstance.InstanceId, _ = uuid.FromString(itemId)
-			ckInstance.CheckId, _ = uuid.FromString(checkId)
-			ckInstance.ConfigId, _ = uuid.FromString(configId)
-			ckInstance.InstanceConfigId, _ = uuid.FromString(itemCfgId)
+			ckInstance.InstanceId, _ = uuid.FromString(itemID)
+			ckInstance.CheckId, _ = uuid.FromString(checkID)
+			ckInstance.ConfigId, _ = uuid.FromString(configID)
+			ckInstance.InstanceConfigId, _ = uuid.FromString(itemCfgID)
 
 			// attach instance to tree
 			tk.tree.Find(tree.FindRequest{
 				ElementType: typ,
-				ElementId:   objId,
+				ElementId:   objID,
 			}, true).LoadInstance(ckInstance)
 			tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
 				tk.meta.repoName,
 				`LoadInstance`,
 				typ,
-				objId,
+				objID,
 				ckInstance.CheckId.String(),
 				ckInstance.InstanceId.String(),
 			)
 		}
 		if err = inRows.Err(); err != nil {
 			inRows.Close()
-			errLocation = fmt.Sprintf("Function=%s, repoId=%s, objType=%s, checkId=%s", `checkInstanceRows.Iterate.Error`, tk.meta.repoID, typ, checkId)
+			errLocation = fmt.Sprintf("Function=%s, repoId=%s, objType=%s, checkID=%s", `checkInstanceRows.Iterate.Error`, tk.meta.repoID, typ, checkID)
 			goto fail
 		}
 	}
@@ -897,14 +897,14 @@ fail:
 
 // orderGroups orders the groups in a repository so they can be
 // processed from root to leaf
-func (tk *TreeKeeper) orderGroups(stMap map[string]*sql.Stmt) (error, map[string][]string, map[string]string) {
+func (tk *TreeKeeper) orderGroups(stMap map[string]*sql.Stmt) (map[string][]string, map[string]string, error) {
 	if tk.status.isBroken {
-		return fmt.Errorf("Broken tree detected"), nil, nil
+		return nil, nil, fmt.Errorf("Broken tree detected")
 	}
 
 	var (
 		err                                                 error
-		groupId, groupState, parentId, childId, candidateId string
+		groupID, groupState, parentID, childID, candidateID string
 		stRows, rlRows                                      *sql.Rows
 		ok                                                  bool
 		grStateMap, grRelMap, grWeirdMap                    map[string]string
@@ -921,76 +921,76 @@ func (tk *TreeKeeper) orderGroups(stMap map[string]*sql.Stmt) (error, map[string
 	// load groups in this repository
 	if stRows, err = stMap[`LoadGroupState`].Query(tk.meta.repoID); err != nil {
 		tk.status.isBroken = true
-		return err, nil, nil
+		return nil, nil, err
 	}
 	defer stRows.Close()
 
 	for stRows.Next() {
-		if err = stRows.Scan(&groupId, &groupState); err != nil {
+		if err = stRows.Scan(&groupID, &groupState); err != nil {
 			// error loading group state
 			tk.status.isBroken = true
-			return err, nil, nil
+			return nil, nil, err
 		}
-		grStateMap[groupId] = groupState
+		grStateMap[groupID] = groupState
 	}
 	if err = stRows.Err(); err != nil {
 		tk.status.isBroken = true
-		return err, nil, nil
+		return nil, nil, err
 	}
 	if len(grStateMap) == 0 {
 		// repository has no groups, return empty handed
-		return nil, grOrder, grWeirdMap
+		return grOrder, grWeirdMap, nil
 	}
 
 	// load relations between groups in this repository
 	if rlRows, err = stMap[`LoadGroupRelations`].Query(tk.meta.repoID); err != nil {
 		tk.status.isBroken = true
-		return err, nil, nil
+		return nil, nil, err
 	}
 	defer rlRows.Close()
 
 	for rlRows.Next() {
-		if err = rlRows.Scan(&groupId, &childId); err != nil {
+		if err = rlRows.Scan(&groupID, &childID); err != nil {
 			// error loading relations
 			tk.status.isBroken = true
-			return err, nil, nil
+			return nil, nil, err
 		}
 		// every group can only be child to one parent group, but
 		// a parent group can have multiple child groups => data
 		// needs to be stored this way
-		grRelMap[childId] = groupId
+		grRelMap[childID] = groupID
 	}
 	if err = rlRows.Err(); err != nil {
 		tk.status.isBroken = true
-		return err, nil, nil
+		return nil, nil, err
 	}
 
 	// iterate over all groups and identify state standalone,
 	// attached to the bucket. once ordered, remove them.
-	for groupId, groupState = range grStateMap {
+	for groupID, groupState = range grStateMap {
 		switch groupState {
 		case "grouped":
 			continue
 		case "standalone":
-			grOrder[groupId] = []string{}
+			grOrder[groupID] = []string{}
 		default:
 			// groups should really not be in a different state
-			grWeirdMap[groupId] = groupState
+			grWeirdMap[groupID] = groupState
 		}
-		delete(grStateMap, groupId)
+		delete(grStateMap, groupID)
 	}
 
 	// simplified first ordering round, only sort children of
 	// standalone groups
-	for childId, groupId = range grRelMap {
-		if _, ok = grOrder[groupId]; !ok {
-			// groupId is not standalone
+	for childID, groupID = range grRelMap {
+		if _, ok = grOrder[groupID]; !ok {
+			// groupID is not standalone
 			continue
 		}
-		// groupId is standalone
-		grOrder[groupId] = append(grOrder[groupId], childId)
-		delete(grRelMap, childId)
-		delete(grStateMap, childId)
+		// groupID is standalone
+		grOrder[groupID] = append(grOrder[groupID], childID)
+		delete(grRelMap, childID)
+		delete(grStateMap, childID)
 	}
 
 	// breaker switch variables to short-circuit an unbounded loop
@@ -1016,19 +1016,19 @@ orderloop:
 
 		// iterate through all unordered children
 	childloop:
-		for childId, parentId = range grRelMap {
-			// since childId was not ordered during the first
-			// pass, its parentId is a grouped group itself
-			for groupId, children = range grOrder {
+		for childID, parentID = range grRelMap {
+			// since childID was not ordered during the first
+			// pass, its parentID is a grouped group itself
+			for groupID, children = range grOrder {
 				// iterate through all children
-				for _, candidateId = range children {
-					if candidateId == parentId {
-						// this candidateId is the searched parent.
-						// since candidateId is a child of
-						// groupId, childId is appended there
-						grOrder[groupId] = append(grOrder[groupId], childId)
-						delete(grStateMap, childId)
-						delete(grRelMap, childId)
+				for _, candidateID = range children {
+					if candidateID == parentID {
+						// this candidateID is the searched parent.
+						// since candidateID is a child of
+						// groupID, childID is appended there
+						grOrder[groupID] = append(grOrder[groupID], childID)
+						delete(grStateMap, childID)
+						delete(grRelMap, childID)
 						continue childloop
 					}
 				}
@@ -1038,11 +1038,11 @@ orderloop:
 	if sameCount >= 3 || len(grRelMap) != 0 {
 		// breaker went off or we have unordered grRelMap left
 		tk.status.isBroken = true
-		return fmt.Errorf("Failed to order groups"), nil, nil
+		return nil, nil, fmt.Errorf("Failed to order groups")
 	}
 
 	// return order
-	return nil, grOrder, grWeirdMap
+	return grOrder, grWeirdMap, nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

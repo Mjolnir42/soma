@@ -11,7 +11,7 @@ import (
 func (tk *TreeKeeper) startupLoad() {
 
 	stMap := tk.prepareStartupStatements()
-	for n, _ := range stMap {
+	for n := range stMap {
 		defer stMap[n].Close()
 	}
 

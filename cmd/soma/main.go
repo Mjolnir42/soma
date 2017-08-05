@@ -12,12 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mjolnir42/soma/internal/rest"
-	"github.com/mjolnir42/soma/internal/soma"
 	log "github.com/Sirupsen/logrus"
 	"github.com/asaskevich/govalidator"
 	"github.com/client9/reopen"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/rest"
+	"github.com/mjolnir42/soma/internal/soma"
 	metrics "github.com/rcrowley/go-metrics"
 )
 

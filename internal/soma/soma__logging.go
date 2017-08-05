@@ -8,8 +8,8 @@
 package soma
 
 import (
-	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
 )
 
 func msgRequest(l *logrus.Logger, q *msg.Request) {

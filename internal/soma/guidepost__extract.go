@@ -15,57 +15,57 @@ import (
 )
 
 // Extract the request routing information
-func (g *GuidePost) extractRouting(q *msg.Request) (string, string, error, bool) {
-	var repoId, repoName, bucketId string
+func (g *GuidePost) extractRouting(q *msg.Request) (string, string, bool, error) {
+	var repoID, repoName, bucketID string
 	var err error
 
-	repoId, bucketId = g.extractId(q)
+	repoID, bucketID = g.extractID(q)
 
 	// lookup repository by bucket
-	if bucketId != `` {
+	if bucketID != `` {
 		if err = g.stmtRepoForBucketID.QueryRow(
-			bucketId,
+			bucketID,
 		).Scan(
-			&repoId,
+			&repoID,
 			&repoName,
 		); err != nil {
 			if err == sql.ErrNoRows {
-				return ``, ``, fmt.Errorf(
-					"No repository found for bucketId %s",
-					bucketId,
-				), true
+				return ``, ``, true, fmt.Errorf(
+					"No repository found for bucketID %s",
+					bucketID,
+				)
 			}
-			return ``, ``, err, false
+			return ``, ``, false, err
 		}
 	}
 
 	// lookup repository name
-	if repoName == `` && repoId != `` {
+	if repoName == `` && repoID != `` {
 		if err = g.stmtRepoNameByID.QueryRow(
-			repoId,
+			repoID,
 		).Scan(
 			&repoName,
 		); err != nil {
 			if err == sql.ErrNoRows {
-				return ``, ``, fmt.Errorf(
+				return ``, ``, true, fmt.Errorf(
 					"No repository found with id %s",
-					repoId,
-				), true
+					repoID,
+				)
 			}
-			return ``, ``, err, false
+			return ``, ``, false, err
 		}
 	}
 
 	if repoName == `` {
-		return ``, ``, fmt.Errorf(
+		return ``, ``, true, fmt.Errorf(
 			`GuidePost: unable find repository for request`,
-		), true
+		)
 	}
-	return repoId, repoName, nil, false
+	return repoID, repoName, false, nil
 }
 
 // Extract embedded IDs that can be used for routing
-func (g *GuidePost) extractId(q *msg.Request) (string, string) {
+func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 	switch q.Action {
 	case
 		`add_system_property_to_repository`,

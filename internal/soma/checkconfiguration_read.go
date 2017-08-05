@@ -600,7 +600,7 @@ func (r *CheckConfigurationRead) instances(cnf *proto.CheckConfig) error {
 	}
 	defer rows.Close()
 
-	instances := make([]proto.CheckInstanceInfo, 0)
+	instances := []proto.CheckInstanceInfo{}
 
 	for rows.Next() {
 		if err = rows.Scan(

@@ -15,11 +15,11 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 
 	var (
 		err                                          error
-		instanceId, srcInstanceId, objectId, view    string
-		inInstanceId, inObjectType, inObjId, attrKey string
-		serviceProperty, teamId, attrValue           string
+		instanceID, srcInstanceID, objectID, view    string
+		inInstanceID, inObjectType, inObjID, attrKey string
+		serviceProperty, teamID, attrValue           string
 		inheritance, childrenOnly                    bool
-		rows, attribute_rows, instance_rows          *sql.Rows
+		rows, attributeRows, instanceRows            *sql.Rows
 	)
 
 	for loopType, loopStmt := range map[string][2]string{
@@ -53,12 +53,12 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 		// load all service properties defined directly on the object
 		for rows.Next() {
 			err = rows.Scan(
-				&instanceId,
-				&srcInstanceId,
-				&objectId,
+				&instanceID,
+				&srcInstanceID,
+				&objectID,
 				&view,
 				&serviceProperty,
-				&teamId,
+				&teamID,
 				&inheritance,
 				&childrenOnly,
 			)
@@ -78,12 +78,12 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 				View:         view,
 				Service:      serviceProperty,
 			}
-			prop.Id, _ = uuid.FromString(instanceId)
+			prop.Id, _ = uuid.FromString(instanceID)
 			prop.Attributes = make([]proto.ServiceAttribute, 0)
 			prop.Instances = make([]tree.PropertyInstance, 0)
 
-			attribute_rows, err = stMap[loopStmt[1]].Query(
-				teamId,
+			attributeRows, err = stMap[loopStmt[1]].Query(
+				teamID,
 				serviceProperty,
 			)
 			if err != nil {
@@ -91,12 +91,12 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 				tk.status.isBroken = true
 				return
 			}
-			defer attribute_rows.Close()
+			defer attributeRows.Close()
 
 		attributeloop:
 			// load service attributes
-			for attribute_rows.Next() {
-				err = attribute_rows.Scan(
+			for attributeRows.Next() {
+				err = attributeRows.Scan(
 					&attrKey,
 					&attrValue,
 				)
@@ -116,25 +116,25 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 				prop.Attributes = append(prop.Attributes, pa)
 			}
 
-			instance_rows, err = stMap[`LoadPropSvcInstance`].Query(
+			instanceRows, err = stMap[`LoadPropSvcInstance`].Query(
 				tk.meta.repoID,
-				srcInstanceId,
+				srcInstanceID,
 			)
 			if err != nil {
 				tk.startLog.Printf("TK[%s] Error loading %s service properties: %s", tk.meta.repoName, loopType, err.Error())
 				tk.status.isBroken = true
 				return
 			}
-			defer instance_rows.Close()
+			defer instanceRows.Close()
 
 		inproploop:
 			// load all all ids for properties that were inherited from the
 			// current service property so the IDs can be set correctly
-			for instance_rows.Next() {
-				err = instance_rows.Scan(
-					&inInstanceId,
+			for instanceRows.Next() {
+				err = instanceRows.Scan(
+					&inInstanceID,
 					&inObjectType,
-					&inObjId,
+					&inObjID,
 				)
 				if err != nil {
 					if err == sql.ErrNoRows {
@@ -145,18 +145,18 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 					return
 				}
 
-				var propObjectId, propInstanceId uuid.UUID
-				if propObjectId, err = uuid.FromString(inObjId); err != nil {
+				var propObjectID, propInstanceID uuid.UUID
+				if propObjectID, err = uuid.FromString(inObjID); err != nil {
 					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
-				if propInstanceId, err = uuid.FromString(inInstanceId); err != nil {
+				if propInstanceID, err = uuid.FromString(inInstanceID); err != nil {
 					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
-				if uuid.Equal(uuid.Nil, propObjectId) || uuid.Equal(uuid.Nil, propInstanceId) {
+				if uuid.Equal(uuid.Nil, propObjectID) || uuid.Equal(uuid.Nil, propInstanceID) {
 					continue inproploop
 				}
 				if inObjectType == "MAGIC_NO_RESULT_VALUE" {
@@ -164,9 +164,9 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 				}
 
 				pi := tree.PropertyInstance{
-					ObjectId:   propObjectId,
+					ObjectId:   propObjectID,
 					ObjectType: inObjectType,
-					InstanceId: propInstanceId,
+					InstanceId: propInstanceID,
 				}
 				prop.Instances = append(prop.Instances, pi)
 			}
@@ -174,7 +174,7 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 			// lookup the object and set the prepared property
 			tk.tree.Find(tree.FindRequest{
 				ElementType: loopType,
-				ElementId:   objectId,
+				ElementId:   objectID,
 			}, true).SetProperty(&prop)
 
 			// throw away all generated actions, we do this for every

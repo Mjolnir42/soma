@@ -11,8 +11,8 @@ import (
 func (tk *TreeKeeper) buildDeploymentDetails() {
 	var (
 		err                                                 error
-		instanceCfgId                                       string
-		objId, objType                                      string
+		instanceCfgID                                       string
+		objID, objType                                      string
 		rows, thresh, pkgs, gSysProps, cSysProps, nSysProps *sql.Rows
 		gCustProps, cCustProps, nCustProps                  *sql.Rows
 		callback                                            sql.NullString
@@ -22,7 +22,7 @@ func (tk *TreeKeeper) buildDeploymentDetails() {
 	// * refactoring switch objType {} block
 	// * SQL error handling
 
-	if rows, err = tk.stmt_List.Query(tk.meta.repoID); err != nil {
+	if rows, err = tk.stmtList.Query(tk.meta.repoID); err != nil {
 		tk.status.isBroken = true
 		return
 	}
@@ -33,18 +33,18 @@ deploymentbuilder:
 		detail := proto.Deployment{}
 
 		err = rows.Scan(
-			&instanceCfgId,
+			&instanceCfgID,
 		)
 		if err != nil {
-			tk.treeLog.Println(`tk.stmt_List.Query().Scan():`, err)
+			tk.treeLog.Println(`tk.stmtList.Query().Scan():`, err)
 			break deploymentbuilder
 		}
 
 		//
 		detail.CheckInstance = &proto.CheckInstance{
-			InstanceConfigId: instanceCfgId,
+			InstanceConfigId: instanceCfgID,
 		}
-		tk.stmt_CheckInstance.QueryRow(instanceCfgId).Scan(
+		tk.stmtCheckInstance.QueryRow(instanceCfgID).Scan(
 			&detail.CheckInstance.Version,
 			&detail.CheckInstance.InstanceId,
 			&detail.CheckInstance.ConstraintHash,
@@ -60,19 +60,19 @@ deploymentbuilder:
 		detail.Check = &proto.Check{
 			CheckId: detail.CheckInstance.CheckId,
 		}
-		tk.stmt_Check.QueryRow(detail.CheckInstance.CheckId).Scan(
+		tk.stmtCheck.QueryRow(detail.CheckInstance.CheckId).Scan(
 			&detail.Check.RepositoryId,
 			&detail.Check.SourceCheckId,
 			&detail.Check.SourceType,
 			&detail.Check.InheritedFrom,
 			&detail.Check.CapabilityId,
-			&objId,
+			&objID,
 			&objType,
 			&detail.Check.Inheritance,
 			&detail.Check.ChildrenOnly,
 		)
 		detail.ObjectType = objType
-		if detail.Check.InheritedFrom != objId {
+		if detail.Check.InheritedFrom != objID {
 			detail.Check.IsInherited = true
 		}
 		detail.Check.CheckConfigId = detail.CheckInstance.ConfigId
@@ -83,12 +83,12 @@ deploymentbuilder:
 			RepositoryId: detail.Check.RepositoryId,
 			BucketId:     detail.Check.BucketId,
 			CapabilityId: detail.Check.CapabilityId,
-			ObjectId:     objId,
+			ObjectId:     objID,
 			ObjectType:   objType,
 			Inheritance:  detail.Check.Inheritance,
 			ChildrenOnly: detail.Check.ChildrenOnly,
 		}
-		tk.stmt_CheckConfig.QueryRow(detail.Check.CheckConfigId).Scan(
+		tk.stmtCheckConfig.QueryRow(detail.Check.CheckConfigId).Scan(
 			&detail.CheckConfig.Name,
 			&detail.CheckConfig.Interval,
 			&detail.CheckConfig.IsActive,
@@ -98,7 +98,7 @@ deploymentbuilder:
 
 		//
 		detail.CheckConfig.Thresholds = []proto.CheckConfigThreshold{}
-		thresh, err = tk.stmt_Threshold.Query(detail.CheckConfig.Id)
+		thresh, err = tk.stmtThreshold.Query(detail.CheckConfig.Id)
 		if err != nil {
 			// a check config must have 1+ thresholds
 			tk.treeLog.Println(`DANGER WILL ROBINSON!`,
@@ -121,7 +121,7 @@ deploymentbuilder:
 				&thr.Level.Numeric,
 			)
 			if err != nil {
-				tk.treeLog.Println(`tk.stmt_Threshold.Query().Scan():`, err)
+				tk.treeLog.Println(`tk.stmtThreshold.Query().Scan():`, err)
 				break deploymentbuilder
 			}
 			detail.CheckConfig.Thresholds = append(detail.CheckConfig.Thresholds, thr)
@@ -138,7 +138,7 @@ deploymentbuilder:
 		detail.Monitoring = &proto.Monitoring{}
 		detail.Metric = &proto.Metric{}
 		detail.Unit = &proto.Unit{}
-		tk.stmt_CapMonMetric.QueryRow(detail.Capability.Id).Scan(
+		tk.stmtCapMonMetric.QueryRow(detail.Capability.Id).Scan(
 			&detail.Capability.Metric,
 			&detail.Capability.MonitoringId,
 			&detail.Capability.View,
@@ -169,7 +169,7 @@ deploymentbuilder:
 
 		//
 		detail.Metric.Packages = &[]proto.MetricPackage{}
-		pkgs, _ = tk.stmt_Pkgs.Query(detail.Metric.Path)
+		pkgs, _ = tk.stmtPkgs.Query(detail.Metric.Path)
 		defer pkgs.Close()
 
 		for pkgs.Next() {
@@ -180,7 +180,7 @@ deploymentbuilder:
 				&pkg.Name,
 			)
 			if err != nil {
-				tk.treeLog.Println(`tk.stmt_Pkgs.Query().Scan():`, err)
+				tk.treeLog.Println(`tk.stmtPkgs.Query().Scan():`, err)
 				break deploymentbuilder
 			}
 			*detail.Metric.Packages = append(*detail.Metric.Packages, pkg)
@@ -193,9 +193,9 @@ deploymentbuilder:
 		case "group":
 			// fetch the group object
 			detail.Group = &proto.Group{
-				Id: objId,
+				Id: objID,
 			}
-			tk.stmt_Group.QueryRow(objId).Scan(
+			tk.stmtGroup.QueryRow(objID).Scan(
 				&detail.Group.BucketId,
 				&detail.Group.Name,
 				&detail.Group.ObjectState,
@@ -210,7 +210,7 @@ deploymentbuilder:
 			}
 			// fetch oncall information if the property is set,
 			// otherwise cleanup detail.Oncall
-			err = tk.stmt_GroupOncall.QueryRow(detail.Group.Id, detail.View).Scan(
+			err = tk.stmtGroupOncall.QueryRow(detail.Group.Id, detail.View).Scan(
 				&detail.Oncall.Id,
 				&detail.Oncall.Name,
 				&detail.Oncall.Number,
@@ -218,12 +218,12 @@ deploymentbuilder:
 			if err == sql.ErrNoRows {
 				detail.Oncall = nil
 			} else if err != nil {
-				tk.treeLog.Println(`tk.stmt_GroupOncall.QueryRow():`, err)
+				tk.treeLog.Println(`tk.stmtGroupOncall.QueryRow():`, err)
 				break deploymentbuilder
 			}
 			// fetch service name, and attributes if applicable
 			if detail.CheckInstance.InstanceService != "" {
-				err = tk.stmt_GroupService.QueryRow(
+				err = tk.stmtGroupService.QueryRow(
 					detail.CheckInstance.InstanceService,
 					detail.View,
 				).Scan(
@@ -233,7 +233,7 @@ deploymentbuilder:
 				if err == sql.ErrNoRows {
 					detail.Service = nil
 				} else if err != nil {
-					tk.treeLog.Println(`tk.stmt_GroupService.QueryRow():`, err)
+					tk.treeLog.Println(`tk.stmtGroupService.QueryRow():`, err)
 					break deploymentbuilder
 				} else {
 					detail.Service.Attributes = []proto.ServiceAttribute{}
@@ -250,7 +250,7 @@ deploymentbuilder:
 			}
 			// fetch system properties
 			detail.Properties = &[]proto.PropertySystem{}
-			gSysProps, _ = tk.stmt_GroupSysProp.Query(detail.Group.Id, detail.View)
+			gSysProps, _ = tk.stmtGroupSysProp.Query(detail.Group.Id, detail.View)
 			defer gSysProps.Close()
 
 			for gSysProps.Next() {
@@ -260,7 +260,7 @@ deploymentbuilder:
 					&prop.Value,
 				)
 				if err != nil {
-					tk.treeLog.Println(`tk.stmt_GroupSysProp.Query().Scan():`, err)
+					tk.treeLog.Println(`tk.stmtGroupSysProp.Query().Scan():`, err)
 					break deploymentbuilder
 				}
 				*detail.Properties = append(*detail.Properties, prop)
@@ -273,7 +273,7 @@ deploymentbuilder:
 			}
 			// fetch custom properties
 			detail.CustomProperties = &[]proto.PropertyCustom{}
-			gCustProps, _ = tk.stmt_GroupCustProp.Query(detail.Group.Id, detail.View)
+			gCustProps, _ = tk.stmtGroupCustProp.Query(detail.Group.Id, detail.View)
 			defer gCustProps.Close()
 
 			for gCustProps.Next() {
@@ -284,7 +284,7 @@ deploymentbuilder:
 					&prop.Value,
 				)
 				if err != nil {
-					tk.treeLog.Println(`tk.stmt_GroupCustProp.Query().Scan():`, err)
+					tk.treeLog.Println(`tk.stmtGroupCustProp.Query().Scan():`, err)
 					break deploymentbuilder
 				}
 				*detail.CustomProperties = append(*detail.CustomProperties, prop)
@@ -295,9 +295,9 @@ deploymentbuilder:
 		case "cluster":
 			// fetch the cluster object
 			detail.Cluster = &proto.Cluster{
-				Id: objId,
+				Id: objID,
 			}
-			tk.stmt_Cluster.QueryRow(objId).Scan(
+			tk.stmtCluster.QueryRow(objID).Scan(
 				&detail.Cluster.Name,
 				&detail.Cluster.BucketId,
 				&detail.Cluster.ObjectState,
@@ -312,7 +312,7 @@ deploymentbuilder:
 			}
 			// fetch oncall information if the property is set,
 			// otherwise cleanup detail.Oncall
-			err = tk.stmt_ClusterOncall.QueryRow(detail.Cluster.Id, detail.View).Scan(
+			err = tk.stmtClusterOncall.QueryRow(detail.Cluster.Id, detail.View).Scan(
 				&detail.Oncall.Id,
 				&detail.Oncall.Name,
 				&detail.Oncall.Number,
@@ -322,7 +322,7 @@ deploymentbuilder:
 			}
 			// fetch the service name, and attributes if applicable
 			if detail.CheckInstance.InstanceService != "" {
-				err = tk.stmt_ClusterService.QueryRow(
+				err = tk.stmtClusterService.QueryRow(
 					detail.CheckInstance.InstanceService,
 					detail.View,
 				).Scan(
@@ -346,7 +346,7 @@ deploymentbuilder:
 			}
 			// fetch system properties
 			detail.Properties = &[]proto.PropertySystem{}
-			cSysProps, _ = tk.stmt_ClusterSysProp.Query(detail.Cluster.Id, detail.View)
+			cSysProps, _ = tk.stmtClusterSysProp.Query(detail.Cluster.Id, detail.View)
 			defer cSysProps.Close()
 
 			for cSysProps.Next() {
@@ -356,7 +356,7 @@ deploymentbuilder:
 					&prop.Value,
 				)
 				if err != nil {
-					tk.treeLog.Println(`tk.stmt_ClusterSysProp.Query().Scan():`, err)
+					tk.treeLog.Println(`tk.stmtClusterSysProp.Query().Scan():`, err)
 					break deploymentbuilder
 				}
 				*detail.Properties = append(*detail.Properties, prop)
@@ -369,7 +369,7 @@ deploymentbuilder:
 			}
 			// fetch custom properties
 			detail.CustomProperties = &[]proto.PropertyCustom{}
-			cCustProps, _ = tk.stmt_ClusterCustProp.Query(detail.Cluster.Id, detail.View)
+			cCustProps, _ = tk.stmtClusterCustProp.Query(detail.Cluster.Id, detail.View)
 			defer cCustProps.Close()
 
 			for cCustProps.Next() {
@@ -388,9 +388,9 @@ deploymentbuilder:
 			// fetch the node object
 			detail.Server = &proto.Server{}
 			detail.Node = &proto.Node{
-				Id: objId,
+				Id: objID,
 			}
-			tk.stmt_Node.QueryRow(objId).Scan(
+			tk.stmtNode.QueryRow(objID).Scan(
 				&detail.Node.AssetId,
 				&detail.Node.Name,
 				&detail.Node.TeamId,
@@ -416,7 +416,7 @@ deploymentbuilder:
 			}
 			// fetch oncall information if the property is set,
 			// otherwise cleanup detail.Oncall
-			err = tk.stmt_NodeOncall.QueryRow(detail.Node.Id, detail.View).Scan(
+			err = tk.stmtNodeOncall.QueryRow(detail.Node.Id, detail.View).Scan(
 				&detail.Oncall.Id,
 				&detail.Oncall.Name,
 				&detail.Oncall.Number,
@@ -426,7 +426,7 @@ deploymentbuilder:
 			}
 			// fetch the service name, and attributes if applicable
 			if detail.CheckInstance.InstanceService != "" {
-				err = tk.stmt_NodeService.QueryRow(
+				err = tk.stmtNodeService.QueryRow(
 					detail.CheckInstance.InstanceService,
 					detail.View,
 				).Scan(
@@ -450,7 +450,7 @@ deploymentbuilder:
 			}
 			// fetch system properties
 			detail.Properties = &[]proto.PropertySystem{}
-			nSysProps, _ = tk.stmt_NodeSysProp.Query(detail.Node.Id, detail.View)
+			nSysProps, _ = tk.stmtNodeSysProp.Query(detail.Node.Id, detail.View)
 			defer nSysProps.Close()
 
 			for nSysProps.Next() {
@@ -460,7 +460,7 @@ deploymentbuilder:
 					&prop.Value,
 				)
 				if err != nil {
-					tk.treeLog.Println(`tk.stmt_NodeSysProp.Query().Scan():`, err)
+					tk.treeLog.Println(`tk.stmtNodeSysProp.Query().Scan():`, err)
 					break deploymentbuilder
 				}
 				*detail.Properties = append(*detail.Properties, prop)
@@ -470,7 +470,7 @@ deploymentbuilder:
 			}
 			// fetch custom properties
 			detail.CustomProperties = &[]proto.PropertyCustom{}
-			nCustProps, _ = tk.stmt_NodeCustProp.Query(detail.Node.Id, detail.View)
+			nCustProps, _ = tk.stmtNodeCustProp.Query(detail.Node.Id, detail.View)
 			defer nCustProps.Close()
 
 			for nCustProps.Next() {
@@ -487,14 +487,14 @@ deploymentbuilder:
 			}
 		}
 
-		tk.stmt_Team.QueryRow(detail.Team.Id).Scan(
+		tk.stmtTeam.QueryRow(detail.Team.Id).Scan(
 			&detail.Team.Name,
 			&detail.Team.LdapId,
 		)
 
 		// if no datacenter information was gathered, use the default DC
 		if detail.Datacenter == "" {
-			tk.stmt_DefaultDC.QueryRow().Scan(&detail.Datacenter)
+			tk.stmtDefaultDC.QueryRow().Scan(&detail.Datacenter)
 		}
 
 		// build JSON of DeploymentDetails
@@ -504,7 +504,7 @@ deploymentbuilder:
 				detail.CheckInstance.InstanceConfigId, err)
 			break deploymentbuilder
 		}
-		if _, err = tk.stmt_Update.Exec(
+		if _, err = tk.stmtUpdate.Exec(
 			detailJSON,
 			detail.Monitoring.Id,
 			detail.CheckInstance.InstanceConfigId,

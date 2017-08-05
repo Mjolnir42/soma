@@ -13,7 +13,7 @@ func (tk *TreeKeeper) startupBuckets(stMap map[string]*sql.Stmt) {
 
 	var (
 		rows                                      *sql.Rows
-		bucketId, bucketName, environment, teamId string
+		bucketID, bucketName, environment, teamID string
 		frozen, deleted                           bool
 		err                                       error
 	)
@@ -30,12 +30,12 @@ func (tk *TreeKeeper) startupBuckets(stMap map[string]*sql.Stmt) {
 bucketloop:
 	for rows.Next() {
 		err = rows.Scan(
-			&bucketId,
+			&bucketID,
 			&bucketName,
 			&frozen,
 			&deleted,
 			&environment,
-			&teamId,
+			&teamID,
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -46,10 +46,10 @@ bucketloop:
 			return
 		}
 		tree.NewBucket(tree.BucketSpec{
-			Id:          bucketId,
+			Id:          bucketID,
 			Name:        bucketName,
 			Environment: environment,
-			Team:        teamId,
+			Team:        teamID,
 			Deleted:     deleted,
 			Frozen:      frozen,
 			Repository:  tk.meta.repoID,
@@ -71,7 +71,7 @@ func (tk *TreeKeeper) startupGroups(stMap map[string]*sql.Stmt) {
 
 	var (
 		rows                                 *sql.Rows
-		groupId, groupName, bucketId, teamId string
+		groupID, groupName, bucketID, teamID string
 		err                                  error
 	)
 
@@ -87,10 +87,10 @@ func (tk *TreeKeeper) startupGroups(stMap map[string]*sql.Stmt) {
 grouploop:
 	for rows.Next() {
 		err = rows.Scan(
-			&groupId,
+			&groupID,
 			&groupName,
-			&bucketId,
-			&teamId,
+			&bucketID,
+			&teamID,
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -101,13 +101,13 @@ grouploop:
 			return
 		}
 		tree.NewGroup(tree.GroupSpec{
-			Id:   groupId,
+			Id:   groupID,
 			Name: groupName,
-			Team: teamId,
+			Team: teamID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "bucket",
-			ParentId:   bucketId,
+			ParentId:   bucketID,
 		})
 		tk.drain(`action`)
 		tk.drain(`error`)
@@ -121,7 +121,7 @@ func (tk *TreeKeeper) startupGroupMemberGroups(stMap map[string]*sql.Stmt) {
 
 	var (
 		rows                  *sql.Rows
-		groupId, childGroupId string
+		groupID, childGroupID string
 		err                   error
 	)
 
@@ -137,8 +137,8 @@ func (tk *TreeKeeper) startupGroupMemberGroups(stMap map[string]*sql.Stmt) {
 memberloop:
 	for rows.Next() {
 		err = rows.Scan(
-			&groupId,
-			&childGroupId,
+			&groupID,
+			&childGroupID,
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -151,11 +151,11 @@ memberloop:
 
 		tk.tree.Find(tree.FindRequest{
 			ElementType: "group",
-			ElementId:   childGroupId,
+			ElementId:   childGroupID,
 		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "group",
-			ParentId:   groupId,
+			ParentId:   groupID,
 		})
 	}
 	tk.drain(`action`)
@@ -170,7 +170,7 @@ func (tk *TreeKeeper) startupGroupedClusters(stMap map[string]*sql.Stmt) {
 	var (
 		err                                     error
 		rows                                    *sql.Rows
-		clusterId, clusterName, teamId, groupId string
+		clusterID, clusterName, teamID, groupID string
 	)
 
 	tk.startLog.Printf("TK[%s]: loading grouped-clusters\n", tk.meta.repoName)
@@ -185,10 +185,10 @@ func (tk *TreeKeeper) startupGroupedClusters(stMap map[string]*sql.Stmt) {
 clusterloop:
 	for rows.Next() {
 		err = rows.Scan(
-			&clusterId,
+			&clusterID,
 			&clusterName,
-			&teamId,
-			&groupId,
+			&teamID,
+			&groupID,
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -200,13 +200,13 @@ clusterloop:
 		}
 
 		tree.NewCluster(tree.ClusterSpec{
-			Id:   clusterId,
+			Id:   clusterID,
 			Name: clusterName,
-			Team: teamId,
+			Team: teamID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "group",
-			ParentId:   groupId,
+			ParentId:   groupID,
 		})
 	}
 	tk.drain(`action`)
@@ -221,7 +221,7 @@ func (tk *TreeKeeper) startupClusters(stMap map[string]*sql.Stmt) {
 	var (
 		err                                      error
 		rows                                     *sql.Rows
-		clusterId, clusterName, bucketId, teamId string
+		clusterID, clusterName, bucketID, teamID string
 	)
 
 	tk.startLog.Printf("TK[%s]: loading clusters\n", tk.meta.repoName)
@@ -236,10 +236,10 @@ func (tk *TreeKeeper) startupClusters(stMap map[string]*sql.Stmt) {
 clusterloop:
 	for rows.Next() {
 		err = rows.Scan(
-			&clusterId,
+			&clusterID,
 			&clusterName,
-			&bucketId,
-			&teamId,
+			&bucketID,
+			&teamID,
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -251,13 +251,13 @@ clusterloop:
 		}
 
 		tree.NewCluster(tree.ClusterSpec{
-			Id:   clusterId,
+			Id:   clusterID,
 			Name: clusterName,
-			Team: teamId,
+			Team: teamID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "bucket",
-			ParentId:   bucketId,
+			ParentId:   bucketID,
 		})
 	}
 	tk.drain(`action`)
@@ -272,10 +272,10 @@ func (tk *TreeKeeper) startupNodes(stMap map[string]*sql.Stmt) {
 	var (
 		err                                          error
 		rows                                         *sql.Rows
-		nodeId, nodeName, teamId, serverId, bucketId string
-		assetId                                      int
+		nodeID, nodeName, teamID, serverID, bucketID string
+		assetID                                      int
 		nodeOnline, nodeDeleted                      bool
-		clusterId, groupId                           sql.NullString
+		clusterID, groupID                           sql.NullString
 	)
 
 	tk.startLog.Printf("TK[%s]: loading nodes\n", tk.meta.repoName)
@@ -290,16 +290,16 @@ func (tk *TreeKeeper) startupNodes(stMap map[string]*sql.Stmt) {
 nodeloop:
 	for rows.Next() {
 		err = rows.Scan(
-			&nodeId,
-			&assetId,
+			&nodeID,
+			&assetID,
 			&nodeName,
-			&teamId,
-			&serverId,
+			&teamID,
+			&serverID,
 			&nodeOnline,
 			&nodeDeleted,
-			&bucketId,
-			&clusterId,
-			&groupId,
+			&bucketID,
+			&clusterID,
+			&groupID,
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -311,31 +311,31 @@ nodeloop:
 		}
 
 		node := tree.NewNode(tree.NodeSpec{
-			Id:       nodeId,
-			AssetId:  uint64(assetId),
+			Id:       nodeID,
+			AssetId:  uint64(assetID),
 			Name:     nodeName,
-			Team:     teamId,
-			ServerId: serverId,
+			Team:     teamID,
+			ServerId: serverID,
 			Online:   nodeOnline,
 			Deleted:  nodeDeleted,
 		})
-		if clusterId.Valid {
+		if clusterID.Valid {
 			node.Attach(tree.AttachRequest{
 				Root:       tk.tree,
 				ParentType: "cluster",
-				ParentId:   clusterId.String,
+				ParentId:   clusterID.String,
 			})
-		} else if groupId.Valid {
+		} else if groupID.Valid {
 			node.Attach(tree.AttachRequest{
 				Root:       tk.tree,
 				ParentType: "group",
-				ParentId:   groupId.String,
+				ParentId:   groupID.String,
 			})
 		} else {
 			node.Attach(tree.AttachRequest{
 				Root:       tk.tree,
 				ParentType: "bucket",
-				ParentId:   bucketId,
+				ParentId:   bucketID,
 			})
 		}
 	}

@@ -128,22 +128,22 @@ func (g *GuidePost) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	// to which tree this request must be forwarded
-	if repoID, repoName, err, nf = g.extractRouting(q); err != nil {
+	if repoID, repoName, nf, err = g.extractRouting(q); err != nil {
 		goto bailout
 	}
 
 	// verify we can process the request
-	if err, nf = g.validateRequest(q); err != nil {
+	if nf, err = g.validateRequest(q); err != nil {
 		goto bailout
 	}
 
 	// fill in required data for the request
-	if err, nf = g.fillReqData(q); err != nil {
+	if nf, err = g.fillReqData(q); err != nil {
 		goto bailout
 	}
 
 	// check we have a treekeeper for that repository
-	if err, nf = g.validateKeeper(repoName); err != nil {
+	if nf, err = g.validateKeeper(repoName); err != nil {
 		goto bailout
 	}
 	keeper = fmt.Sprintf("repository_%s", repoName)

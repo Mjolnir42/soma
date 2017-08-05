@@ -125,7 +125,7 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 	grim.appLog.Println(`GRIM REAPER ACTIVATED. SYSTEM SHUTDOWN INITIATED`)
 
 	// stop + shutdown all treeKeeper   : /^treekeeper_/
-	for handler, _ := range grim.soma.handlerMap.Range() {
+	for handler := range grim.soma.handlerMap.Range() {
 		if strings.HasPrefix(handler, `treekeeper_`) {
 			grim.soma.handlerMap.Get(handler).shutdownNow()
 			grim.soma.handlerMap.Del(handler)
@@ -133,7 +133,7 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 		}
 	}
 	// shutdown all write handler: /_w$/
-	for handler, _ := range grim.soma.handlerMap.Range() {
+	for handler := range grim.soma.handlerMap.Range() {
 		if !strings.HasSuffix(handler, `_w`) {
 			continue
 		}
@@ -142,7 +142,7 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 		grim.appLog.Printf("GrimReaper: shut down %s", handler)
 	}
 	// shutdown all read handler : /_r$/
-	for handler, _ := range grim.soma.handlerMap.Range() {
+	for handler := range grim.soma.handlerMap.Range() {
 		if !strings.HasSuffix(handler, `_r`) {
 			continue
 		}
@@ -171,7 +171,7 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 
 	// log what we have missed
 	grim.appLog.Println(`GrimReaper: checking for still running handlers`)
-	for name, _ := range grim.soma.handlerMap.Range() {
+	for name := range grim.soma.handlerMap.Range() {
 		if name == `grimreaper` {
 			continue
 		}

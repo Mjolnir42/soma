@@ -15,34 +15,34 @@ import (
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
-func (g *GuidePost) validateRequest(q *msg.Request) (error, bool) {
+func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 	switch q.Section {
 	case `check`:
-		if err, nf := g.validateCheckObjectInBucket(q); err != nil {
-			return err, nf
+		if nf, err := g.validateCheckObjectInBucket(q); err != nil {
+			return nf, err
 		}
 	case `node`:
-		if err, nf := g.validateNodeConfig(q); err != nil {
-			return err, nf
+		if nf, err := g.validateNodeConfig(q); err != nil {
+			return nf, err
 		}
 		fallthrough
 	case `cluster`, `group`:
-		if err, nf := g.validateCorrectBucket(q); err != nil {
-			return err, nf
+		if nf, err := g.validateCorrectBucket(q); err != nil {
+			return nf, err
 		}
 	case `bucket`:
-		if err, nf := g.validateBucketInRepository(
+		if nf, err := g.validateBucketInRepository(
 			q.Bucket.RepositoryId,
 			q.Bucket.Id,
 		); err != nil {
-			return err, nf
+			return nf, err
 		}
 	case `repository`:
 		// since repository ids are the routing information,
 		// it is unnecessary to check that the object is where the
 		// routing would point to
 	default:
-		return fmt.Errorf("Invalid request type %s", q.Section), false
+		return false, fmt.Errorf("Invalid request type %s", q.Section)
 	}
 
 	switch q.Action {
@@ -108,117 +108,117 @@ func (g *GuidePost) validateRequest(q *msg.Request) (error, bool) {
 		`delete_system_property_from_repository`,
 		`remove_check`:
 		// actions are accepted, but require no further validation
-		return nil, false
+		return false, nil
 	default:
-		return fmt.Errorf("Unimplemented GuidePost/%s", q.Action), false
+		return false, fmt.Errorf("Unimplemented GuidePost/%s", q.Action)
 	}
 }
 
-func (g *GuidePost) validateObjectMatch(q *msg.Request) (error, bool) {
+func (g *GuidePost) validateObjectMatch(q *msg.Request) (bool, error) {
 	var (
-		nodeId, clusterId, groupId, childGroupId              string
+		nodeID, clusterID, groupID, childGroupID              string
 		valNodeBId, valClusterBId, valGroupBId, valChGroupBId string
 	)
 
 	switch q.Action {
 	case `add_node_to_cluster`:
-		nodeId = (*q.Cluster.Members)[0].Id
-		clusterId = q.Cluster.Id
+		nodeID = (*q.Cluster.Members)[0].Id
+		clusterID = q.Cluster.Id
 	case `add_node_to_group`:
-		nodeId = (*q.Group.MemberNodes)[0].Id
-		groupId = q.Group.Id
+		nodeID = (*q.Group.MemberNodes)[0].Id
+		groupID = q.Group.Id
 	case `add_cluster_to_group`:
-		clusterId = (*q.Group.MemberClusters)[0].Id
-		groupId = q.Group.Id
+		clusterID = (*q.Group.MemberClusters)[0].Id
+		groupID = q.Group.Id
 	case `add_group_to_group`:
-		childGroupId = (*q.Group.MemberGroups)[0].Id
-		groupId = q.Group.Id
+		childGroupID = (*q.Group.MemberGroups)[0].Id
+		groupID = q.Group.Id
 	default:
-		return fmt.Errorf("Incorrect validation attempted for %s",
-			q.Action), false
+		return false, fmt.Errorf("Incorrect validation attempted for %s",
+			q.Action)
 	}
 
-	if nodeId != `` {
-		if err := g.stmtBucketForNodeID.QueryRow(nodeId).Scan(
+	if nodeID != `` {
+		if err := g.stmtBucketForNodeID.QueryRow(nodeID).Scan(
 			&valNodeBId,
 		); err != nil {
 			if err == sql.ErrNoRows {
-				return fmt.Errorf("Unknown node %s", nodeId), true
+				return true, fmt.Errorf("Unknown node %s", nodeID)
 			}
-			return err, false
+			return false, err
 		}
 	}
-	if clusterId != `` {
-		if err := g.stmtBucketForClusterID.QueryRow(clusterId).Scan(
+	if clusterID != `` {
+		if err := g.stmtBucketForClusterID.QueryRow(clusterID).Scan(
 			&valClusterBId,
 		); err != nil {
 			if err == sql.ErrNoRows {
-				return fmt.Errorf("Unknown cluster %s", clusterId), true
+				return true, fmt.Errorf("Unknown cluster %s", clusterID)
 			}
-			return err, false
+			return false, err
 		}
 	}
-	if groupId != `` {
-		if err := g.stmtBucketForGroupID.QueryRow(groupId).Scan(
+	if groupID != `` {
+		if err := g.stmtBucketForGroupID.QueryRow(groupID).Scan(
 			&valGroupBId,
 		); err != nil {
 			if err == sql.ErrNoRows {
-				return fmt.Errorf("Unknown group %s", groupId), true
+				return true, fmt.Errorf("Unknown group %s", groupID)
 			}
-			return err, false
+			return false, err
 		}
 	}
-	if childGroupId != `` {
-		if err := g.stmtBucketForGroupID.QueryRow(childGroupId).Scan(
+	if childGroupID != `` {
+		if err := g.stmtBucketForGroupID.QueryRow(childGroupID).Scan(
 			&valChGroupBId,
 		); err != nil {
 			if err == sql.ErrNoRows {
-				return fmt.Errorf("Unknown group %s", childGroupId), true
+				return true, fmt.Errorf("Unknown group %s", childGroupID)
 			}
-			return err, false
+			return false, err
 		}
 	}
 
 	switch q.Action {
 	case `add_node_to_cluster`:
 		if valNodeBId != valClusterBId {
-			return fmt.Errorf(
+			return false, fmt.Errorf(
 				"Node and Cluster are in different buckets (%s/%s)",
 				valNodeBId, valClusterBId,
-			), false
+			)
 		}
 	case `add_node_to_group`:
 		if valNodeBId != valGroupBId {
-			return fmt.Errorf(
+			return false, fmt.Errorf(
 				"Node and Group are in different buckets (%s/%s)",
 				valNodeBId, valGroupBId,
-			), false
+			)
 		}
 	case `add_cluster_to_group`:
 		if valClusterBId != valGroupBId {
-			return fmt.Errorf(
+			return false, fmt.Errorf(
 				"Cluster and Group are in different buckets (%s/%s)",
 				valClusterBId, valGroupBId,
-			), false
+			)
 		}
 	case `add_group_to_group`:
 		if valChGroupBId != valGroupBId {
-			return fmt.Errorf(
+			return false, fmt.Errorf(
 				"Groups are in different buckets (%s/%s)",
 				valGroupBId, valChGroupBId,
-			), false
+			)
 		}
 	}
-	return nil, false
+	return false, nil
 }
 
 // Verify that an object is assigned to the specified bucket.
-func (g *GuidePost) validateCorrectBucket(q *msg.Request) (error, bool) {
+func (g *GuidePost) validateCorrectBucket(q *msg.Request) (bool, error) {
 	switch q.Action {
 	case `assign_node`:
 		return g.validateNodeUnassigned(q)
 	case `create_cluster`, `create_group`:
-		return nil, false
+		return false, nil
 	}
 	var bid string
 	var err error
@@ -245,51 +245,51 @@ func (g *GuidePost) validateCorrectBucket(q *msg.Request) (error, bool) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// unassigned
-			return fmt.Errorf("%s is not assigned to any bucket",
-				q.Section), true
+			return true, fmt.Errorf("%s is not assigned to any bucket",
+				q.Section)
 		}
-		return err, false
+		return false, err
 	}
 	switch q.Section {
 	case `node`:
 		if bid != q.Node.Config.BucketId {
-			return fmt.Errorf("Node assigned to different bucket %s",
-				bid), false
+			return false, fmt.Errorf("Node assigned to different bucket %s",
+				bid)
 		}
 	case `cluster`:
 		if bid != q.Cluster.BucketId {
-			return fmt.Errorf("Cluster in different bucket %s",
-				bid), false
+			return false, fmt.Errorf("Cluster in different bucket %s",
+				bid)
 		}
 	case `group`:
 		if bid != q.Group.BucketId {
-			return fmt.Errorf("Group in different bucket %s",
-				bid), false
+			return false, fmt.Errorf("Group in different bucket %s",
+				bid)
 		}
 	}
-	return nil, false
+	return false, nil
 }
 
 // Verify that a node is not yet assigned to a bucket. Returns nil
 // on success.
-func (g *GuidePost) validateNodeUnassigned(q *msg.Request) (error, bool) {
+func (g *GuidePost) validateNodeUnassigned(q *msg.Request) (bool, error) {
 	var bid string
 	if err := g.stmtBucketForNodeID.QueryRow(q.Node.Id).Scan(
 		&bid,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			// unassigned is not an error here
-			return nil, false
+			return false, nil
 		}
-		return err, false
+		return false, err
 	}
-	return fmt.Errorf("Node already assigned to bucket %s", bid), false
+	return false, fmt.Errorf("Node already assigned to bucket %s", bid)
 }
 
 // Verify the node has a Config section
-func (g *GuidePost) validateNodeConfig(q *msg.Request) (error, bool) {
+func (g *GuidePost) validateNodeConfig(q *msg.Request) (bool, error) {
 	if q.Node.Config == nil {
-		return fmt.Errorf("NodeConfig subobject missing"), false
+		return false, fmt.Errorf("NodeConfig subobject missing")
 	}
 	return g.validateBucketInRepository(
 		q.Node.Config.RepositoryId,
@@ -299,19 +299,19 @@ func (g *GuidePost) validateNodeConfig(q *msg.Request) (error, bool) {
 
 // Verify that the ObjectId->BucketId->RepositoryId chain is part of
 // the same tree.
-func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (error, bool) {
+func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (bool, error) {
 	var err error
 	var bid string
 	switch q.CheckConfig.ObjectType {
 	case `repository`:
 		if q.CheckConfig.RepositoryId !=
 			q.CheckConfig.ObjectId {
-			return fmt.Errorf("Conflicting repository ids: %s, %s",
+			return false, fmt.Errorf("Conflicting repository ids: %s, %s",
 				q.CheckConfig.RepositoryId,
 				q.CheckConfig.ObjectId,
-			), false
+			)
 		}
-		return nil, false
+		return false, nil
 	case `bucket`:
 		bid = q.CheckConfig.ObjectId
 	case `group`:
@@ -327,20 +327,20 @@ func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (error, bool) {
 			q.CheckConfig.ObjectId,
 		).Scan(&bid)
 	default:
-		return fmt.Errorf("Unknown object type: %s",
+		return false, fmt.Errorf("Unknown object type: %s",
 			q.CheckConfig.ObjectType,
-		), false
+		)
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf("No bucketId for object found"), true
+			return true, fmt.Errorf("No bucketID for object found")
 		}
-		return err, false
+		return false, err
 	}
 	if bid != q.CheckConfig.BucketId {
-		return fmt.Errorf("Object is in bucket %s, not %s",
+		return false, fmt.Errorf("Object is in bucket %s, not %s",
 			bid, q.CheckConfig.BucketId,
-		), false
+		)
 	}
 	return g.validateBucketInRepository(
 		q.CheckConfig.RepositoryId,
@@ -350,7 +350,7 @@ func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (error, bool) {
 
 // Verify that the bucket is part of the specified repository
 func (g *GuidePost) validateBucketInRepository(
-	repo, bucket string) (error, bool) {
+	repo, bucket string) (bool, error) {
 	var repoID, repoName string
 	if err := g.stmtRepoForBucketID.QueryRow(
 		bucket,
@@ -359,21 +359,21 @@ func (g *GuidePost) validateBucketInRepository(
 		&repoName,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf("No repository found for bucket %s",
-				bucket), true
+			return true, fmt.Errorf("No repository found for bucket %s",
+				bucket)
 		}
-		return err, false
+		return false, err
 	}
 	if repo != repoID {
-		return fmt.Errorf("Bucket is in different repository: %s",
-			repoID), false
+		return false, fmt.Errorf("Bucket is in different repository: %s",
+			repoID)
 	}
-	return nil, false
+	return false, nil
 }
 
 // check the check configuration to contain fewer thresholds than
 // the limit for the capability
-func (g *GuidePost) validateCheckThresholds(q *msg.Request) (error, bool) {
+func (g *GuidePost) validateCheckThresholds(q *msg.Request) (bool, error) {
 	var (
 		thrLimit int
 		err      error
@@ -385,64 +385,64 @@ func (g *GuidePost) validateCheckThresholds(q *msg.Request) (error, bool) {
 		&thrLimit,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf(
+			return true, fmt.Errorf(
 				"Capability %s not found",
-				q.CheckConfig.CapabilityId), true
+				q.CheckConfig.CapabilityId)
 		}
-		return err, false
+		return false, err
 	}
 	if len(q.CheckConfig.Thresholds) > thrLimit {
-		return fmt.Errorf(
+		return false, fmt.Errorf(
 			"Specified %d thresholds exceed limit of %d for capability",
 			len(q.CheckConfig.Thresholds),
-			thrLimit), false
+			thrLimit)
 	}
-	return nil, false
+	return false, nil
 }
 
 // check the naming schema for the bucket (global unique object)
-func (g *GuidePost) validateBucketName(q *msg.Request) (error, bool) {
+func (g *GuidePost) validateBucketName(q *msg.Request) (bool, error) {
 	_, repoName, _, _ := g.extractRouting(q)
 
 	if !strings.HasPrefix(
 		q.Bucket.Name,
 		fmt.Sprintf("%s_", repoName),
 	) {
-		return fmt.Errorf("Illegal bucket name format, " +
-			"requires reponame_ prefix"), false
+		return false, fmt.Errorf("Illegal bucket name format, " +
+			"requires reponame_ prefix")
 	}
-	return nil, false
+	return false, nil
 }
 
 // validate current treekeeper state
-func (g *GuidePost) validateKeeper(repoName string) (error, bool) {
+func (g *GuidePost) validateKeeper(repoName string) (bool, error) {
 	// check we have a treekeeper for that repository
 	keeper := fmt.Sprintf("repository_%s", repoName)
 	if _, ok := g.soma.handlerMap.Get(keeper).(*TreeKeeper); !ok {
-		return fmt.Errorf(
+		return true, fmt.Errorf(
 			"No handler for repository %s currently registered.",
-			repoName), true
+			repoName)
 	}
 	handler := g.soma.handlerMap.Get(keeper).(*TreeKeeper)
 
 	// check the treekeeper has not been stopped
 	if handler.isStopped() {
-		return fmt.Errorf(
-			"Repository %s is currently stopped.", repoName), false
+		return false, fmt.Errorf(
+			"Repository %s is currently stopped.", repoName)
 	}
 
 	// check the treekeeper has not encountered a broken tree
 	if handler.isBroken() {
-		return fmt.Errorf(
-			"Repository %s is broken.", repoName), false
+		return false, fmt.Errorf(
+			"Repository %s is broken.", repoName)
 	}
 
 	// check the treekeeper has finished loading
 	if !handler.isReady() {
-		return fmt.Errorf(
-			"Repository %s not fully loaded yet.", repoName), false
+		return false, fmt.Errorf(
+			"Repository %s not fully loaded yet.", repoName)
 	}
-	return nil, false
+	return false, nil
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -27,4 +27,18 @@ func (l *LogHandleMap) Add(key string, fh *reopen.FileWriter) {
 	l.hmap[key] = fh
 }
 
+// Get retrieves a filehandle
+func (l *LogHandleMap) Get(key string) *reopen.FileWriter {
+	l.RLock()
+	defer l.RUnlock()
+	return l.hmap[key]
+}
+
+// Del removes a filehandle
+func (l *LogHandleMap) Del(key string) {
+	l.Lock()
+	defer l.Unlock()
+	delete(l.hmap, key)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

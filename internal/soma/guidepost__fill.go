@@ -20,7 +20,7 @@ import (
 )
 
 //
-func (g *GuidePost) fillReqData(q *msg.Request) (error, bool) {
+func (g *GuidePost) fillReqData(q *msg.Request) (bool, error) {
 	switch {
 	case strings.Contains(q.Action, "add_service_property_to_"):
 		return g.fillServiceAttributes(q)
@@ -32,21 +32,21 @@ func (g *GuidePost) fillReqData(q *msg.Request) (error, bool) {
 		strings.Contains(q.Action, `_property_from_`):
 		return g.fillPropertyDeleteInfo(q)
 	case strings.HasPrefix(q.Action, `add_check_to_`):
-		return g.fillCheckConfigId(q)
+		return g.fillCheckConfigID(q)
 	default:
-		return nil, false
+		return false, nil
 	}
 }
 
 // generate CheckConfigId
-func (g *GuidePost) fillCheckConfigId(q *msg.Request) (error, bool) {
+func (g *GuidePost) fillCheckConfigID(q *msg.Request) (bool, error) {
 	q.CheckConfig.Id = uuid.NewV4().String()
-	return nil, false
+	return false, nil
 }
 
 // Populate the node structure with data, overwriting the client
 // submitted values.
-func (g *GuidePost) fillNode(q *msg.Request) (error, bool) {
+func (g *GuidePost) fillNode(q *msg.Request) (bool, error) {
 	var (
 		err                      error
 		ndName, ndTeam, ndServer string
@@ -62,9 +62,9 @@ func (g *GuidePost) fillNode(q *msg.Request) (error, bool) {
 		&ndDeleted,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf("Node not found: %s", q.Node.Id), true
+			return true, fmt.Errorf("Node not found: %s", q.Node.Id)
 		}
-		return err, false
+		return false, err
 	}
 	q.Node.AssetId = uint64(ndAsset)
 	q.Node.Name = ndName
@@ -72,12 +72,12 @@ func (g *GuidePost) fillNode(q *msg.Request) (error, bool) {
 	q.Node.ServerId = ndServer
 	q.Node.IsOnline = ndOnline
 	q.Node.IsDeleted = ndDeleted
-	return nil, false
+	return false, nil
 }
 
 // load authoritative copy of the service attributes from the
 // database. Replaces whatever the client sent in.
-func (g *GuidePost) fillServiceAttributes(q *msg.Request) (error, bool) {
+func (g *GuidePost) fillServiceAttributes(q *msg.Request) (bool, error) {
 	var (
 		service, attr, val, svName, svTeam, repoID string
 		rows                                       *sql.Rows
@@ -141,7 +141,7 @@ attrloop:
 	}
 abort:
 	if err != nil {
-		return err, nf
+		return nf, err
 	}
 	// not aborted: set the loaded attributes
 	switch q.Section {
@@ -156,43 +156,43 @@ abort:
 	case msg.SectionNode:
 		(*q.Node.Properties)[0].Service.Attributes = attrs
 	}
-	return nil, false
+	return false, nil
 }
 
 // if the request is a check deletion, populate required IDs
-func (g *GuidePost) fillCheckDeleteInfo(q *msg.Request) (error, bool) {
-	var delObjId, delObjTyp, delSrcChkId string
+func (g *GuidePost) fillCheckDeleteInfo(q *msg.Request) (bool, error) {
+	var delObjID, delObjTyp, delSrcChkID string
 	var err error
 
 	if err = g.stmtCheckDetailsForDelete.QueryRow(
 		q.CheckConfig.Id,
 		q.CheckConfig.RepositoryId,
 	).Scan(
-		&delObjId,
+		&delObjID,
 		&delObjTyp,
-		&delSrcChkId,
+		&delSrcChkID,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf(
+			return true, fmt.Errorf(
 				"Failed to find source check for config %s",
-				q.CheckConfig.Id), true
+				q.CheckConfig.Id)
 		}
-		return err, false
+		return false, err
 	}
-	q.CheckConfig.ObjectId = delObjId
+	q.CheckConfig.ObjectId = delObjID
 	q.CheckConfig.ObjectType = delObjTyp
-	q.CheckConfig.ExternalId = delSrcChkId
+	q.CheckConfig.ExternalId = delSrcChkID
 	q.Action = fmt.Sprintf("remove_check_from_%s", delObjTyp)
-	return nil, false
+	return false, nil
 }
 
 // if the request is a property deletion, populate required IDs
-func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (error, bool) {
+func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 	var (
 		err                                             error
 		row                                             *sql.Row
-		queryStmt, view, sysProp, value, cstId, cstProp string
-		svcProp, oncId, oncName                         string
+		queryStmt, view, sysProp, value, cstID, cstProp string
+		svcProp, oncID, oncName                         string
 		oncNumber                                       int
 	)
 
@@ -263,21 +263,21 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (error, bool) {
 		err = row.Scan(&view, &sysProp, &value)
 
 	case strings.HasPrefix(q.Action, `delete_custom_`):
-		err = row.Scan(&view, &cstId, &value, &cstProp)
+		err = row.Scan(&view, &cstID, &value, &cstProp)
 
 	case strings.HasPrefix(q.Action, `delete_service_`):
 		err = row.Scan(&view, &svcProp)
 
 	case strings.HasPrefix(q.Action, `delete_oncall_`):
-		err = row.Scan(&view, &oncId, &oncName, &oncNumber)
+		err = row.Scan(&view, &oncID, &oncName, &oncNumber)
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf(
+			return true, fmt.Errorf(
 				"Failed to find source property for %s",
-				(*q.Repository.Properties)[0].SourceInstanceId), true
+				(*q.Repository.Properties)[0].SourceInstanceId)
 		}
-		return err, false
+		return false, err
 	}
 
 	// assemble and set results: property specification
@@ -295,7 +295,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (error, bool) {
 		}
 	case strings.HasPrefix(q.Action, `delete_custom_`):
 		pCst = &proto.PropertyCustom{
-			Id:    cstId,
+			Id:    cstID,
 			Name:  cstProp,
 			Value: value,
 		}
@@ -306,7 +306,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (error, bool) {
 	case strings.HasPrefix(q.Action, `delete_oncall_`):
 		num := strconv.Itoa(oncNumber)
 		pOnc = &proto.PropertyOncall{
-			Id:     oncId,
+			Id:     oncID,
 			Name:   oncName,
 			Number: num,
 		}
@@ -373,7 +373,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (error, bool) {
 	case `delete_oncall_property_from_node`:
 		(*q.Node.Properties)[0].Oncall = pOnc
 	}
-	return nil, false
+	return false, err
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

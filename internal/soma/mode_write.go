@@ -11,9 +11,9 @@ package soma
 import (
 	"database/sql"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
-	"github.com/Sirupsen/logrus"
 )
 
 // ModeWrite handles write requests for modes
