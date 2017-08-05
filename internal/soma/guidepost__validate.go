@@ -1,13 +1,22 @@
-package main
+/*-
+ * Copyright (c) 2016-2017, Jörg Pernfuß
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package soma
 
 import (
 	"database/sql"
 	"fmt"
 	"strings"
+
+	"github.com/mjolnir42/soma/internal/msg"
 )
 
-func (g *guidePost) validateRequest(q *treeRequest) (error, bool) {
-	switch q.RequestType {
+func (g *GuidePost) validateRequest(q *msg.Request) (error, bool) {
+	switch q.Section {
 	case `check`:
 		if err, nf := g.validateCheckObjectInBucket(q); err != nil {
 			return err, nf
@@ -23,8 +32,8 @@ func (g *guidePost) validateRequest(q *treeRequest) (error, bool) {
 		}
 	case `bucket`:
 		if err, nf := g.validateBucketInRepository(
-			q.Bucket.Bucket.RepositoryId,
-			q.Bucket.Bucket.Id,
+			q.Bucket.RepositoryId,
+			q.Bucket.Id,
 		); err != nil {
 			return err, nf
 		}
@@ -33,7 +42,7 @@ func (g *guidePost) validateRequest(q *treeRequest) (error, bool) {
 		// it is unnecessary to check that the object is where the
 		// routing would point to
 	default:
-		return fmt.Errorf("Invalid request type %s", q.RequestType), false
+		return fmt.Errorf("Invalid request type %s", q.Section), false
 	}
 
 	switch q.Action {
@@ -105,7 +114,7 @@ func (g *guidePost) validateRequest(q *treeRequest) (error, bool) {
 	}
 }
 
-func (g *guidePost) validateObjectMatch(q *treeRequest) (error, bool) {
+func (g *GuidePost) validateObjectMatch(q *msg.Request) (error, bool) {
 	var (
 		nodeId, clusterId, groupId, childGroupId              string
 		valNodeBId, valClusterBId, valGroupBId, valChGroupBId string
@@ -113,24 +122,24 @@ func (g *guidePost) validateObjectMatch(q *treeRequest) (error, bool) {
 
 	switch q.Action {
 	case `add_node_to_cluster`:
-		nodeId = (*q.Cluster.Cluster.Members)[0].Id
-		clusterId = q.Cluster.Cluster.Id
+		nodeId = (*q.Cluster.Members)[0].Id
+		clusterId = q.Cluster.Id
 	case `add_node_to_group`:
-		nodeId = (*q.Group.Group.MemberNodes)[0].Id
-		groupId = q.Group.Group.Id
+		nodeId = (*q.Group.MemberNodes)[0].Id
+		groupId = q.Group.Id
 	case `add_cluster_to_group`:
-		clusterId = (*q.Group.Group.MemberClusters)[0].Id
-		groupId = q.Group.Group.Id
+		clusterId = (*q.Group.MemberClusters)[0].Id
+		groupId = q.Group.Id
 	case `add_group_to_group`:
-		childGroupId = (*q.Group.Group.MemberGroups)[0].Id
-		groupId = q.Group.Group.Id
+		childGroupId = (*q.Group.MemberGroups)[0].Id
+		groupId = q.Group.Id
 	default:
 		return fmt.Errorf("Incorrect validation attempted for %s",
 			q.Action), false
 	}
 
 	if nodeId != `` {
-		if err := g.bucket_for_node.QueryRow(nodeId).Scan(
+		if err := g.stmtBucketForNodeID.QueryRow(nodeId).Scan(
 			&valNodeBId,
 		); err != nil {
 			if err == sql.ErrNoRows {
@@ -140,7 +149,7 @@ func (g *guidePost) validateObjectMatch(q *treeRequest) (error, bool) {
 		}
 	}
 	if clusterId != `` {
-		if err := g.bucket_for_cluster.QueryRow(clusterId).Scan(
+		if err := g.stmtBucketForClusterID.QueryRow(clusterId).Scan(
 			&valClusterBId,
 		); err != nil {
 			if err == sql.ErrNoRows {
@@ -150,7 +159,7 @@ func (g *guidePost) validateObjectMatch(q *treeRequest) (error, bool) {
 		}
 	}
 	if groupId != `` {
-		if err := g.bucket_for_group.QueryRow(groupId).Scan(
+		if err := g.stmtBucketForGroupID.QueryRow(groupId).Scan(
 			&valGroupBId,
 		); err != nil {
 			if err == sql.ErrNoRows {
@@ -160,7 +169,7 @@ func (g *guidePost) validateObjectMatch(q *treeRequest) (error, bool) {
 		}
 	}
 	if childGroupId != `` {
-		if err := g.bucket_for_group.QueryRow(childGroupId).Scan(
+		if err := g.stmtBucketForGroupID.QueryRow(childGroupId).Scan(
 			&valChGroupBId,
 		); err != nil {
 			if err == sql.ErrNoRows {
@@ -204,7 +213,7 @@ func (g *guidePost) validateObjectMatch(q *treeRequest) (error, bool) {
 }
 
 // Verify that an object is assigned to the specified bucket.
-func (g *guidePost) validateCorrectBucket(q *treeRequest) (error, bool) {
+func (g *GuidePost) validateCorrectBucket(q *msg.Request) (error, bool) {
 	switch q.Action {
 	case `assign_node`:
 		return g.validateNodeUnassigned(q)
@@ -213,22 +222,22 @@ func (g *guidePost) validateCorrectBucket(q *treeRequest) (error, bool) {
 	}
 	var bid string
 	var err error
-	switch q.RequestType {
+	switch q.Section {
 	case `node`:
-		err = g.bucket_for_node.QueryRow(
-			q.Node.Node.Id,
+		err = g.stmtBucketForNodeID.QueryRow(
+			q.Node.Id,
 		).Scan(
 			&bid,
 		)
 	case `cluster`:
-		err = g.bucket_for_cluster.QueryRow(
-			q.Cluster.Cluster.Id,
+		err = g.stmtBucketForClusterID.QueryRow(
+			q.Cluster.Id,
 		).Scan(
 			&bid,
 		)
 	case `group`:
-		err = g.bucket_for_group.QueryRow(
-			q.Group.Group.Id,
+		err = g.stmtBucketForGroupID.QueryRow(
+			q.Group.Id,
 		).Scan(
 			&bid,
 		)
@@ -237,23 +246,23 @@ func (g *guidePost) validateCorrectBucket(q *treeRequest) (error, bool) {
 		if err == sql.ErrNoRows {
 			// unassigned
 			return fmt.Errorf("%s is not assigned to any bucket",
-				q.RequestType), true
+				q.Section), true
 		}
 		return err, false
 	}
-	switch q.RequestType {
+	switch q.Section {
 	case `node`:
-		if bid != q.Node.Node.Config.BucketId {
+		if bid != q.Node.Config.BucketId {
 			return fmt.Errorf("Node assigned to different bucket %s",
 				bid), false
 		}
 	case `cluster`:
-		if bid != q.Cluster.Cluster.BucketId {
+		if bid != q.Cluster.BucketId {
 			return fmt.Errorf("Cluster in different bucket %s",
 				bid), false
 		}
 	case `group`:
-		if bid != q.Group.Group.BucketId {
+		if bid != q.Group.BucketId {
 			return fmt.Errorf("Group in different bucket %s",
 				bid), false
 		}
@@ -263,9 +272,9 @@ func (g *guidePost) validateCorrectBucket(q *treeRequest) (error, bool) {
 
 // Verify that a node is not yet assigned to a bucket. Returns nil
 // on success.
-func (g *guidePost) validateNodeUnassigned(q *treeRequest) (error, bool) {
+func (g *GuidePost) validateNodeUnassigned(q *msg.Request) (error, bool) {
 	var bid string
-	if err := g.bucket_for_node.QueryRow(q.Node.Node.Id).Scan(
+	if err := g.stmtBucketForNodeID.QueryRow(q.Node.Id).Scan(
 		&bid,
 	); err != nil {
 		if err == sql.ErrNoRows {
@@ -278,48 +287,48 @@ func (g *guidePost) validateNodeUnassigned(q *treeRequest) (error, bool) {
 }
 
 // Verify the node has a Config section
-func (g *guidePost) validateNodeConfig(q *treeRequest) (error, bool) {
-	if q.Node.Node.Config == nil {
+func (g *GuidePost) validateNodeConfig(q *msg.Request) (error, bool) {
+	if q.Node.Config == nil {
 		return fmt.Errorf("NodeConfig subobject missing"), false
 	}
 	return g.validateBucketInRepository(
-		q.Node.Node.Config.RepositoryId,
-		q.Node.Node.Config.BucketId,
+		q.Node.Config.RepositoryId,
+		q.Node.Config.BucketId,
 	)
 }
 
 // Verify that the ObjectId->BucketId->RepositoryId chain is part of
 // the same tree.
-func (g *guidePost) validateCheckObjectInBucket(q *treeRequest) (error, bool) {
+func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (error, bool) {
 	var err error
 	var bid string
-	switch q.CheckConfig.CheckConfig.ObjectType {
+	switch q.CheckConfig.ObjectType {
 	case `repository`:
-		if q.CheckConfig.CheckConfig.RepositoryId !=
-			q.CheckConfig.CheckConfig.ObjectId {
+		if q.CheckConfig.RepositoryId !=
+			q.CheckConfig.ObjectId {
 			return fmt.Errorf("Conflicting repository ids: %s, %s",
-				q.CheckConfig.CheckConfig.RepositoryId,
-				q.CheckConfig.CheckConfig.ObjectId,
+				q.CheckConfig.RepositoryId,
+				q.CheckConfig.ObjectId,
 			), false
 		}
 		return nil, false
 	case `bucket`:
-		bid = q.CheckConfig.CheckConfig.ObjectId
+		bid = q.CheckConfig.ObjectId
 	case `group`:
-		err = g.bucket_for_group.QueryRow(
-			q.CheckConfig.CheckConfig.ObjectId,
+		err = g.stmtBucketForGroupID.QueryRow(
+			q.CheckConfig.ObjectId,
 		).Scan(&bid)
 	case `cluster`:
-		err = g.bucket_for_cluster.QueryRow(
-			q.CheckConfig.CheckConfig.ObjectId,
+		err = g.stmtBucketForClusterID.QueryRow(
+			q.CheckConfig.ObjectId,
 		).Scan(&bid)
 	case `node`:
-		err = g.bucket_for_node.QueryRow(
-			q.CheckConfig.CheckConfig.ObjectId,
+		err = g.stmtBucketForNodeID.QueryRow(
+			q.CheckConfig.ObjectId,
 		).Scan(&bid)
 	default:
 		return fmt.Errorf("Unknown object type: %s",
-			q.CheckConfig.CheckConfig.ObjectType,
+			q.CheckConfig.ObjectType,
 		), false
 	}
 	if err != nil {
@@ -328,23 +337,25 @@ func (g *guidePost) validateCheckObjectInBucket(q *treeRequest) (error, bool) {
 		}
 		return err, false
 	}
-	if bid != q.CheckConfig.CheckConfig.BucketId {
+	if bid != q.CheckConfig.BucketId {
 		return fmt.Errorf("Object is in bucket %s, not %s",
-			bid, q.CheckConfig.CheckConfig.BucketId,
+			bid, q.CheckConfig.BucketId,
 		), false
 	}
 	return g.validateBucketInRepository(
-		q.CheckConfig.CheckConfig.RepositoryId,
-		q.CheckConfig.CheckConfig.BucketId,
+		q.CheckConfig.RepositoryId,
+		q.CheckConfig.BucketId,
 	)
 }
 
 // Verify that the bucket is part of the specified repository
-func (g *guidePost) validateBucketInRepository(
+func (g *GuidePost) validateBucketInRepository(
 	repo, bucket string) (error, bool) {
-	var repoId, repoName string
-	if err := g.repo_stmt.QueryRow(bucket).Scan(
-		&repoId,
+	var repoID, repoName string
+	if err := g.stmtRepoForBucketID.QueryRow(
+		bucket,
+	).Scan(
+		&repoID,
 		&repoName,
 	); err != nil {
 		if err == sql.ErrNoRows {
@@ -353,46 +364,48 @@ func (g *guidePost) validateBucketInRepository(
 		}
 		return err, false
 	}
-	if repo != repoId {
+	if repo != repoID {
 		return fmt.Errorf("Bucket is in different repository: %s",
-			repoId), false
+			repoID), false
 	}
 	return nil, false
 }
 
 // check the check configuration to contain fewer thresholds than
 // the limit for the capability
-func (g *guidePost) validateCheckThresholds(q *treeRequest) (error, bool) {
+func (g *GuidePost) validateCheckThresholds(q *msg.Request) (error, bool) {
 	var (
 		thrLimit int
 		err      error
 	)
 
-	if err = g.cthr_stmt.QueryRow(
-		q.CheckConfig.CheckConfig.CapabilityId,
-	).Scan(&thrLimit); err != nil {
+	if err = g.stmtCapabilityThresholds.QueryRow(
+		q.CheckConfig.CapabilityId,
+	).Scan(
+		&thrLimit,
+	); err != nil {
 		if err == sql.ErrNoRows {
 			return fmt.Errorf(
 				"Capability %s not found",
-				q.CheckConfig.CheckConfig.CapabilityId), true
+				q.CheckConfig.CapabilityId), true
 		}
 		return err, false
 	}
-	if len(q.CheckConfig.CheckConfig.Thresholds) > thrLimit {
+	if len(q.CheckConfig.Thresholds) > thrLimit {
 		return fmt.Errorf(
 			"Specified %d thresholds exceed limit of %d for capability",
-			len(q.CheckConfig.CheckConfig.Thresholds),
+			len(q.CheckConfig.Thresholds),
 			thrLimit), false
 	}
 	return nil, false
 }
 
 // check the naming schema for the bucket (global unique object)
-func (g *guidePost) validateBucketName(q *treeRequest) (error, bool) {
+func (g *GuidePost) validateBucketName(q *msg.Request) (error, bool) {
 	_, repoName, _, _ := g.extractRouting(q)
 
 	if !strings.HasPrefix(
-		q.Bucket.Bucket.Name,
+		q.Bucket.Name,
 		fmt.Sprintf("%s_", repoName),
 	) {
 		return fmt.Errorf("Illegal bucket name format, " +
@@ -402,15 +415,15 @@ func (g *guidePost) validateBucketName(q *treeRequest) (error, bool) {
 }
 
 // validate current treekeeper state
-func (g *guidePost) validateKeeper(repoName string) (error, bool) {
+func (g *GuidePost) validateKeeper(repoName string) (error, bool) {
 	// check we have a treekeeper for that repository
 	keeper := fmt.Sprintf("repository_%s", repoName)
-	if _, ok := handlerMap[keeper].(*treeKeeper); !ok {
+	if _, ok := g.soma.handlerMap.Get(keeper).(*TreeKeeper); !ok {
 		return fmt.Errorf(
 			"No handler for repository %s currently registered.",
 			repoName), true
 	}
-	handler := handlerMap[keeper].(*treeKeeper)
+	handler := g.soma.handlerMap.Get(keeper).(*TreeKeeper)
 
 	// check the treekeeper has not been stopped
 	if handler.isStopped() {

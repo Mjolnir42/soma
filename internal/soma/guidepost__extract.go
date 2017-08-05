@@ -1,12 +1,21 @@
-package main
+/*-
+ * Copyright (c) 2016-2017, Jörg Pernfuß
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package soma
 
 import (
 	"database/sql"
 	"fmt"
+
+	"github.com/mjolnir42/soma/internal/msg"
 )
 
 // Extract the request routing information
-func (g *guidePost) extractRouting(q *treeRequest) (string, string, error, bool) {
+func (g *GuidePost) extractRouting(q *msg.Request) (string, string, error, bool) {
 	var repoId, repoName, bucketId string
 	var err error
 
@@ -14,7 +23,7 @@ func (g *guidePost) extractRouting(q *treeRequest) (string, string, error, bool)
 
 	// lookup repository by bucket
 	if bucketId != `` {
-		if err = g.repo_stmt.QueryRow(
+		if err = g.stmtRepoForBucketID.QueryRow(
 			bucketId,
 		).Scan(
 			&repoId,
@@ -32,7 +41,7 @@ func (g *guidePost) extractRouting(q *treeRequest) (string, string, error, bool)
 
 	// lookup repository name
 	if repoName == `` && repoId != `` {
-		if err = g.name_stmt.QueryRow(
+		if err = g.stmtRepoNameByID.QueryRow(
 			repoId,
 		).Scan(
 			&repoName,
@@ -56,7 +65,7 @@ func (g *guidePost) extractRouting(q *treeRequest) (string, string, error, bool)
 }
 
 // Extract embedded IDs that can be used for routing
-func (g *guidePost) extractId(q *treeRequest) (string, string) {
+func (g *GuidePost) extractId(q *msg.Request) (string, string) {
 	switch q.Action {
 	case
 		`add_system_property_to_repository`,
@@ -67,10 +76,10 @@ func (g *guidePost) extractId(q *treeRequest) (string, string) {
 		`delete_custom_property_from_repository`,
 		`delete_oncall_property_from_repository`,
 		`delete_service_property_from_repository`:
-		return q.Repository.Repository.Id, ``
+		return q.Repository.Id, ``
 	case
 		`create_bucket`:
-		return q.Bucket.Bucket.RepositoryId, ``
+		return q.Bucket.RepositoryId, ``
 	case
 		`add_system_property_to_bucket`,
 		`add_custom_property_to_bucket`,
@@ -80,7 +89,7 @@ func (g *guidePost) extractId(q *treeRequest) (string, string) {
 		`delete_custom_property_from_bucket`,
 		`delete_oncall_property_from_bucket`,
 		`delete_service_property_from_bucket`:
-		return ``, q.Bucket.Bucket.Id
+		return ``, q.Bucket.Id
 	case
 		`add_group_to_group`,
 		`add_cluster_to_group`,
@@ -94,7 +103,7 @@ func (g *guidePost) extractId(q *treeRequest) (string, string) {
 		`delete_custom_property_from_group`,
 		`delete_oncall_property_from_group`,
 		`delete_service_property_from_group`:
-		return ``, q.Group.Group.BucketId
+		return ``, q.Group.BucketId
 	case
 		`add_node_to_cluster`,
 		`create_cluster`,
@@ -106,7 +115,7 @@ func (g *guidePost) extractId(q *treeRequest) (string, string) {
 		`delete_custom_property_from_cluster`,
 		`delete_oncall_property_from_cluster`,
 		`delete_service_property_from_cluster`:
-		return ``, q.Cluster.Cluster.BucketId
+		return ``, q.Cluster.BucketId
 	case
 		`add_check_to_repository`,
 		`add_check_to_bucket`,
@@ -114,7 +123,7 @@ func (g *guidePost) extractId(q *treeRequest) (string, string) {
 		`add_check_to_cluster`,
 		`add_check_to_node`,
 		`remove_check`:
-		return q.CheckConfig.CheckConfig.RepositoryId, ``
+		return q.CheckConfig.RepositoryId, ``
 	case
 		`assign_node`,
 		`add_system_property_to_node`,
@@ -125,7 +134,7 @@ func (g *guidePost) extractId(q *treeRequest) (string, string) {
 		`delete_custom_property_from_node`,
 		`delete_oncall_property_from_node`,
 		`delete_service_property_from_node`:
-		return q.Node.Node.Config.RepositoryId, q.Node.Node.Config.BucketId
+		return q.Node.Config.RepositoryId, q.Node.Config.BucketId
 	}
 	return ``, ``
 }

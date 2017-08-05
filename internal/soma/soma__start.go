@@ -36,6 +36,7 @@ func (s *Soma) Start() {
 
 	if !s.conf.ReadOnly {
 		s.handlerMap.Add(`forest_custodian`, newForestCustodian(s.conf.QueueLen, s))
+		s.handlerMap.Add(`guidepost`, newGuidePost(s.conf.QueueLen, s))
 		s.handlerMap.Add(`lifecycle`, newLifeCycle(s))
 
 		if !s.conf.Observer {

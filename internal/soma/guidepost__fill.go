@@ -1,4 +1,11 @@
-package main
+/*-
+ * Copyright (c) 2016-2017, Jörg Pernfuß
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package soma
 
 import (
 	"database/sql"
@@ -6,13 +13,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/satori/go.uuid"
 )
 
 //
-func (g *guidePost) fillReqData(q *treeRequest) (error, bool) {
+func (g *GuidePost) fillReqData(q *msg.Request) (error, bool) {
 	switch {
 	case strings.Contains(q.Action, "add_service_property_to_"):
 		return g.fillServiceAttributes(q)
@@ -31,21 +39,21 @@ func (g *guidePost) fillReqData(q *treeRequest) (error, bool) {
 }
 
 // generate CheckConfigId
-func (g *guidePost) fillCheckConfigId(q *treeRequest) (error, bool) {
-	q.CheckConfig.CheckConfig.Id = uuid.NewV4().String()
+func (g *GuidePost) fillCheckConfigId(q *msg.Request) (error, bool) {
+	q.CheckConfig.Id = uuid.NewV4().String()
 	return nil, false
 }
 
 // Populate the node structure with data, overwriting the client
 // submitted values.
-func (g *guidePost) fillNode(q *treeRequest) (error, bool) {
+func (g *GuidePost) fillNode(q *msg.Request) (error, bool) {
 	var (
 		err                      error
 		ndName, ndTeam, ndServer string
 		ndAsset                  int64
 		ndOnline, ndDeleted      bool
 	)
-	if err = g.node_stmt.QueryRow(q.Node.Node.Id).Scan(
+	if err = g.stmtNodeDetails.QueryRow(q.Node.Id).Scan(
 		&ndAsset,
 		&ndName,
 		&ndTeam,
@@ -54,53 +62,57 @@ func (g *guidePost) fillNode(q *treeRequest) (error, bool) {
 		&ndDeleted,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf("Node not found: %s", q.Node.Node.Id), true
+			return fmt.Errorf("Node not found: %s", q.Node.Id), true
 		}
 		return err, false
 	}
-	q.Node.Node.AssetId = uint64(ndAsset)
-	q.Node.Node.Name = ndName
-	q.Node.Node.TeamId = ndTeam
-	q.Node.Node.ServerId = ndServer
-	q.Node.Node.IsOnline = ndOnline
-	q.Node.Node.IsDeleted = ndDeleted
+	q.Node.AssetId = uint64(ndAsset)
+	q.Node.Name = ndName
+	q.Node.TeamId = ndTeam
+	q.Node.ServerId = ndServer
+	q.Node.IsOnline = ndOnline
+	q.Node.IsDeleted = ndDeleted
 	return nil, false
 }
 
 // load authoritative copy of the service attributes from the
 // database. Replaces whatever the client sent in.
-func (g *guidePost) fillServiceAttributes(q *treeRequest) (error, bool) {
+func (g *GuidePost) fillServiceAttributes(q *msg.Request) (error, bool) {
 	var (
-		service, attr, val, svName, svTeam, repoId string
+		service, attr, val, svName, svTeam, repoID string
 		rows                                       *sql.Rows
 		err                                        error
 		nf                                         bool
 	)
 	attrs := []proto.ServiceAttribute{}
 
-	switch q.RequestType {
-	case "repository":
-		svName = (*q.Repository.Repository.Properties)[0].Service.Name
-		svTeam = (*q.Repository.Repository.Properties)[0].Service.TeamId
-	case "bucket":
-		svName = (*q.Bucket.Bucket.Properties)[0].Service.Name
-		svTeam = (*q.Bucket.Bucket.Properties)[0].Service.TeamId
-	case "group":
-		svName = (*q.Group.Group.Properties)[0].Service.Name
-		svTeam = (*q.Group.Group.Properties)[0].Service.TeamId
-	case "cluster":
-		svName = (*q.Cluster.Cluster.Properties)[0].Service.Name
-		svTeam = (*q.Cluster.Cluster.Properties)[0].Service.TeamId
-	case "node":
-		svName = (*q.Node.Node.Properties)[0].Service.Name
-		svTeam = (*q.Node.Node.Properties)[0].Service.TeamId
+	switch q.Section {
+	case msg.SectionRepository:
+		svName = (*q.Repository.Properties)[0].Service.Name
+		svTeam = (*q.Repository.Properties)[0].Service.TeamId
+	case msg.SectionBucket:
+		svName = (*q.Bucket.Properties)[0].Service.Name
+		svTeam = (*q.Bucket.Properties)[0].Service.TeamId
+	case msg.SectionGroup:
+		svName = (*q.Group.Properties)[0].Service.Name
+		svTeam = (*q.Group.Properties)[0].Service.TeamId
+	case msg.SectionCluster:
+		svName = (*q.Cluster.Properties)[0].Service.Name
+		svTeam = (*q.Cluster.Properties)[0].Service.TeamId
+	case msg.SectionNode:
+		svName = (*q.Node.Properties)[0].Service.Name
+		svTeam = (*q.Node.Properties)[0].Service.TeamId
 	}
 
-	// ignore error since it would have been caught by guidePost
-	repoId, _, _, _ = g.extractRouting(q)
+	// ignore error since it would have been caught by GuidePost
+	repoID, _, _, _ = g.extractRouting(q)
 
 	// validate the tuple (repo, team, service) is valid
-	if err = g.serv_stmt.QueryRow(repoId, svName, svTeam).Scan(&service); err != nil {
+	if err = g.stmtServiceLookup.QueryRow(
+		repoID, svName, svTeam,
+	).Scan(
+		&service,
+	); err != nil {
 		if err == sql.ErrNoRows {
 			nf = true
 			err = fmt.Errorf("Requested service %s not available for team %s",
@@ -110,7 +122,9 @@ func (g *guidePost) fillServiceAttributes(q *treeRequest) (error, bool) {
 	}
 
 	// load attributes
-	if rows, err = g.attr_stmt.Query(repoId, svName, svTeam); err != nil {
+	if rows, err = g.stmtServiceAttributes.Query(
+		repoID, svName, svTeam,
+	); err != nil {
 		goto abort
 	}
 	defer rows.Close()
@@ -130,29 +144,29 @@ abort:
 		return err, nf
 	}
 	// not aborted: set the loaded attributes
-	switch q.RequestType {
-	case "repository":
-		(*q.Repository.Repository.Properties)[0].Service.Attributes = attrs
-	case "bucket":
-		(*q.Bucket.Bucket.Properties)[0].Service.Attributes = attrs
-	case "group":
-		(*q.Group.Group.Properties)[0].Service.Attributes = attrs
-	case "cluster":
-		(*q.Cluster.Cluster.Properties)[0].Service.Attributes = attrs
-	case "node":
-		(*q.Node.Node.Properties)[0].Service.Attributes = attrs
+	switch q.Section {
+	case msg.SectionRepository:
+		(*q.Repository.Properties)[0].Service.Attributes = attrs
+	case msg.SectionBucket:
+		(*q.Bucket.Properties)[0].Service.Attributes = attrs
+	case msg.SectionGroup:
+		(*q.Group.Properties)[0].Service.Attributes = attrs
+	case msg.SectionCluster:
+		(*q.Cluster.Properties)[0].Service.Attributes = attrs
+	case msg.SectionNode:
+		(*q.Node.Properties)[0].Service.Attributes = attrs
 	}
 	return nil, false
 }
 
 // if the request is a check deletion, populate required IDs
-func (g *guidePost) fillCheckDeleteInfo(q *treeRequest) (error, bool) {
+func (g *GuidePost) fillCheckDeleteInfo(q *msg.Request) (error, bool) {
 	var delObjId, delObjTyp, delSrcChkId string
 	var err error
 
-	if err = g.cdel_stmt.QueryRow(
-		q.CheckConfig.CheckConfig.Id,
-		q.CheckConfig.CheckConfig.RepositoryId,
+	if err = g.stmtCheckDetailsForDelete.QueryRow(
+		q.CheckConfig.Id,
+		q.CheckConfig.RepositoryId,
 	).Scan(
 		&delObjId,
 		&delObjTyp,
@@ -161,19 +175,19 @@ func (g *guidePost) fillCheckDeleteInfo(q *treeRequest) (error, bool) {
 		if err == sql.ErrNoRows {
 			return fmt.Errorf(
 				"Failed to find source check for config %s",
-				q.CheckConfig.CheckConfig.Id), true
+				q.CheckConfig.Id), true
 		}
 		return err, false
 	}
-	q.CheckConfig.CheckConfig.ObjectId = delObjId
-	q.CheckConfig.CheckConfig.ObjectType = delObjTyp
-	q.CheckConfig.CheckConfig.ExternalId = delSrcChkId
+	q.CheckConfig.ObjectId = delObjId
+	q.CheckConfig.ObjectType = delObjTyp
+	q.CheckConfig.ExternalId = delSrcChkId
 	q.Action = fmt.Sprintf("remove_check_from_%s", delObjTyp)
 	return nil, false
 }
 
 // if the request is a property deletion, populate required IDs
-func (g *guidePost) fillPropertyDeleteInfo(q *treeRequest) (error, bool) {
+func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (error, bool) {
 	var (
 		err                                             error
 		row                                             *sql.Row
@@ -227,22 +241,22 @@ func (g *guidePost) fillPropertyDeleteInfo(q *treeRequest) (error, bool) {
 	}
 
 	// execute and scan
-	switch q.RequestType {
-	case `repository`:
+	switch q.Section {
+	case msg.SectionRepository:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Repository.Repository.Properties)[0].SourceInstanceId)
-	case `bucket`:
+			(*q.Repository.Properties)[0].SourceInstanceId)
+	case msg.SectionBucket:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Bucket.Bucket.Properties)[0].SourceInstanceId)
-	case `group`:
+			(*q.Bucket.Properties)[0].SourceInstanceId)
+	case msg.SectionGroup:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Group.Group.Properties)[0].SourceInstanceId)
-	case `cluster`:
+			(*q.Group.Properties)[0].SourceInstanceId)
+	case msg.SectionCluster:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Cluster.Cluster.Properties)[0].SourceInstanceId)
-	case `node`:
+			(*q.Cluster.Properties)[0].SourceInstanceId)
+	case msg.SectionNode:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Node.Node.Properties)[0].SourceInstanceId)
+			(*q.Node.Properties)[0].SourceInstanceId)
 	}
 	switch {
 	case strings.HasPrefix(q.Action, `delete_system_`):
@@ -261,7 +275,7 @@ func (g *guidePost) fillPropertyDeleteInfo(q *treeRequest) (error, bool) {
 		if err == sql.ErrNoRows {
 			return fmt.Errorf(
 				"Failed to find source property for %s",
-				(*q.Repository.Repository.Properties)[0].SourceInstanceId), true
+				(*q.Repository.Properties)[0].SourceInstanceId), true
 		}
 		return err, false
 	}
@@ -301,63 +315,63 @@ func (g *guidePost) fillPropertyDeleteInfo(q *treeRequest) (error, bool) {
 	// assemble and set results: view
 	switch {
 	case strings.HasSuffix(q.Action, `_repository`):
-		(*q.Repository.Repository.Properties)[0].View = view
+		(*q.Repository.Properties)[0].View = view
 	case strings.HasSuffix(q.Action, `_bucket`):
-		(*q.Bucket.Bucket.Properties)[0].View = view
+		(*q.Bucket.Properties)[0].View = view
 	case strings.HasSuffix(q.Action, `_group`):
-		(*q.Group.Group.Properties)[0].View = view
+		(*q.Group.Properties)[0].View = view
 	case strings.HasSuffix(q.Action, `_cluster`):
-		(*q.Cluster.Cluster.Properties)[0].View = view
+		(*q.Cluster.Properties)[0].View = view
 	case strings.HasSuffix(q.Action, `_node`):
-		(*q.Node.Node.Properties)[0].View = view
+		(*q.Node.Properties)[0].View = view
 	}
 
 	// final assembly step
 	switch q.Action {
 	case `delete_system_property_from_repository`:
-		(*q.Repository.Repository.Properties)[0].System = pSys
+		(*q.Repository.Properties)[0].System = pSys
 	case `delete_custom_property_from_repository`:
-		(*q.Repository.Repository.Properties)[0].Custom = pCst
+		(*q.Repository.Properties)[0].Custom = pCst
 	case `delete_service_property_from_repository`:
-		(*q.Repository.Repository.Properties)[0].Service = pSvc
+		(*q.Repository.Properties)[0].Service = pSvc
 	case `delete_oncall_property_from_repository`:
-		(*q.Repository.Repository.Properties)[0].Oncall = pOnc
+		(*q.Repository.Properties)[0].Oncall = pOnc
 
 	case `delete_system_property_from_bucket`:
-		(*q.Bucket.Bucket.Properties)[0].System = pSys
+		(*q.Bucket.Properties)[0].System = pSys
 	case `delete_custom_property_from_bucket`:
-		(*q.Bucket.Bucket.Properties)[0].Custom = pCst
+		(*q.Bucket.Properties)[0].Custom = pCst
 	case `delete_service_property_from_bucket`:
-		(*q.Bucket.Bucket.Properties)[0].Service = pSvc
+		(*q.Bucket.Properties)[0].Service = pSvc
 	case `delete_oncall_property_from_bucket`:
-		(*q.Bucket.Bucket.Properties)[0].Oncall = pOnc
+		(*q.Bucket.Properties)[0].Oncall = pOnc
 
 	case `delete_system_property_from_group`:
-		(*q.Group.Group.Properties)[0].System = pSys
+		(*q.Group.Properties)[0].System = pSys
 	case `delete_custom_property_from_group`:
-		(*q.Group.Group.Properties)[0].Custom = pCst
+		(*q.Group.Properties)[0].Custom = pCst
 	case `delete_service_property_from_group`:
-		(*q.Group.Group.Properties)[0].Service = pSvc
+		(*q.Group.Properties)[0].Service = pSvc
 	case `delete_oncall_property_from_group`:
-		(*q.Group.Group.Properties)[0].Oncall = pOnc
+		(*q.Group.Properties)[0].Oncall = pOnc
 
 	case `delete_system_property_from_cluster`:
-		(*q.Cluster.Cluster.Properties)[0].System = pSys
+		(*q.Cluster.Properties)[0].System = pSys
 	case `delete_custom_property_from_cluster`:
-		(*q.Cluster.Cluster.Properties)[0].Custom = pCst
+		(*q.Cluster.Properties)[0].Custom = pCst
 	case `delete_service_property_from_cluster`:
-		(*q.Cluster.Cluster.Properties)[0].Service = pSvc
+		(*q.Cluster.Properties)[0].Service = pSvc
 	case `delete_oncall_property_from_cluster`:
-		(*q.Cluster.Cluster.Properties)[0].Oncall = pOnc
+		(*q.Cluster.Properties)[0].Oncall = pOnc
 
 	case `delete_system_property_from_node`:
-		(*q.Node.Node.Properties)[0].System = pSys
+		(*q.Node.Properties)[0].System = pSys
 	case `delete_custom_property_from_node`:
-		(*q.Node.Node.Properties)[0].Custom = pCst
+		(*q.Node.Properties)[0].Custom = pCst
 	case `delete_service_property_from_node`:
-		(*q.Node.Node.Properties)[0].Service = pSvc
+		(*q.Node.Properties)[0].Service = pSvc
 	case `delete_oncall_property_from_node`:
-		(*q.Node.Node.Properties)[0].Oncall = pOnc
+		(*q.Node.Properties)[0].Oncall = pOnc
 	}
 	return nil, false
 }
