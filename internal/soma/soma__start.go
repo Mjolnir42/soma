@@ -34,6 +34,7 @@ func (s *Soma) Start() {
 	s.handlerMap.Add(`user_r`, newUserRead(s.conf.QueueLen))
 	s.handlerMap.Add(`validity_r`, newValidityRead(s.conf.QueueLen))
 	s.handlerMap.Add(`view_r`, newViewRead(s.conf.QueueLen))
+	s.handlerMap.Add(`workflow_r`, newWorkflowRead(s.conf.QueueLen))
 
 	if !s.conf.ReadOnly {
 		s.handlerMap.Add(`forest_custodian`, newForestCustodian(s.conf.QueueLen, s))
@@ -58,6 +59,7 @@ func (s *Soma) Start() {
 			s.handlerMap.Add(`user_w`, newUserWrite(s.conf.QueueLen, s))
 			s.handlerMap.Add(`validity_w`, newValidityWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`view_w`, newViewWrite(s.conf.QueueLen))
+			s.handlerMap.Add(`workflow_w`, newWorkflowWrite(s.conf.QueueLen))
 		}
 	}
 

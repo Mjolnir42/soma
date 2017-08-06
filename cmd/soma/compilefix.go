@@ -999,4 +999,27 @@ type somaHostDeploymentHandler struct {
 func (self *somaHostDeploymentHandler) run() {
 }
 
+type workflowWrite struct {
+	input                      chan msg.Request
+	shutdown                   chan bool
+	conn                       *sql.DB
+	stmtRetryDeployment        *sql.Stmt
+	stmtTriggerAvailableUpdate *sql.Stmt
+	stmtSet                    *sql.Stmt
+	appLog                     *log.Logger
+	reqLog                     *log.Logger
+	errLog                     *log.Logger
+}
+
+type workflowRead struct {
+	input       chan msg.Request
+	shutdown    chan bool
+	conn        *sql.DB
+	stmtSummary *sql.Stmt
+	stmtList    *sql.Stmt
+	appLog      *log.Logger
+	reqLog      *log.Logger
+	errLog      *log.Logger
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
