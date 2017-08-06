@@ -11,9 +11,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
 	spawnAttributeRead(appLog, reqLog, errLog)
-	spawnBucketReadHandler(appLog, reqLog, errLog)
-	spawnCheckConfigurationReadHandler(appLog, reqLog, errLog)
-	spawnClusterReadHandler(appLog, reqLog, errLog)
 	spawnEntityRead(appLog, reqLog, errLog)
 	spawnEnvironmentReadHandler(appLog, reqLog, errLog)
 	spawnGroupReadHandler(appLog, reqLog, errLog)
@@ -22,7 +19,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnMonitoringRead(appLog, reqLog, errLog)
 	spawnObjectStateReadHandler(appLog, reqLog, errLog)
 	spawnOutputTreeHandler(appLog, reqLog, errLog)
-	spawnRepositoryReadHandler(appLog, reqLog, errLog)
 	spawnWorkflowReadHandler(appLog, reqLog, errLog)
 
 	if !SomaCfg.ReadOnly {
@@ -157,30 +153,6 @@ func spawnAttributeWrite(appLog, reqLog, errLog *log.Logger) {
 	go handler.run()
 }
 
-func spawnRepositoryReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var repositoryReadHandler somaRepositoryReadHandler
-	repositoryReadHandler.input = make(chan somaRepositoryRequest, 64)
-	repositoryReadHandler.shutdown = make(chan bool)
-	repositoryReadHandler.conn = conn
-	repositoryReadHandler.appLog = appLog
-	repositoryReadHandler.reqLog = reqLog
-	repositoryReadHandler.errLog = errLog
-	handlerMap["repositoryReadHandler"] = &repositoryReadHandler
-	go repositoryReadHandler.run()
-}
-
-func spawnBucketReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var bucketReadHandler somaBucketReadHandler
-	bucketReadHandler.input = make(chan somaBucketRequest, 64)
-	bucketReadHandler.shutdown = make(chan bool)
-	bucketReadHandler.conn = conn
-	bucketReadHandler.appLog = appLog
-	bucketReadHandler.reqLog = reqLog
-	bucketReadHandler.errLog = errLog
-	handlerMap["bucketReadHandler"] = &bucketReadHandler
-	go bucketReadHandler.run()
-}
-
 func spawnGroupReadHandler(appLog, reqLog, errLog *log.Logger) {
 	var groupReadHandler somaGroupReadHandler
 	groupReadHandler.input = make(chan somaGroupRequest, 64)
@@ -191,30 +163,6 @@ func spawnGroupReadHandler(appLog, reqLog, errLog *log.Logger) {
 	groupReadHandler.errLog = errLog
 	handlerMap["groupReadHandler"] = &groupReadHandler
 	go groupReadHandler.run()
-}
-
-func spawnClusterReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var clusterReadHandler somaClusterReadHandler
-	clusterReadHandler.input = make(chan somaClusterRequest, 64)
-	clusterReadHandler.shutdown = make(chan bool)
-	clusterReadHandler.conn = conn
-	clusterReadHandler.appLog = appLog
-	clusterReadHandler.reqLog = reqLog
-	clusterReadHandler.errLog = errLog
-	handlerMap["clusterReadHandler"] = &clusterReadHandler
-	go clusterReadHandler.run()
-}
-
-func spawnCheckConfigurationReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var checkConfigurationReadHandler somaCheckConfigurationReadHandler
-	checkConfigurationReadHandler.input = make(chan somaCheckConfigRequest, 64)
-	checkConfigurationReadHandler.shutdown = make(chan bool)
-	checkConfigurationReadHandler.conn = conn
-	checkConfigurationReadHandler.appLog = appLog
-	checkConfigurationReadHandler.reqLog = reqLog
-	checkConfigurationReadHandler.errLog = errLog
-	handlerMap["checkConfigurationReadHandler"] = &checkConfigurationReadHandler
-	go checkConfigurationReadHandler.run()
 }
 
 func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {
