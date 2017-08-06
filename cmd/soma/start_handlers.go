@@ -29,7 +29,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	if !SomaCfg.ReadOnly {
 		if !SomaCfg.Observer {
 			spawnAttributeWrite(appLog, reqLog, errLog)
-			spawnDeploymentHandler(appLog, reqLog, errLog)
 			spawnEntityWrite(appLog, reqLog, errLog)
 			spawnEnvironmentWriteHandler(appLog, reqLog, errLog)
 			spawnMonitoringWrite(appLog, reqLog, errLog)
@@ -217,18 +216,6 @@ func spawnCheckConfigurationReadHandler(appLog, reqLog, errLog *log.Logger) {
 	checkConfigurationReadHandler.errLog = errLog
 	handlerMap["checkConfigurationReadHandler"] = &checkConfigurationReadHandler
 	go checkConfigurationReadHandler.run()
-}
-
-func spawnDeploymentHandler(appLog, reqLog, errLog *log.Logger) {
-	var deploymentHandler somaDeploymentHandler
-	deploymentHandler.input = make(chan somaDeploymentRequest, 64)
-	deploymentHandler.shutdown = make(chan bool)
-	deploymentHandler.conn = conn
-	deploymentHandler.appLog = appLog
-	deploymentHandler.reqLog = reqLog
-	deploymentHandler.errLog = errLog
-	handlerMap["deploymentHandler"] = &deploymentHandler
-	go deploymentHandler.run()
 }
 
 func spawnHostDeploymentHandler(appLog, reqLog, errLog *log.Logger) {

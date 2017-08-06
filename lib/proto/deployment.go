@@ -9,7 +9,32 @@
 
 package proto
 
+// Constants for the different states a deployment can be in
+const (
+	DeploymentAwaitingComputation   = `awaiting_computation`
+	DeploymentComputed              = `computed`
+	DeploymentAwaitingRollout       = `awaiting_rollout`
+	DeploymentRolloutInProgress     = `rollout_in_progress`
+	DeploymentActive                = `active`
+	DeploymentRolloutFailed         = `rollout_failed`
+	DeploymentAwaitingDeprovision   = `awaiting_deprovision`
+	DeploymentDeprovisionInProgress = `deprovision_in_progress`
+	DeploymentDeprovisionFailed     = `deprovision_failed`
+	DeploymentDeprovisioned         = `deprovisioned`
+	DeploymentAwaitingDeletion      = `awaiting_deletion`
+	DeploymentBlocked               = `blocked`
+	DeploymentNone                  = `none`
+)
+
+// Constants for the different deployment tasks
+const (
+	TaskDelete      = `delete`
+	TaskDeprovision = `deprovision`
+	TaskRollout     = `rollout`
+)
+
 type Deployment struct {
+	ID               string            `json:"id"`
 	Repository       string            `json:"repository"`
 	Environment      string            `json:"environment"`
 	Bucket           string            `json:"bucket"`

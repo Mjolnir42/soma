@@ -88,6 +88,7 @@ const (
 const (
 	CategoryMonitoring = `monitoring`
 	SectionCapability  = `capability`
+	SectionDeployment  = `deployment`
 	SectionMonitoring  = `monitoringsystem`
 )
 
@@ -99,8 +100,10 @@ const (
 	ActionCreate         = `create`
 	ActionDeclare        = `declare`
 	ActionDelete         = `delete`
+	ActionGet            = `get`
 	ActionGrant          = `grant`
 	ActionInsertNullID   = `insert-null`
+	ActionFailed         = `failed`
 	ActionList           = `list`
 	ActionMemberAdd      = `member-add`
 	ActionMemberList     = `member-list`
@@ -122,6 +125,7 @@ const (
 	ActionShowConfig     = `show-config`
 	ActionShutdown       = `shutdown`
 	ActionStopRepository = `stop-repository`
+	ActionSuccess        = `success`
 	ActionSummary        = `summary`
 	ActionSync           = `sync`
 	ActionUnassign       = `unassign`

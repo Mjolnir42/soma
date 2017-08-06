@@ -34,6 +34,7 @@ type Request struct {
 	CheckConfig proto.CheckConfig
 	Cluster     proto.Cluster
 	Datacenter  proto.Datacenter
+	Deployment  proto.Deployment
 	Entity      proto.Entity
 	Environment proto.Environment
 	Grant       proto.Grant

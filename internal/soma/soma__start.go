@@ -42,6 +42,7 @@ func (s *Soma) Start() {
 		if !s.conf.Observer {
 			s.handlerMap.Add(`capability_w`, newCapabilityWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`datacenter_w`, newDatacenterWrite(s.conf.QueueLen))
+			s.handlerMap.Add(`deployment_w`, newDeploymentWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`job_block`, newJobBlock(s.conf.QueueLen))
 			s.handlerMap.Add(`mode_w`, newModeWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`node_w`, newNodeWrite(s.conf.QueueLen))

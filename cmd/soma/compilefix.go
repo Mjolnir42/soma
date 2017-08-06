@@ -937,4 +937,37 @@ type grimReaper struct {
 func (grim *grimReaper) run() {
 }
 
+type somaDeploymentRequest struct {
+	action     string
+	Deployment string
+	reply      chan somaResult
+}
+
+type somaDeploymentResult struct {
+	ResultError error
+	ListEntry   string
+	Deployment  proto.Deployment
+}
+
+type somaDeploymentHandler struct {
+	input    chan somaDeploymentRequest
+	shutdown chan bool
+	conn     *sql.DB
+	get_stmt *sql.Stmt
+	upd_stmt *sql.Stmt
+	sta_stmt *sql.Stmt
+	act_stmt *sql.Stmt
+	lst_stmt *sql.Stmt
+	all_stmt *sql.Stmt
+	clr_stmt *sql.Stmt
+	dpr_stmt *sql.Stmt
+	sty_stmt *sql.Stmt
+	appLog   *log.Logger
+	reqLog   *log.Logger
+	errLog   *log.Logger
+}
+
+func (w *somaDeploymentHandler) run() {
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

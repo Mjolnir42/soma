@@ -31,6 +31,7 @@ type Result struct {
 	CheckConfig []proto.CheckConfig
 	Cluster     []proto.Cluster
 	Datacenter  []proto.Datacenter
+	Deployment  []proto.Deployment
 	Entity      []proto.Entity
 	Environment []proto.Environment
 	Grant       []proto.Grant
@@ -122,6 +123,8 @@ func (r *Result) Clear(s string) {
 		r.Cluster = []proto.Cluster{}
 	case `datacenter`:
 		r.Datacenter = []proto.Datacenter{}
+	case `deployment`:
+		r.Deployment = []proto.Deployment{}
 	case `entity`:
 		r.Entity = []proto.Entity{}
 	case `environment`:
