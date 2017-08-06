@@ -970,4 +970,33 @@ type somaDeploymentHandler struct {
 func (w *somaDeploymentHandler) run() {
 }
 
+type somaHostDeploymentRequest struct {
+	action  string
+	system  string
+	assetid int64
+	idlist  []string
+	reply   chan somaResult
+}
+
+type somaHostDeploymentResult struct {
+	ResultError error
+	Delete      bool
+	DeleteId    string
+	Deployment  proto.Deployment
+}
+
+type somaHostDeploymentHandler struct {
+	input     chan somaHostDeploymentRequest
+	shutdown  chan bool
+	conn      *sql.DB
+	geti_stmt *sql.Stmt
+	last_stmt *sql.Stmt
+	appLog    *log.Logger
+	reqLog    *log.Logger
+	errLog    *log.Logger
+}
+
+func (self *somaHostDeploymentHandler) run() {
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

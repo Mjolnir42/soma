@@ -157,7 +157,6 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 		`guidepost`,
 		`lifecycle`,
 		`deployment`,
-		`hostdeployment`,
 	} {
 		grim.soma.handlerMap.Get(h).shutdownNow()
 		grim.soma.handlerMap.Del(h)

@@ -20,6 +20,7 @@ const (
 	SectionAttribute             = `attribute`
 	SectionDatacenter            = `datacenter`
 	SectionEnvironment           = `environment`
+	SectionHostDeployment        = `hostdeployment`
 	SectionInstanceMgmt          = `instance-mgmt`
 	SectionJob                   = `job`
 	SectionLevel                 = `level`
@@ -95,6 +96,7 @@ const (
 // Actions for the various permission sections
 const (
 	ActionAll            = `all`
+	ActionAssemble       = `assemble`
 	ActionAssign         = `assign`
 	ActionAudit          = `audit`
 	ActionCreate         = `create`

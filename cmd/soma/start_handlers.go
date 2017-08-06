@@ -17,7 +17,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnEntityRead(appLog, reqLog, errLog)
 	spawnEnvironmentReadHandler(appLog, reqLog, errLog)
 	spawnGroupReadHandler(appLog, reqLog, errLog)
-	spawnHostDeploymentHandler(appLog, reqLog, errLog)
 	spawnInstanceReadHandler(appLog, reqLog, errLog)
 	spawnJobReadHandler(appLog, reqLog, errLog)
 	spawnMonitoringRead(appLog, reqLog, errLog)
@@ -216,18 +215,6 @@ func spawnCheckConfigurationReadHandler(appLog, reqLog, errLog *log.Logger) {
 	checkConfigurationReadHandler.errLog = errLog
 	handlerMap["checkConfigurationReadHandler"] = &checkConfigurationReadHandler
 	go checkConfigurationReadHandler.run()
-}
-
-func spawnHostDeploymentHandler(appLog, reqLog, errLog *log.Logger) {
-	var hostDeploymentHandler somaHostDeploymentHandler
-	hostDeploymentHandler.input = make(chan somaHostDeploymentRequest, 64)
-	hostDeploymentHandler.shutdown = make(chan bool)
-	hostDeploymentHandler.conn = conn
-	hostDeploymentHandler.appLog = appLog
-	hostDeploymentHandler.reqLog = reqLog
-	hostDeploymentHandler.errLog = errLog
-	handlerMap["hostDeploymentHandler"] = &hostDeploymentHandler
-	go hostDeploymentHandler.run()
 }
 
 func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {

@@ -23,44 +23,45 @@ type Result struct {
 
 	Super *Supervisor
 
-	ActionObj   []proto.Action
-	Attribute   []proto.Attribute
-	Bucket      []proto.Bucket
-	Capability  []proto.Capability
-	Category    []proto.Category
-	CheckConfig []proto.CheckConfig
-	Cluster     []proto.Cluster
-	Datacenter  []proto.Datacenter
-	Deployment  []proto.Deployment
-	Entity      []proto.Entity
-	Environment []proto.Environment
-	Grant       []proto.Grant
-	Group       []proto.Group
-	Instance    []proto.Instance
-	Job         []proto.Job
-	Level       []proto.Level
-	Metric      []proto.Metric
-	Mode        []proto.Mode
-	Monitoring  []proto.Monitoring
-	Node        []proto.Node
-	Oncall      []proto.Oncall
-	Permission  []proto.Permission
-	Predicate   []proto.Predicate
-	Property    []proto.Property
-	Provider    []proto.Provider
-	Repository  []proto.Repository
-	SectionObj  []proto.Section
-	Server      []proto.Server
-	State       []proto.State
-	Status      []proto.Status
-	System      []proto.SystemOperation
-	Team        []proto.Team
-	Tree        proto.Tree
-	Unit        []proto.Unit
-	User        []proto.User
-	Validity    []proto.Validity
-	View        []proto.View
-	Workflow    []proto.Workflow
+	ActionObj      []proto.Action
+	Attribute      []proto.Attribute
+	Bucket         []proto.Bucket
+	Capability     []proto.Capability
+	Category       []proto.Category
+	CheckConfig    []proto.CheckConfig
+	Cluster        []proto.Cluster
+	Datacenter     []proto.Datacenter
+	Deployment     []proto.Deployment
+	Entity         []proto.Entity
+	Environment    []proto.Environment
+	Grant          []proto.Grant
+	Group          []proto.Group
+	HostDeployment []proto.HostDeployment
+	Instance       []proto.Instance
+	Job            []proto.Job
+	Level          []proto.Level
+	Metric         []proto.Metric
+	Mode           []proto.Mode
+	Monitoring     []proto.Monitoring
+	Node           []proto.Node
+	Oncall         []proto.Oncall
+	Permission     []proto.Permission
+	Predicate      []proto.Predicate
+	Property       []proto.Property
+	Provider       []proto.Provider
+	Repository     []proto.Repository
+	SectionObj     []proto.Section
+	Server         []proto.Server
+	State          []proto.State
+	Status         []proto.Status
+	System         []proto.SystemOperation
+	Team           []proto.Team
+	Tree           proto.Tree
+	Unit           []proto.Unit
+	User           []proto.User
+	Validity       []proto.Validity
+	View           []proto.View
+	Workflow       []proto.Workflow
 }
 
 func FromRequest(rq *Request) Result {
@@ -133,6 +134,9 @@ func (r *Result) Clear(s string) {
 		r.Grant = []proto.Grant{}
 	case `group`:
 		r.Group = []proto.Group{}
+	case `hostdeployment`:
+		r.HostDeployment = []proto.HostDeployment{}
+		r.Deployment = []proto.Deployment{}
 	case `instance`:
 		r.Instance = []proto.Instance{}
 	case `job`:

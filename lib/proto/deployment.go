@@ -30,6 +30,7 @@ const (
 const (
 	TaskDelete      = `delete`
 	TaskDeprovision = `deprovision`
+	TaskPending     = `pending`
 	TaskRollout     = `rollout`
 )
 

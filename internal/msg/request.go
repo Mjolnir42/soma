@@ -14,15 +14,16 @@ import (
 )
 
 type Request struct {
-	Section    string
-	Action     string
-	RemoteAddr string
-	AuthUser   string
-	Reply      chan Result
-	JobID      uuid.UUID
-	Search     Filter
-	Update     UpdateData
-	Flag       Flags
+	Section       string
+	Action        string
+	RemoteAddr    string
+	AuthUser      string
+	Reply         chan Result
+	JobID         uuid.UUID
+	Search        Filter
+	Update        UpdateData
+	Flag          Flags
+	DeploymentIDs []string
 
 	Super *Supervisor
 
