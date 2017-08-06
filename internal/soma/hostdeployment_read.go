@@ -42,15 +42,15 @@ func (r *HostDeploymentRead) register(c *sql.DB, l ...*logrus.Logger) {
 }
 
 // run is the event loop for HostDeploymentRead
-func (self *HostDeploymentRead) run() {
+func (r *HostDeploymentRead) run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.DeploymentInstancesForNode:    self.stmtInstancesForNode,
-		stmt.DeploymentLastInstanceVersion: self.stmtLastInstanceVersion,
+		stmt.DeploymentInstancesForNode:    r.stmtInstancesForNode,
+		stmt.DeploymentLastInstanceVersion: r.stmtLastInstanceVersion,
 	} {
-		if prepStmt, err = self.conn.Prepare(statement); err != nil {
-			self.errLog.Fatal(`hostdeployment`, err, stmt.Name(statement))
+		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+			r.errLog.Fatal(`hostdeployment`, err, stmt.Name(statement))
 		}
 		defer prepStmt.Close()
 	}
@@ -58,26 +58,26 @@ func (self *HostDeploymentRead) run() {
 runloop:
 	for {
 		select {
-		case <-self.Shutdown:
+		case <-r.Shutdown:
 			break runloop
-		case req := <-self.Input:
+		case req := <-r.Input:
 			go func() {
-				self.process(&req)
+				r.process(&req)
 			}()
 		}
 	}
 }
 
 // process is the request dispatcher
-func (self *HostDeploymentRead) process(q *msg.Request) {
+func (r *HostDeploymentRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)
-	msgRequest(self.reqLog, q)
+	msgRequest(r.reqLog, q)
 
 	switch q.Action {
 	case msg.ActionGet:
-		self.get(q, &result)
+		r.get(q, &result)
 	case msg.ActionAssemble:
-		self.assemble(q, &result)
+		r.assemble(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -85,14 +85,14 @@ func (self *HostDeploymentRead) process(q *msg.Request) {
 }
 
 // get returns all local deployments for a node
-func (self *HostDeploymentRead) get(q *msg.Request, mr *msg.Result) {
+func (r *HostDeploymentRead) get(q *msg.Request, mr *msg.Result) {
 	var (
 		checkInstanceID, deploymentDetails, status string
 		idList                                     *sql.Rows
 		err                                        error
 	)
 
-	if idList, err = self.stmtInstancesForNode.Query(
+	if idList, err = r.stmtInstancesForNode.Query(
 		q.Node.AssetId,
 		q.Monitoring.Id,
 	); err != nil {
@@ -109,7 +109,7 @@ func (self *HostDeploymentRead) get(q *msg.Request, mr *msg.Result) {
 			return
 		}
 
-		if err = self.stmtLastInstanceVersion.QueryRow(
+		if err = r.stmtLastInstanceVersion.QueryRow(
 			checkInstanceID,
 		).Scan(
 			&deploymentDetails,
@@ -145,7 +145,7 @@ func (self *HostDeploymentRead) get(q *msg.Request, mr *msg.Result) {
 
 		// remove credentials from the hostapi
 	skiploop:
-		for i, _ := range depl.Service.Attributes {
+		for i := range depl.Service.Attributes {
 			if strings.HasPrefix(
 				depl.Service.Attributes[i].Name,
 				`credential_`,
@@ -169,14 +169,14 @@ func (self *HostDeploymentRead) get(q *msg.Request, mr *msg.Result) {
 }
 
 // assemble calculates update instructions for a node
-func (self *HostDeploymentRead) assemble(q *msg.Request, mr *msg.Result) {
+func (r *HostDeploymentRead) assemble(q *msg.Request, mr *msg.Result) {
 	var (
 		checkInstanceID, deploymentDetails, status string
 		idList                                     *sql.Rows
 		err                                        error
 	)
 
-	if idList, err = self.stmtInstancesForNode.Query(
+	if idList, err = r.stmtInstancesForNode.Query(
 		q.Node.AssetId,
 		q.Monitoring.Id,
 	); err != nil {
@@ -196,7 +196,7 @@ assembleloop:
 		}
 		idMap[checkInstanceID] = true
 
-		if err = self.stmtLastInstanceVersion.QueryRow(
+		if err = r.stmtLastInstanceVersion.QueryRow(
 			checkInstanceID,
 		).Scan(
 			&deploymentDetails,
@@ -234,7 +234,7 @@ assembleloop:
 
 		// remove credentials from the hostapi
 	skiploop:
-		for i, _ := range depl.Service.Attributes {
+		for i := range depl.Service.Attributes {
 			if strings.HasPrefix(
 				depl.Service.Attributes[i].Name,
 				`credential_`,
@@ -256,14 +256,14 @@ assembleloop:
 	}
 
 	// assemble delete list
-	for _, delId := range q.DeploymentIDs {
-		if _, ok := idMap[delId]; !ok {
+	for _, delID := range q.DeploymentIDs {
+		if _, ok := idMap[delID]; !ok {
 			// submitted ID is not in the list of IDs for which
 			// deployments were retrieved
 			mr.HostDeployment = append(
 				mr.HostDeployment,
 				proto.HostDeployment{
-					CheckInstanceId: delId,
+					CheckInstanceId: delID,
 					DeleteInstance:  true,
 				},
 			)
@@ -273,8 +273,8 @@ assembleloop:
 }
 
 // shutdownNow signals the handler to shut down
-func (self *HostDeploymentRead) shutdownNow() {
-	close(self.Shutdown)
+func (r *HostDeploymentRead) shutdownNow() {
+	close(r.Shutdown)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

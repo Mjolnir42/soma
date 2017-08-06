@@ -14,7 +14,7 @@ import (
 
 // deprovisionForUpdate checks if a new version for this ID is waiting
 // and returns the task string that should be used
-func (self *DeploymentWrite) deprovisionForUpdate(q *msg.Request) (string, error) {
+func (w *DeploymentWrite) deprovisionForUpdate(q *msg.Request) (string, error) {
 	var (
 		err       error
 		hasUpdate bool
@@ -24,7 +24,7 @@ func (self *DeploymentWrite) deprovisionForUpdate(q *msg.Request) (string, error
 	// returns true if there is a updated version blocked, ie.
 	// after this deprovisioning a new version will be rolled out
 	// -- statement always returns true or false, never null
-	if err = self.stmtDeprovisionForUpdate.QueryRow(
+	if err = w.stmtDeprovisionForUpdate.QueryRow(
 		q.Deployment.ID,
 	).Scan(
 		&hasUpdate,

@@ -57,22 +57,22 @@ func (w *DeploymentWrite) register(c *sql.DB, l ...*logrus.Logger) {
 }
 
 // run is the event loop for DeploymentWrite
-func (self *DeploymentWrite) run() {
+func (w *DeploymentWrite) run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.DeploymentGet:              self.stmtGet,
-		stmt.DeploymentUpdate:           self.stmtSetStatusUpdate,
-		stmt.DeploymentStatus:           self.stmtGetStatus,
-		stmt.DeploymentActivate:         self.stmtActivate,
-		stmt.DeploymentList:             self.stmtList,
-		stmt.DeploymentListAll:          self.stmtAll,
-		stmt.DeploymentClearFlag:        self.stmtClearFlag,
-		stmt.DeploymentDeprovision:      self.stmtDeprovision,
-		stmt.DeploymentDeprovisionStyle: self.stmtDeprovisionForUpdate,
+		stmt.DeploymentGet:              w.stmtGet,
+		stmt.DeploymentUpdate:           w.stmtSetStatusUpdate,
+		stmt.DeploymentStatus:           w.stmtGetStatus,
+		stmt.DeploymentActivate:         w.stmtActivate,
+		stmt.DeploymentList:             w.stmtList,
+		stmt.DeploymentListAll:          w.stmtAll,
+		stmt.DeploymentClearFlag:        w.stmtClearFlag,
+		stmt.DeploymentDeprovision:      w.stmtDeprovision,
+		stmt.DeploymentDeprovisionStyle: w.stmtDeprovisionForUpdate,
 	} {
-		if prepStmt, err = self.conn.Prepare(statement); err != nil {
-			self.errLog.Fatal(`deployment`, err, stmt.Name(statement))
+		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+			w.errLog.Fatal(`deployment`, err, stmt.Name(statement))
 		}
 		defer prepStmt.Close()
 	}
@@ -80,30 +80,30 @@ func (self *DeploymentWrite) run() {
 runloop:
 	for {
 		select {
-		case <-self.Shutdown:
+		case <-w.Shutdown:
 			break runloop
-		case req := <-self.Input:
-			self.process(&req)
+		case req := <-w.Input:
+			w.process(&req)
 		}
 	}
 }
 
 // process is the request dispatcher
-func (self *DeploymentWrite) process(q *msg.Request) {
+func (w *DeploymentWrite) process(q *msg.Request) {
 	result := msg.FromRequest(q)
-	msgRequest(self.reqLog, q)
+	msgRequest(w.reqLog, q)
 
 	switch q.Action {
 	case msg.ActionGet:
-		self.get(q, &result)
+		w.get(q, &result)
 	case msg.ActionSuccess:
-		self.success(q, &result)
+		w.success(q, &result)
 	case msg.ActionFailed:
-		self.failed(q, &result)
+		w.failed(q, &result)
 	case msg.ActionList:
-		self.listPending(q, &result)
+		w.listPending(q, &result)
 	case msg.ActionAll:
-		self.listAll(q, &result)
+		w.listAll(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -112,7 +112,7 @@ func (self *DeploymentWrite) process(q *msg.Request) {
 
 // get retrieves a single deployment, adds the correct current task to
 // the stored deployment and advances the deployment workflow as required
-func (self *DeploymentWrite) get(q *msg.Request, mr *msg.Result) {
+func (w *DeploymentWrite) get(q *msg.Request, mr *msg.Result) {
 	var (
 		instanceConfigID, status, nextStatus                      string
 		newCurrentStatus, details, newNextStatus, deprovisionTask string
@@ -121,7 +121,7 @@ func (self *DeploymentWrite) get(q *msg.Request, mr *msg.Result) {
 		res                                                       sql.Result
 	)
 
-	if err = self.stmtGet.QueryRow(
+	if err = w.stmtGet.QueryRow(
 		q.Deployment.ID,
 	).Scan(
 		&instanceConfigID,
@@ -145,7 +145,7 @@ func (self *DeploymentWrite) get(q *msg.Request, mr *msg.Result) {
 	// returns true if there is a updated version blocked, ie.
 	// after this deprovisioning a new version will be rolled out
 	// -- statement always returns true or false, never null
-	if err = self.stmtDeprovisionForUpdate.QueryRow(
+	if err = w.stmtDeprovisionForUpdate.QueryRow(
 		q.Deployment.ID,
 	).Scan(
 		&hasUpdate,
@@ -205,7 +205,7 @@ func (self *DeploymentWrite) get(q *msg.Request, mr *msg.Result) {
 	}
 
 	if statusUpdateRequired {
-		if res, err = self.stmtSetStatusUpdate.Exec(
+		if res, err = w.stmtSetStatusUpdate.Exec(
 			newCurrentStatus,
 			newNextStatus,
 			instanceConfigID,
@@ -221,14 +221,14 @@ func (self *DeploymentWrite) get(q *msg.Request, mr *msg.Result) {
 }
 
 // success marks a rollout as successfully completed
-func (self *DeploymentWrite) success(q *msg.Request, mr *msg.Result) {
+func (w *DeploymentWrite) success(q *msg.Request, mr *msg.Result) {
 	var (
 		instanceConfigID, status, next, task string
 		err                                  error
 		res                                  sql.Result
 	)
 
-	if err = self.stmtGetStatus.QueryRow(
+	if err = w.stmtGetStatus.QueryRow(
 		q.Deployment.ID,
 	).Scan(
 		&instanceConfigID,
@@ -244,7 +244,7 @@ func (self *DeploymentWrite) success(q *msg.Request, mr *msg.Result) {
 
 	switch status {
 	case proto.DeploymentRolloutInProgress:
-		if res, err = self.stmtActivate.Exec(
+		if res, err = w.stmtActivate.Exec(
 			next,
 			proto.DeploymentNone,
 			time.Now().UTC(),
@@ -256,14 +256,14 @@ func (self *DeploymentWrite) success(q *msg.Request, mr *msg.Result) {
 
 		task = proto.TaskRollout
 	case proto.DeploymentDeprovisionInProgress:
-		if task, err = self.deprovisionForUpdate(
+		if task, err = w.deprovisionForUpdate(
 			q,
 		); err != nil {
 			mr.ServerError(err, q.Section)
 			return
 		}
 
-		if res, err = self.stmtDeprovision.Exec(
+		if res, err = w.stmtDeprovision.Exec(
 			next,
 			proto.DeploymentNone,
 			time.Now().UTC(),
@@ -293,14 +293,14 @@ func (self *DeploymentWrite) success(q *msg.Request, mr *msg.Result) {
 }
 
 // failed marks a rollout as failed
-func (self *DeploymentWrite) failed(q *msg.Request, mr *msg.Result) {
+func (w *DeploymentWrite) failed(q *msg.Request, mr *msg.Result) {
 	var (
 		instanceConfigID, status, next, task string
 		err                                  error
 		res                                  sql.Result
 	)
 
-	if err = self.stmtGetStatus.QueryRow(
+	if err = w.stmtGetStatus.QueryRow(
 		q.Deployment.ID,
 	).Scan(
 		&instanceConfigID,
@@ -316,7 +316,7 @@ func (self *DeploymentWrite) failed(q *msg.Request, mr *msg.Result) {
 
 	switch status {
 	case proto.DeploymentRolloutInProgress:
-		if res, err = self.stmtSetStatusUpdate.Exec(
+		if res, err = w.stmtSetStatusUpdate.Exec(
 			proto.DeploymentRolloutFailed,
 			proto.DeploymentNone,
 			instanceConfigID,
@@ -326,14 +326,14 @@ func (self *DeploymentWrite) failed(q *msg.Request, mr *msg.Result) {
 		}
 		task = proto.TaskRollout
 	case proto.DeploymentDeprovisionInProgress:
-		if task, err = self.deprovisionForUpdate(
+		if task, err = w.deprovisionForUpdate(
 			q,
 		); err != nil {
 			mr.ServerError(err, q.Section)
 			return
 		}
 
-		if res, err = self.stmtSetStatusUpdate.Exec(
+		if res, err = w.stmtSetStatusUpdate.Exec(
 			proto.DeploymentDeprovisionFailed,
 			proto.DeploymentNone,
 			instanceConfigID,
@@ -363,14 +363,14 @@ func (self *DeploymentWrite) failed(q *msg.Request, mr *msg.Result) {
 
 // listPending returns all deployment IDs for a monitoring system that have
 // a pending update that has not yet been fetched
-func (self *DeploymentWrite) listPending(q *msg.Request, mr *msg.Result) {
+func (w *DeploymentWrite) listPending(q *msg.Request, mr *msg.Result) {
 	var (
 		instanceID string
 		err        error
 		list       *sql.Rows
 	)
 
-	if list, err = self.stmtList.Query(
+	if list, err = w.stmtList.Query(
 		q.Monitoring.Id,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -391,7 +391,7 @@ func (self *DeploymentWrite) listPending(q *msg.Request, mr *msg.Result) {
 		})
 
 		// XXX BUG requires a manual transaction
-		self.stmtClearFlag.Exec(instanceID)
+		w.stmtClearFlag.Exec(instanceID)
 	}
 	if err = list.Err(); err != nil {
 		mr.ServerError(err, q.Section)
@@ -401,14 +401,14 @@ func (self *DeploymentWrite) listPending(q *msg.Request, mr *msg.Result) {
 }
 
 // listAll returns all deployment IDs for a monitoring system
-func (self *DeploymentWrite) listAll(q *msg.Request, mr *msg.Result) {
+func (w *DeploymentWrite) listAll(q *msg.Request, mr *msg.Result) {
 	var (
 		instanceID string
 		err        error
 		all        *sql.Rows
 	)
 
-	if all, err = self.stmtAll.Query(
+	if all, err = w.stmtAll.Query(
 		q.Deployment.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -429,7 +429,7 @@ func (self *DeploymentWrite) listAll(q *msg.Request, mr *msg.Result) {
 		})
 
 		// XXX BUG requires a manual transaction
-		self.stmtClearFlag.Exec(instanceID)
+		w.stmtClearFlag.Exec(instanceID)
 	}
 	if err = all.Err(); err != nil {
 		mr.ServerError(err, q.Section)
@@ -439,8 +439,8 @@ func (self *DeploymentWrite) listAll(q *msg.Request, mr *msg.Result) {
 }
 
 // shutdownNow signals the handler to shut down
-func (self *DeploymentWrite) shutdownNow() {
-	close(self.Shutdown)
+func (w *DeploymentWrite) shutdownNow() {
+	close(w.Shutdown)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
