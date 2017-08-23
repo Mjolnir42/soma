@@ -11,7 +11,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
 	spawnAttributeRead(appLog, reqLog, errLog)
-	spawnEntityRead(appLog, reqLog, errLog)
 	spawnEnvironmentReadHandler(appLog, reqLog, errLog)
 	spawnGroupReadHandler(appLog, reqLog, errLog)
 	spawnInstanceReadHandler(appLog, reqLog, errLog)
@@ -23,7 +22,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	if !SomaCfg.ReadOnly {
 		if !SomaCfg.Observer {
 			spawnAttributeWrite(appLog, reqLog, errLog)
-			spawnEntityWrite(appLog, reqLog, errLog)
 			spawnEnvironmentWriteHandler(appLog, reqLog, errLog)
 			spawnMonitoringWrite(appLog, reqLog, errLog)
 			spawnObjectStateWriteHandler(appLog, reqLog, errLog)
@@ -76,30 +74,6 @@ func spawnObjectStateWriteHandler(appLog, reqLog, errLog *log.Logger) {
 	handler.reqLog = reqLog
 	handler.errLog = errLog
 	handlerMap[`state_w`] = &handler
-	go handler.run()
-}
-
-func spawnEntityRead(appLog, reqLog, errLog *log.Logger) {
-	var handler entityRead
-	handler.input = make(chan msg.Request)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`entity_r`] = &handler
-	go handler.run()
-}
-
-func spawnEntityWrite(appLog, reqLog, errLog *log.Logger) {
-	var handler entityWrite
-	handler.input = make(chan msg.Request, 64)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`entity_w`] = &handler
 	go handler.run()
 }
 

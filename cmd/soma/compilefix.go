@@ -1022,4 +1022,27 @@ type workflowRead struct {
 	errLog      *log.Logger
 }
 
+type entityRead struct {
+	input    chan msg.Request
+	shutdown chan bool
+	conn     *sql.DB
+	stmtList *sql.Stmt
+	stmtShow *sql.Stmt
+	appLog   *log.Logger
+	reqLog   *log.Logger
+	errLog   *log.Logger
+}
+
+type entityWrite struct {
+	input      chan msg.Request
+	shutdown   chan bool
+	conn       *sql.DB
+	stmtAdd    *sql.Stmt
+	stmtRemove *sql.Stmt
+	stmtRename *sql.Stmt
+	appLog     *log.Logger
+	reqLog     *log.Logger
+	errLog     *log.Logger
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
