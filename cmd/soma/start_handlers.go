@@ -10,7 +10,6 @@ import (
 func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
-	spawnEnvironmentReadHandler(appLog, reqLog, errLog)
 	spawnInstanceReadHandler(appLog, reqLog, errLog)
 	spawnJobReadHandler(appLog, reqLog, errLog)
 	spawnMonitoringRead(appLog, reqLog, errLog)
@@ -19,35 +18,10 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 
 	if !SomaCfg.ReadOnly {
 		if !SomaCfg.Observer {
-			spawnEnvironmentWriteHandler(appLog, reqLog, errLog)
 			spawnMonitoringWrite(appLog, reqLog, errLog)
 			spawnObjectStateWriteHandler(appLog, reqLog, errLog)
 		}
 	}
-}
-
-func spawnEnvironmentReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var environmentReadHandler environmentRead
-	environmentReadHandler.input = make(chan msg.Request)
-	environmentReadHandler.shutdown = make(chan bool)
-	environmentReadHandler.conn = conn
-	environmentReadHandler.appLog = appLog
-	environmentReadHandler.reqLog = reqLog
-	environmentReadHandler.errLog = errLog
-	handlerMap[`environment_r`] = &environmentReadHandler
-	go environmentReadHandler.run()
-}
-
-func spawnEnvironmentWriteHandler(appLog, reqLog, errLog *log.Logger) {
-	var environmentWriteHandler environmentWrite
-	environmentWriteHandler.input = make(chan msg.Request, 64)
-	environmentWriteHandler.shutdown = make(chan bool)
-	environmentWriteHandler.conn = conn
-	environmentWriteHandler.appLog = appLog
-	environmentWriteHandler.reqLog = reqLog
-	environmentWriteHandler.errLog = errLog
-	handlerMap[`environment_w`] = &environmentWriteHandler
-	go environmentWriteHandler.run()
 }
 
 func spawnObjectStateReadHandler(appLog, reqLog, errLog *log.Logger) {
