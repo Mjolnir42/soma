@@ -13,6 +13,7 @@ func (s *Soma) Start() {
 	s.handlerMap.Add(`grimreaper`, newGrimReaper(1, s))
 	// TODO: start supervisor completely
 
+	s.handlerMap.Add(`attribute_r`, newAttributeRead(s.conf.QueueLen))
 	s.handlerMap.Add(`bucket_r`, newBucketRead(s.conf.QueueLen))
 	s.handlerMap.Add(`capability_r`, newCapabilityRead(s.conf.QueueLen))
 	s.handlerMap.Add(`checkconfig_r`, newCheckConfigurationRead(s.conf.QueueLen))
@@ -43,6 +44,7 @@ func (s *Soma) Start() {
 		s.handlerMap.Add(`lifecycle`, newLifeCycle(s))
 
 		if !s.conf.Observer {
+			s.handlerMap.Add(`attribute_w`, newAttributeWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`capability_w`, newCapabilityWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`datacenter_w`, newDatacenterWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`deployment_w`, newDeploymentWrite(s.conf.QueueLen))
