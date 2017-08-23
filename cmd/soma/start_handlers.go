@@ -11,7 +11,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
 	spawnEnvironmentReadHandler(appLog, reqLog, errLog)
-	spawnGroupReadHandler(appLog, reqLog, errLog)
 	spawnInstanceReadHandler(appLog, reqLog, errLog)
 	spawnJobReadHandler(appLog, reqLog, errLog)
 	spawnMonitoringRead(appLog, reqLog, errLog)
@@ -97,18 +96,6 @@ func spawnMonitoringWrite(appLog, reqLog, errLog *log.Logger) {
 	handler.errLog = errLog
 	handlerMap[`monitoring_w`] = &handler
 	go handler.run()
-}
-
-func spawnGroupReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var groupReadHandler somaGroupReadHandler
-	groupReadHandler.input = make(chan somaGroupRequest, 64)
-	groupReadHandler.shutdown = make(chan bool)
-	groupReadHandler.conn = conn
-	groupReadHandler.appLog = appLog
-	groupReadHandler.reqLog = reqLog
-	groupReadHandler.errLog = errLog
-	handlerMap["groupReadHandler"] = &groupReadHandler
-	go groupReadHandler.run()
 }
 
 func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {
