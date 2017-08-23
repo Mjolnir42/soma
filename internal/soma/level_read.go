@@ -113,6 +113,10 @@ func (r *LevelRead) list(q *msg.Request, mr *msg.Result) {
 			ShortName: short,
 		})
 	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
 	mr.OK()
 }
 
