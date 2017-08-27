@@ -133,6 +133,16 @@ const (
 	ActionUnassign       = `unassign`
 	ActionUpdate         = `update`
 	ActionUse            = `use`
+	ActionVersions       = `versions`
+)
+
+// Entity types
+const (
+	EntityRepository = `repository`
+	EntityBucket     = `bucket`
+	EntityGroup      = `group`
+	EntityCluster    = `cluster`
+	EntityNode       = `node`
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

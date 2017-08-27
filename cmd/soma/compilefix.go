@@ -1090,4 +1090,16 @@ type environmentWrite struct {
 	errLog     *log.Logger
 }
 
+type instance struct {
+	input     chan msg.Request
+	shutdown  chan bool
+	conn      *sql.DB
+	stmt_show *sql.Stmt
+	stmt_list *sql.Stmt
+	stmt_vers *sql.Stmt
+	appLog    *log.Logger
+	reqLog    *log.Logger
+	errLog    *log.Logger
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

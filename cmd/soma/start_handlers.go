@@ -10,7 +10,6 @@ import (
 func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
-	spawnInstanceReadHandler(appLog, reqLog, errLog)
 	spawnJobReadHandler(appLog, reqLog, errLog)
 	spawnMonitoringRead(appLog, reqLog, errLog)
 	spawnObjectStateReadHandler(appLog, reqLog, errLog)
@@ -124,18 +123,6 @@ func spawnOutputTreeHandler(appLog, reqLog, errLog *log.Logger) {
 	handler.reqLog = reqLog
 	handler.errLog = errLog
 	handlerMap[`tree_r`] = &handler
-	go handler.run()
-}
-
-func spawnInstanceReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var handler instance
-	handler.input = make(chan msg.Request, 128)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`instance_r`] = &handler
 	go handler.run()
 }
 

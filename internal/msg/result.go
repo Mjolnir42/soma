@@ -137,7 +137,7 @@ func (r *Result) Clear(s string) {
 	case `hostdeployment`:
 		r.HostDeployment = []proto.HostDeployment{}
 		r.Deployment = []proto.Deployment{}
-	case `instance`:
+	case `instance`, `instance-mgmt`:
 		r.Instance = []proto.Instance{}
 	case `job`:
 		r.Job = []proto.Job{}

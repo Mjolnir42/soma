@@ -11,9 +11,9 @@ package main
 import (
 	"net/http"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/julienschmidt/httprouter"
 )
 
 // InstanceShow returns information about a check instance
@@ -142,8 +142,10 @@ func InstanceListAll(w http.ResponseWriter, r *http.Request,
 	if !IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
-		Section:    `runtime`,
-		Action:     `instance_list_all`,
+		// Section: msg.SectionInstanceMgmt
+		Section: `runtime`,
+		// Action: msg.ActionAll
+		Action: `instance_list_all`,
 	}) {
 		DispatchForbidden(&w, nil)
 		return
@@ -152,11 +154,16 @@ func InstanceListAll(w http.ResponseWriter, r *http.Request,
 	returnChannel := make(chan msg.Result)
 	handler := handlerMap[`instance_r`].(*instance)
 	handler.input <- msg.Request{
-		Section:    `runtime`,
-		Action:     `instance_list_all`,
+		// Section: msg.SectionInstanceMgmt
+		Section: `runtime`,
+		// Action: msg.ActionAll
+		Action: `instance_list_all`,
+		// set msg.Request.Flag.Unscoped == true
 		Reply:      returnChannel,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
+		Instance:   proto.Instance{},
+		Flag:       msg.Flags{Unscoped: true},
 	}
 	result := <-returnChannel
 	SendMsgResult(&w, &result)
