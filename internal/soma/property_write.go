@@ -190,11 +190,10 @@ func (w *PropertyWrite) addCustom(q *msg.Request, mr *msg.Result) {
 // addService inserts team services or global service templates
 func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 	var (
-		res    sql.Result
-		err    error
-		tx     *sql.Tx
-		attr   proto.ServiceAttribute
-		rowCnt int64
+		res  sql.Result
+		err  error
+		tx   *sql.Tx
+		attr proto.ServiceAttribute
 	)
 
 	if tx, err = w.conn.Begin(); err != nil {
@@ -221,13 +220,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 			return
 		}
 	}
-	if rowCnt, err = res.RowsAffected(); err != nil {
-		mr.ServerError(err, q.Section)
-		tx.Rollback()
-		return
-	} else if rowCnt != 1 {
-		mr.ServerError(fmt.Errorf("Insert affected %d rows",
-			rowCnt), q.Section)
+	if !mr.RowCnt(res.RowsAffected()) {
 		tx.Rollback()
 		return
 	}
@@ -256,13 +249,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 				return
 			}
 		}
-		if rowCnt, err = res.RowsAffected(); err != nil {
-			mr.ServerError(err, q.Section)
-			tx.Rollback()
-			return
-		} else if rowCnt != 1 {
-			mr.ServerError(fmt.Errorf("Insert affected %d rows",
-				rowCnt), q.Section)
+		if !mr.RowCnt(res.RowsAffected()) {
 			tx.Rollback()
 			return
 		}
@@ -347,10 +334,9 @@ func (w *PropertyWrite) removeCustom(q *msg.Request, mr *msg.Result) {
 // removeService deletes a team service or service template
 func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 	var (
-		res    sql.Result
-		err    error
-		tx     *sql.Tx
-		rowCnt int64
+		res sql.Result
+		err error
+		tx  *sql.Tx
 	)
 
 	if tx, err = w.conn.Begin(); err != nil {
@@ -400,13 +386,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 			return
 		}
 	}
-	if rowCnt, err = res.RowsAffected(); err != nil {
-		mr.ServerError(err, q.Section)
-		tx.Rollback()
-		return
-	} else if rowCnt != 1 {
-		mr.ServerError(fmt.Errorf("Delete affected %d rows",
-			rowCnt), q.Section)
+	if !mr.RowCnt(res.RowsAffected()) {
 		tx.Rollback()
 		return
 	}

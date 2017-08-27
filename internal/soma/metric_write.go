@@ -103,7 +103,6 @@ func (w *MetricWrite) add(q *msg.Request, mr *msg.Result) {
 		err      error
 		tx       *sql.Tx
 		pkg      proto.MetricPackage
-		rowCnt   int64
 		inputVal string
 	)
 
@@ -165,12 +164,8 @@ func (w *MetricWrite) add(q *msg.Request, mr *msg.Result) {
 	}
 
 	// get row count while still within the transaction
-	if rowCnt, _ = res.RowsAffected(); rowCnt != 1 {
+	if !mr.RowCnt(res.RowsAffected()) {
 		tx.Rollback()
-		mr.ServerError(
-			fmt.Errorf("Metric insertion affected %d"+
-				" rows instead of 1", rowCnt),
-			q.Section)
 		return
 	}
 
@@ -186,12 +181,8 @@ func (w *MetricWrite) add(q *msg.Request, mr *msg.Result) {
 				mr.ServerError(err, q.Section)
 				return
 			}
-			if rowCnt, _ = res.RowsAffected(); rowCnt != 1 {
+			if !mr.RowCnt(res.RowsAffected()) {
 				tx.Rollback()
-				mr.ServerError(
-					fmt.Errorf("Package insertion affected %d"+
-						" rows instead of 1", rowCnt),
-					q.Section)
 				return
 			}
 		}
@@ -209,10 +200,9 @@ func (w *MetricWrite) add(q *msg.Request, mr *msg.Result) {
 // remove deletes a metric
 func (w *MetricWrite) remove(q *msg.Request, mr *msg.Result) {
 	var (
-		res    sql.Result
-		err    error
-		tx     *sql.Tx
-		rowCnt int64
+		res sql.Result
+		err error
+		tx  *sql.Tx
 	)
 
 	// start transaction
@@ -240,12 +230,8 @@ func (w *MetricWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 
 	// get row count while still within the transaction
-	if rowCnt, _ = res.RowsAffected(); rowCnt != 1 {
+	if !mr.RowCnt(res.RowsAffected()) {
 		tx.Rollback()
-		mr.ServerError(
-			fmt.Errorf("Metric deletion affected %d"+
-				" rows instead of 1", rowCnt),
-			q.Section)
 		return
 	}
 
