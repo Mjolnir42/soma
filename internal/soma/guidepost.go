@@ -222,7 +222,7 @@ func (g *GuidePost) sysprocess(q *msg.Request) {
 	result.System = []proto.SystemOperation{q.System}
 
 	switch q.System.Request {
-	case msg.ActionStopRepository:
+	case msg.ActionRepoStop:
 		repoID = q.System.RepositoryId
 	default:
 		result.UnknownRequest(q)
@@ -266,7 +266,7 @@ func (g *GuidePost) sysprocess(q *msg.Request) {
 	}
 
 	switch q.System.Request {
-	case msg.ActionStopRepository:
+	case msg.ActionRepoStop:
 		if !handler.isStopped() {
 			close(handler.Stop)
 		}

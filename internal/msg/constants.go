@@ -127,7 +127,6 @@ const (
 	ActionShow           = `show`
 	ActionShowConfig     = `show-config`
 	ActionShutdown       = `shutdown`
-	ActionStopRepository = `stop-repository`
 	ActionSuccess        = `success`
 	ActionSummary        = `summary`
 	ActionSync           = `sync`
