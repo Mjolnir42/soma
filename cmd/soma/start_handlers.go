@@ -11,14 +11,7 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
 	spawnJobReadHandler(appLog, reqLog, errLog)
-	spawnObjectStateReadHandler(appLog, reqLog, errLog)
 	spawnOutputTreeHandler(appLog, reqLog, errLog)
-
-	if !SomaCfg.ReadOnly {
-		if !SomaCfg.Observer {
-			spawnObjectStateWriteHandler(appLog, reqLog, errLog)
-		}
-	}
 }
 
 func spawnObjectStateReadHandler(appLog, reqLog, errLog *log.Logger) {
