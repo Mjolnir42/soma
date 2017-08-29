@@ -24,6 +24,7 @@ const (
 	SectionHostDeployment        = `hostdeployment`
 	SectionInstanceMgmt          = `instance-mgmt`
 	SectionJob                   = `job`
+	SectionJobMgmt               = `job-mgmt`
 	SectionLevel                 = `level`
 	SectionMetric                = `metric`
 	SectionMode                  = `mode`
