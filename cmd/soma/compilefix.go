@@ -1102,4 +1102,29 @@ type instance struct {
 	errLog    *log.Logger
 }
 
+type monitoringRead struct {
+	input            chan msg.Request
+	shutdown         chan bool
+	conn             *sql.DB
+	stmtListAll      *sql.Stmt
+	stmtListScoped   *sql.Stmt
+	stmtShow         *sql.Stmt
+	stmtSearchAll    *sql.Stmt
+	stmtSearchScoped *sql.Stmt
+	appLog           *log.Logger
+	reqLog           *log.Logger
+	errLog           *log.Logger
+}
+
+type monitoringWrite struct {
+	input      chan msg.Request
+	shutdown   chan bool
+	conn       *sql.DB
+	stmtAdd    *sql.Stmt
+	stmtRemove *sql.Stmt
+	appLog     *log.Logger
+	reqLog     *log.Logger
+	errLog     *log.Logger
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

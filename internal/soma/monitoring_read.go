@@ -1,49 +1,56 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß
+ * Copyright (c) 2016-2017, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package main
+package soma
 
 import (
 	"database/sql"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
-	log "github.com/Sirupsen/logrus"
-	uuid "github.com/satori/go.uuid"
 )
 
-type monitoringRead struct {
-	input            chan msg.Request
-	shutdown         chan bool
+// MonitoringRead handles read requests for monitoring systems
+type MonitoringRead struct {
+	Input            chan msg.Request
+	Shutdown         chan struct{}
 	conn             *sql.DB
 	stmtListAll      *sql.Stmt
 	stmtListScoped   *sql.Stmt
 	stmtShow         *sql.Stmt
 	stmtSearchAll    *sql.Stmt
 	stmtSearchScoped *sql.Stmt
-	appLog           *log.Logger
-	reqLog           *log.Logger
-	errLog           *log.Logger
+	appLog           *logrus.Logger
+	reqLog           *logrus.Logger
+	errLog           *logrus.Logger
 }
 
-type monitoringWrite struct {
-	input      chan msg.Request
-	shutdown   chan bool
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	appLog     *log.Logger
-	reqLog     *log.Logger
-	errLog     *log.Logger
+// newMonitoringRead return a new MonitoringRead handler with
+// input buffer of length
+func newMonitoringRead(length int) (r *MonitoringRead) {
+	r = &MonitoringRead{}
+	r.Input = make(chan msg.Request, length)
+	r.Shutdown = make(chan struct{})
+	return
 }
 
-func (r *monitoringRead) run() {
+// register initializes resources provided by the Soma app
+func (r *MonitoringRead) register(c *sql.DB, l ...*logrus.Logger) {
+	r.conn = c
+	r.appLog = l[0]
+	r.reqLog = l[1]
+	r.errLog = l[2]
+}
+
+// run is the event loop for MonitoringRead
+func (r *MonitoringRead) run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -62,9 +69,9 @@ func (r *monitoringRead) run() {
 runloop:
 	for {
 		select {
-		case <-r.shutdown:
+		case <-r.Shutdown:
 			break runloop
-		case req := <-r.input:
+		case req := <-r.Input:
 			go func() {
 				r.process(&req)
 			}()
@@ -72,26 +79,21 @@ runloop:
 	}
 }
 
-func (r *monitoringRead) process(q *msg.Request) {
+// process is the request dispatcher
+func (r *MonitoringRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 	msgRequest(r.reqLog, q)
 
 	switch q.Action {
-	case `list`:
-		switch {
-		case q.Flag.Unscoped:
-			r.listAll(q, &result)
-		default:
-			r.listScoped(q, &result)
-		}
-	case `search`:
-		switch {
-		case q.Flag.Unscoped:
-			r.searchAll(q, &result)
-		default:
-			r.searchScoped(q, &result)
-		}
-	case `show`:
+	case msg.ActionList:
+		r.listScoped(q, &result)
+	case msg.ActionAll:
+		r.listAll(q, &result)
+	case msg.ActionSearch:
+		r.searchScoped(q, &result)
+	case msg.ActionSearchAll:
+		r.searchAll(q, &result)
+	case msg.ActionShow:
 		r.show(q, &result)
 	default:
 		result.UnknownRequest(q)
@@ -100,7 +102,8 @@ func (r *monitoringRead) process(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (r *monitoringRead) listAll(q *msg.Request, mr *msg.Result) {
+// listAll returns all monitoring systems
+func (r *MonitoringRead) listAll(q *msg.Request, mr *msg.Result) {
 	var (
 		err            error
 		monitoringID   string
@@ -108,7 +111,7 @@ func (r *monitoringRead) listAll(q *msg.Request, mr *msg.Result) {
 		rows           *sql.Rows
 	)
 	if rows, err = r.stmtListAll.Query(); err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		return
 	}
 
@@ -118,8 +121,7 @@ func (r *monitoringRead) listAll(q *msg.Request, mr *msg.Result) {
 			&monitoringName,
 		); err != nil {
 			rows.Close()
-			mr.ServerError(err)
-			mr.Clear(q.Section)
+			mr.ServerError(err, q.Section)
 			return
 		}
 		mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
@@ -128,13 +130,14 @@ func (r *monitoringRead) listAll(q *msg.Request, mr *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		return
 	}
 	mr.OK()
 }
 
-func (r *monitoringRead) listScoped(q *msg.Request, mr *msg.Result) {
+// listScoped returns all monitoring systems the user has access to
+func (r *MonitoringRead) listScoped(q *msg.Request, mr *msg.Result) {
 	var (
 		err            error
 		monitoringID   string
@@ -152,8 +155,7 @@ func (r *monitoringRead) listScoped(q *msg.Request, mr *msg.Result) {
 			&monitoringName,
 		); err != nil {
 			rows.Close()
-			mr.ServerError(err)
-			mr.Clear(q.Section)
+			mr.ServerError(err, q.Section)
 			return
 		}
 		mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
@@ -162,13 +164,14 @@ func (r *monitoringRead) listScoped(q *msg.Request, mr *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		return
 	}
 	mr.OK()
 }
 
-func (r *monitoringRead) show(q *msg.Request, mr *msg.Result) {
+// show returns details about a specific monitoring system
+func (r *MonitoringRead) show(q *msg.Request, mr *msg.Result) {
 	var (
 		err                      error
 		monitoringID, name, mode string
@@ -176,7 +179,9 @@ func (r *monitoringRead) show(q *msg.Request, mr *msg.Result) {
 		callbackNull             sql.NullString
 		callback                 string
 	)
-	if err = r.stmtShow.QueryRow(q.Monitoring.Id).Scan(
+	if err = r.stmtShow.QueryRow(
+		q.Monitoring.Id,
+	).Scan(
 		&monitoringID,
 		&name,
 		&mode,
@@ -184,10 +189,10 @@ func (r *monitoringRead) show(q *msg.Request, mr *msg.Result) {
 		&teamID,
 		&callbackNull,
 	); err == sql.ErrNoRows {
-		mr.NotFound(err)
+		mr.NotFound(err, q.Section)
 		return
 	} else if err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		return
 	}
 
@@ -205,7 +210,8 @@ func (r *monitoringRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-func (r *monitoringRead) searchAll(q *msg.Request, mr *msg.Result) {
+// searchAll looks up a monitoring systems ID by name
+func (r *MonitoringRead) searchAll(q *msg.Request, mr *msg.Result) {
 	var (
 		err            error
 		monitoringID   string
@@ -218,10 +224,10 @@ func (r *monitoringRead) searchAll(q *msg.Request, mr *msg.Result) {
 		&monitoringID,
 		&monitoringName,
 	); err == sql.ErrNoRows {
-		mr.NotFound(err)
+		mr.NotFound(err, q.Section)
 		return
 	} else if err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		return
 	}
 	mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
@@ -231,7 +237,9 @@ func (r *monitoringRead) searchAll(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-func (r *monitoringRead) searchScoped(q *msg.Request, mr *msg.Result) {
+// searchScoped looks up a monitoring systems ID by name, restricted
+// to the user's access
+func (r *MonitoringRead) searchScoped(q *msg.Request, mr *msg.Result) {
 	var (
 		err            error
 		monitoringID   string
@@ -245,10 +253,10 @@ func (r *monitoringRead) searchScoped(q *msg.Request, mr *msg.Result) {
 		&monitoringID,
 		&monitoringName,
 	); err == sql.ErrNoRows {
-		mr.NotFound(err)
+		mr.NotFound(err, q.Section)
 		return
 	} else if err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		return
 	}
 	mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
@@ -258,99 +266,9 @@ func (r *monitoringRead) searchScoped(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-func (r *monitoringRead) shutdownNow() {
-	r.shutdown <- true
-}
-
-func (w *monitoringWrite) run() {
-	var err error
-
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.MonitoringSystemAdd:    w.stmtAdd,
-		stmt.MonitoringSystemRemove: w.stmtRemove,
-	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
-			w.errLog.Fatal(`monitoring`, err, stmt.Name(statement))
-		}
-		defer prepStmt.Close()
-	}
-
-runloop:
-	for {
-		select {
-		case <-w.shutdown:
-			break runloop
-		case req := <-w.input:
-			w.process(&req)
-		}
-	}
-}
-
-func (w *monitoringWrite) process(q *msg.Request) {
-	result := msg.FromRequest(q)
-	msgRequest(w.reqLog, q)
-
-	switch q.Action {
-	case `add`:
-		w.add(q, &result)
-	case `remove`:
-		w.remove(q, &result)
-	default:
-		result.UnknownRequest(q)
-	}
-
-	q.Reply <- result
-}
-
-func (w *monitoringWrite) add(q *msg.Request, mr *msg.Result) {
-	var (
-		err      error
-		res      sql.Result
-		callback sql.NullString
-	)
-
-	q.Monitoring.Id = uuid.NewV4().String()
-	if q.Monitoring.Callback != `` {
-		callback = sql.NullString{
-			String: q.Monitoring.Callback,
-			Valid:  true,
-		}
-	}
-	if res, err = w.stmtAdd.Exec(
-		q.Monitoring.Id,
-		q.Monitoring.Name,
-		q.Monitoring.Mode,
-		q.Monitoring.Contact,
-		q.Monitoring.TeamId,
-		callback,
-	); err != nil {
-		mr.ServerError(err)
-		return
-	}
-	if mr.RowCnt(res.RowsAffected()) {
-		mr.Monitoring = append(mr.Monitoring, q.Monitoring)
-	}
-}
-
-func (w *monitoringWrite) remove(q *msg.Request, mr *msg.Result) {
-	var (
-		err error
-		res sql.Result
-	)
-
-	if res, err = w.stmtRemove.Exec(
-		q.Monitoring.Id,
-	); err != nil {
-		mr.ServerError(err)
-		return
-	}
-	if mr.RowCnt(res.RowsAffected()) {
-		mr.Monitoring = append(mr.Monitoring, q.Monitoring)
-	}
-}
-
-func (w *monitoringWrite) shutdownNow() {
-	w.shutdown <- true
+// shutdownNow signals the handler to shut down
+func (r *MonitoringRead) shutdownNow() {
+	close(r.Shutdown)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -11,13 +11,11 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
 	spawnJobReadHandler(appLog, reqLog, errLog)
-	spawnMonitoringRead(appLog, reqLog, errLog)
 	spawnObjectStateReadHandler(appLog, reqLog, errLog)
 	spawnOutputTreeHandler(appLog, reqLog, errLog)
 
 	if !SomaCfg.ReadOnly {
 		if !SomaCfg.Observer {
-			spawnMonitoringWrite(appLog, reqLog, errLog)
 			spawnObjectStateWriteHandler(appLog, reqLog, errLog)
 		}
 	}
@@ -44,30 +42,6 @@ func spawnObjectStateWriteHandler(appLog, reqLog, errLog *log.Logger) {
 	handler.reqLog = reqLog
 	handler.errLog = errLog
 	handlerMap[`state_w`] = &handler
-	go handler.run()
-}
-
-func spawnMonitoringRead(appLog, reqLog, errLog *log.Logger) {
-	var handler monitoringRead
-	handler.input = make(chan msg.Request, 64)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`monitoring_r`] = &handler
-	go handler.run()
-}
-
-func spawnMonitoringWrite(appLog, reqLog, errLog *log.Logger) {
-	var handler monitoringWrite
-	handler.input = make(chan msg.Request, 64)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`monitoring_w`] = &handler
 	go handler.run()
 }
 
