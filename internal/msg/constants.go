@@ -19,6 +19,7 @@ const (
 	CategoryGlobal               = `global`
 	SectionAttribute             = `attribute`
 	SectionDatacenter            = `datacenter`
+	SectionEntity                = `entity`
 	SectionEnvironment           = `environment`
 	SectionHostDeployment        = `hostdeployment`
 	SectionInstanceMgmt          = `instance-mgmt`
@@ -39,7 +40,6 @@ const (
 	SectionState                 = `state`
 	SectionStatus                = `status`
 	SectionTeam                  = `team`
-	SectionEntity                = `entity`
 	SectionUnit                  = `unit`
 	SectionUser                  = `user`
 	SectionValidity              = `validity`
