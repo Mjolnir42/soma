@@ -14,30 +14,6 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnOutputTreeHandler(appLog, reqLog, errLog)
 }
 
-func spawnObjectStateReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var handler stateRead
-	handler.input = make(chan msg.Request)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`state_r`] = &handler
-	go handler.run()
-}
-
-func spawnObjectStateWriteHandler(appLog, reqLog, errLog *log.Logger) {
-	var handler stateWrite
-	handler.input = make(chan msg.Request, 64)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`state_w`] = &handler
-	go handler.run()
-}
-
 func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {
 	var supervisorHandler supervisor
 	var err error
