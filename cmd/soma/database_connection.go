@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mjolnir42/soma/internal/stmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/lib/pq"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/stmt"
 )
 
 func connectToDatabase(appLog, errLog *log.Logger) {
@@ -29,7 +30,7 @@ func connectToDatabase(appLog, errLog *log.Logger) {
 	)
 
 	// enable handling of infinity timestamps
-	pq.EnableInfinityTs(NegTimeInf, PosTimeInf)
+	pq.EnableInfinityTs(msg.NegTimeInf, msg.PosTimeInf)
 
 	conn, err = sql.Open(driver, connect)
 	if err != nil {

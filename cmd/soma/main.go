@@ -29,18 +29,6 @@ var (
 	handlerMap = make(map[string]interface{})
 	// config file runtime configuration
 	SomaCfg soma.Config
-	// this offset influences the biggest date representable in
-	// the system without overflow
-	unixToInternalOffset int64 = 62135596800
-	// this will be used as mapping for the PostgreSQL time value
-	// -infinity. Dates earlier than this will be truncated to
-	// NegTimeInf. RFC3339: -8192-01-01T00:00:00Z
-	NegTimeInf = time.Date(-8192, time.January, 1, 0, 0, 0, 0, time.UTC)
-	// this will be used as mapping for the PostgreSQL time value
-	// +infinity. It is as far as research showed close to the highest
-	// time value Go can represent.
-	// RFC: 219248499-12-06 15:30:07.999999999 +0000 UTC
-	PosTimeInf = time.Unix(1<<63-1-unixToInternalOffset, 999999999)
 	// Orderly shutdown of the system has been called. GrimReaper is active
 	ShutdownInProgress bool = false
 	// lookup table of logfile handles for logrotate reopen
