@@ -13,6 +13,7 @@ import (
 	"database/sql"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/config"
 )
 
 // Soma application struct
@@ -20,7 +21,7 @@ type Soma struct {
 	handlerMap   *HandlerMap
 	logMap       *LogHandleMap
 	dbConnection *sql.DB
-	conf         *Config
+	conf         *config.Config
 	appLog       *logrus.Logger
 	reqLog       *logrus.Logger
 	errLog       *logrus.Logger
@@ -31,7 +32,7 @@ func New(
 	appHandlerMap *HandlerMap,
 	logHandleMap *LogHandleMap,
 	dbConnection *sql.DB,
-	conf *Config,
+	conf *config.Config,
 	appLog, reqLog, errLog *logrus.Logger,
 ) *Soma {
 	s := Soma{}

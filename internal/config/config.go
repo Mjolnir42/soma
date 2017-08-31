@@ -6,7 +6,7 @@
  * that can be found in the LICENSE file.
  */
 
-package soma
+package config
 
 import (
 	"bytes"
