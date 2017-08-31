@@ -1150,4 +1150,17 @@ type stateWrite struct {
 	errLog     *log.Logger
 }
 
+type jobsRead struct {
+	input         chan msg.Request
+	shutdown      chan bool
+	conn          *sql.DB
+	listall_stmt  *sql.Stmt
+	listscp_stmt  *sql.Stmt
+	showid_stmt   *sql.Stmt
+	showlist_stmt *sql.Stmt
+	appLog        *log.Logger
+	reqLog        *log.Logger
+	errLog        *log.Logger
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

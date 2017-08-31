@@ -24,6 +24,7 @@ func (s *Soma) Start() {
 	s.handlerMap.Add(`group_r`, newGroupRead(s.conf.QueueLen))
 	s.handlerMap.Add(`hostdeployment_r`, newHostDeploymentRead(s.conf.QueueLen))
 	s.handlerMap.Add(`instance_r`, newInstanceRead(s.conf.QueueLen))
+	s.handlerMap.Add(`job_r`, newJobRead(s.conf.QueueLen))
 	s.handlerMap.Add(`mode_r`, newModeRead(s.conf.QueueLen))
 	s.handlerMap.Add(`monitoring_r`, newMonitoringRead(s.conf.QueueLen))
 	s.handlerMap.Add(`node_r`, newNodeRead(s.conf.QueueLen))

@@ -123,6 +123,7 @@ const (
 	ActionSearch         = `search`
 	ActionSearchAll      = `search-all`
 	ActionSearchByAsset  = `search/asset`
+	ActionSearchByList   = `search/list`
 	ActionSearchByName   = `search/name`
 	ActionSet            = `set`
 	ActionShow           = `show`

@@ -10,7 +10,6 @@ import (
 func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
 
-	spawnJobReadHandler(appLog, reqLog, errLog)
 	spawnOutputTreeHandler(appLog, reqLog, errLog)
 }
 
@@ -43,18 +42,6 @@ func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {
 	supervisorHandler.activation = SomaCfg.Auth.Activation
 	handlerMap[`supervisor`] = &supervisorHandler
 	go supervisorHandler.run()
-}
-
-func spawnJobReadHandler(appLog, reqLog, errLog *log.Logger) {
-	var handler jobsRead
-	handler.input = make(chan msg.Request, 256)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`jobs_r`] = &handler
-	go handler.run()
 }
 
 func spawnOutputTreeHandler(appLog, reqLog, errLog *log.Logger) {
