@@ -32,3 +32,9 @@ _testmain.go
 *.prof
 
 # Dev
+/docs/api
+/docs/command*
+/docs/common
+/docs/concepts
+/docs/pkey_auth.txt
+/docs/soma_global_log.txt
