@@ -10,11 +10,12 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 import (
 	"database/sql"
 
+	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/perm"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/auth"
-	log "github.com/Sirupsen/logrus"
 )
 
 type supervisor struct {
@@ -75,6 +76,7 @@ type supervisor struct {
 	appLog                *log.Logger
 	reqLog                *log.Logger
 	errLog                *log.Logger
+	conf                  *config.Config
 }
 
 func (s *supervisor) run() {

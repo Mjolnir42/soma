@@ -16,6 +16,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/client9/reopen"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/rest"
 	"github.com/mjolnir42/soma/internal/soma"
 	metrics "github.com/rcrowley/go-metrics"
@@ -28,7 +29,7 @@ var (
 	// lookup table for go routine input channels
 	handlerMap = make(map[string]interface{})
 	// config file runtime configuration
-	SomaCfg soma.Config
+	SomaCfg config.Config
 	// Orderly shutdown of the system has been called. GrimReaper is active
 	ShutdownInProgress bool = false
 	// lookup table of logfile handles for logrotate reopen
