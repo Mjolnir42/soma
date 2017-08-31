@@ -92,7 +92,7 @@ func (s *supervisor) activate_user(q *msg.Request) {
 		goto dispatch
 	}
 	// request has been decrypted, log it
-	s.reqLog.Printf(LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
+	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
 
 	// -> check token.UserName != `root`
 	if token.UserName == `root` {
@@ -159,8 +159,8 @@ func (s *supervisor) activate_user(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	validFrom, _ = time.Parse(rfc3339Milli, token.ValidFrom)
-	expiresAt, _ = time.Parse(rfc3339Milli, token.ExpiresAt)
+	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
+	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 	credExpiresAt = validFrom.Add(time.Duration(s.credExpiry) * time.Hour * 24).UTC()
 
 	// -> open transaction

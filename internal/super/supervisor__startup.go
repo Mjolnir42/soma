@@ -172,8 +172,8 @@ func (s *supervisor) startupTokens() {
 		); err != nil {
 			s.errLog.Fatal(`supervisor/load-tokens,scan: `, err)
 		}
-		valid = validFrom.Format(rfc3339Milli)
-		expires = expiresAt.Format(rfc3339Milli)
+		valid = validFrom.Format(msg.RFC3339Milli)
+		expires = expiresAt.Format(msg.RFC3339Milli)
 
 		if err = s.tokens.insert(token, valid, expires, salt); err != nil {
 			s.errLog.Fatal(`supervisor/load-tokens,insert: `, err)

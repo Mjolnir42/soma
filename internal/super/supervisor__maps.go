@@ -31,6 +31,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/auth"
 
 	"github.com/mjolnir42/scrypth64"
@@ -72,10 +73,10 @@ func (t *svTokenMap) insert(token, valid, expires, salt string) error {
 	)
 	// convert input data into the different formats required to
 	// perform later actions without conversions
-	if valTime, err = time.Parse(rfc3339Milli, valid); err != nil {
+	if valTime, err = time.Parse(msg.RFC3339Milli, valid); err != nil {
 		return err
 	}
-	if expTime, err = time.Parse(rfc3339Milli, expires); err != nil {
+	if expTime, err = time.Parse(msg.RFC3339Milli, expires); err != nil {
 		return err
 	}
 	if bExpTime, err = expTime.MarshalBinary(); err != nil {

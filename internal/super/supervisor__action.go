@@ -125,7 +125,7 @@ func (s *supervisor) actionShow(q *msg.Request, r *msg.Result) {
 		Category:    category,
 		Details: &proto.DetailsCreation{
 			CreatedBy: user,
-			CreatedAt: ts.Format(rfc3339Milli),
+			CreatedAt: ts.Format(msg.RFC3339Milli),
 		},
 	}}
 	r.OK()

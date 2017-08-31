@@ -88,7 +88,7 @@ func (s *supervisor) issue_token(q *msg.Request) {
 		goto dispatch
 	}
 
-	s.reqLog.Printf(LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
+	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
 
 	if cred = s.credentials.read(token.UserName); cred == nil {
 		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
@@ -109,8 +109,8 @@ func (s *supervisor) issue_token(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	validFrom, _ = time.Parse(rfc3339Milli, token.ValidFrom)
-	expiresAt, _ = time.Parse(rfc3339Milli, token.ExpiresAt)
+	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
+	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 	// -> DB Insert: token data
 	if tx, err = s.conn.Begin(); err != nil {
 		result.ServerError(err)

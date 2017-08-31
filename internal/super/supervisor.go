@@ -10,7 +10,7 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 import (
 	"database/sql"
 
-	log "github.com/Sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/perm"
@@ -73,9 +73,9 @@ type supervisor struct {
 	stmt_PermissionSearch *sql.Stmt
 	stmt_PermissionMap    *sql.Stmt
 	stmt_PermissionUnmap  *sql.Stmt
-	appLog                *log.Logger
-	reqLog                *log.Logger
-	errLog                *log.Logger
+	appLog                *logrus.Logger
+	reqLog                *logrus.Logger
+	errLog                *logrus.Logger
 	conf                  *config.Config
 }
 

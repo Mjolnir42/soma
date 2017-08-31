@@ -87,8 +87,8 @@ func (s *supervisor) fetchTokenFromDB(token string) bool {
 		return false
 	}
 
-	strValid = validF.UTC().Format(rfc3339Milli)
-	strExpire = validU.UTC().Format(rfc3339Milli)
+	strValid = validF.UTC().Format(msg.RFC3339Milli)
+	strExpire = validU.UTC().Format(msg.RFC3339Milli)
 
 	if err = s.tokens.insert(token, strValid, strExpire, salt); err == nil {
 		return true
@@ -139,7 +139,7 @@ func (s *supervisor) checkIV(iv string) error {
 }
 
 func (s *supervisor) requestLog(q *msg.Request) {
-	s.reqLog.Printf(LogStrSRq,
+	s.reqLog.Printf(msg.LogStrSRq,
 		fmt.Sprintf("supervisor/%s",
 			q.Section,
 		),

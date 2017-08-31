@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/mjolnir42/soma/internal/msg"
-	log "github.com/Sirupsen/logrus"
 )
 
 func (s *supervisor) authorize(q *msg.Request) {
@@ -82,7 +81,9 @@ func IsAuthorized(request *msg.Authorization) bool {
 		return true
 	}
 	// not authorized
-	log.Printf(LogStrErr, `authorize`, `request`,
+	singleton.errLog.Printf(
+		"Section=%s, Action=%s, InternalCode=%d, Error=%s", // shutup go vet
+		`authorize`, `request`,
 		result.Super.Verdict,
 		fmt.Sprintf("Forbidden: %s, %s, %s/%s",
 			request.AuthUser,

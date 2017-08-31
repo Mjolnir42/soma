@@ -125,7 +125,7 @@ func (s *supervisor) categoryShow(q *msg.Request, r *msg.Result) {
 	r.Category = []proto.Category{proto.Category{
 		Name: category,
 		Details: &proto.CategoryDetails{
-			CreatedAt: ts.Format(rfc3339Milli),
+			CreatedAt: ts.Format(msg.RFC3339Milli),
 			CreatedBy: user,
 		},
 	}}

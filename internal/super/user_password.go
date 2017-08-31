@@ -70,7 +70,7 @@ func (s *supervisor) userPassword(q *msg.Request) {
 	// -- the ldap password (reset/ldap)
 	// -- the token         (reset/mailtoken)
 
-	s.reqLog.Printf(LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
+	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
 
 	if err = s.stmt_FindUser.QueryRow(token.UserName).
 		Scan(&userId); err == sql.ErrNoRows {
@@ -149,8 +149,8 @@ func (s *supervisor) userPassword(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	validFrom, _ = time.Parse(rfc3339Milli, token.ValidFrom)
-	expiresAt, _ = time.Parse(rfc3339Milli, token.ExpiresAt)
+	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
+	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 	credDeactivateAt = validFrom.Add(time.Second * -1).UTC()
 	credExpiresAt = validFrom.Add(time.Duration(s.credExpiry) * time.Hour * 24).UTC()
 

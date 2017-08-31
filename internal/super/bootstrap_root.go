@@ -126,8 +126,8 @@ func (s *supervisor) bootstrapRoot(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	validFrom, _ = time.Parse(rfc3339Milli, token.ValidFrom)
-	expiresAt, _ = time.Parse(rfc3339Milli, token.ExpiresAt)
+	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
+	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 
 	// -> DB Insert: root password data
 	if tx, err = s.conn.Begin(); err != nil {
