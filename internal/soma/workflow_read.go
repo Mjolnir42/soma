@@ -149,24 +149,24 @@ func (r *WorkflowRead) list(q *msg.Request, mr *msg.Result) {
 			CurrentStatus:    status,
 			IsInherited:      isInherited,
 			Info: &proto.InstanceVersionInfo{
-				CreatedAt: created.UTC().Format(rfc3339Milli),
+				CreatedAt: created.UTC().Format(msg.RFC3339Milli),
 			},
 		}
 		if activatedNull.Valid {
 			instance.Info.ActivatedAt = activatedNull.
-				Time.UTC().Format(rfc3339Milli)
+				Time.UTC().Format(msg.RFC3339Milli)
 		}
 		if deprovisionedNull.Valid {
 			instance.Info.DeprovisionedAt = deprovisionedNull.
-				Time.UTC().Format(rfc3339Milli)
+				Time.UTC().Format(msg.RFC3339Milli)
 		}
 		if updatedNull.Valid {
 			instance.Info.StatusLastUpdatedAt = updatedNull.
-				Time.UTC().Format(rfc3339Milli)
+				Time.UTC().Format(msg.RFC3339Milli)
 		}
 		if notifiedNull.Valid {
 			instance.Info.NotifiedAt = notifiedNull.
-				Time.UTC().Format(rfc3339Milli)
+				Time.UTC().Format(msg.RFC3339Milli)
 		}
 		*workflow.Instances = append(*workflow.Instances,
 			instance)

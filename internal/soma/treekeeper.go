@@ -29,8 +29,6 @@ import (
 // Metrics is the map of runtime metric registries
 var Metrics = make(map[string]metrics.Registry)
 
-const rfc3339Milli string = "2006-01-02T15:04:05.000Z07:00"
-
 // TreeKeeper handles the repository tree structure
 type TreeKeeper struct {
 	Input               chan msg.Request
@@ -372,7 +370,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		tk.soma.conf.LogPath,
 		`job`,
 		fmt.Sprintf("%s_%s_%s.log",
-			time.Now().UTC().Format(rfc3339Milli),
+			time.Now().UTC().Format(msg.RFC3339Milli),
 			tk.meta.repoName,
 			q.JobID.String(),
 		),

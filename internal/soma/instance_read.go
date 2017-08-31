@@ -294,24 +294,24 @@ func (r *InstanceRead) versions(q *msg.Request, mr *msg.Result) {
 			IsInherited:      isInherited,
 			Info: &proto.InstanceVersionInfo{
 				// created timestamp is a not null column
-				CreatedAt: createdNull.Time.Format(rfc3339Milli),
+				CreatedAt: createdNull.Time.Format(msg.RFC3339Milli),
 			},
 		}
 		if activatedNull.Valid {
 			inst.Info.ActivatedAt = activatedNull.Time.Format(
-				rfc3339Milli)
+				msg.RFC3339Milli)
 		}
 		if deprovisionedNull.Valid {
 			inst.Info.DeprovisionedAt = deprovisionedNull.Time.
-				Format(rfc3339Milli)
+				Format(msg.RFC3339Milli)
 		}
 		if updatedNull.Valid {
 			inst.Info.StatusLastUpdatedAt = updatedNull.Time.
-				Format(rfc3339Milli)
+				Format(msg.RFC3339Milli)
 		}
 		if notifiedNull.Valid {
 			inst.Info.NotifiedAt = notifiedNull.Time.Format(
-				rfc3339Milli)
+				msg.RFC3339Milli)
 		}
 		mr.Instance = append(mr.Instance, inst)
 	}

@@ -223,12 +223,12 @@ func (r *JobRead) show(q *msg.Request, mr *msg.Result) {
 		TeamId:       teamID,
 		Error:        jobError,
 	}
-	job.TsQueued = jobQueued.Format(rfc3339Milli)
+	job.TsQueued = jobQueued.Format(msg.RFC3339Milli)
 	if jobStarted.Valid {
-		job.TsStarted = jobStarted.Time.Format(rfc3339Milli)
+		job.TsStarted = jobStarted.Time.Format(msg.RFC3339Milli)
 	}
 	if jobFinished.Valid {
-		job.TsFinished = jobFinished.Time.Format(rfc3339Milli)
+		job.TsFinished = jobFinished.Time.Format(msg.RFC3339Milli)
 	}
 	if q.Flag.JobDetail {
 		job.Details = &proto.JobDetails{
@@ -290,12 +290,12 @@ func (r *JobRead) search(q *msg.Request, mr *msg.Result) {
 			TeamId:       teamID,
 			Error:        jobError,
 		}
-		job.TsQueued = jobQueued.Format(rfc3339Milli)
+		job.TsQueued = jobQueued.Format(msg.RFC3339Milli)
 		if jobStarted.Valid {
-			job.TsStarted = jobStarted.Time.Format(rfc3339Milli)
+			job.TsStarted = jobStarted.Time.Format(msg.RFC3339Milli)
 		}
 		if jobFinished.Valid {
-			job.TsFinished = jobFinished.Time.Format(rfc3339Milli)
+			job.TsFinished = jobFinished.Time.Format(msg.RFC3339Milli)
 		}
 		if q.Flag.JobDetail && q.Search.IsDetailed {
 			job.Details = &proto.JobDetails{

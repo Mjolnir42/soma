@@ -13,7 +13,7 @@ import (
 )
 
 func msgRequest(l *logrus.Logger, q *msg.Request) {
-	l.Infof(LogStrSRq,
+	l.Infof(msg.LogStrSRq,
 		q.Section,
 		q.Action,
 		q.AuthUser,

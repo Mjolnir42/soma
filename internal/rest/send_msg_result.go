@@ -13,11 +13,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/soma"
 	"github.com/mjolnir42/soma/lib/auth"
 	"github.com/mjolnir42/soma/lib/proto"
-	log "github.com/Sirupsen/logrus"
 )
 
 // sendMsgResult is the output function for all requests that did not
@@ -32,14 +31,14 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 
 	// this is central error command, proceeding to log
 	if r.Error != nil {
-		log.Printf(soma.LogStrErr, r.Section, r.Action, r.Code, r.Error.Error())
+		log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, r.Error.Error())
 	}
 
 	switch r.Section {
 	case `kex`:
 		k = r.Super.Kex
 		if bjson, err = json.Marshal(&k); err != nil {
-			log.Printf(soma.LogStrErr, r.Section, r.Action, r.Code, err.Error())
+			log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, err.Error())
 			dispatchInternalError(w, nil)
 			return
 		}
@@ -49,22 +48,22 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		switch r.Code {
 		case 200:
 			if r.Super.Verdict == 200 {
-				log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 200)
+				log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 				goto dispatchOCTET
 			}
-			log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 401)
+			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 401)
 			dispatchUnauthorized(w, nil)
 		case 400:
-			log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 400)
+			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 400)
 			dispatchBadRequest(w, nil)
 		case 404:
-			log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 404)
+			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 404)
 			dispatchNotFound(w, r.Error)
 		case 406:
-			log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 406)
+			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 406)
 			dispatchConflict(w, r.Error)
 		default:
-			log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 401)
+			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 401)
 			dispatchUnauthorized(w, nil)
 		}
 		return
@@ -126,48 +125,48 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		result = proto.NewNodeResult()
 		*result.Nodes = append(*result.Nodes, r.Node...)
 	default:
-		log.Printf(soma.LogStrErr, r.Section, r.Action, 0, `Result from unhandled subsystem`)
+		log.Printf(msg.LogStrErr, r.Section, r.Action, 0, `Result from unhandled subsystem`)
 		dispatchInternalError(w, nil)
 		return
 	}
 
 	switch r.Code {
 	case 200:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 200)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		if r.Error != nil {
 			result.Error(r.Error)
 		}
 		result.OK()
 	case 202:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 202)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 202)
 		result.JobId = r.JobId
 		result.Accepted()
 	case 400:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 400)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 400)
 		dispatchBadRequest(w, nil)
 		return
 	case 403:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 403)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 403)
 		dispatchForbidden(w, r.Error)
 		return
 	case 404:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 200)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.NotFound()
 	case 406:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 406)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 406)
 		dispatchConflict(w, r.Error)
 		return
 	case 500:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 500)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 500)
 		result.Error(r.Error)
 	case 501:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 501)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 501)
 		result.NotImplemented()
 	case 503:
-		log.Printf(soma.LogStrOK, r.Section, r.Action, r.Code, 503)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 503)
 		result.Unavailable()
 	default:
-		log.Printf(soma.LogStrErr, r.Section, r.Action, r.Code, `Unhandled internal result code`)
+		log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, `Unhandled internal result code`)
 		dispatchInternalError(w, nil)
 		return
 	}
@@ -179,7 +178,7 @@ dispatchOCTET:
 
 buildJSON:
 	if bjson, err = json.Marshal(&result); err != nil {
-		log.Printf(soma.LogStrErr, r.Section, r.Action, r.Code, err)
+		log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, err)
 		dispatchInternalError(w, nil)
 		return
 	}
