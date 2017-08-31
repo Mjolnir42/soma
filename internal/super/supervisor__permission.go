@@ -74,7 +74,7 @@ func (s *supervisor) permissionWrite(q *msg.Request) {
 	}
 
 	if result.IsOK() {
-		handlerMap[`supervisor`].(*supervisor).update <- msg.CacheUpdateFromRequest(q)
+		s.update <- msg.CacheUpdateFromRequest(q)
 	}
 
 	q.Reply <- result

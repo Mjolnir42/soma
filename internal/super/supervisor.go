@@ -18,6 +18,12 @@ import (
 	"github.com/mjolnir42/soma/lib/auth"
 )
 
+var (
+	// only one supervisor instance will be set up by New
+	initialized = false
+	singleton   *supervisor
+)
+
 type supervisor struct {
 	input                 chan msg.Request
 	update                chan msg.Request
@@ -80,11 +86,17 @@ type supervisor struct {
 }
 
 func New(c *config.Config) *supervisor {
+	if initialized {
+		return nil
+	}
 	s := &supervisor{}
 	s.conf = c
 
 	// set package variable config for functions
 	cfg = c
+	// set singleton supervisor instance
+	singleton = s
+	initialized = true
 	return s
 }
 

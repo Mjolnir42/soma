@@ -69,8 +69,7 @@ func IsAuthorized(request *msg.Authorization) bool {
 		return true
 	}
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	singleton.input <- msg.Request{
 		Section:    `authorize`,
 		Action:     `request`,
 		AuthUser:   request.AuthUser,
