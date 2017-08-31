@@ -37,6 +37,7 @@ func (s *Soma) Start() {
 	s.handlerMap.Add(`state_r`, newStateRead(s.conf.QueueLen))
 	s.handlerMap.Add(`status_r`, newStatusRead(s.conf.QueueLen))
 	s.handlerMap.Add(`team_r`, newTeamRead(s.conf.QueueLen))
+	s.handlerMap.Add(`tree_r`, newTreeRead(s.conf.QueueLen))
 	s.handlerMap.Add(`unit_r`, newUnitRead(s.conf.QueueLen))
 	s.handlerMap.Add(`user_r`, newUserRead(s.conf.QueueLen))
 	s.handlerMap.Add(`validity_r`, newValidityRead(s.conf.QueueLen))

@@ -9,8 +9,6 @@ import (
 
 func startHandlers(appLog, reqLog, errLog *log.Logger) {
 	spawnSupervisorHandler(appLog, reqLog, errLog)
-
-	spawnOutputTreeHandler(appLog, reqLog, errLog)
 }
 
 func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {
@@ -42,18 +40,6 @@ func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {
 	supervisorHandler.activation = SomaCfg.Auth.Activation
 	handlerMap[`supervisor`] = &supervisorHandler
 	go supervisorHandler.run()
-}
-
-func spawnOutputTreeHandler(appLog, reqLog, errLog *log.Logger) {
-	var handler outputTree
-	handler.input = make(chan msg.Request, 128)
-	handler.shutdown = make(chan bool)
-	handler.conn = conn
-	handler.appLog = appLog
-	handler.reqLog = reqLog
-	handler.errLog = errLog
-	handlerMap[`tree_r`] = &handler
-	go handler.run()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

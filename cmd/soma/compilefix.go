@@ -1163,4 +1163,28 @@ type jobsRead struct {
 	errLog        *log.Logger
 }
 
+type outputTree struct {
+	input    chan msg.Request
+	shutdown chan bool
+	conn     *sql.DB
+	// object details
+	stmtRepo    *sql.Stmt
+	stmtBucket  *sql.Stmt
+	stmtGroup   *sql.Stmt
+	stmtCluster *sql.Stmt
+	stmtNode    *sql.Stmt
+	// object tree
+	stmtRepoBuck *sql.Stmt
+	stmtBuckGrp  *sql.Stmt
+	stmtBuckClr  *sql.Stmt
+	stmtBuckNod  *sql.Stmt
+	stmtGrpGrp   *sql.Stmt
+	stmtGrpClr   *sql.Stmt
+	stmtGrpNod   *sql.Stmt
+	stmtClrNod   *sql.Stmt
+	appLog       *log.Logger
+	reqLog       *log.Logger
+	errLog       *log.Logger
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
