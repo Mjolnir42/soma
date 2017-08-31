@@ -30,8 +30,9 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/scrypth64"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/stmt"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -101,7 +102,7 @@ func (s *supervisor) startupRoot() {
 			s.errLog.Fatal(`supervisor/string-to-mcf: `, err)
 		}
 		s.credentials.insert(`root`, uuid.Nil, validFrom.UTC(),
-			PosTimeInf.UTC(), mcf)
+			msg.PosTimeInf.UTC(), mcf)
 	}
 }
 

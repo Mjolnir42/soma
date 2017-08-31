@@ -32,10 +32,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mjolnir42/scrypth64"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/auth"
-	"github.com/mjolnir42/scrypth64"
 	"github.com/satori/go.uuid"
 )
 
@@ -157,7 +157,7 @@ func (s *supervisor) bootstrapRoot(q *msg.Request) {
 	}
 	// -> s.credentials Update
 	s.credentials.insert(`root`, uuid.Nil, validFrom.UTC(),
-		PosTimeInf.UTC(), mcf)
+		msg.PosTimeInf.UTC(), mcf)
 	// -> s.tokens Update
 	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
 		token.Salt); err != nil {
