@@ -79,6 +79,15 @@ type supervisor struct {
 	conf                  *config.Config
 }
 
+func New(c *config.Config) *supervisor {
+	s := &supervisor{}
+	s.conf = c
+
+	// set package variable config for functions
+	cfg = c
+	return s
+}
+
 func (s *supervisor) run() {
 	var err error
 

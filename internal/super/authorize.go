@@ -4,8 +4,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/msg"
 )
+
+// cfg is a copy of the config.Config given to Supervisor so
+// exported functions can access it
+var cfg *config.Config
 
 func (s *supervisor) authorize(q *msg.Request) {
 	result := msg.FromRequest(q)
@@ -60,7 +65,7 @@ func (s *supervisor) authorize_global(q *msg.Request) (uint16, bool) {
 
 func IsAuthorized(request *msg.Authorization) bool {
 	// instance is configured as wild-west instance
-	if SomaCfg.OpenInstance {
+	if cfg.OpenInstance {
 		return true
 	}
 	returnChannel := make(chan msg.Result)

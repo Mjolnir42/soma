@@ -18,26 +18,26 @@ func validateLdapCredentials(user, password string) (bool, error) {
 		pem  []byte
 	)
 
-	addr := fmt.Sprintf("%s:%d", SomaCfg.Ldap.Address, SomaCfg.Ldap.Port)
+	addr := fmt.Sprintf("%s:%d", cfg.Ldap.Address, cfg.Ldap.Port)
 	bindDN := strings.Join(
 		[]string{
 			strings.Join(
 				[]string{
-					SomaCfg.Ldap.Attribute,
+					cfg.Ldap.Attribute,
 					user,
 				},
 				`=`,
 			),
-			SomaCfg.Ldap.UserDN,
-			SomaCfg.Ldap.BaseDN,
+			cfg.Ldap.UserDN,
+			cfg.Ldap.BaseDN,
 		},
 		`,`,
 	)
 
-	if SomaCfg.Ldap.TLS {
+	if cfg.Ldap.TLS {
 		conf := &tls.Config{
-			InsecureSkipVerify: SomaCfg.Ldap.SkipVerify,
-			ServerName:         SomaCfg.Ldap.Address,
+			InsecureSkipVerify: cfg.Ldap.SkipVerify,
+			ServerName:         cfg.Ldap.Address,
 			MinVersion:         tls.VersionTLS12,
 			MaxVersion:         tls.VersionTLS12,
 			CipherSuites: []uint16{
@@ -45,8 +45,8 @@ func validateLdapCredentials(user, password string) (bool, error) {
 				tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
 			},
 		}
-		if SomaCfg.Ldap.Cert != "" {
-			if pem, err = ioutil.ReadFile(SomaCfg.Ldap.Cert); err != nil {
+		if cfg.Ldap.Cert != "" {
+			if pem, err = ioutil.ReadFile(cfg.Ldap.Cert); err != nil {
 				return false, err
 			}
 			conf.RootCAs = x509.NewCertPool()
