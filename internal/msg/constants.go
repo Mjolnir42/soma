@@ -121,7 +121,7 @@ const (
 	ActionRetry          = `retry`
 	ActionRevoke         = `revoke`
 	ActionSearch         = `search`
-	ActionSearchAll      = `search-all`
+	ActionSearchAll      = `search/all`
 	ActionSearchByAsset  = `search/asset`
 	ActionSearchByList   = `search/list`
 	ActionSearchByName   = `search/name`
