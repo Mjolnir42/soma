@@ -6,7 +6,7 @@
  * that can be found in the LICENSE file.
  */
 
-package main
+package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"

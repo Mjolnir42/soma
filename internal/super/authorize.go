@@ -1,4 +1,4 @@
-package main
+package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"fmt"
