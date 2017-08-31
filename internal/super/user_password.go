@@ -109,7 +109,7 @@ func (s *supervisor) userPassword(q *msg.Request) {
 			goto dispatch
 		default:
 			result.ServerError(fmt.Errorf("Unknown activation: %s",
-				SomaCfg.Auth.Activation))
+				s.conf.Auth.Activation))
 			goto dispatch
 		}
 	case `change`:

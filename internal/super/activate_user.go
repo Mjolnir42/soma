@@ -121,7 +121,7 @@ func (s *supervisor) activate_user(q *msg.Request) {
 	}
 
 	// no account ownership verification in open mode
-	if !SomaCfg.OpenInstance {
+	if !s.conf.OpenInstance {
 		switch s.activation {
 		case `ldap`:
 			if ok, err = validateLdapCredentials(token.UserName, token.Token); err != nil {
@@ -142,7 +142,7 @@ func (s *supervisor) activate_user(q *msg.Request) {
 			goto dispatch
 		default:
 			result.ServerError(fmt.Errorf("Unknown activation: %s",
-				SomaCfg.Auth.Activation))
+				s.conf.Auth.Activation))
 			goto dispatch
 		}
 	}
