@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // RightSearch function
@@ -14,7 +15,7 @@ func RightSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `right`,
@@ -31,7 +32,7 @@ func RightSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
 	mr := msg.Request{
 		Section:    `right`,
 		Action:     `search`,
@@ -48,7 +49,7 @@ func RightSearch(w http.ResponseWriter, r *http.Request,
 		},
 	}
 
-	handler.input <- mr
+	handler.Input <- mr
 	result := <-returnChannel
 	SendMsgResult(&w, &result)
 }
@@ -72,7 +73,7 @@ func RightGrant(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `right`,
@@ -84,8 +85,8 @@ func RightGrant(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `right`,
 		Action:     `grant`,
 		Reply:      returnChannel,
@@ -108,7 +109,7 @@ func RightRevoke(w http.ResponseWriter, r *http.Request,
 		PermissionId: params.ByName(`permission`),
 	}
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `right`,
@@ -120,8 +121,8 @@ func RightRevoke(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `right`,
 		Action:     `revoke`,
 		Reply:      returnChannel,

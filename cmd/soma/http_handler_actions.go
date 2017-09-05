@@ -12,9 +12,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // ActionList accepts requests to list actions in a specific section
@@ -22,7 +23,7 @@ func ActionList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `action`,
@@ -33,8 +34,8 @@ func ActionList(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `action`,
 		Action:     `list`,
 		Reply:      returnChannel,
@@ -54,7 +55,7 @@ func ActionShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `action`,
@@ -65,8 +66,8 @@ func ActionShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `action`,
 		Action:     `show`,
 		Reply:      returnChannel,
@@ -87,7 +88,7 @@ func ActionSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `action`,
@@ -111,8 +112,8 @@ func ActionSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `action`,
 		Action:     `search`,
 		Reply:      returnChannel,
@@ -132,7 +133,7 @@ func ActionAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `action`,
@@ -156,8 +157,8 @@ func ActionAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `action`,
 		Action:     `add`,
 		Reply:      returnChannel,
@@ -177,7 +178,7 @@ func ActionRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `action`,
@@ -188,8 +189,8 @@ func ActionRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `action`,
 		Action:     `remove`,
 		Reply:      returnChannel,

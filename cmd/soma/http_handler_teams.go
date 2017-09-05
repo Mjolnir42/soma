@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // TeamList function
@@ -14,7 +15,7 @@ func TeamList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `team`,
@@ -58,7 +59,7 @@ func TeamShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `team`,
@@ -87,7 +88,7 @@ func TeamSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `team`,
@@ -113,7 +114,7 @@ func TeamAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `team`,
@@ -150,7 +151,7 @@ func TeamUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `team`,
@@ -189,7 +190,7 @@ func TeamRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `team`,

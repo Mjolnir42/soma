@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"unicode/utf8"
 
-	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // ClusterList function
@@ -16,7 +17,7 @@ func ClusterList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `cluster`,
@@ -63,7 +64,7 @@ func ClusterShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `cluster`,
@@ -92,7 +93,7 @@ func ClusterListMember(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `cluster`,
@@ -128,7 +129,7 @@ func ClusterCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `cluster`,
@@ -173,7 +174,7 @@ func ClusterAddMember(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `cluster`,
@@ -235,7 +236,7 @@ func ClusterAddProperty(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `cluster`,
@@ -297,7 +298,7 @@ func ClusterRemoveProperty(w http.ResponseWriter, r *http.Request,
 		},
 	}
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `cluster`,

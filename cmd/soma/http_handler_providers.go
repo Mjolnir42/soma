@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // ProviderList function
@@ -14,7 +15,7 @@ func ProviderList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `provider`,
@@ -39,7 +40,7 @@ func ProviderShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `provider`,
@@ -67,7 +68,7 @@ func ProviderAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `provider`,
@@ -102,7 +103,7 @@ func ProviderRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `provider`,

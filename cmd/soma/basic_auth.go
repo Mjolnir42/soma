@@ -39,8 +39,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mjolnir42/soma/internal/msg"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -77,8 +78,8 @@ func BasicAuth(h httprouter.Handle) httprouter.Handle {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
 				if len(pair) == 2 {
 					returnChannel := make(chan msg.Result)
-					super := handlerMap[`supervisor`].(*supervisor)
-					super.input <- msg.Request{
+					super := handlerMap[`supervisor`].(*super.Supervisor)
+					super.Input <- msg.Request{
 						Section: `authenticate`,
 						Action:  `basic`,
 						Reply:   returnChannel,

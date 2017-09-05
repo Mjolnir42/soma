@@ -12,9 +12,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // SectionList accepts requests to list all sections
@@ -22,7 +23,7 @@ func SectionList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `section`,
@@ -33,8 +34,8 @@ func SectionList(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `section`,
 		Action:     `list`,
 		Reply:      returnChannel,
@@ -51,7 +52,7 @@ func SectionShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `section`,
@@ -62,8 +63,8 @@ func SectionShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `section`,
 		Action:     `show`,
 		Reply:      returnChannel,
@@ -82,7 +83,7 @@ func SectionSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `section`,
@@ -106,8 +107,8 @@ func SectionSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `section`,
 		Action:     `search`,
 		Reply:      returnChannel,
@@ -126,7 +127,7 @@ func SectionAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `section`,
@@ -144,8 +145,8 @@ func SectionAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `section`,
 		Action:     `add`,
 		Reply:      returnChannel,
@@ -165,7 +166,7 @@ func SectionRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `section`,
@@ -176,8 +177,8 @@ func SectionRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `section`,
 		Action:     `remove`,
 		Reply:      returnChannel,

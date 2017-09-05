@@ -1,10 +1,9 @@
 package main
 
 import (
-	"encoding/hex"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
 )
 
 func startHandlers(appLog, reqLog, errLog *log.Logger) {
@@ -12,15 +11,13 @@ func startHandlers(appLog, reqLog, errLog *log.Logger) {
 }
 
 func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {
-	var supervisorHandler supervisor
-	var err error
-	supervisorHandler.input = make(chan msg.Request, 1024)
-	supervisorHandler.update = make(chan msg.Request, 1024)
-	supervisorHandler.shutdown = make(chan bool)
-	supervisorHandler.conn = conn
-	supervisorHandler.appLog = appLog
-	supervisorHandler.reqLog = reqLog
-	supervisorHandler.errLog = errLog
+	var supervisorHandler super.Supervisor
+	//var err error
+	supervisorHandler.Input = make(chan msg.Request, 1024)
+	supervisorHandler.Update = make(chan msg.Request, 1024)
+	supervisorHandler.Shutdown = make(chan struct{})
+	supervisorHandler.Register(conn, appLog, reqLog, errLog)
+	/* XXX move to NewSupervisor function
 	supervisorHandler.readonly = SomaCfg.ReadOnly
 	if supervisorHandler.seed, err = hex.DecodeString(SomaCfg.Auth.TokenSeed); err != nil {
 		panic(err)
@@ -38,8 +35,9 @@ func spawnSupervisorHandler(appLog, reqLog, errLog *log.Logger) {
 	supervisorHandler.kexExpiry = SomaCfg.Auth.KexExpirySeconds
 	supervisorHandler.credExpiry = SomaCfg.Auth.CredentialExpiryDays
 	supervisorHandler.activation = SomaCfg.Auth.Activation
+	*/
 	handlerMap[`supervisor`] = &supervisorHandler
-	go supervisorHandler.run()
+	go supervisorHandler.Run()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -70,7 +70,7 @@ func IsAuthorized(request *msg.Authorization) bool {
 		return true
 	}
 	returnChannel := make(chan msg.Result)
-	singleton.input <- msg.Request{
+	singleton.Input <- msg.Request{
 		Section:    `authorize`,
 		Action:     `request`,
 		AuthUser:   request.AuthUser,

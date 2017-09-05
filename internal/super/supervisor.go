@@ -26,9 +26,9 @@ var (
 
 // Supervisor handles all AAA requests
 type Supervisor struct {
-	input                             chan msg.Request
-	update                            chan msg.Request
-	shutdown                          chan bool
+	Input                             chan msg.Request
+	Update                            chan msg.Request
+	Shutdown                          chan struct{}
 	conn                              *sql.DB
 	seed                              []byte
 	key                               []byte
@@ -102,7 +102,16 @@ func New(c *config.Config) *Supervisor {
 	return s
 }
 
-func (s *Supervisor) run() {
+// Register initializes resources provided by the Soma app
+func (s *Supervisor) Register(c *sql.DB, l ...*logrus.Logger) {
+	s.conn = c
+	s.appLog = l[0]
+	s.reqLog = l[1]
+	s.errLog = l[2]
+}
+
+// Run ...
+func (s *Supervisor) Run() {
 	var err error
 
 	// set library options
@@ -179,7 +188,7 @@ runloop:
 	for {
 		// handle cache updates before handling user requests
 		select {
-		case req := <-s.update:
+		case req := <-s.Update:
 			s.process(&req)
 			continue runloop
 		default:
@@ -188,11 +197,11 @@ runloop:
 
 		// handle whatever request comes in
 		select {
-		case <-s.shutdown:
+		case <-s.Shutdown:
 			break runloop
-		case req := <-s.update:
+		case req := <-s.Update:
 			s.process(&req)
-		case req := <-s.input:
+		case req := <-s.Input:
 			s.process(&req)
 		}
 	}
@@ -245,7 +254,7 @@ func (s *Supervisor) process(q *msg.Request) {
 }
 
 func (s *Supervisor) shutdownNow() {
-	s.shutdown <- true
+	close(s.Shutdown)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

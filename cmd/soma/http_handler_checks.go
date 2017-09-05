@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/lib/proto"
 
 	"github.com/julienschmidt/httprouter"
@@ -17,7 +18,7 @@ func CheckConfigurationList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `check`,
@@ -66,7 +67,7 @@ func CheckConfigurationShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:     params.ByName(`AuthenticatedUser`),
 		RemoteAddr:   extractAddress(r.RemoteAddr),
 		Section:      `check`,
@@ -104,7 +105,7 @@ func CheckConfigurationCreate(w http.ResponseWriter, r *http.Request,
 	}
 	cReq.CheckConfig.Id = uuid.Nil.String()
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:     params.ByName(`AuthenticatedUser`),
 		RemoteAddr:   extractAddress(r.RemoteAddr),
 		Section:      `check`,
@@ -138,7 +139,7 @@ func CheckConfigurationDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:     params.ByName(`AuthenticatedUser`),
 		RemoteAddr:   extractAddress(r.RemoteAddr),
 		Section:      `check`,

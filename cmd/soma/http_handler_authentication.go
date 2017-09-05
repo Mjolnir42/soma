@@ -31,6 +31,7 @@ import (
 	"net/http"
 
 	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/lib/auth"
 
 	"github.com/julienschmidt/httprouter"
@@ -57,8 +58,8 @@ func AuthenticationKex(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section: `kex`,
 		Action:  `init`,
 		Reply:   returnChannel,
@@ -150,8 +151,8 @@ func AuthenticationEncryptedData(w *http.ResponseWriter,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section: section,
 		Action:  action,
 		Reply:   returnChannel,

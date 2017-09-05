@@ -74,7 +74,7 @@ func (s *Supervisor) permissionWrite(q *msg.Request) {
 	}
 
 	if result.IsOK() {
-		s.update <- msg.CacheUpdateFromRequest(q)
+		s.Update <- msg.CacheUpdateFromRequest(q)
 	}
 
 	q.Reply <- result

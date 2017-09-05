@@ -11,9 +11,10 @@ package main
 import (
 	"net/http"
 
-	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/internal/super"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // CategoryList function
@@ -21,7 +22,7 @@ func CategoryList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `category`,
@@ -32,8 +33,8 @@ func CategoryList(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `category`,
 		Action:     `list`,
 		Reply:      returnChannel,
@@ -49,7 +50,7 @@ func CategoryShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `category`,
@@ -60,8 +61,8 @@ func CategoryShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `category`,
 		Action:     `show`,
 		Reply:      returnChannel,
@@ -80,7 +81,7 @@ func CategoryAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `category`,
@@ -98,8 +99,8 @@ func CategoryAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `category`,
 		Action:     `add`,
 		Reply:      returnChannel,
@@ -118,7 +119,7 @@ func CategoryRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !IsAuthorized(&msg.Authorization{
+	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `category`,
@@ -129,8 +130,8 @@ func CategoryRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*supervisor)
-	handler.input <- msg.Request{
+	handler := handlerMap[`supervisor`].(*super.Supervisor)
+	handler.Input <- msg.Request{
 		Section:    `category`,
 		Action:     `remove`,
 		Reply:      returnChannel,

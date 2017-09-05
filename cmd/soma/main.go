@@ -19,6 +19,7 @@ import (
 	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/rest"
 	"github.com/mjolnir42/soma/internal/soma"
+	"github.com/mjolnir42/soma/internal/super"
 	metrics "github.com/rcrowley/go-metrics"
 )
 
@@ -217,7 +218,7 @@ func main() {
 
 	startHandlers(appLog, reqLog, errLog)
 
-	rst = rest.New(IsAuthorized, &hm)
+	rst = rest.New(super.IsAuthorized, &hm)
 
 	router := httprouter.New()
 
