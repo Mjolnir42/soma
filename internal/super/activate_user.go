@@ -32,14 +32,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mjolnir42/scrypth64"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/auth"
-	"github.com/mjolnir42/scrypth64"
 	uuid "github.com/satori/go.uuid"
 )
 
-func (s *supervisor) activate_user(q *msg.Request) {
+func (s *Supervisor) activateUser(q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Super = &msg.Supervisor{}
 
@@ -50,7 +50,7 @@ func (s *supervisor) activate_user(q *msg.Request) {
 		kex                                 *auth.Kex
 		validFrom, expiresAt, credExpiresAt time.Time
 		token                               auth.Token
-		userId                              string
+		userID                              string
 		userUUID                            uuid.UUID
 		ok, active                          bool
 		mcf                                 scrypth64.Mcf
@@ -102,21 +102,21 @@ func (s *supervisor) activate_user(q *msg.Request) {
 	}
 
 	// check we have the user
-	if err = s.stmt_FindUser.QueryRow(token.UserName).Scan(&userId); err == sql.ErrNoRows {
+	if err = s.stmtFindUserID.QueryRow(token.UserName).Scan(&userID); err == sql.ErrNoRows {
 		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
 		goto dispatch
 	} else if err != nil {
 		result.ServerError(err)
 	}
-	userUUID, _ = uuid.FromString(userId)
+	userUUID, _ = uuid.FromString(userID)
 
 	// check the user is not already active
-	if err = s.stmt_CheckUser.QueryRow(userId).Scan(&active); err == sql.ErrNoRows {
+	if err = s.stmtCheckUserActive.QueryRow(userID).Scan(&active); err == sql.ErrNoRows {
 		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
 		goto dispatch
 	}
 	if active {
-		result.Conflict(fmt.Errorf("User %s (%s) is already active", token.UserName, userId))
+		result.Conflict(fmt.Errorf("User %s (%s) is already active", token.UserName, userID))
 		goto dispatch
 	}
 

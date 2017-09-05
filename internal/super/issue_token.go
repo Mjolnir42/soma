@@ -37,7 +37,7 @@ import (
 	"github.com/mjolnir42/soma/lib/auth"
 )
 
-func (s *supervisor) issue_token(q *msg.Request) {
+func (s *Supervisor) issueToken(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var (
 		cred                 *svCredential
@@ -82,7 +82,7 @@ func (s *supervisor) issue_token(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	if token.UserName == `root` && s.root_restricted && !q.Super.Restricted {
+	if token.UserName == `root` && s.rootRestricted && !q.Super.Restricted {
 		result.ServerError(
 			fmt.Errorf(`Root token requested on unrestricted endpoint`))
 		goto dispatch

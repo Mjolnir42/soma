@@ -18,7 +18,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (s *supervisor) action(q *msg.Request) {
+func (s *Supervisor) action(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	s.requestLog(q)
@@ -42,7 +42,7 @@ abort:
 	q.Reply <- result
 }
 
-func (s *supervisor) actionRead(q *msg.Request) {
+func (s *Supervisor) actionRead(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
@@ -57,14 +57,14 @@ func (s *supervisor) actionRead(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (s *supervisor) actionList(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) actionList(q *msg.Request, r *msg.Result) {
 	r.ActionObj = []proto.Action{}
 	var (
 		err                             error
 		rows                            *sql.Rows
 		actionID, actionName, sectionID string
 	)
-	if rows, err = s.stmt_ActionList.Query(); err != nil {
+	if rows, err = s.stmtActionList.Query(); err != nil {
 		r.ServerError(err)
 		return
 	}
@@ -95,14 +95,14 @@ func (s *supervisor) actionList(q *msg.Request, r *msg.Result) {
 	r.OK()
 }
 
-func (s *supervisor) actionShow(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) actionShow(q *msg.Request, r *msg.Result) {
 	var (
 		err                             error
 		ts                              time.Time
 		actionID, actionName, sectionID string
 		category, user, sectionName     string
 	)
-	if err = s.stmt_ActionShow.QueryRow(q.ActionObj.Id).Scan(
+	if err = s.stmtActionShow.QueryRow(q.ActionObj.Id).Scan(
 		&actionID,
 		&actionName,
 		&sectionID,
@@ -131,14 +131,14 @@ func (s *supervisor) actionShow(q *msg.Request, r *msg.Result) {
 	r.OK()
 }
 
-func (s *supervisor) actionSearch(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) actionSearch(q *msg.Request, r *msg.Result) {
 	r.ActionObj = []proto.Action{}
 	var (
 		err                             error
 		rows                            *sql.Rows
 		actionID, actionName, sectionID string
 	)
-	if rows, err = s.stmt_ActionList.Query(
+	if rows, err = s.stmtActionSearch.Query(
 		q.ActionObj.Name,
 		q.ActionObj.SectionId,
 	); err != nil {
@@ -172,7 +172,7 @@ func (s *supervisor) actionSearch(q *msg.Request, r *msg.Result) {
 	r.OK()
 }
 
-func (s *supervisor) actionWrite(q *msg.Request) {
+func (s *Supervisor) actionWrite(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
@@ -189,13 +189,13 @@ func (s *supervisor) actionWrite(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (s *supervisor) actionAdd(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) actionAdd(q *msg.Request, r *msg.Result) {
 	var (
 		err error
 		res sql.Result
 	)
 	q.ActionObj.Id = uuid.NewV4().String()
-	if res, err = s.stmt_ActionAdd.Exec(
+	if res, err = s.stmtActionAdd.Exec(
 		q.ActionObj.Id,
 		q.ActionObj.Name,
 		q.ActionObj.SectionId,
@@ -209,7 +209,7 @@ func (s *supervisor) actionAdd(q *msg.Request, r *msg.Result) {
 	}
 }
 
-func (s *supervisor) actionRemove(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) actionRemove(q *msg.Request, r *msg.Result) {
 	var (
 		err error
 		tx  *sql.Tx
@@ -258,7 +258,7 @@ func (s *supervisor) actionRemove(q *msg.Request, r *msg.Result) {
 	r.ActionObj = []proto.Action{q.ActionObj}
 }
 
-func (s *supervisor) actionRemoveTx(id string,
+func (s *Supervisor) actionRemoveTx(id string,
 	txMap map[string]*sql.Stmt) (sql.Result, error) {
 	var (
 		err error

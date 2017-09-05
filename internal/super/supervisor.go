@@ -21,75 +21,77 @@ import (
 var (
 	// only one supervisor instance will be set up by New
 	initialized = false
-	singleton   *supervisor
+	singleton   *Supervisor
 )
 
-type supervisor struct {
-	input                 chan msg.Request
-	update                chan msg.Request
-	shutdown              chan bool
-	conn                  *sql.DB
-	seed                  []byte
-	key                   []byte
-	readonly              bool
-	tokenExpiry           uint64
-	kexExpiry             uint64
-	credExpiry            uint64
-	activation            string
-	root_disabled         bool
-	root_restricted       bool
-	kex                   *svKexMap
-	tokens                *svTokenMap
-	credentials           *svCredMap
-	global_permissions    *svPermMapGlobal
-	global_grants         *svGrantMapGlobal
-	limited_permissions   *svPermMapLimited
-	id_user               *svLockMap
-	id_user_rev           *svLockMap
-	id_team               *svLockMap
-	id_permission         *svLockMap
-	id_userteam           *svLockMap
-	permCache             *perm.Cache
-	stmt_FToken           *sql.Stmt
-	stmt_FindUser         *sql.Stmt
-	stmt_CheckUser        *sql.Stmt
-	stmt_ListCategory     *sql.Stmt
-	stmt_ShowCategory     *sql.Stmt
-	stmt_SectionList      *sql.Stmt
-	stmt_SectionShow      *sql.Stmt
-	stmt_SectionSearch    *sql.Stmt
-	stmt_SectionAdd       *sql.Stmt
-	stmt_ActionList       *sql.Stmt
-	stmt_ActionShow       *sql.Stmt
-	stmt_ActionSearch     *sql.Stmt
-	stmt_ActionAdd        *sql.Stmt
-	stmt_RevokeGlobal     *sql.Stmt
-	stmt_RevokeRepo       *sql.Stmt
-	stmt_RevokeTeam       *sql.Stmt
-	stmt_RevokeMonitor    *sql.Stmt
-	stmt_GrantGlobal      *sql.Stmt
-	stmt_GrantRepo        *sql.Stmt
-	stmt_GrantTeam        *sql.Stmt
-	stmt_GrantMonitor     *sql.Stmt
-	stmt_SearchGlobal     *sql.Stmt
-	stmt_SearchRepo       *sql.Stmt
-	stmt_SearchTeam       *sql.Stmt
-	stmt_SearchMonitor    *sql.Stmt
-	stmt_PermissionList   *sql.Stmt
-	stmt_PermissionSearch *sql.Stmt
-	stmt_PermissionMap    *sql.Stmt
-	stmt_PermissionUnmap  *sql.Stmt
-	appLog                *logrus.Logger
-	reqLog                *logrus.Logger
-	errLog                *logrus.Logger
-	conf                  *config.Config
+// Supervisor handles all AAA requests
+type Supervisor struct {
+	input                             chan msg.Request
+	update                            chan msg.Request
+	shutdown                          chan bool
+	conn                              *sql.DB
+	seed                              []byte
+	key                               []byte
+	readonly                          bool
+	tokenExpiry                       uint64
+	kexExpiry                         uint64
+	credExpiry                        uint64
+	activation                        string
+	rootDisabled                      bool
+	rootRestricted                    bool
+	kex                               *svKexMap
+	tokens                            *svTokenMap
+	credentials                       *svCredMap
+	globalPermissions                 *svPermMapGlobal
+	globalGrants                      *svGrantMapGlobal
+	limitedPermissions                *svPermMapLimited
+	mapUserID                         *svLockMap
+	mapUserIDReverse                  *svLockMap
+	mapTeamID                         *svLockMap
+	mapPermissionID                   *svLockMap
+	mapUserTeamID                     *svLockMap
+	permCache                         *perm.Cache
+	stmtTokenSelect                   *sql.Stmt
+	stmtFindUserID                    *sql.Stmt
+	stmtCheckUserActive               *sql.Stmt
+	stmtCategoryList                  *sql.Stmt
+	stmtCategoryShow                  *sql.Stmt
+	stmtSectionList                   *sql.Stmt
+	stmtSectionShow                   *sql.Stmt
+	stmtSectionSearch                 *sql.Stmt
+	stmtSectionAdd                    *sql.Stmt
+	stmtActionList                    *sql.Stmt
+	stmtActionShow                    *sql.Stmt
+	stmtActionSearch                  *sql.Stmt
+	stmtActionAdd                     *sql.Stmt
+	stmtRevokeAuthorizationGlobal     *sql.Stmt
+	stmtRevokeAuthorizationRepository *sql.Stmt
+	stmtRevokeAuthorizationTeam       *sql.Stmt
+	stmtRevokeAuthorizationMonitoring *sql.Stmt
+	stmtGrantAuthorizationGlobal      *sql.Stmt
+	stmtGrantAuthorizationRepository  *sql.Stmt
+	stmtGrantAuthorizationTeam        *sql.Stmt
+	stmtGrantAuthorizationMonitoring  *sql.Stmt
+	stmtSearchAuthorizationGlobal     *sql.Stmt
+	stmtSearchAuthorizationRepository *sql.Stmt
+	stmtSearchAuthorizationTeam       *sql.Stmt
+	stmtSearchAuthorizationMonitoring *sql.Stmt
+	stmtPermissionList                *sql.Stmt
+	stmtPermissionSearch              *sql.Stmt
+	stmtPermissionMapEntry            *sql.Stmt
+	stmtPermissionUnmapEntry          *sql.Stmt
+	appLog                            *logrus.Logger
+	reqLog                            *logrus.Logger
+	errLog                            *logrus.Logger
+	conf                              *config.Config
 }
 
-func New(c *config.Config) *supervisor {
+// New returns a new supervisor if none have been initialized yet
+func New(c *config.Config) *Supervisor {
 	if initialized {
 		return nil
 	}
-	s := &supervisor{}
+	s := &Supervisor{}
 	s.conf = c
 
 	// set package variable config for functions
@@ -100,7 +102,7 @@ func New(c *config.Config) *supervisor {
 	return s
 }
 
-func (s *supervisor) run() {
+func (s *Supervisor) run() {
 	var err error
 
 	// set library options
@@ -108,17 +110,17 @@ func (s *supervisor) run() {
 	auth.KexExpirySeconds = s.kexExpiry
 
 	// initialize maps
-	s.id_user = s.newLockMap()
-	s.id_user_rev = s.newLockMap()
-	s.id_team = s.newLockMap()
-	s.id_permission = s.newLockMap()
-	s.id_userteam = s.newLockMap()
+	s.mapUserID = s.newLockMap()
+	s.mapUserIDReverse = s.newLockMap()
+	s.mapTeamID = s.newLockMap()
+	s.mapPermissionID = s.newLockMap()
+	s.mapUserTeamID = s.newLockMap()
 	s.tokens = s.newTokenMap()
 	s.credentials = s.newCredentialMap()
 	s.kex = s.newKexMap()
-	s.global_permissions = s.newGlobalPermMap()
-	s.global_grants = s.newGlobalGrantMap()
-	s.limited_permissions = s.newLimitedPermMap()
+	s.globalPermissions = s.newGlobalPermMap()
+	s.globalGrants = s.newGlobalGrantMap()
+	s.limitedPermissions = s.newLimitedPermMap()
 
 	// start permission cache
 	s.permCache = perm.New()
@@ -127,22 +129,22 @@ func (s *supervisor) run() {
 	s.startupLoad()
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.SelectToken:                   s.stmt_FToken,
-		stmt.FindUserID:                    s.stmt_FindUser,
-		stmt.CategoryList:                  s.stmt_ListCategory,
-		stmt.CategoryShow:                  s.stmt_ShowCategory,
-		stmt.PermissionList:                s.stmt_PermissionList,
-		stmt.PermissionSearchByName:        s.stmt_PermissionSearch,
-		stmt.SectionList:                   s.stmt_SectionList,
-		stmt.SectionShow:                   s.stmt_SectionShow,
-		stmt.SectionSearch:                 s.stmt_SectionSearch,
-		stmt.ActionList:                    s.stmt_ActionList,
-		stmt.ActionShow:                    s.stmt_ActionShow,
-		stmt.ActionSearch:                  s.stmt_ActionSearch,
-		stmt.SearchGlobalAuthorization:     s.stmt_SearchGlobal,
-		stmt.SearchRepositoryAuthorization: s.stmt_SearchRepo,
-		stmt.SearchTeamAuthorization:       s.stmt_SearchTeam,
-		stmt.SearchMonitoringAuthorization: s.stmt_SearchMonitor,
+		stmt.SelectToken:                   s.stmtTokenSelect,
+		stmt.FindUserID:                    s.stmtFindUserID,
+		stmt.CategoryList:                  s.stmtCategoryList,
+		stmt.CategoryShow:                  s.stmtCategoryShow,
+		stmt.PermissionList:                s.stmtPermissionList,
+		stmt.PermissionSearchByName:        s.stmtPermissionSearch,
+		stmt.SectionList:                   s.stmtSectionList,
+		stmt.SectionShow:                   s.stmtSectionShow,
+		stmt.SectionSearch:                 s.stmtSectionSearch,
+		stmt.ActionList:                    s.stmtActionList,
+		stmt.ActionShow:                    s.stmtActionShow,
+		stmt.ActionSearch:                  s.stmtActionSearch,
+		stmt.SearchGlobalAuthorization:     s.stmtSearchAuthorizationGlobal,
+		stmt.SearchRepositoryAuthorization: s.stmtSearchAuthorizationRepository,
+		stmt.SearchTeamAuthorization:       s.stmtSearchAuthorizationTeam,
+		stmt.SearchMonitoringAuthorization: s.stmtSearchAuthorizationMonitoring,
 	} {
 		if prepStmt, err = s.conn.Prepare(statement); err != nil {
 			s.errLog.Fatal(`supervisor`, err, stmt.Name(statement))
@@ -152,19 +154,19 @@ func (s *supervisor) run() {
 
 	if !s.readonly {
 		for statement, prepStmt := range map[string]*sql.Stmt{
-			stmt.CheckUserActive:               s.stmt_CheckUser,
-			stmt.SectionAdd:                    s.stmt_SectionAdd,
-			stmt.ActionAdd:                     s.stmt_ActionAdd,
-			stmt.RevokeGlobalAuthorization:     s.stmt_RevokeGlobal,
-			stmt.RevokeRepositoryAuthorization: s.stmt_RevokeRepo,
-			stmt.RevokeTeamAuthorization:       s.stmt_RevokeTeam,
-			stmt.RevokeMonitoringAuthorization: s.stmt_RevokeMonitor,
-			stmt.GrantGlobalAuthorization:      s.stmt_GrantGlobal,
-			stmt.GrantRepositoryAuthorization:  s.stmt_GrantRepo,
-			stmt.GrantTeamAuthorization:        s.stmt_GrantTeam,
-			stmt.GrantMonitoringAuthorization:  s.stmt_GrantMonitor,
-			stmt.PermissionMapEntry:            s.stmt_PermissionMap,
-			stmt.PermissionUnmapEntry:          s.stmt_PermissionUnmap,
+			stmt.CheckUserActive:               s.stmtCheckUserActive,
+			stmt.SectionAdd:                    s.stmtSectionAdd,
+			stmt.ActionAdd:                     s.stmtActionAdd,
+			stmt.RevokeGlobalAuthorization:     s.stmtRevokeAuthorizationGlobal,
+			stmt.RevokeRepositoryAuthorization: s.stmtRevokeAuthorizationRepository,
+			stmt.RevokeTeamAuthorization:       s.stmtRevokeAuthorizationTeam,
+			stmt.RevokeMonitoringAuthorization: s.stmtRevokeAuthorizationMonitoring,
+			stmt.GrantGlobalAuthorization:      s.stmtGrantAuthorizationGlobal,
+			stmt.GrantRepositoryAuthorization:  s.stmtGrantAuthorizationRepository,
+			stmt.GrantTeamAuthorization:        s.stmtGrantAuthorizationTeam,
+			stmt.GrantMonitoringAuthorization:  s.stmtGrantAuthorizationMonitoring,
+			stmt.PermissionMapEntry:            s.stmtPermissionMapEntry,
+			stmt.PermissionUnmapEntry:          s.stmtPermissionUnmapEntry,
 		} {
 			if prepStmt, err = s.conn.Prepare(statement); err != nil {
 				s.errLog.Fatal(`supervisor`, err, stmt.Name(statement))
@@ -196,7 +198,7 @@ runloop:
 	}
 }
 
-func (s *supervisor) process(q *msg.Request) {
+func (s *Supervisor) process(q *msg.Request) {
 	switch q.Section {
 	case `kex`:
 		go func() { s.kexInit(q) }()
@@ -205,13 +207,13 @@ func (s *supervisor) process(q *msg.Request) {
 		s.bootstrapRoot(q)
 
 	case `authenticate`:
-		go func() { s.validate_basic_auth(q) }()
+		go func() { s.validateBasicAuth(q) }()
 
 	case `token`:
-		go func() { s.issue_token(q) }()
+		go func() { s.issueToken(q) }()
 
 	case `activate`:
-		go func() { s.activate_user(q) }()
+		go func() { s.activateUser(q) }()
 
 	case `password`:
 		go func() { s.userPassword(q) }()
@@ -220,7 +222,7 @@ func (s *supervisor) process(q *msg.Request) {
 		go func() { s.authorize(q) }()
 
 	case `map`:
-		go func() { s.update_map(q) }()
+		go func() { s.updateMap(q) }()
 
 	case `category`:
 		s.category(q)
@@ -242,7 +244,7 @@ func (s *supervisor) process(q *msg.Request) {
 	}
 }
 
-func (s *supervisor) shutdownNow() {
+func (s *Supervisor) shutdownNow() {
 	s.shutdown <- true
 }
 

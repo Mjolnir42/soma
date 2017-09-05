@@ -12,13 +12,13 @@ import (
 // exported functions can access it
 var cfg *config.Config
 
-func (s *supervisor) authorize(q *msg.Request) {
+func (s *Supervisor) authorize(q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Super = &msg.Supervisor{}
 
 	switch svPermissionActionScopeMap[q.Super.PermAction] {
 	case `global`:
-		result.Super.Verdict, result.Super.VerdictAdmin = s.authorize_global(q)
+		result.Super.Verdict, result.Super.VerdictAdmin = s.authorizeGlobal(q)
 	case `repository`:
 	case `team`:
 	default:
@@ -32,26 +32,26 @@ unauthorized:
 	q.Reply <- result
 }
 
-func (s *supervisor) authorize_global(q *msg.Request) (uint16, bool) {
+func (s *Supervisor) authorizeGlobal(q *msg.Request) (uint16, bool) {
 	var (
 		userUUID, permUUID string
 		ok                 bool
 	)
 	// unknown user
-	if userUUID, ok = s.id_user_rev.get(q.AuthUser); !ok {
+	if userUUID, ok = s.mapUserIDReverse.get(q.AuthUser); !ok {
 		return 403, false
 	}
 	// user has omnipotence
-	if s.global_permissions.assess(userUUID,
+	if s.globalPermissions.assess(userUUID,
 		`00000000-0000-0000-0000-000000000000`) {
 		return 200, true
 	}
 	for _, perm := range svGlobalRequiredPermission[q.Super.PermAction] {
 		// incomplete permission schema -> denied
-		if permUUID, ok = s.id_permission.get(perm); !ok {
+		if permUUID, ok = s.mapPermissionID.get(perm); !ok {
 			return 403, false
 		}
-		if s.global_permissions.assess(userUUID, permUUID) {
+		if s.globalPermissions.assess(userUUID, permUUID) {
 			// has system permission (ordered + checked first)
 			if strings.HasPrefix(perm, `system_`) {
 				return 200, true
@@ -63,6 +63,7 @@ func (s *supervisor) authorize_global(q *msg.Request) (uint16, bool) {
 	return 403, false
 }
 
+// IsAuthorized returns if the request is permitted
 func IsAuthorized(request *msg.Authorization) bool {
 	// instance is configured as wild-west instance
 	if cfg.OpenInstance {

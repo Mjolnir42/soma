@@ -18,7 +18,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (s *supervisor) section(q *msg.Request) {
+func (s *Supervisor) section(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	s.requestLog(q)
@@ -42,7 +42,7 @@ abort:
 	q.Reply <- result
 }
 
-func (s *supervisor) sectionRead(q *msg.Request) {
+func (s *Supervisor) sectionRead(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
@@ -57,7 +57,7 @@ func (s *supervisor) sectionRead(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (s *supervisor) sectionList(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) sectionList(q *msg.Request, r *msg.Result) {
 	r.SectionObj = []proto.Section{}
 	var (
 		err                    error
@@ -65,7 +65,7 @@ func (s *supervisor) sectionList(q *msg.Request, r *msg.Result) {
 		sectionID, sectionName string
 	)
 
-	if _, err = s.stmt_SectionList.Query(); err != nil {
+	if _, err = s.stmtSectionList.Query(); err != nil {
 		r.ServerError(err)
 		return
 	}
@@ -91,14 +91,14 @@ func (s *supervisor) sectionList(q *msg.Request, r *msg.Result) {
 	}
 }
 
-func (s *supervisor) sectionShow(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) sectionShow(q *msg.Request, r *msg.Result) {
 	var (
 		err                                    error
 		sectionID, sectionName, category, user string
 		ts                                     time.Time
 	)
 
-	if err = s.stmt_SectionShow.QueryRow(q.SectionObj.Id).Scan(
+	if err = s.stmtSectionShow.QueryRow(q.SectionObj.Id).Scan(
 		&sectionID,
 		&sectionName,
 		&category,
@@ -122,7 +122,7 @@ func (s *supervisor) sectionShow(q *msg.Request, r *msg.Result) {
 	}}
 }
 
-func (s *supervisor) sectionSearch(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) sectionSearch(q *msg.Request, r *msg.Result) {
 	r.SectionObj = []proto.Section{}
 	var (
 		err                    error
@@ -130,7 +130,7 @@ func (s *supervisor) sectionSearch(q *msg.Request, r *msg.Result) {
 		sectionID, sectionName string
 	)
 
-	if _, err = s.stmt_SectionSearch.Query(
+	if _, err = s.stmtSectionSearch.Query(
 		q.SectionObj.Name); err != nil {
 		r.ServerError(err)
 		return
@@ -157,7 +157,7 @@ func (s *supervisor) sectionSearch(q *msg.Request, r *msg.Result) {
 	}
 }
 
-func (s *supervisor) sectionWrite(q *msg.Request) {
+func (s *Supervisor) sectionWrite(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
@@ -174,13 +174,13 @@ func (s *supervisor) sectionWrite(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (s *supervisor) sectionAdd(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) sectionAdd(q *msg.Request, r *msg.Result) {
 	var (
 		err error
 		res sql.Result
 	)
 	q.SectionObj.Id = uuid.NewV4().String()
-	if res, err = s.stmt_SectionAdd.Exec(
+	if res, err = s.stmtSectionAdd.Exec(
 		q.SectionObj.Id,
 		q.SectionObj.Name,
 		q.SectionObj.Category,
@@ -194,7 +194,7 @@ func (s *supervisor) sectionAdd(q *msg.Request, r *msg.Result) {
 	}
 }
 
-func (s *supervisor) sectionRemove(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) sectionRemove(q *msg.Request, r *msg.Result) {
 	var (
 		err error
 		tx  *sql.Tx
@@ -246,7 +246,7 @@ func (s *supervisor) sectionRemove(q *msg.Request, r *msg.Result) {
 	r.ActionObj = []proto.Action{q.ActionObj}
 }
 
-func (s *supervisor) sectionRemoveTx(id string,
+func (s *Supervisor) sectionRemoveTx(id string,
 	txMap map[string]*sql.Stmt) (sql.Result, error) {
 	var (
 		err      error

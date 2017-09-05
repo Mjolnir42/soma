@@ -2,38 +2,38 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import "github.com/mjolnir42/soma/internal/msg"
 
-func (s *supervisor) update_map(q *msg.Request) {
+func (s *Supervisor) updateMap(q *msg.Request) {
 
 	switch q.Super.Object {
 	case `team`:
 		switch q.Action {
 		case `add`:
-			s.id_team.insert(q.Super.Team.Id, q.Super.Team.Name)
+			s.mapTeamID.insert(q.Super.Team.Id, q.Super.Team.Name)
 		case `update`:
-			s.id_team.insert(q.Super.Team.Id, q.Super.Team.Name)
+			s.mapTeamID.insert(q.Super.Team.Id, q.Super.Team.Name)
 		case `delete`:
-			s.id_team.remove(q.Super.Team.Id)
+			s.mapTeamID.remove(q.Super.Team.Id)
 		}
 	case `user`:
 		switch q.Action {
 		case `add`:
-			s.id_user.insert(q.Super.User.Id, q.Super.User.UserName)
-			s.id_user_rev.insert(q.Super.User.UserName, q.Super.User.Id)
-			s.id_userteam.insert(q.Super.User.Id, q.Super.User.TeamId)
+			s.mapUserID.insert(q.Super.User.Id, q.Super.User.UserName)
+			s.mapUserIDReverse.insert(q.Super.User.UserName, q.Super.User.Id)
+			s.mapUserTeamID.insert(q.Super.User.Id, q.Super.User.TeamId)
 		case `update`:
-			oldname, _ := s.id_user.get(q.Super.User.Id)
+			oldname, _ := s.mapUserID.get(q.Super.User.Id)
 			if oldname != q.Super.User.UserName {
-				s.id_user_rev.remove(oldname)
+				s.mapUserIDReverse.remove(oldname)
 			}
-			s.id_user.insert(q.Super.User.Id, q.Super.User.UserName)
-			s.id_user_rev.insert(q.Super.User.UserName, q.Super.User.Id)
-			s.id_userteam.insert(q.Super.User.Id, q.Super.User.TeamId)
+			s.mapUserID.insert(q.Super.User.Id, q.Super.User.UserName)
+			s.mapUserIDReverse.insert(q.Super.User.UserName, q.Super.User.Id)
+			s.mapUserTeamID.insert(q.Super.User.Id, q.Super.User.TeamId)
 		case `delete`:
-			if name, ok := s.id_user.get(q.Super.User.Id); ok {
-				s.id_user_rev.remove(name)
+			if name, ok := s.mapUserID.get(q.Super.User.Id); ok {
+				s.mapUserIDReverse.remove(name)
 			}
-			s.id_user.remove(q.Super.User.Id)
-			s.id_userteam.remove(q.Super.User.Id)
+			s.mapUserID.remove(q.Super.User.Id)
+			s.mapUserTeamID.remove(q.Super.User.Id)
 		}
 	}
 

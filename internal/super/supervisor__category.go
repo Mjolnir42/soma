@@ -19,7 +19,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (s *supervisor) category(q *msg.Request) {
+func (s *Supervisor) category(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	s.requestLog(q)
@@ -45,7 +45,7 @@ abort:
 	q.Reply <- result
 }
 
-func (s *supervisor) categoryRead(q *msg.Request) {
+func (s *Supervisor) categoryRead(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
@@ -57,7 +57,7 @@ func (s *supervisor) categoryRead(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (s *supervisor) categoryWrite(q *msg.Request) {
+func (s *Supervisor) categoryWrite(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
@@ -75,13 +75,13 @@ func (s *supervisor) categoryWrite(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (s *supervisor) categoryList(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) categoryList(q *msg.Request, r *msg.Result) {
 	var (
 		err      error
 		rows     *sql.Rows
 		category string
 	)
-	if rows, err = s.stmt_ListCategory.Query(); err != nil {
+	if rows, err = s.stmtCategoryList.Query(); err != nil {
 		r.ServerError(err)
 		return
 	}
@@ -105,13 +105,13 @@ func (s *supervisor) categoryList(q *msg.Request, r *msg.Result) {
 	r.OK()
 }
 
-func (s *supervisor) categoryShow(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) categoryShow(q *msg.Request, r *msg.Result) {
 	var (
 		err            error
 		category, user string
 		ts             time.Time
 	)
-	if err = s.stmt_ShowCategory.QueryRow(q.Category.Name).Scan(
+	if err = s.stmtCategoryShow.QueryRow(q.Category.Name).Scan(
 		&category,
 		&user,
 		&ts,
@@ -132,7 +132,7 @@ func (s *supervisor) categoryShow(q *msg.Request, r *msg.Result) {
 	r.OK()
 }
 
-func (s *supervisor) categoryAdd(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) categoryAdd(q *msg.Request, r *msg.Result) {
 	var (
 		err error
 		tx  *sql.Tx
@@ -180,7 +180,7 @@ func (s *supervisor) categoryAdd(q *msg.Request, r *msg.Result) {
 	r.Category = []proto.Category{q.Category}
 }
 
-func (s *supervisor) categoryAddTx(q *msg.Request,
+func (s *Supervisor) categoryAddTx(q *msg.Request,
 	txMap map[string]*sql.Stmt) (sql.Result, error) {
 	var (
 		err    error
@@ -215,7 +215,7 @@ func (s *supervisor) categoryAddTx(q *msg.Request,
 	)
 }
 
-func (s *supervisor) categoryRemove(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) categoryRemove(q *msg.Request, r *msg.Result) {
 	var (
 		err error
 		tx  *sql.Tx
@@ -279,7 +279,7 @@ func (s *supervisor) categoryRemove(q *msg.Request, r *msg.Result) {
 
 }
 
-func (s *supervisor) categoryRemoveTx(q *msg.Request,
+func (s *Supervisor) categoryRemoveTx(q *msg.Request,
 	txMap map[string]*sql.Stmt) (sql.Result, error) {
 	var (
 		err                     error

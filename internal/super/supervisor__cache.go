@@ -11,7 +11,7 @@ import "github.com/mjolnir42/soma/internal/msg"
 
 // cache handles all requests to update the supervisor
 // permission cache
-func (s *supervisor) cache(q *msg.Request) {
+func (s *Supervisor) cache(q *msg.Request) {
 	s.permCache.Perform(q)
 }
 

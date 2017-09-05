@@ -17,7 +17,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (s *supervisor) right(q *msg.Request) {
+func (s *Supervisor) right(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	s.requestLog(q)
@@ -48,7 +48,7 @@ abort:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightWrite(q *msg.Request) {
+func (s *Supervisor) rightWrite(q *msg.Request) {
 	switch q.Action {
 	case `grant`:
 		switch q.Grant.Category {
@@ -93,7 +93,7 @@ func (s *supervisor) rightWrite(q *msg.Request) {
 	}
 }
 
-func (s *supervisor) rightGrantGlobal(q *msg.Request) {
+func (s *Supervisor) rightGrantGlobal(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var (
 		err                             error
@@ -123,7 +123,7 @@ func (s *supervisor) rightGrantGlobal(q *msg.Request) {
 	}
 
 	q.Grant.Id = uuid.NewV4().String()
-	if res, err = s.stmt_GrantGlobal.Exec(
+	if res, err = s.stmtGrantAuthorizationGlobal.Exec(
 		q.Grant.Id,
 		adminID,
 		userID,
@@ -144,7 +144,7 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightGrantRepository(q *msg.Request) {
+func (s *Supervisor) rightGrantRepository(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var (
 		err                       error
@@ -196,7 +196,7 @@ func (s *supervisor) rightGrantRepository(q *msg.Request) {
 	}
 
 	q.Grant.Id = uuid.NewV4().String()
-	if res, err = s.stmt_GrantRepo.Exec(
+	if res, err = s.stmtGrantAuthorizationRepository.Exec(
 		q.Grant.Id,
 		userID,
 		toolID,
@@ -222,7 +222,7 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightGrantTeam(q *msg.Request) {
+func (s *Supervisor) rightGrantTeam(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var (
 		err                    error
@@ -243,7 +243,7 @@ func (s *supervisor) rightGrantTeam(q *msg.Request) {
 	}
 
 	q.Grant.Id = uuid.NewV4().String()
-	if res, err = s.stmt_GrantTeam.Exec(
+	if res, err = s.stmtGrantAuthorizationTeam.Exec(
 		q.Grant.Id,
 		userID,
 		toolID,
@@ -264,7 +264,7 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightGrantMonitoring(q *msg.Request) {
+func (s *Supervisor) rightGrantMonitoring(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var (
 		err                    error
@@ -285,7 +285,7 @@ func (s *supervisor) rightGrantMonitoring(q *msg.Request) {
 	}
 
 	q.Grant.Id = uuid.NewV4().String()
-	if res, err = s.stmt_GrantMonitor.Exec(
+	if res, err = s.stmtGrantAuthorizationMonitoring.Exec(
 		q.Grant.Id,
 		userID,
 		toolID,
@@ -306,12 +306,12 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightRevokeGlobal(q *msg.Request) {
+func (s *Supervisor) rightRevokeGlobal(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var err error
 	var res sql.Result
 
-	if res, err = s.stmt_RevokeGlobal.Exec(
+	if res, err = s.stmtRevokeAuthorizationGlobal.Exec(
 		q.Grant.Id,
 		q.Grant.PermissionId,
 		q.Grant.Category,
@@ -327,12 +327,12 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightRevokeRepository(q *msg.Request) {
+func (s *Supervisor) rightRevokeRepository(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var err error
 	var res sql.Result
 
-	if res, err = s.stmt_RevokeRepo.Exec(
+	if res, err = s.stmtRevokeAuthorizationRepository.Exec(
 		q.Grant.Id,
 		q.Grant.PermissionId,
 		q.Grant.Category,
@@ -348,12 +348,12 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightRevokeTeam(q *msg.Request) {
+func (s *Supervisor) rightRevokeTeam(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var err error
 	var res sql.Result
 
-	if res, err = s.stmt_RevokeTeam.Exec(
+	if res, err = s.stmtRevokeAuthorizationTeam.Exec(
 		q.Grant.Id,
 		q.Grant.PermissionId,
 		q.Grant.Category,
@@ -369,12 +369,12 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightRevokeMonitoring(q *msg.Request) {
+func (s *Supervisor) rightRevokeMonitoring(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var err error
 	var res sql.Result
 
-	if res, err = s.stmt_RevokeMonitor.Exec(
+	if res, err = s.stmtRevokeAuthorizationMonitoring.Exec(
 		q.Grant.Id,
 		q.Grant.PermissionId,
 		q.Grant.Category,
@@ -390,7 +390,7 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightRead(q *msg.Request) {
+func (s *Supervisor) rightRead(q *msg.Request) {
 	switch q.Action {
 	case `search`:
 		switch q.Grant.Category {
@@ -411,13 +411,13 @@ func (s *supervisor) rightRead(q *msg.Request) {
 	}
 }
 
-func (s *supervisor) rightSearchGlobal(q *msg.Request) {
+func (s *Supervisor) rightSearchGlobal(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var (
 		err     error
 		grantID string
 	)
-	if err = s.stmt_SearchGlobal.QueryRow(
+	if err = s.stmtSearchAuthorizationGlobal.QueryRow(
 		q.Grant.PermissionId,
 		q.Grant.Category,
 		q.Grant.RecipientId,
@@ -441,7 +441,7 @@ dispatch:
 	q.Reply <- result
 }
 
-func (s *supervisor) rightSearchScoped(q *msg.Request) {
+func (s *Supervisor) rightSearchScoped(q *msg.Request) {
 	result := msg.FromRequest(q)
 	var (
 		err     error
@@ -450,11 +450,11 @@ func (s *supervisor) rightSearchScoped(q *msg.Request) {
 	)
 	switch q.Grant.Category {
 	case `repository`, `repository:grant`:
-		scope = s.stmt_SearchRepo
+		scope = s.stmtSearchAuthorizationRepository
 	case `team`, `team:grant`:
-		scope = s.stmt_SearchTeam
+		scope = s.stmtSearchAuthorizationTeam
 	case `monitoring`, `monitoring:grant`:
-		scope = s.stmt_SearchMonitor
+		scope = s.stmtSearchAuthorizationMonitoring
 	}
 	if err = scope.QueryRow(
 		q.Grant.PermissionId,

@@ -33,7 +33,7 @@ import (
 	"github.com/mjolnir42/soma/lib/auth"
 )
 
-func (s *supervisor) kexInit(q *msg.Request) {
+func (s *Supervisor) kexInit(q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Action = `reply`
 	kex := q.Super.Kex

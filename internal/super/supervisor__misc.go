@@ -20,7 +20,7 @@ import (
 )
 
 // TODO: timer, delete all expired key exchanges
-func (s *supervisor) pruneKex() {
+func (s *Supervisor) pruneKex() {
 	s.kex.lock()
 	defer s.kex.unlock()
 	for kexID, kex := range s.kex.KMap {
@@ -30,56 +30,56 @@ func (s *supervisor) pruneKex() {
 	}
 }
 
-func (s *supervisor) newTokenMap() *svTokenMap {
+func (s *Supervisor) newTokenMap() *svTokenMap {
 	m := svTokenMap{}
 	m.TMap = make(map[string]svToken)
 	return &m
 }
 
-func (s *supervisor) newCredentialMap() *svCredMap {
+func (s *Supervisor) newCredentialMap() *svCredMap {
 	m := svCredMap{}
 	m.CMap = make(map[string]svCredential)
 	return &m
 }
 
-func (s *supervisor) newKexMap() *svKexMap {
+func (s *Supervisor) newKexMap() *svKexMap {
 	m := svKexMap{}
 	m.KMap = make(map[string]auth.Kex)
 	return &m
 }
 
-func (s *supervisor) newLockMap() *svLockMap {
+func (s *Supervisor) newLockMap() *svLockMap {
 	l := svLockMap{}
 	l.LockMap = make(map[string]string)
 	return &l
 }
 
-func (s *supervisor) newGlobalPermMap() *svPermMapGlobal {
+func (s *Supervisor) newGlobalPermMap() *svPermMapGlobal {
 	g := svPermMapGlobal{}
 	g.GMap = make(map[string]map[string]string)
 	return &g
 }
 
-func (s *supervisor) newGlobalGrantMap() *svGrantMapGlobal {
+func (s *Supervisor) newGlobalGrantMap() *svGrantMapGlobal {
 	g := svGrantMapGlobal{}
 	g.GMap = make(map[string][]string)
 	return &g
 }
 
-func (s *supervisor) newLimitedPermMap() *svPermMapLimited {
+func (s *Supervisor) newLimitedPermMap() *svPermMapLimited {
 	l := svPermMapLimited{}
 	l.LMap = make(map[string]map[string][]string)
 	return &l
 }
 
-func (s *supervisor) fetchTokenFromDB(token string) bool {
+func (s *Supervisor) fetchTokenFromDB(token string) bool {
 	var (
 		err                       error
 		salt, strValid, strExpire string
 		validF, validU            time.Time
 	)
 
-	err = s.stmt_FToken.QueryRow(token).Scan(&salt, &validF, &validU)
+	err = s.stmtTokenSelect.QueryRow(token).Scan(&salt, &validF, &validU)
 	if err == sql.ErrNoRows {
 		return false
 	} else if err != nil {
@@ -96,7 +96,7 @@ func (s *supervisor) fetchTokenFromDB(token string) bool {
 	return false
 }
 
-func (s *supervisor) fetchRootToken() (string, error) {
+func (s *Supervisor) fetchRootToken() (string, error) {
 	var (
 		err   error
 		token string
@@ -117,7 +117,7 @@ func (s *supervisor) fetchRootToken() (string, error) {
 // an initial nonce of 0 which can always lead to crypto
 // swamps. Why are safe from that, since the Nonce calculation
 // always takes the Abs value of the IV, stripping the sign.
-func (s *supervisor) checkIV(iv string) error {
+func (s *Supervisor) checkIV(iv string) error {
 	var (
 		err       error
 		bIV       []byte
@@ -138,7 +138,7 @@ func (s *supervisor) checkIV(iv string) error {
 	return nil
 }
 
-func (s *supervisor) requestLog(q *msg.Request) {
+func (s *Supervisor) requestLog(q *msg.Request) {
 	s.reqLog.Printf(msg.LogStrSRq,
 		fmt.Sprintf("supervisor/%s",
 			q.Section,

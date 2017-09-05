@@ -36,7 +36,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (s *supervisor) startupLoad() {
+func (s *Supervisor) startupLoad() {
 
 	s.startupRoot()
 
@@ -52,7 +52,7 @@ func (s *supervisor) startupLoad() {
 	s.startupGrants()
 }
 
-func (s *supervisor) startupRoot() {
+func (s *Supervisor) startupRoot() {
 	var (
 		err                  error
 		flag, crypt          string
@@ -77,9 +77,9 @@ func (s *supervisor) startupRoot() {
 		}
 		switch flag {
 		case `disabled`:
-			s.root_disabled = state
+			s.rootDisabled = state
 		case `restricted`:
-			s.root_restricted = state
+			s.rootRestricted = state
 		}
 	}
 	if err = rows.Err(); err != nil {
@@ -106,7 +106,7 @@ func (s *supervisor) startupRoot() {
 	}
 }
 
-func (s *supervisor) startupCredentials() {
+func (s *Supervisor) startupCredentials() {
 	var (
 		err                  error
 		rows                 *sql.Rows
@@ -149,7 +149,7 @@ func (s *supervisor) startupCredentials() {
 	}
 }
 
-func (s *supervisor) startupTokens() {
+func (s *Supervisor) startupTokens() {
 	var (
 		err                         error
 		token, salt, valid, expires string
@@ -184,7 +184,7 @@ func (s *supervisor) startupTokens() {
 	}
 }
 
-func (s *supervisor) startupUsersAndTeams() {
+func (s *Supervisor) startupUsersAndTeams() {
 	var (
 		err                                    error
 		userUUID, userName, teamUUID, teamName string
@@ -199,14 +199,14 @@ func (s *supervisor) startupUsersAndTeams() {
 
 	// reduce lock overhead by locking here once and then using the
 	// unlocked bulk interface
-	s.id_user.lock()
-	defer s.id_user.unlock()
-	s.id_user_rev.lock()
-	defer s.id_user_rev.unlock()
-	s.id_team.lock()
-	defer s.id_team.unlock()
-	s.id_userteam.lock()
-	defer s.id_userteam.unlock()
+	s.mapUserID.lock()
+	defer s.mapUserID.unlock()
+	s.mapUserIDReverse.lock()
+	defer s.mapUserIDReverse.unlock()
+	s.mapTeamID.lock()
+	defer s.mapTeamID.unlock()
+	s.mapUserTeamID.lock()
+	defer s.mapUserTeamID.unlock()
 
 	for rows.Next() {
 		if err = rows.Scan(
@@ -217,17 +217,17 @@ func (s *supervisor) startupUsersAndTeams() {
 		); err != nil {
 			s.errLog.Fatal(`supervisor/load-user-team-mapping,scan: `, err)
 		}
-		s.id_user.load(userUUID, userName)
-		s.id_user_rev.load(userName, userUUID)
-		s.id_team.load(teamUUID, teamName)
-		s.id_userteam.load(userUUID, teamUUID)
+		s.mapUserID.load(userUUID, userName)
+		s.mapUserIDReverse.load(userName, userUUID)
+		s.mapTeamID.load(teamUUID, teamName)
+		s.mapUserTeamID.load(userUUID, teamUUID)
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-user-team-mapping,next: `, err)
 	}
 }
 
-func (s *supervisor) startupPermissions() {
+func (s *Supervisor) startupPermissions() {
 	var (
 		err                error
 		permUUID, permName string
@@ -242,8 +242,8 @@ func (s *supervisor) startupPermissions() {
 
 	// reduce lock overhead by locking here once and then using the
 	// unlocked bulk interface
-	s.id_permission.lock()
-	defer s.id_permission.unlock()
+	s.mapPermissionID.lock()
+	defer s.mapPermissionID.unlock()
 
 	for rows.Next() {
 		if err = rows.Scan(
@@ -252,14 +252,14 @@ func (s *supervisor) startupPermissions() {
 		); err != nil {
 			s.errLog.Fatal(`supervisor/load-permissions,scan: `, err)
 		}
-		s.id_permission.load(permName, permUUID)
+		s.mapPermissionID.load(permName, permUUID)
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-permissions,next: `, err)
 	}
 }
 
-func (s *supervisor) startupGrants() {
+func (s *Supervisor) startupGrants() {
 	var (
 		err                           error
 		grantUUID, permUUID, userUUID string
@@ -274,10 +274,10 @@ func (s *supervisor) startupGrants() {
 
 	// reduce lock overhead by locking here once and then using the
 	// unlocked load method
-	s.global_permissions.lock()
-	defer s.global_permissions.unlock()
-	s.global_grants.lock()
-	defer s.global_grants.unlock()
+	s.globalPermissions.lock()
+	defer s.globalPermissions.unlock()
+	s.globalGrants.lock()
+	defer s.globalGrants.unlock()
 
 	for rows.Next() {
 		if err = rows.Scan(
@@ -287,8 +287,8 @@ func (s *supervisor) startupGrants() {
 		); err != nil {
 			s.errLog.Fatal(`supervisor/load-user-systemglobal-grants,scan: `, err)
 		}
-		s.global_permissions.load(userUUID, permUUID, grantUUID)
-		s.global_grants.load(userUUID, permUUID, grantUUID)
+		s.globalPermissions.load(userUUID, permUUID, grantUUID)
+		s.globalGrants.load(userUUID, permUUID, grantUUID)
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-user-systemglobal-grants,next: `, err)

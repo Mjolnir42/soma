@@ -39,9 +39,9 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-func (s *supervisor) bootstrapRoot(q *msg.Request) {
+func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 	result := msg.FromRequest(q)
-	kexId := q.Super.KexId
+	kexID := q.Super.KexId
 	data := q.Super.Data
 	var kex *auth.Kex
 	var err error
@@ -67,11 +67,11 @@ func (s *supervisor) bootstrapRoot(q *msg.Request) {
 	if s.credentials.read(`root`) != nil {
 		result.BadRequest(fmt.Errorf(`Root account is already active`))
 		//    --> delete kex
-		s.kex.remove(kexId)
+		s.kex.remove(kexID)
 		goto dispatch
 	}
 	// -> get kex
-	if kex = s.kex.read(kexId); kex == nil {
+	if kex = s.kex.read(kexID); kex == nil {
 		//    --> reply 404 if not found
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
@@ -83,7 +83,7 @@ func (s *supervisor) bootstrapRoot(q *msg.Request) {
 		goto dispatch
 	}
 	// -> delete kex from s.kex (kex is now used)
-	s.kex.remove(kexId)
+	s.kex.remove(kexID)
 	// -> rdata = kex.DecodeAndDecrypt(data)
 	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
 		result.ServerError(err)
@@ -100,7 +100,7 @@ func (s *supervisor) bootstrapRoot(q *msg.Request) {
 		result.Unauthorized(nil)
 		goto dispatch
 	}
-	if token.UserName == `root` && s.root_restricted && !q.Super.Restricted {
+	if token.UserName == `root` && s.rootRestricted && !q.Super.Restricted {
 		result.ServerError(
 			fmt.Errorf(`Root bootstrap requested on unrestricted endpoint`))
 		goto dispatch

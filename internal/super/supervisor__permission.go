@@ -19,7 +19,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (s *supervisor) permission(q *msg.Request) {
+func (s *Supervisor) permission(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	s.requestLog(q)
@@ -45,7 +45,7 @@ abort:
 	q.Reply <- result
 }
 
-func (s *supervisor) permissionWrite(q *msg.Request) {
+func (s *Supervisor) permissionWrite(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
@@ -80,7 +80,7 @@ func (s *supervisor) permissionWrite(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (s *supervisor) permissionAdd(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) permissionAdd(q *msg.Request, r *msg.Result) {
 	var (
 		err error
 		tx  *sql.Tx
@@ -128,7 +128,7 @@ func (s *supervisor) permissionAdd(q *msg.Request, r *msg.Result) {
 	r.Permission = []proto.Permission{q.Permission}
 }
 
-func (s *supervisor) permissionAddTx(q *msg.Request,
+func (s *Supervisor) permissionAddTx(q *msg.Request,
 	txMap map[string]*sql.Stmt) (sql.Result, error) {
 	var (
 		err                        error
@@ -178,7 +178,7 @@ func (s *supervisor) permissionAddTx(q *msg.Request,
 	)
 }
 
-func (s *supervisor) permissionRemove(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) permissionRemove(q *msg.Request, r *msg.Result) {
 	var (
 		err error
 		tx  *sql.Tx
@@ -232,7 +232,7 @@ func (s *supervisor) permissionRemove(q *msg.Request, r *msg.Result) {
 	r.Permission = []proto.Permission{q.Permission}
 }
 
-func (s *supervisor) permissionRemoveTx(q *msg.Request,
+func (s *Supervisor) permissionRemoveTx(q *msg.Request,
 	txMap map[string]*sql.Stmt) (sql.Result, error) {
 	var (
 		err                  error
@@ -301,7 +301,7 @@ func (s *supervisor) permissionRemoveTx(q *msg.Request,
 	return txMap[`permission_rm_tx_remove`].Exec(q.Permission.Id)
 }
 
-func (s *supervisor) permissionMap(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) permissionMap(q *msg.Request, r *msg.Result) {
 	var (
 		err                 error
 		res                 sql.Result
@@ -322,7 +322,7 @@ func (s *supervisor) permissionMap(q *msg.Request, r *msg.Result) {
 	}
 	mapID = uuid.NewV4().String()
 
-	if res, err = s.stmt_PermissionUnmap.Exec(
+	if res, err = s.stmtPermissionMapEntry.Exec(
 		mapID,
 		q.Permission.Category,
 		q.Permission.Id,
@@ -337,7 +337,7 @@ func (s *supervisor) permissionMap(q *msg.Request, r *msg.Result) {
 	}
 }
 
-func (s *supervisor) permissionUnmap(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) permissionUnmap(q *msg.Request, r *msg.Result) {
 	var (
 		err                 error
 		res                 sql.Result
@@ -356,7 +356,7 @@ func (s *supervisor) permissionUnmap(q *msg.Request, r *msg.Result) {
 		return
 	}
 
-	if res, err = s.stmt_PermissionUnmap.Exec(
+	if res, err = s.stmtPermissionUnmapEntry.Exec(
 		q.Permission.Id,
 		q.Permission.Category,
 		sectionID,
@@ -370,7 +370,7 @@ func (s *supervisor) permissionUnmap(q *msg.Request, r *msg.Result) {
 	}
 }
 
-func (s *supervisor) permissionRead(q *msg.Request) {
+func (s *Supervisor) permissionRead(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
@@ -385,13 +385,13 @@ func (s *supervisor) permissionRead(q *msg.Request) {
 	q.Reply <- result
 }
 
-func (s *supervisor) permissionList(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) permissionList(q *msg.Request, r *msg.Result) {
 	var (
 		err      error
 		rows     *sql.Rows
 		id, name string
 	)
-	if rows, err = s.stmt_PermissionList.Query(
+	if rows, err = s.stmtPermissionList.Query(
 		q.Permission.Category,
 	); err != nil {
 		r.ServerError(err)
@@ -422,7 +422,7 @@ func (s *supervisor) permissionList(q *msg.Request, r *msg.Result) {
 	r.OK()
 }
 
-func (s *supervisor) permissionShow(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 	var (
 		err                                          error
 		tx                                           *sql.Tx
@@ -574,13 +574,13 @@ func (s *supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 	r.OK()
 }
 
-func (s *supervisor) permissionSearch(q *msg.Request, r *msg.Result) {
+func (s *Supervisor) permissionSearch(q *msg.Request, r *msg.Result) {
 	var (
 		err      error
 		rows     *sql.Rows
 		id, name string
 	)
-	if rows, err = s.stmt_PermissionList.Query(
+	if rows, err = s.stmtPermissionSearch.Query(
 		q.Permission.Name,
 		q.Permission.Category,
 	); err != nil {

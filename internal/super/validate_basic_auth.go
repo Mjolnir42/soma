@@ -34,12 +34,12 @@ import (
 	"github.com/mjolnir42/soma/lib/auth"
 )
 
-func (s *supervisor) validate_basic_auth(q *msg.Request) {
+func (s *Supervisor) validateBasicAuth(q *msg.Request) {
 	var tok *svToken
 	result := msg.FromRequest(q)
 
 	// basic auth always fails for root if root is disabled
-	if q.Super.BasicAuthUser == `root` && s.root_disabled {
+	if q.Super.BasicAuthUser == `root` && s.rootDisabled {
 		result.ServerError(
 			fmt.Errorf(`Attempted authentication on disabled root account`))
 		goto unauthorized
@@ -48,7 +48,7 @@ func (s *supervisor) validate_basic_auth(q *msg.Request) {
 	// basic auth always fails for root if root is restricted and
 	// the request comes from an unrestricted endpoint. Note: there
 	// are currently no restricted endpoints (https over unix socket)
-	if q.Super.BasicAuthUser == `root` && s.root_restricted && !q.Super.Restricted {
+	if q.Super.BasicAuthUser == `root` && s.rootRestricted && !q.Super.Restricted {
 		result.ServerError(
 			fmt.Errorf(`Attempted root authentication on unrestricted endpoint`))
 		goto unauthorized
