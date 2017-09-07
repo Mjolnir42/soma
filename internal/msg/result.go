@@ -73,14 +73,6 @@ func FromRequest(rq *Request) Result {
 	}
 }
 
-func CacheUpdateFromRequest(rq *Request) Request {
-	return Request{
-		Section:      `cache`,
-		Action:       `update`,
-		CacheRequest: rq,
-	}
-}
-
 func (r *Result) IsOK() bool {
 	switch r.Code {
 	case 200:

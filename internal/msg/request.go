@@ -91,4 +91,12 @@ type Flags struct {
 	RebuildLevel string
 }
 
+func CacheUpdateFromRequest(rq *Request) Request {
+	return Request{
+		Section:      `cache`,
+		Action:       `update`,
+		CacheRequest: rq,
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
