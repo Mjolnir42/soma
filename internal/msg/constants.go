@@ -96,6 +96,7 @@ const (
 
 // Actions for the various permission sections
 const (
+	ActionAdd            = `add`
 	ActionAll            = `all`
 	ActionAssemble       = `assemble`
 	ActionAssign         = `assign`
@@ -103,10 +104,11 @@ const (
 	ActionCreate         = `create`
 	ActionDeclare        = `declare`
 	ActionDelete         = `delete`
+	ActionDestroy        = `destroy`
+	ActionFailed         = `failed`
 	ActionGet            = `get`
 	ActionGrant          = `grant`
 	ActionInsertNullID   = `insert-null`
-	ActionFailed         = `failed`
 	ActionList           = `list`
 	ActionMemberAdd      = `member-add`
 	ActionMemberList     = `member-list`
@@ -114,6 +116,7 @@ const (
 	ActionPropertyAdd    = `property-add`
 	ActionPropertyRemove = `property-remove`
 	ActionPurge          = `purge`
+	ActionRemove         = `remove`
 	ActionRename         = `rename`
 	ActionRepoRebuild    = `rebuild-repository`
 	ActionRepoRestart    = `restart-repository`
