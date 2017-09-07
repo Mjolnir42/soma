@@ -65,7 +65,7 @@ func (s *Supervisor) actionList(q *msg.Request, r *msg.Result) {
 		actionID, actionName, sectionID string
 	)
 	if rows, err = s.stmtActionList.Query(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	defer rows.Close()
@@ -76,8 +76,7 @@ func (s *Supervisor) actionList(q *msg.Request, r *msg.Result) {
 			&actionName,
 			&sectionID,
 		); err != nil {
-			r.ServerError(err)
-			r.Clear(q.Section)
+			r.ServerError(err, q.Section)
 			return
 		}
 		r.ActionObj = append(r.ActionObj,
@@ -88,8 +87,7 @@ func (s *Supervisor) actionList(q *msg.Request, r *msg.Result) {
 			})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
-		r.Clear(q.Section)
+		r.ServerError(err, q.Section)
 		return
 	}
 	r.OK()
@@ -111,10 +109,10 @@ func (s *Supervisor) actionShow(q *msg.Request, r *msg.Result) {
 		&user,
 		&ts,
 	); err == sql.ErrNoRows {
-		r.NotFound(err)
+		r.NotFound(err, q.Section)
 		return
 	} else if err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	r.ActionObj = []proto.Action{proto.Action{
@@ -142,7 +140,7 @@ func (s *Supervisor) actionSearch(q *msg.Request, r *msg.Result) {
 		q.ActionObj.Name,
 		q.ActionObj.SectionId,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	defer rows.Close()
@@ -153,8 +151,7 @@ func (s *Supervisor) actionSearch(q *msg.Request, r *msg.Result) {
 			&actionName,
 			&sectionID,
 		); err != nil {
-			r.ServerError(err)
-			r.Clear(q.Section)
+			r.ServerError(err, q.Section)
 			return
 		}
 		r.ActionObj = append(r.ActionObj,
@@ -165,8 +162,7 @@ func (s *Supervisor) actionSearch(q *msg.Request, r *msg.Result) {
 			})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
-		r.Clear(q.Section)
+		r.ServerError(err, q.Section)
 		return
 	}
 	r.OK()
@@ -201,7 +197,7 @@ func (s *Supervisor) actionAdd(q *msg.Request, r *msg.Result) {
 		q.ActionObj.SectionId,
 		q.AuthUser,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	if r.RowCnt(res.RowsAffected()) {
@@ -219,7 +215,7 @@ func (s *Supervisor) actionRemove(q *msg.Request, r *msg.Result) {
 
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -231,7 +227,7 @@ func (s *Supervisor) actionRemove(q *msg.Request, r *msg.Result) {
 		if txMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("s.ActionTx.Prepare(%s) error: %s",
 				name, err.Error())
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
@@ -239,7 +235,7 @@ func (s *Supervisor) actionRemove(q *msg.Request, r *msg.Result) {
 
 	if res, err = s.actionRemoveTx(q.ActionObj.Id,
 		txMap); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -251,7 +247,7 @@ func (s *Supervisor) actionRemove(q *msg.Request, r *msg.Result) {
 
 	// close transaction
 	if err = tx.Commit(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 

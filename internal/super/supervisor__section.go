@@ -66,7 +66,7 @@ func (s *Supervisor) sectionList(q *msg.Request, r *msg.Result) {
 	)
 
 	if _, err = s.stmtSectionList.Query(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	defer rows.Close()
@@ -76,8 +76,7 @@ func (s *Supervisor) sectionList(q *msg.Request, r *msg.Result) {
 			&sectionID,
 			&sectionName,
 		); err != nil {
-			r.ServerError(err)
-			r.Clear(q.Section)
+			r.ServerError(err, q.Section)
 			return
 		}
 		r.SectionObj = append(r.SectionObj, proto.Section{
@@ -86,8 +85,7 @@ func (s *Supervisor) sectionList(q *msg.Request, r *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
-		r.Clear(q.Section)
+		r.ServerError(err, q.Section)
 	}
 }
 
@@ -105,10 +103,10 @@ func (s *Supervisor) sectionShow(q *msg.Request, r *msg.Result) {
 		&user,
 		&ts,
 	); err == sql.ErrNoRows {
-		r.NotFound(err)
+		r.NotFound(err, q.Section)
 		return
 	} else if err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	r.SectionObj = []proto.Section{proto.Section{
@@ -132,7 +130,7 @@ func (s *Supervisor) sectionSearch(q *msg.Request, r *msg.Result) {
 
 	if _, err = s.stmtSectionSearch.Query(
 		q.SectionObj.Name); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	defer rows.Close()
@@ -142,8 +140,7 @@ func (s *Supervisor) sectionSearch(q *msg.Request, r *msg.Result) {
 			&sectionID,
 			&sectionName,
 		); err != nil {
-			r.ServerError(err)
-			r.Clear(q.Section)
+			r.ServerError(err, q.Section)
 			return
 		}
 		r.SectionObj = append(r.SectionObj, proto.Section{
@@ -152,8 +149,7 @@ func (s *Supervisor) sectionSearch(q *msg.Request, r *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
-		r.Clear(q.Section)
+		r.ServerError(err, q.Section)
 	}
 }
 
@@ -186,7 +182,7 @@ func (s *Supervisor) sectionAdd(q *msg.Request, r *msg.Result) {
 		q.SectionObj.Category,
 		q.AuthUser,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	if r.RowCnt(res.RowsAffected()) {
@@ -204,7 +200,7 @@ func (s *Supervisor) sectionRemove(q *msg.Request, r *msg.Result) {
 
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -219,7 +215,7 @@ func (s *Supervisor) sectionRemove(q *msg.Request, r *msg.Result) {
 		if txMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("s.SectionTx.Prepare(%s) error: %s",
 				name, err.Error())
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
@@ -227,7 +223,7 @@ func (s *Supervisor) sectionRemove(q *msg.Request, r *msg.Result) {
 
 	if res, err = s.sectionRemoveTx(q.SectionObj.Id,
 		txMap); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -239,7 +235,7 @@ func (s *Supervisor) sectionRemove(q *msg.Request, r *msg.Result) {
 
 	// close transaction
 	if err = tx.Commit(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 

@@ -90,7 +90,7 @@ func (s *Supervisor) permissionAdd(q *msg.Request, r *msg.Result) {
 
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -102,14 +102,14 @@ func (s *Supervisor) permissionAdd(q *msg.Request, r *msg.Result) {
 		if txMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("s.PermissionTx.Prepare(%s) error: %s",
 				name, err.Error())
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
 	}
 
 	if res, err = s.permissionAddTx(q, txMap); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -121,7 +121,7 @@ func (s *Supervisor) permissionAdd(q *msg.Request, r *msg.Result) {
 
 	// close transaction
 	if err = tx.Commit(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -188,7 +188,7 @@ func (s *Supervisor) permissionRemove(q *msg.Request, r *msg.Result) {
 
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -206,14 +206,14 @@ func (s *Supervisor) permissionRemove(q *msg.Request, r *msg.Result) {
 		if txMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("s.PermissionTx.Prepare(%s) error: %s",
 				name, err.Error())
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
 	}
 
 	if res, err = s.permissionRemoveTx(q, txMap); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -225,7 +225,7 @@ func (s *Supervisor) permissionRemove(q *msg.Request, r *msg.Result) {
 
 	// close transaction
 	if err = tx.Commit(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -329,7 +329,7 @@ func (s *Supervisor) permissionMap(q *msg.Request, r *msg.Result) {
 		sectionID,
 		actionID,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	if r.RowCnt(res.RowsAffected()) {
@@ -362,7 +362,7 @@ func (s *Supervisor) permissionUnmap(q *msg.Request, r *msg.Result) {
 		sectionID,
 		actionID,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	if r.RowCnt(res.RowsAffected()) {
@@ -394,7 +394,7 @@ func (s *Supervisor) permissionList(q *msg.Request, r *msg.Result) {
 	if rows, err = s.stmtPermissionList.Query(
 		q.Permission.Category,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	defer rows.Close()
@@ -404,8 +404,7 @@ func (s *Supervisor) permissionList(q *msg.Request, r *msg.Result) {
 			&id,
 			&name,
 		); err != nil {
-			r.ServerError(err)
-			r.Clear(q.Section)
+			r.ServerError(err, q.Section)
 			return
 		}
 		r.Permission = append(r.Permission, proto.Permission{
@@ -415,8 +414,7 @@ func (s *Supervisor) permissionList(q *msg.Request, r *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
-		r.Clear(q.Section)
+		r.ServerError(err, q.Section)
 		return
 	}
 	r.OK()
@@ -436,11 +434,11 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 
 	// open multi-statement transaction, set it readonly
 	if tx, err = s.conn.Begin(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	if _, err = tx.Exec(stmt.ReadOnlyTransaction); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -454,7 +452,7 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 		if txMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("s.PermissionTx.Prepare(%s) error: %s",
 				name, err.Error())
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
@@ -470,11 +468,11 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 		&user,
 		&ts,
 	); err == sql.ErrNoRows {
-		r.NotFound(err)
+		r.NotFound(err, q.Section)
 		tx.Rollback()
 		return
 	} else if err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -494,7 +492,7 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 		q.Permission.Id,
 		q.Permission.Category,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -508,7 +506,7 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 			&category,
 		); err != nil {
 			rows.Close()
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
@@ -521,7 +519,7 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -530,7 +528,7 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 		q.Permission.Id,
 		q.Permission.Category,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -542,7 +540,7 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 			&category,
 		); err != nil {
 			rows.Close()
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
@@ -553,14 +551,14 @@ func (s *Supervisor) permissionShow(q *msg.Request, r *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
 
 	// close transaction
 	if err = tx.Commit(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -584,7 +582,7 @@ func (s *Supervisor) permissionSearch(q *msg.Request, r *msg.Result) {
 		q.Permission.Name,
 		q.Permission.Category,
 	); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	defer rows.Close()
@@ -594,8 +592,7 @@ func (s *Supervisor) permissionSearch(q *msg.Request, r *msg.Result) {
 			&id,
 			&name,
 		); err != nil {
-			r.ServerError(err)
-			r.Clear(q.Section)
+			r.ServerError(err, q.Section)
 			return
 		}
 		r.Permission = append(r.Permission, proto.Permission{
@@ -605,8 +602,7 @@ func (s *Supervisor) permissionSearch(q *msg.Request, r *msg.Result) {
 		})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
-		r.Clear(q.Section)
+		r.ServerError(err, q.Section)
 		return
 	}
 	r.OK()

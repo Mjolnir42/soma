@@ -82,7 +82,7 @@ func (s *Supervisor) categoryList(q *msg.Request, r *msg.Result) {
 		category string
 	)
 	if rows, err = s.stmtCategoryList.Query(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	defer rows.Close()
@@ -91,16 +91,14 @@ func (s *Supervisor) categoryList(q *msg.Request, r *msg.Result) {
 		if err = rows.Scan(
 			&category,
 		); err != nil {
-			r.ServerError(err)
-			r.Clear(q.Section)
+			r.ServerError(err, q.Section)
 			return
 		}
 		r.Category = append(r.Category,
 			proto.Category{Name: category})
 	}
 	if err = rows.Err(); err != nil {
-		r.ServerError(err)
-		r.Clear(q.Section)
+		r.ServerError(err, q.Section)
 	}
 	r.OK()
 }
@@ -116,10 +114,10 @@ func (s *Supervisor) categoryShow(q *msg.Request, r *msg.Result) {
 		&user,
 		&ts,
 	); err == sql.ErrNoRows {
-		r.NotFound(err)
+		r.NotFound(err, q.Section)
 		return
 	} else if err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 	r.Category = []proto.Category{proto.Category{
@@ -142,7 +140,7 @@ func (s *Supervisor) categoryAdd(q *msg.Request, r *msg.Result) {
 
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -154,14 +152,14 @@ func (s *Supervisor) categoryAdd(q *msg.Request, r *msg.Result) {
 		if txMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("s.CategoryTx.Prepare(%s) error: %s",
 				name, err.Error())
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
 	}
 
 	if res, err = s.categoryAddTx(q, txMap); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -173,7 +171,7 @@ func (s *Supervisor) categoryAdd(q *msg.Request, r *msg.Result) {
 
 	// close transaction
 	if err = tx.Commit(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -225,7 +223,7 @@ func (s *Supervisor) categoryRemove(q *msg.Request, r *msg.Result) {
 
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
@@ -253,14 +251,14 @@ func (s *Supervisor) categoryRemove(q *msg.Request, r *msg.Result) {
 		if txMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("s.CategoryTx.Prepare(%s) error: %s",
 				name, err.Error())
-			r.ServerError(err)
+			r.ServerError(err, q.Section)
 			tx.Rollback()
 			return
 		}
 	}
 
 	if res, err = s.categoryRemoveTx(q, txMap); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		tx.Rollback()
 		return
 	}
@@ -273,7 +271,7 @@ func (s *Supervisor) categoryRemove(q *msg.Request, r *msg.Result) {
 
 	// close transaction
 	if err = tx.Commit(); err != nil {
-		r.ServerError(err)
+		r.ServerError(err, q.Section)
 		return
 	}
 
