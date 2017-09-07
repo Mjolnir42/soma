@@ -233,19 +233,19 @@ func (s *Supervisor) process(q *msg.Request) {
 	case `map`:
 		go func() { s.updateMap(q) }()
 
-	case `category`:
+	case msg.SectionCategory:
 		s.category(q)
 
-	case `permission`:
+	case msg.SectionPermission:
 		s.permission(q)
 
-	case `right`:
+	case msg.SectionRight:
 		s.right(q)
 
-	case `section`:
+	case msg.SectionSection:
 		s.section(q)
 
-	case `action`:
+	case msg.SectionAction:
 		s.action(q)
 
 	case `cache`:

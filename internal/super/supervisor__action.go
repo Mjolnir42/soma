@@ -24,9 +24,9 @@ func (s *Supervisor) action(q *msg.Request) {
 	s.requestLog(q)
 
 	switch q.Action {
-	case `list`, `show`, `search`:
+	case msg.ActionList, msg.ActionShow, msg.ActionSearch:
 		go func() { s.actionRead(q) }()
-	case `add`, `remove`:
+	case msg.ActionAdd, msg.ActionRemove:
 		if s.readonly {
 			result.Conflict(fmt.Errorf(`Readonly instance`))
 			goto abort
@@ -46,11 +46,11 @@ func (s *Supervisor) actionRead(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		s.actionList(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		s.actionShow(q, &result)
-	case `search`:
+	case msg.ActionSearch:
 		s.actionSearch(q, &result)
 	}
 
@@ -172,9 +172,9 @@ func (s *Supervisor) actionWrite(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		s.actionAdd(q, &result)
-	case `remove`:
+	case msg.ActionRemove:
 		s.actionRemove(q, &result)
 	}
 

@@ -25,10 +25,10 @@ func (s *Supervisor) category(q *msg.Request) {
 	s.requestLog(q)
 
 	switch q.Action {
-	case `list`, `show`:
+	case msg.ActionList, msg.ActionShow:
 		go func() { s.categoryRead(q) }()
 
-	case `add`, `remove`:
+	case msg.ActionAdd, msg.ActionRemove:
 		if s.readonly {
 			result.Conflict(fmt.Errorf(`Readonly instance`))
 			goto abort
@@ -49,9 +49,9 @@ func (s *Supervisor) categoryRead(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		s.categoryList(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		s.categoryShow(q, &result)
 	}
 	q.Reply <- result
@@ -61,9 +61,9 @@ func (s *Supervisor) categoryWrite(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		s.categoryAdd(q, &result)
-	case `remove`:
+	case msg.ActionRemove:
 		s.categoryRemove(q, &result)
 		return
 	}

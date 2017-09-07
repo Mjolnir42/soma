@@ -24,9 +24,12 @@ func (s *Supervisor) section(q *msg.Request) {
 	s.requestLog(q)
 
 	switch q.Action {
-	case `list`, `show`, `search`:
+	case msg.ActionList,
+		msg.ActionShow,
+		msg.ActionSearch:
 		go func() { s.sectionRead(q) }()
-	case `add`, `remove`:
+	case msg.ActionAdd,
+		msg.ActionRemove:
 		if s.readonly {
 			result.Conflict(fmt.Errorf(`Readonly instance`))
 			goto abort
@@ -46,11 +49,11 @@ func (s *Supervisor) sectionRead(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		s.sectionList(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		s.sectionShow(q, &result)
-	case `search`:
+	case msg.ActionSearch:
 		s.sectionSearch(q, &result)
 	}
 
@@ -157,9 +160,9 @@ func (s *Supervisor) sectionWrite(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		s.sectionAdd(q, &result)
-	case `remove`:
+	case msg.ActionRemove:
 		s.sectionRemove(q, &result)
 	}
 

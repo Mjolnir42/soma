@@ -13,6 +13,17 @@ const (
 	CategorySystem      = `system`
 )
 
+// Grant categories mirror the regular categories but allow
+// to grant the permission
+const (
+	CategoryGrantGlobal     = `global:grant`
+	CategoryGrantOperation  = `operation:grant`
+	CategoryGrantPermission = `permission:grant`
+	CategoryGrantRepository = `repository:grant`
+	CategoryGrantTeam       = `team:grant`
+	CategoryGrantMonitoring = `monitoring:grant`
+)
+
 // Sections in category global are for actions with a global
 // scope
 const (
@@ -59,8 +70,11 @@ const (
 // for actions on the permission system
 const (
 	CategoryPermission = `permission`
+	SectionAction      = `action`
 	SectionCategory    = `category`
 	SectionPermission  = `permission`
+	SectionRight       = `right`
+	SectionSection     = `section`
 )
 
 // Sections in category repository are for actions with
@@ -110,6 +124,7 @@ const (
 	ActionGrant          = `grant`
 	ActionInsertNullID   = `insert-null`
 	ActionList           = `list`
+	ActionMap            = `map`
 	ActionMemberAdd      = `member-add`
 	ActionMemberList     = `member-list`
 	ActionMemberRemove   = `member-remove`
@@ -136,6 +151,7 @@ const (
 	ActionSummary        = `summary`
 	ActionSync           = `sync`
 	ActionUnassign       = `unassign`
+	ActionUnmap          = `unmap`
 	ActionUpdate         = `update`
 	ActionUse            = `use`
 	ActionVersions       = `versions`

@@ -25,10 +25,15 @@ func (s *Supervisor) permission(q *msg.Request) {
 	s.requestLog(q)
 
 	switch q.Action {
-	case `list`, `search/name`, `show`:
+	case msg.ActionList,
+		msg.ActionSearchByName,
+		msg.ActionShow:
 		go func() { s.permissionRead(q) }()
 
-	case `add`, `remove`, `map`, `unmap`:
+	case msg.ActionAdd,
+		msg.ActionRemove,
+		msg.ActionMap,
+		msg.ActionUnmap:
 		if s.readonly {
 			result.Conflict(fmt.Errorf(`Readonly instance`))
 			goto abort
@@ -49,27 +54,33 @@ func (s *Supervisor) permissionWrite(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		switch q.Permission.Category {
-		case
-			`global`, `permission`, `operations`,
-			`repository`, `team`, `monitoring`:
+		case msg.CategoryGlobal,
+			msg.CategoryPermission,
+			msg.CategoryOperation,
+			msg.CategoryRepository,
+			msg.CategoryTeam,
+			msg.CategoryMonitoring:
 			s.permissionAdd(q, &result)
 		default:
 			result.ServerError(fmt.Errorf(`Illegal category`))
 		}
-	case `remove`:
+	case msg.ActionRemove:
 		switch q.Permission.Category {
-		case
-			`global`, `permission`, `operations`,
-			`repository`, `team`, `monitoring`:
+		case msg.CategoryGlobal,
+			msg.CategoryPermission,
+			msg.CategoryOperation,
+			msg.CategoryRepository,
+			msg.CategoryTeam,
+			msg.CategoryMonitoring:
 			s.permissionRemove(q, &result)
 		default:
 			result.ServerError(fmt.Errorf(`Illegal category`))
 		}
-	case `map`:
+	case msg.ActionMap:
 		s.permissionMap(q, &result)
-	case `unmap`:
+	case msg.ActionUnmap:
 		s.permissionUnmap(q, &result)
 	}
 
@@ -138,18 +149,18 @@ func (s *Supervisor) permissionAddTx(q *msg.Request,
 	q.Permission.Id = uuid.NewV4().String()
 	grantPermID = uuid.NewV4().String()
 	switch q.Permission.Category {
-	case `global`:
-		grantCategory = `global:grant`
-	case `permission`:
-		grantCategory = `permission:grant`
-	case `operations`:
-		grantCategory = `operations:grant`
-	case `repository`:
-		grantCategory = `repository:grant`
-	case `team`:
-		grantCategory = `team:grant`
-	case `monitoring`:
-		grantCategory = `monitoring:grant`
+	case msg.CategoryGlobal:
+		grantCategory = msg.CategoryGrantGlobal
+	case msg.CategoryPermission:
+		grantCategory = msg.CategoryGrantPermission
+	case msg.CategoryOperation:
+		grantCategory = msg.CategoryGrantOperation
+	case msg.CategoryRepository:
+		grantCategory = msg.CategoryGrantRepository
+	case msg.CategoryTeam:
+		grantCategory = msg.CategoryGrantTeam
+	case msg.CategoryMonitoring:
+		grantCategory = msg.CategoryGrantMonitoring
 	}
 
 	if res, err = txMap[`permission_add_tx_perm`].Exec(
@@ -243,13 +254,15 @@ func (s *Supervisor) permissionRemoveTx(q *msg.Request,
 
 	// select correct revocation statement scope
 	switch q.Permission.Category {
-	case `global`, `permission`, `operations`:
+	case msg.CategoryGlobal,
+		msg.CategoryPermission,
+		msg.CategoryOperation:
 		revocation = `permission_rm_tx_rev_gl`
-	case `repository`:
+	case msg.CategoryRepository:
 		revocation = `permission_rm_tx_rev_rp`
-	case `team`:
+	case msg.CategoryTeam:
 		revocation = `permission_rm_tx_rev_tm`
-	case `monitoring`:
+	case msg.CategoryMonitoring:
 		revocation = `permission_rm_tx_rev_mn`
 	}
 
@@ -374,11 +387,11 @@ func (s *Supervisor) permissionRead(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	switch q.Action {
-	case `list`:
+	case msg.ActionList:
 		s.permissionList(q, &result)
-	case `show`:
+	case msg.ActionShow:
 		s.permissionShow(q, &result)
-	case `search/name`:
+	case msg.ActionSearchByName:
 		s.permissionSearch(q, &result)
 	}
 

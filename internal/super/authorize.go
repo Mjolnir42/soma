@@ -17,10 +17,10 @@ func (s *Supervisor) authorize(q *msg.Request) {
 	result.Super = &msg.Supervisor{}
 
 	switch svPermissionActionScopeMap[q.Super.PermAction] {
-	case `global`:
+	case msg.CategoryGlobal:
 		result.Super.Verdict, result.Super.VerdictAdmin = s.authorizeGlobal(q)
-	case `repository`:
-	case `team`:
+	case msg.CategoryRepository:
+	case msg.CategoryTeam:
 	default:
 		goto unauthorized
 	}

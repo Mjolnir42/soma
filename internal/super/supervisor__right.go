@@ -30,13 +30,13 @@ func (s *Supervisor) right(q *msg.Request) {
 	}
 
 	switch q.Action {
-	case `grant`, `revoke`:
+	case msg.ActionGrant, msg.ActionRevoke:
 		if s.readonly {
 			result.Conflict(fmt.Errorf(`Readonly instance`))
 			goto abort
 		}
 		s.rightWrite(q)
-	case `search`:
+	case msg.ActionSearch:
 		go func() { s.rightRead(q) }()
 	default:
 		result.UnknownRequest(q)
@@ -50,44 +50,44 @@ abort:
 
 func (s *Supervisor) rightWrite(q *msg.Request) {
 	switch q.Action {
-	case `grant`:
+	case msg.ActionGrant:
 		switch q.Grant.Category {
-		case `system`,
-			`global`,
-			`global:grant`,
-			`permission`,
-			`permission:grant`,
-			`operations`,
-			`operations:grant`:
+		case msg.CategorySystem,
+			msg.CategoryGlobal,
+			msg.CategoryGrantGlobal,
+			msg.CategoryPermission,
+			msg.CategoryGrantPermission,
+			msg.CategoryOperation,
+			msg.CategoryGrantOperation:
 			s.rightGrantGlobal(q)
-		case `repository`,
-			`repository:grant`:
+		case msg.CategoryRepository,
+			msg.CategoryGrantRepository:
 			s.rightGrantRepository(q)
-		case `team`,
-			`team:grant`:
+		case msg.CategoryTeam,
+			msg.CategoryGrantTeam:
 			s.rightGrantTeam(q)
-		case `monitoring`,
-			`monitoring:grant`:
+		case msg.CategoryMonitoring,
+			msg.CategoryGrantMonitoring:
 			s.rightGrantMonitoring(q)
 		}
-	case `revoke`:
+	case msg.ActionRevoke:
 		switch q.Grant.Category {
-		case `system`,
-			`global`,
-			`global:grant`,
-			`permission`,
-			`permission:grant`,
-			`operations`,
-			`operations:grant`:
+		case msg.CategorySystem,
+			msg.CategoryGlobal,
+			msg.CategoryGrantGlobal,
+			msg.CategoryPermission,
+			msg.CategoryGrantPermission,
+			msg.CategoryOperation,
+			msg.CategoryGrantOperation:
 			s.rightRevokeGlobal(q)
-		case `repository`,
-			`repository:grant`:
+		case msg.CategoryRepository,
+			msg.CategoryGrantRepository:
 			s.rightRevokeRepository(q)
-		case `team`,
-			`team:grant`:
+		case msg.CategoryTeam,
+			msg.CategoryGrantTeam:
 			s.rightRevokeTeam(q)
-		case `monitoring`,
-			`monitoring:grant`:
+		case msg.CategoryMonitoring,
+			msg.CategoryGrantMonitoring:
 			s.rightRevokeMonitoring(q)
 		}
 	}
@@ -156,10 +156,10 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request) {
 	)
 
 	switch q.Grant.ObjectType {
-	case `repository`:
+	case msg.EntityRepository:
 		repoID.String = q.Grant.ObjectId
 		repoID.Valid = true
-	case `bucket`:
+	case msg.EntityBucket:
 		if err = s.conn.QueryRow(
 			stmt.RepoByBucketId,
 			q.Grant.ObjectId,
@@ -173,7 +173,7 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request) {
 
 		bucketID.String = q.Grant.ObjectId
 		bucketID.Valid = true
-	case `group`, `cluster`, `node`:
+	case msg.EntityGroup, msg.EntityCluster, msg.EntityNode:
 		result.NotImplemented(fmt.Errorf(
 			`Deep repository grants currently not implemented.`))
 		goto dispatch
@@ -392,20 +392,22 @@ dispatch:
 
 func (s *Supervisor) rightRead(q *msg.Request) {
 	switch q.Action {
-	case `search`:
+	case msg.ActionSearch:
 		switch q.Grant.Category {
-		case `system`,
-			`global`,
-			`global:grant`,
-			`permission`,
-			`permission:grant`,
-			`operations`,
-			`operations:grant`:
+		case msg.CategorySystem,
+			msg.CategoryGlobal,
+			msg.CategoryGrantGlobal,
+			msg.CategoryPermission,
+			msg.CategoryGrantPermission,
+			msg.CategoryOperation,
+			msg.CategoryGrantOperation:
 			s.rightSearchGlobal(q)
-		case
-			`repository`, `repository:grant`,
-			`team`, `team:grant`,
-			`monitoring`, `monitoring:grant`:
+		case msg.CategoryRepository,
+			msg.CategoryGrantRepository,
+			msg.CategoryTeam,
+			msg.CategoryGrantTeam,
+			msg.CategoryMonitoring,
+			msg.CategoryGrantMonitoring:
 			s.rightSearchScoped(q)
 		}
 	}
@@ -449,11 +451,14 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request) {
 		scope   *sql.Stmt
 	)
 	switch q.Grant.Category {
-	case `repository`, `repository:grant`:
+	case msg.CategoryRepository,
+		msg.CategoryGrantRepository:
 		scope = s.stmtSearchAuthorizationRepository
-	case `team`, `team:grant`:
+	case msg.CategoryTeam,
+		msg.CategoryGrantTeam:
 		scope = s.stmtSearchAuthorizationTeam
-	case `monitoring`, `monitoring:grant`:
+	case msg.CategoryMonitoring,
+		msg.CategoryGrantMonitoring:
 		scope = s.stmtSearchAuthorizationMonitoring
 	}
 	if err = scope.QueryRow(
