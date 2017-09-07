@@ -12,9 +12,11 @@ import (
 	"fmt"
 
 	"github.com/mjolnir42/soma/lib/proto"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Result struct {
+	ID      uuid.UUID
 	Section string
 	Action  string
 	Code    uint16

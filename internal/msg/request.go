@@ -14,6 +14,7 @@ import (
 )
 
 type Request struct {
+	ID            uuid.UUID
 	Section       string
 	Action        string
 	RemoteAddr    string
