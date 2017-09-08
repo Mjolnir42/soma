@@ -27,6 +27,7 @@ type Request struct {
 	DeploymentIDs []string
 
 	Super *Supervisor
+	Cache *Request
 
 	ActionObj   proto.Action
 	Attribute   proto.Attribute
@@ -66,8 +67,6 @@ type Request struct {
 	Validity    proto.Validity
 	View        proto.View
 	Workflow    proto.Workflow
-
-	CacheRequest *Request
 }
 
 type Filter struct {
@@ -93,9 +92,9 @@ type Flags struct {
 
 func CacheUpdateFromRequest(rq *Request) Request {
 	return Request{
-		Section:      `cache`,
-		Action:       `update`,
-		CacheRequest: rq,
+		Section: `cache`,
+		Action:  `update`,
+		Cache:   rq,
 	}
 }
 
