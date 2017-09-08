@@ -208,7 +208,7 @@ runloop:
 }
 
 func (s *Supervisor) process(q *msg.Request) {
-	switch q.Section {
+	switch q.Super.Task {
 	case `kex`:
 		go func() { s.kexInit(q) }()
 

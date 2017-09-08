@@ -29,9 +29,9 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 
 	// determine type of the request subject
 	switch {
-	case strings.HasPrefix(q.AuthUser, `admin_`):
+	case strings.HasPrefix(q.Super.Authorize.AuthUser, `admin_`):
 		subjType = `admin`
-	case strings.HasPrefix(q.AuthUser, `tool_`):
+	case strings.HasPrefix(q.Super.Authorize.AuthUser, `tool_`):
 		subjType = `tool`
 	default:
 		subjType = `user`
@@ -42,7 +42,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	defer c.lock.RUnlock()
 
 	// look up the user, also handles admin and tool accounts
-	if user = c.user.getByName(q.AuthUser); user == nil {
+	if user = c.user.getByName(q.Super.Authorize.AuthUser); user == nil {
 		goto dispatch
 	}
 
@@ -53,13 +53,13 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	}
 
 	// extract category
-	category = c.section.getByName(q.Section).Category
+	category = c.section.getByName(q.Super.Authorize.Section).Category
 
 	// lookup sectionID and actionID of the Request, abort for
 	// unknown actions
 	if action := c.action.getByName(
-		q.Section,
-		q.Action,
+		q.Super.Authorize.Section,
+		q.Super.Authorize.Action,
 	); action == nil {
 		goto dispatch
 	} else {
@@ -89,7 +89,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 
 	// check if the user has one the permissions that map the
 	// requested action
-	if c.checkPermission(mergedPermIDs, any, q, subjType, user.Id,
+	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, subjType, user.Id,
 		category) {
 		result.Super.Verdict = 200
 		goto dispatch
@@ -103,7 +103,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	}
 
 	// check if the user's team has a specific grant for the action
-	if c.checkPermission(mergedPermIDs, any, q, `team`, user.TeamId,
+	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, `team`, user.TeamId,
 		category) {
 		result.Super.Verdict = 200
 	}

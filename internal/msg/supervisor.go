@@ -14,6 +14,7 @@ import (
 )
 
 type Supervisor struct {
+	Task               string
 	Verdict            uint16
 	RestrictedEndpoint bool
 	// KeyExchange Data
@@ -28,13 +29,9 @@ type Supervisor struct {
 		User  string
 		Token string
 	}
+	// Request to be authorized
+	Authorize *Request
 	// XXX Everything below is deprecated
-	// Fields for permission authorization requests
-	Request        *Authorization
-	PermAction     string //XXX
-	PermRepository string //XXX
-	PermMonitoring string //XXX
-	PermNode       string //XXX
 	// Fields for map update notifications
 	Object string
 	User   proto.User
