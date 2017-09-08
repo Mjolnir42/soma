@@ -60,11 +60,11 @@ func AuthenticationKex(w http.ResponseWriter, r *http.Request,
 	returnChannel := make(chan msg.Result)
 	handler := handlerMap[`supervisor`].(*super.Supervisor)
 	handler.Input <- msg.Request{
-		Section: `kex`,
-		Action:  `init`,
-		Reply:   returnChannel,
+		Section:    `kex`,
+		Action:     `init`,
+		RemoteAddr: extractAddress(r.RemoteAddr),
+		Reply:      returnChannel,
 		Super: &msg.Supervisor{
-			RemoteAddr: extractAddress(r.RemoteAddr),
 			Kex: auth.Kex{
 				Public:               kex.Public,
 				InitializationVector: kex.InitializationVector,
@@ -153,14 +153,19 @@ func AuthenticationEncryptedData(w *http.ResponseWriter,
 	returnChannel := make(chan msg.Result)
 	handler := handlerMap[`supervisor`].(*super.Supervisor)
 	handler.Input <- msg.Request{
-		Section: section,
-		Action:  action,
-		Reply:   returnChannel,
+		Section:    section,
+		Action:     action,
+		RemoteAddr: extractAddress(r.RemoteAddr),
+		Reply:      returnChannel,
 		Super: &msg.Supervisor{
-			RemoteAddr: extractAddress(r.RemoteAddr),
-			KexId:      params.ByName(`uuid`),
-			Data:       data,
-			Restricted: false,
+			RestrictedEndpoint: false,
+			Encrypted: struct {
+				KexID string
+				Data  []byte
+			}{
+				KexID: params.ByName(`uuid`),
+				Data:  data,
+			},
 		},
 	}
 	result := <-returnChannel

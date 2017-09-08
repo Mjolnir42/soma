@@ -41,8 +41,8 @@ import (
 
 func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 	result := msg.FromRequest(q)
-	kexID := q.Super.KexId
-	data := q.Super.Data
+	kexID := q.Super.Encrypted.KexID
+	data := q.Super.Encrypted.Data
 	var kex *auth.Kex
 	var err error
 	var plain []byte
@@ -77,7 +77,7 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 		goto dispatch
 	}
 	// -> check kex.SameSource
-	if !kex.IsSameSourceExtractedString(q.Super.RemoteAddr) {
+	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
 		//    --> reply 404 if !SameSource
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
@@ -100,7 +100,7 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 		result.Unauthorized(nil)
 		goto dispatch
 	}
-	if token.UserName == `root` && s.rootRestricted && !q.Super.Restricted {
+	if token.UserName == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
 		result.ServerError(
 			fmt.Errorf(`Root bootstrap requested on unrestricted endpoint`))
 		goto dispatch
@@ -121,7 +121,7 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 		goto dispatch
 	}
 	// -> generate token
-	token.SetIPAddressExtractedString(q.Super.RemoteAddr)
+	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(mcf, s.key, s.seed); err != nil {
 		result.ServerError(err)
 		goto dispatch
@@ -182,7 +182,12 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 	// -> send sdata reply
 	result.Super = &msg.Supervisor{
 		Verdict: 200,
-		Data:    data,
+		Encrypted: struct {
+			KexID string
+			Data  []byte
+		}{
+			Data: data,
+		},
 	}
 	result.OK()
 

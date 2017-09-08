@@ -170,7 +170,7 @@ func SendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 	goto buildJSON
 
 dispatchOCTET:
-	DispatchOctetReply(w, &r.Super.Data)
+	DispatchOctetReply(w, &r.Super.Encrypted.Data)
 	return
 
 buildJSON:

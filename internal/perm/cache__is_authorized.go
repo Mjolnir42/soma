@@ -20,8 +20,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	result := msg.FromRequest(q)
 	// default action is to deny
 	result.Super = &msg.Supervisor{
-		Verdict:      401,
-		VerdictAdmin: false,
+		Verdict: 401,
 	}
 	var user *proto.User
 	var subjType, category, actionID, sectionID string
@@ -50,7 +49,6 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	// check if the subject has omnipotence
 	if c.checkOmnipotence(subjType, user.Id) {
 		result.Super.Verdict = 200
-		result.Super.VerdictAdmin = true
 		goto dispatch
 	}
 
@@ -75,7 +73,6 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 		goto dispatch
 	} else if ok {
 		result.Super.Verdict = 200
-		result.Super.VerdictAdmin = true
 		goto dispatch
 	}
 
@@ -95,7 +92,6 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	if c.checkPermission(mergedPermIDs, any, q, subjType, user.Id,
 		category) {
 		result.Super.Verdict = 200
-		result.Super.VerdictAdmin = false
 		goto dispatch
 	}
 
@@ -110,7 +106,6 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	if c.checkPermission(mergedPermIDs, any, q, `team`, user.TeamId,
 		category) {
 		result.Super.Verdict = 200
-		result.Super.VerdictAdmin = false
 	}
 
 dispatch:

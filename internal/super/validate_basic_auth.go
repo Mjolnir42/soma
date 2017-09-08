@@ -39,7 +39,7 @@ func (s *Supervisor) validateBasicAuth(q *msg.Request) {
 	result := msg.FromRequest(q)
 
 	// basic auth always fails for root if root is disabled
-	if q.Super.BasicAuthUser == `root` && s.rootDisabled {
+	if q.Super.BasicAuth.User == `root` && s.rootDisabled {
 		result.ServerError(
 			fmt.Errorf(`Attempted authentication on disabled root account`))
 		goto unauthorized
@@ -48,23 +48,23 @@ func (s *Supervisor) validateBasicAuth(q *msg.Request) {
 	// basic auth always fails for root if root is restricted and
 	// the request comes from an unrestricted endpoint. Note: there
 	// are currently no restricted endpoints (https over unix socket)
-	if q.Super.BasicAuthUser == `root` && s.rootRestricted && !q.Super.Restricted {
+	if q.Super.BasicAuth.User == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
 		result.ServerError(
 			fmt.Errorf(`Attempted root authentication on unrestricted endpoint`))
 		goto unauthorized
 	}
 
-	tok = s.tokens.read(q.Super.BasicAuthToken)
+	tok = s.tokens.read(q.Super.BasicAuth.Token)
 	if tok == nil && !s.readonly {
 		// rw instance knows every token
 		result.ServerError(fmt.Errorf(`Unknown Token (TokenMap)`))
 		goto unauthorized
 	} else if tok == nil {
-		if !s.fetchTokenFromDB(q.Super.BasicAuthToken) {
+		if !s.fetchTokenFromDB(q.Super.BasicAuth.Token) {
 			result.ServerError(fmt.Errorf(`Unknown Token (pgSQL)`))
 			goto unauthorized
 		}
-		tok = s.tokens.read(q.Super.BasicAuthToken)
+		tok = s.tokens.read(q.Super.BasicAuth.Token)
 	}
 	if time.Now().UTC().Before(tok.validFrom.UTC()) ||
 		time.Now().UTC().After(tok.expiresAt.UTC()) {
@@ -72,7 +72,7 @@ func (s *Supervisor) validateBasicAuth(q *msg.Request) {
 		goto unauthorized
 	}
 
-	if auth.VerifyExtracted(q.Super.BasicAuthUser, q.Super.RemoteAddr, tok.binToken, s.key,
+	if auth.VerifyExtracted(q.Super.BasicAuth.User, q.RemoteAddr, tok.binToken, s.key,
 		s.seed, tok.binExpiresAt, tok.salt) {
 		// valid token
 		result.Super = &msg.Supervisor{Verdict: 200}

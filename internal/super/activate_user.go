@@ -56,7 +56,7 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 		mcf                                 scrypth64.Mcf
 		tx                                  *sql.Tx
 	)
-	data := q.Super.Data
+	data := q.Super.Encrypted.Data
 
 	if s.readonly {
 		result.Conflict(fmt.Errorf(`Readonly instance`))
@@ -68,19 +68,19 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 	defer timer.Stop()
 
 	// -> get kex
-	if kex = s.kex.read(q.Super.KexId); kex == nil {
+	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
 		//    --> reply 404 if not found
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 	// -> check kex.SameSource
-	if !kex.IsSameSourceExtractedString(q.Super.RemoteAddr) {
+	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
 		//    --> reply 404 if !SameSource
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 	// -> delete kex from s.kex (kex is now used)
-	s.kex.remove(q.Super.KexId)
+	s.kex.remove(q.Super.Encrypted.KexID)
 	// -> rdata = kex.DecodeAndDecrypt(data)
 	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
 		result.ServerError(err)
@@ -92,7 +92,7 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 		goto dispatch
 	}
 	// request has been decrypted, log it
-	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
+	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.RemoteAddr)
 
 	// -> check token.UserName != `root`
 	if token.UserName == `root` {
@@ -154,7 +154,7 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 		goto dispatch
 	}
 	// -> generate token
-	token.SetIPAddressExtractedString(q.Super.RemoteAddr)
+	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(mcf, s.key, s.seed); err != nil {
 		result.ServerError(err)
 		goto dispatch
@@ -226,7 +226,7 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 	}
 	// -> send sdata reply
 	result.Super.Verdict = 200
-	result.Super.Data = data
+	result.Super.Encrypted.Data = data
 	result.OK()
 
 dispatch:

@@ -14,17 +14,21 @@ import (
 )
 
 type Supervisor struct {
-	Verdict      uint16
-	VerdictAdmin bool
-	RemoteAddr   string
+	Verdict            uint16
+	RestrictedEndpoint bool
+	// KeyExchange Data
+	Kex auth.Kex
 	// Fields for encrypted requests
-	KexId string
-	Data  []byte
-	Kex   auth.Kex
+	Encrypted struct {
+		KexID string
+		Data  []byte
+	}
 	// Fields for basic authentication requests
-	BasicAuthUser  string
-	BasicAuthToken string
-	Restricted     bool
+	BasicAuth struct {
+		User  string
+		Token string
+	}
+	// XXX Everything below is deprecated
 	// Fields for permission authorization requests
 	Request        *Authorization
 	PermAction     string //XXX

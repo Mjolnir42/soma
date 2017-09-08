@@ -49,7 +49,7 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 		tx                   *sql.Tx
 		validFrom, expiresAt time.Time
 	)
-	data := q.Super.Data
+	data := q.Super.Encrypted.Data
 
 	// issue_token is a master instance function
 	if s.readonly {
@@ -61,17 +61,17 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 	defer timer.Stop()
 
 	// -> get kex
-	if kex = s.kex.read(q.Super.KexId); kex == nil {
+	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 	// check kex.SameSource
-	if !kex.IsSameSourceExtractedString(q.Super.RemoteAddr) {
+	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 	// delete kex from s.kex (kex is now used)
-	s.kex.remove(q.Super.KexId)
+	s.kex.remove(q.Super.Encrypted.KexID)
 	// decrypt request
 	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
 		result.ServerError(err)
@@ -82,13 +82,13 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	if token.UserName == `root` && s.rootRestricted && !q.Super.Restricted {
+	if token.UserName == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
 		result.ServerError(
 			fmt.Errorf(`Root token requested on unrestricted endpoint`))
 		goto dispatch
 	}
 
-	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
+	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.RemoteAddr)
 
 	if cred = s.credentials.read(token.UserName); cred == nil {
 		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
@@ -104,7 +104,7 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 		goto dispatch
 	}
 	// generate token if the provided credentials are valid
-	token.SetIPAddressExtractedString(q.Super.RemoteAddr)
+	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(cred.cryptMCF, s.key, s.seed); err != nil {
 		result.ServerError(err)
 		goto dispatch
@@ -151,7 +151,12 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 	// -> send sdata reply
 	result.Super = &msg.Supervisor{
 		Verdict: 200,
-		Data:    data,
+		Encrypted: struct {
+			KexID string
+			Data  []byte
+		}{
+			Data: data,
+		},
 	}
 	result.OK()
 

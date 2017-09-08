@@ -58,7 +58,7 @@ func (s *Supervisor) kexInit(q *msg.Request) {
 	kex.SetTimeUTC()
 
 	// record the client ip address
-	kex.SetIPAddressExtractedString(q.Super.RemoteAddr)
+	kex.SetIPAddressExtractedString(q.RemoteAddr)
 
 	// generate a request ID
 	kex.GenerateNewRequestID()

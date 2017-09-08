@@ -31,7 +31,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 		mcf                                                   scrypth64.Mcf
 		ok, active                                            bool
 	)
-	data := q.Super.Data
+	data := q.Super.Encrypted.Data
 
 	if s.readonly {
 		result.Conflict(fmt.Errorf(`Readonly instance`))
@@ -42,17 +42,17 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	defer timer.Stop()
 
 	// get kex
-	if kex = s.kex.read(q.Super.KexId); kex == nil {
+	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 
-	if !kex.IsSameSourceExtractedString(q.Super.RemoteAddr) {
+	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 
-	s.kex.remove(q.Super.KexId)
+	s.kex.remove(q.Super.Encrypted.KexID)
 
 	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
 		result.ServerError(err)
@@ -70,7 +70,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	// -- the ldap password (reset/ldap)
 	// -- the token         (reset/mailtoken)
 
-	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.Super.RemoteAddr)
+	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.RemoteAddr)
 
 	if err = s.stmtFindUserID.QueryRow(token.UserName).
 		Scan(&userID); err == sql.ErrNoRows {
@@ -144,7 +144,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 		goto dispatch
 	}
 
-	token.SetIPAddressExtractedString(q.Super.RemoteAddr)
+	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(mcf, s.key, s.seed); err != nil {
 		result.ServerError(err)
 		goto dispatch
@@ -230,7 +230,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	}
 	// -> send sdata reply
 	result.Super.Verdict = 200
-	result.Super.Data = data
+	result.Super.Encrypted.Data = data
 	result.OK()
 
 dispatch:
