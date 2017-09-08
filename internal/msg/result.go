@@ -68,6 +68,7 @@ type Result struct {
 
 func FromRequest(rq *Request) Result {
 	return Result{
+		ID:      rq.ID,
 		Section: rq.Section,
 		Action:  rq.Action,
 	}
