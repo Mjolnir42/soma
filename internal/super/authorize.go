@@ -22,6 +22,7 @@ func IsAuthorized(q *msg.Request) bool {
 	// is reading from q.Reply
 	returnChannel := make(chan msg.Result)
 	singleton.Input <- msg.Request{
+		ID:      q.ID,
 		Section: `supervisor`,
 		Action:  `supervisor`,
 		Reply:   returnChannel,
