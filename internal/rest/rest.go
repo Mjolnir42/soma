@@ -15,13 +15,13 @@ import (
 
 // Rest holds the required state for the REST interface
 type Rest struct {
-	isAuthorized func(*msg.Authorization) bool
+	isAuthorized func(*msg.Request) bool
 	handlerMap   *soma.HandlerMap
 }
 
 // New returns a new REST interface
 func New(
-	authorizationFunction func(*msg.Authorization) bool,
+	authorizationFunction func(*msg.Request) bool,
 	appHandlerMap *soma.HandlerMap,
 ) *Rest {
 	r := Rest{}

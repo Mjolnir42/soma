@@ -11,26 +11,16 @@ package rest
 import (
 	"net/http"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/soma"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/julienschmidt/httprouter"
 )
 
 // NodeAdd function
 func (x *Rest) NodeAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
-
-	if !x.isAuthorized(&msg.Authorization{
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Section:    `node-mgmt`,
-		Action:     `add`,
-	}) {
-		dispatchForbidden(&w, nil)
-		return
-	}
 
 	cReq := proto.NewNodeRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
@@ -46,10 +36,9 @@ func (x *Rest) NodeAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
-	handler.Input <- msg.Request{
-		Section:    `node-mgmt`,
-		Action:     `add`,
+	request := msg.Request{
+		Section:    msg.SectionNodeMgmt,
+		Action:     msg.ActionAdd,
 		Reply:      returnChannel,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
@@ -63,6 +52,14 @@ func (x *Rest) NodeAdd(w http.ResponseWriter, r *http.Request,
 			IsDeleted: false,
 		},
 	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
+	handler.Input <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -72,25 +69,22 @@ func (x *Rest) NodeSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	if !x.isAuthorized(&msg.Authorization{
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Section:    `node-mgmt`,
-		Action:     `sync`,
-	}) {
-		dispatchForbidden(&w, nil)
-		return
-	}
-
 	returnChannel := make(chan msg.Result)
-	handler := x.handlerMap.Get(`node_r`).(*soma.NodeRead)
-	handler.Input <- msg.Request{
-		Section:    `node-mgmt`,
-		Action:     `sync`,
+	request := msg.Request{
+		Section:    msg.SectionNodeMgmt,
+		Action:     msg.ActionSync,
 		Reply:      returnChannel,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	handler := x.handlerMap.Get(`node_r`).(*soma.NodeRead)
+	handler.Input <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -100,17 +94,6 @@ func (x *Rest) NodeUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	if !x.isAuthorized(&msg.Authorization{
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Section:    `node-mgmt`,
-		Action:     `update`,
-		NodeID:     params.ByName(`nodeID`),
-	}) {
-		dispatchForbidden(&w, nil)
-		return
-	}
-
 	cReq := proto.NewNodeRequest()
 	err := decodeJSONBody(r, &cReq)
 	if err != nil {
@@ -119,10 +102,9 @@ func (x *Rest) NodeUpdate(w http.ResponseWriter, r *http.Request,
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
-	handler.Input <- msg.Request{
-		Section:    `node-mgmt`,
-		Action:     `update`,
+	request := msg.Request{
+		Section:    msg.SectionNodeMgmt,
+		Action:     msg.ActionUpdate,
 		Reply:      returnChannel,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
@@ -136,6 +118,14 @@ func (x *Rest) NodeUpdate(w http.ResponseWriter, r *http.Request,
 			IsDeleted: cReq.Node.IsDeleted,
 		},
 	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
+	handler.Input <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -145,32 +135,21 @@ func (x *Rest) NodeRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	action := `remove`
 	cReq := proto.NewNodeRequest()
 	err := decodeJSONBody(r, &cReq)
 	if err != nil {
 		dispatchBadRequest(&w, err)
 		return
 	}
-	if cReq.Flags.Purge {
-		action = `purge`
-	}
 
-	if !x.isAuthorized(&msg.Authorization{
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Section:    `node-mgmt`,
-		Action:     action,
-		NodeID:     params.ByName(`nodeID`),
-	}) {
-		dispatchForbidden(&w, nil)
-		return
+	action := msg.ActionRemove
+	if cReq.Flags.Purge {
+		action = msg.ActionPurge
 	}
 
 	returnChannel := make(chan msg.Result)
-	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
-	handler.Input <- msg.Request{
-		Section:    `node-mgmt`,
+	request := msg.Request{
+		Section:    msg.SectionNodeMgmt,
 		Action:     action,
 		Reply:      returnChannel,
 		RemoteAddr: extractAddress(r.RemoteAddr),
@@ -179,6 +158,14 @@ func (x *Rest) NodeRemove(w http.ResponseWriter, r *http.Request,
 			Id: params.ByName(`nodeID`),
 		},
 	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
+	handler.Input <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
