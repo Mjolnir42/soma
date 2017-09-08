@@ -15,6 +15,7 @@ import (
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/soma"
 	"github.com/mjolnir42/soma/lib/proto"
+	uuid "github.com/satori/go.uuid"
 )
 
 // NodeAdd function
@@ -37,6 +38,7 @@ func (x *Rest) NodeAdd(w http.ResponseWriter, r *http.Request,
 
 	returnChannel := make(chan msg.Result)
 	request := msg.Request{
+		ID:         uuid.NewV4(),
 		Section:    msg.SectionNodeMgmt,
 		Action:     msg.ActionAdd,
 		Reply:      returnChannel,
@@ -71,6 +73,7 @@ func (x *Rest) NodeSync(w http.ResponseWriter, r *http.Request,
 
 	returnChannel := make(chan msg.Result)
 	request := msg.Request{
+		ID:         uuid.NewV4(),
 		Section:    msg.SectionNodeMgmt,
 		Action:     msg.ActionSync,
 		Reply:      returnChannel,
@@ -103,6 +106,7 @@ func (x *Rest) NodeUpdate(w http.ResponseWriter, r *http.Request,
 
 	returnChannel := make(chan msg.Result)
 	request := msg.Request{
+		ID:         uuid.NewV4(),
 		Section:    msg.SectionNodeMgmt,
 		Action:     msg.ActionUpdate,
 		Reply:      returnChannel,
@@ -149,6 +153,7 @@ func (x *Rest) NodeRemove(w http.ResponseWriter, r *http.Request,
 
 	returnChannel := make(chan msg.Result)
 	request := msg.Request{
+		ID:         uuid.NewV4(),
 		Section:    msg.SectionNodeMgmt,
 		Action:     action,
 		Reply:      returnChannel,
