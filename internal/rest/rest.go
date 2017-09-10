@@ -9,6 +9,7 @@
 package rest // import "github.com/mjolnir42/soma/internal/rest"
 
 import (
+	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/soma"
 )
@@ -17,17 +18,20 @@ import (
 type Rest struct {
 	isAuthorized func(*msg.Request) bool
 	handlerMap   *soma.HandlerMap
+	conf         *config.Config
 }
 
 // New returns a new REST interface
 func New(
 	authorizationFunction func(*msg.Request) bool,
 	appHandlerMap *soma.HandlerMap,
+	conf *config.Config,
 ) *Rest {
-	r := Rest{}
-	r.isAuthorized = authorizationFunction
-	r.handlerMap = appHandlerMap
-	return &r
+	x := Rest{}
+	x.isAuthorized = authorizationFunction
+	x.handlerMap = appHandlerMap
+	x.conf = conf
+	return &x
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

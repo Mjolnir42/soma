@@ -218,7 +218,7 @@ func main() {
 
 	startHandlers(appLog, reqLog, errLog)
 
-	rst = rest.New(super.IsAuthorized, &hm)
+	rst = rest.New(super.IsAuthorized, &hm, &SomaCfg)
 
 	router := httprouter.New()
 
