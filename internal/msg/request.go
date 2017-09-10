@@ -93,8 +93,8 @@ type Flags struct {
 
 func CacheUpdateFromRequest(rq *Request) Request {
 	return Request{
-		Section: `cache`,
-		Action:  `update`,
+		Section: SectionSupervisor,
+		Action:  ActionCacheUpdate,
 		Cache:   rq,
 	}
 }
