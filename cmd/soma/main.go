@@ -221,8 +221,6 @@ func main() {
 
 	rst = rest.New(super.IsAuthorized, &hm, &SomaCfg)
 
-	router := httprouter.New()
-
 	router.HEAD(`/`, Check(Ping))
 	router.HEAD(`/authenticate/validate/`, Check(BasicAuth(AuthenticationValidate)))
 
@@ -309,7 +307,6 @@ func main() {
 	router.GET(`/status/:status`, Check(BasicAuth(StatusShow)))
 	router.GET(`/status/`, Check(BasicAuth(StatusList)))
 	router.GET(`/sync/datacenters/`, Check(BasicAuth(DatacenterSync)))
-	router.GET(`/sync/node/`, Check(BasicAuth(rst.NodeSync)))
 	router.GET(`/sync/servers/`, Check(BasicAuth(ServerSync)))
 	router.GET(`/sync/teams/`, Check(BasicAuth(TeamSync)))
 	router.GET(`/sync/users/`, Check(BasicAuth(UserSync)))
@@ -371,7 +368,6 @@ func main() {
 			router.DELETE(`/modes/:mode`, Check(BasicAuth(ModeRemove)))
 			router.DELETE(`/monitoring/:monitoring`, Check(BasicAuth(MonitoringRemove)))
 			router.DELETE(`/nodes/:node/property/:type/:source`, Check(BasicAuth(NodeRemoveProperty)))
-			router.DELETE(`/node/:nodeID`, Check(BasicAuth(rst.NodeRemove)))
 			router.DELETE(`/oncall/:oncall`, Check(BasicAuth(OncallRemove)))
 			router.DELETE(`/predicates/:predicate`, Check(BasicAuth(PredicateRemove)))
 			router.DELETE(`/property/custom/:repository/:custom`, Check(BasicAuth(PropertyRemove)))
@@ -423,7 +419,6 @@ func main() {
 			router.POST(`/modes/`, Check(BasicAuth(ModeAdd)))
 			router.POST(`/monitoring/`, Check(BasicAuth(MonitoringAdd)))
 			router.POST(`/nodes/:node/property/:type/`, Check(BasicAuth(NodeAddProperty)))
-			router.POST(`/nodes/`, Check(BasicAuth(rst.NodeAdd)))
 			router.POST(`/oncall/`, Check(BasicAuth(OncallAdd)))
 			router.POST(`/predicates/`, Check(BasicAuth(PredicateAdd)))
 			router.POST(`/property/custom/:repository/`, Check(BasicAuth(PropertyAdd)))
@@ -454,7 +449,6 @@ func main() {
 			router.PUT(`/environments/:environment`, Check(BasicAuth(EnvironmentRename)))
 			router.PUT(`/jobs/id/:jobid`, Check(BasicAuth(JobDelay)))
 			router.PUT(`/nodes/:node/config`, Check(BasicAuth(NodeAssign)))
-			router.PUT(`/node/:nodeID`, Check(BasicAuth(rst.NodeUpdate)))
 			router.PUT(`/servers/:server`, Check(BasicAuth(ServerUpdate)))
 			router.PUT(`/states/:state`, Check(BasicAuth(StateRename)))
 			router.PUT(`/teams/:team`, Check(BasicAuth(TeamUpdate)))
@@ -462,15 +456,9 @@ func main() {
 		}
 	}
 
-	if SomaCfg.Daemon.TLS {
-		errLog.Fatal(http.ListenAndServeTLS(
-			SomaCfg.Daemon.URL.Host,
-			SomaCfg.Daemon.Cert,
-			SomaCfg.Daemon.Key,
-			router))
-	} else {
-		errLog.Fatal(http.ListenAndServe(SomaCfg.Daemon.URL.Host, router))
-	}
+	go rst.Run()
+
+	//XXX wait for shutdown
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
