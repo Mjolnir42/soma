@@ -124,10 +124,23 @@ func NodeAssign(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	// check if the user is allowed to assign nodes from this team
+	if !super.IsAuthorized(&msg.Authorization{
+		AuthUser:   params.ByName(`AuthenticatedUser`),
+		RemoteAddr: extractAddress(r.RemoteAddr),
+		Section:    `node`,
+		Action:     `assign`,
+		NodeID:     params.ByName(`node`),
+	}) {
+		DispatchForbidden(&w, nil)
+		return
+	}
+
+	// check if the user is allowed to assign nodes to the target repo
 	if !super.IsAuthorized(&msg.Authorization{
 		AuthUser:     params.ByName(`AuthenticatedUser`),
 		RemoteAddr:   extractAddress(r.RemoteAddr),
-		Section:      `node`,
+		Section:      `node-config`,
 		Action:       `assign`,
 		NodeID:       params.ByName(`node`),
 		RepositoryID: cReq.Node.Config.RepositoryId,
