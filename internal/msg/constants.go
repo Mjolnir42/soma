@@ -157,6 +157,25 @@ const (
 	ActionVersions       = `versions`
 )
 
+// Actions in section
+const (
+	SectionSupervisor  = `supervisor`
+	ActionActivate     = `activate`
+	ActionAuthenticate = `authenticate`
+	ActionAuthorize    = `authorize`
+	ActionBootstrap    = `bootstrap`
+	ActionDeactivate   = `deactivate`
+	ActionKex          = `kex`
+	ActionPassword     = `password`
+	ActionToken        = `token`
+	TaskChange         = `change`
+	TaskInvalidate     = `invalidate`
+	TaskNone           = `none`
+	TaskRequest        = `request`
+	TaskReset          = `reset`
+	TaskUser           = `user`
+)
+
 // Entity types
 const (
 	EntityRepository = `repository`
