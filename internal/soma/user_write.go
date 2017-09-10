@@ -14,7 +14,6 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
-	"github.com/mjolnir42/soma/internal/super"
 	uuid "github.com/satori/go.uuid"
 )
 
