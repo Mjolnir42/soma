@@ -217,8 +217,6 @@ func main() {
 	app = soma.New(&hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog)
 	app.Start()
 
-	startHandlers(appLog, reqLog, errLog)
-
 	rst = rest.New(super.IsAuthorized, &hm, &SomaCfg)
 
 	router.HEAD(`/`, Check(Ping))

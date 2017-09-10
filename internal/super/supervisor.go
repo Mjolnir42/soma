@@ -9,6 +9,7 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
+	"encoding/hex"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/config"
@@ -86,13 +87,41 @@ type Supervisor struct {
 	conf                              *config.Config
 }
 
-// New returns a new supervisor if none have been initialized yet
+// New returns a new supervisor if none have been initialized yet,
+// or the already initialized supervisor if it has.
+// It will panic if config has broken cryptographic seeds
 func New(c *config.Config) *Supervisor {
+	var err error
 	if initialized {
-		return nil
+		return singleton
 	}
+
 	s := &Supervisor{}
 	s.conf = c
+	s.Input = make(chan msg.Request, s.conf.QueueLen)
+	s.Update = make(chan msg.Request, s.conf.QueueLen)
+	s.Shutdown = make(chan struct{})
+	s.readonly = s.conf.ReadOnly
+	if s.seed, err = hex.DecodeString(
+		s.conf.Auth.TokenSeed,
+	); err != nil {
+		panic(err)
+	}
+	if len(s.seed) == 0 {
+		panic(`token.seed has length 0`)
+	}
+	if s.key, err = hex.DecodeString(
+		s.conf.Auth.TokenKey,
+	); err != nil {
+		panic(err)
+	}
+	if len(s.key) == 0 {
+		panic(`token.key has length 0`)
+	}
+	s.tokenExpiry = s.conf.Auth.TokenExpirySeconds
+	s.kexExpiry = s.conf.Auth.KexExpirySeconds
+	s.credExpiry = s.conf.Auth.CredentialExpiryDays
+	s.activation = s.conf.Auth.Activation
 
 	// set package variable config for functions
 	cfg = c

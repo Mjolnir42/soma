@@ -7,11 +7,13 @@
 
 package soma
 
+import "github.com/mjolnir42/soma/internal/super"
+
 // Start launches all application handlers
 func (s *Soma) Start() {
 	// grimReaper and supervisor must run first
 	s.handlerMap.Add(`grimreaper`, newGrimReaper(1, s))
-	// TODO: start supervisor completely
+	s.handlerMap.Add(`supervisor`, super.New(s.conf))
 
 	s.handlerMap.Add(`attribute_r`, newAttributeRead(s.conf.QueueLen))
 	s.handlerMap.Add(`bucket_r`, newBucketRead(s.conf.QueueLen))
@@ -88,6 +90,7 @@ func (s *Soma) Start() {
 			s.dbConnection,
 			s.exportLogger(),
 		)
+		// starts the handler in a goroutine
 		s.handlerMap.Run(handler)
 	}
 }
