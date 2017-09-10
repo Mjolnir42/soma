@@ -55,6 +55,7 @@ func New() *Cache {
 	c.action = newActionLookup()
 	c.user = newUserLookup()
 	c.team = newTeamLookup()
+	c.object = newObjectLookup()
 	c.pmap = newPermissionMapping()
 	c.grantGlobal = newUnscopedGrantMap()
 	c.grantRepository = newScopedGrantMap()

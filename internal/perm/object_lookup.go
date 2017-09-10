@@ -24,6 +24,17 @@ type objectLookup struct {
 	byNode map[string]map[string][]string
 }
 
+// newObjectLookup returns an initialized objectLookup
+func newObjectLookup() *objectLookup {
+	o := objectLookup{}
+	o.byRepository = map[string]map[string][]string{}
+	o.byBucket = map[string]map[string][]string{}
+	o.byGroup = map[string]map[string][]string{}
+	o.byCluster = map[string]map[string][]string{}
+	o.byNode = map[string]map[string][]string{}
+	return &o
+}
+
 // addRepository inserts a new repository into the cache
 func (m *objectLookup) addRepository(repoID string) {
 	if _, ok := m.byRepository[repoID]; ok {
