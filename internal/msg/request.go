@@ -9,6 +9,7 @@
 package msg
 
 import (
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
@@ -96,6 +97,16 @@ func CacheUpdateFromRequest(rq *Request) Request {
 		Action:  `update`,
 		Cache:   rq,
 	}
+}
+
+// Log logs the request to the provided logwriter
+func (r *Request) Log(l *logrus.Logger) {
+	l.Infof(LogStrSRq,
+		r.Section,
+		r.Action,
+		r.AuthUser,
+		r.RemoteAddr,
+	)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
