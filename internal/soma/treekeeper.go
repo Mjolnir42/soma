@@ -389,6 +389,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 
 	// q.Action == `rebuild` will fall through switch
 	switch q.Action {
+	// XXX CONVERT to msg.Request.Section / msg.Request.Action
 
 	//
 	// TREE MANIPULATION REQUESTS
@@ -634,6 +635,26 @@ actionloop:
 
 	// accept tree changes
 	tk.tree.Commit()
+
+	// update permission cache
+	switch q.Section {
+	case msg.SectionRepository, msg.SectionBucket, msg.SectionGroup, msg.SectionCluster:
+		switch q.Action {
+		case msg.ActionCreate, msg.ActionDestroy:
+			go func() {
+				super := tk.soma.getSupervisor()
+				super.Update <- msg.CacheUpdateFromRequest(q)
+			}()
+		}
+	case msg.SectionNodeConfig:
+		switch q.Action {
+		case msg.ActionAssign, msg.ActionUnassign:
+			go func() {
+				super := tk.soma.getSupervisor()
+				super.Update <- msg.CacheUpdateFromRequest(q)
+			}()
+		}
+	}
 	return
 
 bailout:
