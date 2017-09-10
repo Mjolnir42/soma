@@ -38,16 +38,16 @@ func newMonitoringWrite(length int) (w *MonitoringWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *MonitoringWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *MonitoringWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for MonitoringWrite
-func (w *MonitoringWrite) run() {
+// Run is the event loop for MonitoringWrite
+func (w *MonitoringWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -137,8 +137,8 @@ func (w *MonitoringWrite) delete(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *MonitoringWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *MonitoringWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

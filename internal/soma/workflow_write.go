@@ -38,16 +38,16 @@ func newWorkflowWrite(length int) (w *WorkflowWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *WorkflowWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *WorkflowWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for WorkflowWrite
-func (w *WorkflowWrite) run() {
+// Run is the event loop for WorkflowWrite
+func (w *WorkflowWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -168,8 +168,8 @@ func (w *WorkflowWrite) set(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *WorkflowWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *WorkflowWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

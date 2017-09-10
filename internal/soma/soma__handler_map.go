@@ -65,14 +65,14 @@ func (h *HandlerMap) Range() map[string]Handler {
 func (h *HandlerMap) Register(n string, c *sql.DB, l []*logrus.Logger) {
 	h.Lock()
 	defer h.Unlock()
-	h.hmap[n].register(c, l...)
+	h.hmap[n].Register(c, l...)
 }
 
 // Run starts the handler n
 func (h *HandlerMap) Run(n string) {
 	h.Lock()
 	defer h.Unlock()
-	go h.hmap[n].run()
+	go h.hmap[n].Run()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

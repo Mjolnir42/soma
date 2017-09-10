@@ -50,16 +50,16 @@ func newCheckConfigurationRead(length int) (r *CheckConfigurationRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *CheckConfigurationRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *CheckConfigurationRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for CheckConfigurationRead
-func (r *CheckConfigurationRead) run() {
+// Run is the event loop for CheckConfigurationRead
+func (r *CheckConfigurationRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -634,8 +634,8 @@ func (r *CheckConfigurationRead) instances(cnf *proto.CheckConfig) error {
 	return nil
 }
 
-// shutdownNow signals the handler to shut down
-func (r *CheckConfigurationRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *CheckConfigurationRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

@@ -38,16 +38,16 @@ func newStateRead(length int) (r *StateRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *StateRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *StateRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for StateRead
-func (r *StateRead) run() {
+// Run is the event loop for StateRead
+func (r *StateRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -140,8 +140,8 @@ func (r *StateRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *StateRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *StateRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

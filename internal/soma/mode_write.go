@@ -37,16 +37,16 @@ func newModeWrite(length int) (w *ModeWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *ModeWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *ModeWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for ModeWrite
-func (w *ModeWrite) run() {
+// Run is the event loop for ModeWrite
+func (w *ModeWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -122,8 +122,8 @@ func (w *ModeWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *ModeWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *ModeWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

@@ -37,16 +37,16 @@ func newModeRead(length int) (r *ModeRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *ModeRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *ModeRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for ModeRead
-func (r *ModeRead) run() {
+// Run is the event loop for ModeRead
+func (r *ModeRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -141,8 +141,8 @@ func (r *ModeRead) show(q *msg.Request, mr *msg.Result) {
 	})
 }
 
-// shutdownNow signals the handler to shut down
-func (r *ModeRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *ModeRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

@@ -37,16 +37,16 @@ func newViewRead(length int) (r *ViewRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *ViewRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *ViewRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for ViewRead
-func (r *ViewRead) run() {
+// Run is the event loop for ViewRead
+func (r *ViewRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -141,8 +141,8 @@ func (r *ViewRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *ViewRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *ViewRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

@@ -37,16 +37,16 @@ func newProviderWrite(length int) (w *ProviderWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *ProviderWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *ProviderWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for ProviderWrite
-func (w *ProviderWrite) run() {
+// Run is the event loop for ProviderWrite
+func (w *ProviderWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -122,8 +122,8 @@ func (w *ProviderWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *ProviderWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *ProviderWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

@@ -37,16 +37,16 @@ func newAttributeWrite(length int) (w *AttributeWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *AttributeWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *AttributeWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for AttributeWrite
-func (w *AttributeWrite) run() {
+// Run is the event loop for AttributeWrite
+func (w *AttributeWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -124,8 +124,8 @@ func (w *AttributeWrite) delete(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *AttributeWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *AttributeWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

@@ -41,16 +41,16 @@ func newMonitoringRead(length int) (r *MonitoringRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *MonitoringRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *MonitoringRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for MonitoringRead
-func (r *MonitoringRead) run() {
+// Run is the event loop for MonitoringRead
+func (r *MonitoringRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -266,8 +266,8 @@ func (r *MonitoringRead) searchScoped(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *MonitoringRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *MonitoringRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

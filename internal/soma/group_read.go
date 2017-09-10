@@ -45,16 +45,16 @@ func newGroupRead(length int) (r *GroupRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *GroupRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *GroupRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for GroupRead
-func (r *GroupRead) run() {
+// Run is the event loop for GroupRead
+func (r *GroupRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -339,8 +339,8 @@ func (r *GroupRead) memberList(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *GroupRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *GroupRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

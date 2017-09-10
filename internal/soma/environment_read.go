@@ -38,16 +38,16 @@ func newEnvironmentRead(length int) (r *EnvironmentRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *EnvironmentRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *EnvironmentRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for EnvironmentRead
-func (r *EnvironmentRead) run() {
+// Run is the event loop for EnvironmentRead
+func (r *EnvironmentRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -142,8 +142,8 @@ func (r *EnvironmentRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *EnvironmentRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *EnvironmentRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

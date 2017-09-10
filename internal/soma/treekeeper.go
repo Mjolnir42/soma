@@ -97,20 +97,20 @@ func newTreeKeeper(length int) (tk *TreeKeeper) {
 	return
 }
 
-// register is only implemented by TreeKeeper to fulfill the Handler
+// Register is only implemented by TreeKeeper to fulfill the Handler
 // interface. It is expected to by started by ForestCustodian which
 // will fully initialize it.
-func (tk *TreeKeeper) register(c *sql.DB, l ...*logrus.Logger) {
+func (tk *TreeKeeper) Register(c *sql.DB, l ...*logrus.Logger) {
 	// TreeKeeper receives its own db connection
 	tk.appLog = l[0]
 	// TreeKeeper does not use the global request log
 	// TreeKeeper does not use the global error log
 }
 
-// run() is the method a treeKeeper executes in its background
+// Run is the method a treeKeeper executes in its background
 // go-routine. It checks and handles the input channels and reacts
 // appropriately.
-func (tk *TreeKeeper) run() {
+func (tk *TreeKeeper) Run() {
 	tk.appLog.Printf(
 		"Starting TreeKeeper for Repo %s (%s)",
 		tk.meta.repoName,
@@ -669,9 +669,8 @@ bailout:
 	return
 }
 
-/* Ops Access
- */
-func (tk *TreeKeeper) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (tk *TreeKeeper) ShutdownNow() {
 	if !tk.isStopped() {
 		tk.stopNow()
 	}

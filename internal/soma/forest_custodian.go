@@ -48,16 +48,16 @@ func newForestCustodian(length int, s *Soma) (f *ForestCustodian) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (f *ForestCustodian) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (f *ForestCustodian) Register(c *sql.DB, l ...*logrus.Logger) {
 	f.conn = c
 	f.appLog = l[0]
 	f.reqLog = l[1]
 	f.errLog = l[2]
 }
 
-// run is the event loop for ForestCustodian
-func (f *ForestCustodian) run() {
+// Run is the event loop for ForestCustodian
+func (f *ForestCustodian) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -211,8 +211,8 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (f *ForestCustodian) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (f *ForestCustodian) ShutdownNow() {
 	close(f.Shutdown)
 }
 

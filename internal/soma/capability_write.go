@@ -42,16 +42,16 @@ func newCapabilityWrite(length int) (w *CapabilityWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *CapabilityWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *CapabilityWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for CapabilityWrite
-func (w *CapabilityWrite) run() {
+// Run is the event loop for CapabilityWrite
+func (w *CapabilityWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -185,8 +185,8 @@ func (w *CapabilityWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *CapabilityWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *CapabilityWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

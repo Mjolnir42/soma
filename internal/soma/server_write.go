@@ -40,16 +40,16 @@ func newServerWrite(length int) (w *ServerWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *ServerWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *ServerWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for ServerWrite
-func (w *ServerWrite) run() {
+// Run is the event loop for ServerWrite
+func (w *ServerWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -212,8 +212,8 @@ func (w *ServerWrite) update(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *ServerWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *ServerWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

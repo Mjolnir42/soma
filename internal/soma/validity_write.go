@@ -37,16 +37,16 @@ func newValidityWrite(length int) (w *ValidityWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *ValidityWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *ValidityWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for ValidityWrite
-func (w *ValidityWrite) run() {
+// Run is the event loop for ValidityWrite
+func (w *ValidityWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -126,8 +126,8 @@ func (w *ValidityWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *ValidityWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *ValidityWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

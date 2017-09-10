@@ -37,16 +37,16 @@ func newLevelWrite(length int) (w *LevelWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *LevelWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *LevelWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for LevelWrite
-func (w *LevelWrite) run() {
+// Run is the event loop for LevelWrite
+func (w *LevelWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -124,8 +124,8 @@ func (w *LevelWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *LevelWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *LevelWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

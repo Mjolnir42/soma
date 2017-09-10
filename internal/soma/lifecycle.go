@@ -55,16 +55,16 @@ func newLifeCycle(s *Soma) (l *LifeCycle) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (lc *LifeCycle) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (lc *LifeCycle) Register(c *sql.DB, l ...*logrus.Logger) {
 	lc.conn = c
 	lc.appLog = l[0]
 	lc.reqLog = l[1]
 	lc.errLog = l[2]
 }
 
-// run is the loop for LifeCycle
-func (lc *LifeCycle) run() {
+// Run is the loop for LifeCycle
+func (lc *LifeCycle) Run() {
 	var err error
 	lc.pokers = make(map[string]chan string)
 
@@ -485,8 +485,8 @@ func (lc *LifeCycle) pokeSystem(callback string, in chan string) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (lc *LifeCycle) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (lc *LifeCycle) ShutdownNow() {
 	close(lc.Shutdown)
 }
 

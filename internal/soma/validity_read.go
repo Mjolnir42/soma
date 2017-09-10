@@ -38,16 +38,16 @@ func newValidityRead(length int) (r *ValidityRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *ValidityRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *ValidityRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for ValidityRead
-func (r *ValidityRead) run() {
+// Run is the event loop for ValidityRead
+func (r *ValidityRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -163,8 +163,8 @@ func (r *ValidityRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *ValidityRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *ValidityRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

@@ -38,16 +38,16 @@ func newOncallRead(length int) (r *OncallRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *OncallRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *OncallRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for OncallRead
-func (r *OncallRead) run() {
+// Run is the event loop for OncallRead
+func (r *OncallRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -149,8 +149,8 @@ func (r *OncallRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *OncallRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *OncallRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

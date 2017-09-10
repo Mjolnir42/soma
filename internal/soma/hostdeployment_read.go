@@ -40,16 +40,16 @@ func newHostDeploymentRead(length int) (r *HostDeploymentRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *HostDeploymentRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *HostDeploymentRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for HostDeploymentRead
-func (r *HostDeploymentRead) run() {
+// Run is the event loop for HostDeploymentRead
+func (r *HostDeploymentRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -279,8 +279,8 @@ assembleloop:
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *HostDeploymentRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *HostDeploymentRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

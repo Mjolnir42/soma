@@ -47,17 +47,17 @@ func newJobBlock(length int) (j *JobBlock) {
 	return
 }
 
-// register initializes resources provided by the Soma app. This
+// Register initializes resources provided by the Soma app. This
 // handler does not use the database connection, but accepts it
 // to implement the interface
-func (j *JobBlock) register(c *sql.DB, l ...*logrus.Logger) {
+func (j *JobBlock) Register(c *sql.DB, l ...*logrus.Logger) {
 	j.appLog = l[0]
 	j.reqLog = l[1]
 	j.errLog = l[2]
 }
 
-// run is the event loop for JobBlock
-func (j *JobBlock) run() {
+// Run is the event loop for JobBlock
+func (j *JobBlock) Run() {
 	tock := time.Tick(1 * time.Minute)
 	j.jobDone = make(map[string]time.Time)
 	j.blockList = make(map[string][]blockSpec)
@@ -136,8 +136,8 @@ runloop:
 	}
 }
 
-// shutdownNow signals the handler to shutdown
-func (j *JobBlock) shutdownNow() {
+// ShutdownNow signals the handler to shutdown
+func (j *JobBlock) ShutdownNow() {
 	close(j.Shutdown)
 }
 

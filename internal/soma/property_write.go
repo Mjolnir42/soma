@@ -52,16 +52,16 @@ func newPropertyWrite(length int) (w *PropertyWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *PropertyWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *PropertyWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for PropertyWrite
-func (w *PropertyWrite) run() {
+// Run is the event loop for PropertyWrite
+func (w *PropertyWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -398,8 +398,8 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 	mr.Property = append(mr.Property, q.Property)
 }
 
-// shutdownNow signals the handler to shut down
-func (w *PropertyWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *PropertyWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

@@ -37,16 +37,16 @@ func newUnitRead(length int) (r *UnitRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *UnitRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *UnitRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for UnitRead
-func (r *UnitRead) run() {
+// Run is the event loop for UnitRead
+func (r *UnitRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -144,8 +144,8 @@ func (r *UnitRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *UnitRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *UnitRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

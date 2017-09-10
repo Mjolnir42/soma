@@ -39,16 +39,16 @@ func newTeamRead(length int) (r *TeamRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *TeamRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *TeamRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for TeamRead
-func (r *TeamRead) run() {
+// Run is the event loop for TeamRead
+func (r *TeamRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -195,8 +195,8 @@ func (r *TeamRead) sync(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *TeamRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *TeamRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

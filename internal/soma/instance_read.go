@@ -42,16 +42,16 @@ func newInstanceRead(length int) (r *InstanceRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *InstanceRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *InstanceRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for InstanceRead
-func (r *InstanceRead) run() {
+// Run is the event loop for InstanceRead
+func (r *InstanceRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -322,7 +322,8 @@ func (r *InstanceRead) versions(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-func (r *InstanceRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *InstanceRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

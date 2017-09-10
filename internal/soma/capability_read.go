@@ -38,16 +38,16 @@ func newCapabilityRead(length int) (r *CapabilityRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *CapabilityRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *CapabilityRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for CapabilityRead
-func (r *CapabilityRead) run() {
+// Run is the event loop for CapabilityRead
+func (r *CapabilityRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -166,8 +166,8 @@ func (r *CapabilityRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *CapabilityRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *CapabilityRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

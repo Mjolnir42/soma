@@ -14,6 +14,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/internal/super"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -42,16 +43,16 @@ func newUserWrite(length int, s *Soma) (w *UserWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *UserWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *UserWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for UserWrite
-func (w *UserWrite) run() {
+// Run is the event loop for UserWrite
+func (w *UserWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -83,7 +84,7 @@ func (w *UserWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	// supervisor must be notified of user change
-	super := w.soma.handlerMap.Get(`supervisor`).(*Supervisor)
+	super := w.soma.handlerMap.Get(`supervisor`).(*super.Supervisor)
 	notify := msg.Request{
 		Section: `map`,
 		Action:  q.Action,
@@ -202,8 +203,8 @@ func (w *UserWrite) purge(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *UserWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *UserWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

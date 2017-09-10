@@ -38,16 +38,16 @@ func newMetricRead(length int) (r *MetricRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *MetricRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *MetricRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for MetricRead
-func (r *MetricRead) run() {
+// Run is the event loop for MetricRead
+func (r *MetricRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -147,8 +147,8 @@ func (r *MetricRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *MetricRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *MetricRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

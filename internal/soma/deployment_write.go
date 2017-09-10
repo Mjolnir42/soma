@@ -48,16 +48,16 @@ func newDeploymentWrite(length int) (w *DeploymentWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *DeploymentWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *DeploymentWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for DeploymentWrite
-func (w *DeploymentWrite) run() {
+// Run is the event loop for DeploymentWrite
+func (w *DeploymentWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -438,8 +438,8 @@ func (w *DeploymentWrite) listAll(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (w *DeploymentWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *DeploymentWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

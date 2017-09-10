@@ -38,16 +38,16 @@ func newEntityRead(length int) (r *EntityRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *EntityRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *EntityRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for EntityRead
-func (r *EntityRead) run() {
+// Run is the event loop for EntityRead
+func (r *EntityRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -141,8 +141,8 @@ func (r *EntityRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *EntityRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *EntityRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

@@ -192,11 +192,11 @@ func (f *ForestCustodian) spawnTreeKeeper(q *msg.Request, s *tree.Tree,
 
 	// during rebuild the treekeeper will not run in background
 	if tK.status.requiresRebuild {
-		tK.run()
+		tK.Run()
 	} else {
 		// non-rebuild, register TK and detach
 		f.soma.handlerMap.Add(keeperName, tK)
-		go tK.run()
+		go tK.Run()
 	}
 	return nil
 }

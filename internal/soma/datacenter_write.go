@@ -38,16 +38,16 @@ func newDatacenterWrite(length int) (w *DatacenterWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *DatacenterWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *DatacenterWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for DatacenterWrite
-func (w *DatacenterWrite) run() {
+// Run is the event loop for DatacenterWrite
+func (w *DatacenterWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -144,8 +144,8 @@ func (w *DatacenterWrite) rename(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *DatacenterWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *DatacenterWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

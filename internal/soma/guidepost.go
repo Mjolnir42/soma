@@ -55,16 +55,16 @@ func newGuidePost(length int, s *Soma) (g *GuidePost) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (g *GuidePost) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (g *GuidePost) Register(c *sql.DB, l ...*logrus.Logger) {
 	g.conn = c
 	g.appLog = l[0]
 	g.reqLog = l[1]
 	g.errLog = l[2]
 }
 
-// run is the event loop for GuidePost
-func (g *GuidePost) run() {
+// Run is the event loop for GuidePost
+func (g *GuidePost) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -277,8 +277,8 @@ exit:
 	q.Reply <- result
 }
 
-// shutdownNow signals the handler to shut down
-func (g *GuidePost) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (g *GuidePost) ShutdownNow() {
 	close(g.Shutdown)
 }
 

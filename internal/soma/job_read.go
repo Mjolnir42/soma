@@ -45,16 +45,16 @@ func newJobRead(length int) (r *JobRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *JobRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *JobRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for JobRead
-func (r *JobRead) run() {
+// Run is the event loop for JobRead
+func (r *JobRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -311,8 +311,8 @@ func (r *JobRead) search(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *JobRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *JobRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

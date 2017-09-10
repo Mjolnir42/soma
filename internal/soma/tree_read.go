@@ -71,16 +71,16 @@ func newTreeRead(length int) (r *TreeRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *TreeRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *TreeRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for TreeRead
-func (r *TreeRead) run() {
+// Run is the event loop for TreeRead
+func (r *TreeRead) Run() {
 	var err error
 
 	// single-object return statements
@@ -495,8 +495,8 @@ func (r *TreeRead) node(id string, depth int) (*proto.Node, error) {
 	return &node, nil
 }
 
-// shutdownNow signals the handler to shut down
-func (r *TreeRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *TreeRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

@@ -37,16 +37,16 @@ func newPredicateWrite(length int) (w *PredicateWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *PredicateWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *PredicateWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for PredicateWrite
-func (w *PredicateWrite) run() {
+// Run is the event loop for PredicateWrite
+func (w *PredicateWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -122,8 +122,8 @@ func (w *PredicateWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *PredicateWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *PredicateWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

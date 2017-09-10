@@ -46,16 +46,16 @@ func newGrimReaper(length int, s *Soma) (grim *GrimReaper) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (grim *GrimReaper) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (grim *GrimReaper) Register(c *sql.DB, l ...*logrus.Logger) {
 	grim.conn = c
 	grim.appLog = l[0]
 	grim.reqLog = l[1]
 	grim.errLog = l[2]
 }
 
-// run is the event loop for GrimReaper
-func (grim *GrimReaper) run() {
+// Run is the event loop for GrimReaper
+func (grim *GrimReaper) Run() {
 	// defer calls stack in LIFO order
 	defer os.Exit(0)
 	defer grim.conn.Close()
@@ -127,7 +127,7 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 	// stop + shutdown all treeKeeper   : /^treekeeper_/
 	for handler := range grim.soma.handlerMap.Range() {
 		if strings.HasPrefix(handler, `treekeeper_`) {
-			grim.soma.handlerMap.Get(handler).shutdownNow()
+			grim.soma.handlerMap.Get(handler).ShutdownNow()
 			grim.soma.handlerMap.Del(handler)
 			grim.appLog.Printf("GrimReaper: shut down %s", handler)
 		}
@@ -137,7 +137,7 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 		if !strings.HasSuffix(handler, `_w`) {
 			continue
 		}
-		grim.soma.handlerMap.Get(handler).shutdownNow()
+		grim.soma.handlerMap.Get(handler).ShutdownNow()
 		grim.soma.handlerMap.Del(handler)
 		grim.appLog.Printf("GrimReaper: shut down %s", handler)
 	}
@@ -146,7 +146,7 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 		if !strings.HasSuffix(handler, `_r`) {
 			continue
 		}
-		grim.soma.handlerMap.Get(handler).shutdownNow()
+		grim.soma.handlerMap.Get(handler).ShutdownNow()
 		grim.soma.handlerMap.Del(handler)
 		grim.appLog.Printf("GrimReaper: shut down %s", handler)
 	}
@@ -158,13 +158,13 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 		`lifecycle`,
 		`deployment`,
 	} {
-		grim.soma.handlerMap.Get(h).shutdownNow()
+		grim.soma.handlerMap.Get(h).ShutdownNow()
 		grim.soma.handlerMap.Del(h)
 		grim.appLog.Printf("GrimReaper: shut down %s", h)
 	}
 
 	// shutdown supervisor -- needs handling in BasicAuth()
-	grim.soma.handlerMap.Get(`supervisor`).shutdownNow()
+	grim.soma.handlerMap.Get(`supervisor`).ShutdownNow()
 	grim.soma.handlerMap.Del(`supervisor`)
 	grim.appLog.Println(`GrimReaper: shut down the supervisor`)
 
@@ -180,9 +180,9 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 	return true
 }
 
-// shutdownNow signals the handler to shut down. In the case of the
+// ShutdownNow signals the handler to shut down. In the case of the
 // GrimReaper, this will shut down SOMA
-func (grim *GrimReaper) shutdownNow() {
+func (grim *GrimReaper) ShutdownNow() {
 	close(grim.Shutdown)
 }
 

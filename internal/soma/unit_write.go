@@ -37,16 +37,16 @@ func newUnitWrite(length int) (w *UnitWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *UnitWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *UnitWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for UnitWrite
-func (w *UnitWrite) run() {
+// Run is the event loop for UnitWrite
+func (w *UnitWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -123,8 +123,8 @@ func (w *UnitWrite) remove(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *UnitWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *UnitWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

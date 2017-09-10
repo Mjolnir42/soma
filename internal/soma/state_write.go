@@ -38,16 +38,16 @@ func newStateWrite(length int) (w *StateWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *StateWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *StateWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for StateWrite
-func (w *StateWrite) run() {
+// Run is the event loop for StateWrite
+func (w *StateWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -142,8 +142,8 @@ func (w *StateWrite) rename(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *StateWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *StateWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 

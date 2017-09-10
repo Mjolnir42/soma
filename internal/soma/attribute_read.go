@@ -38,16 +38,16 @@ func newAttributeRead(length int) (r *AttributeRead) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (r *AttributeRead) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (r *AttributeRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.conn = c
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
 }
 
-// run is the event loop for AttributeRead
-func (r *AttributeRead) run() {
+// Run is the event loop for AttributeRead
+func (r *AttributeRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -149,8 +149,8 @@ func (r *AttributeRead) show(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// shutdownNow signals the handler to shut down
-func (r *AttributeRead) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (r *AttributeRead) ShutdownNow() {
 	close(r.Shutdown)
 }
 

@@ -38,16 +38,16 @@ func newViewWrite(length int) (w *ViewWrite) {
 	return
 }
 
-// register initializes resources provided by the Soma app
-func (w *ViewWrite) register(c *sql.DB, l ...*logrus.Logger) {
+// Register initializes resources provided by the Soma app
+func (w *ViewWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.conn = c
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
 }
 
-// run is the event loop for ViewWrite
-func (w *ViewWrite) run() {
+// Run is the event loop for ViewWrite
+func (w *ViewWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
@@ -145,8 +145,8 @@ func (w *ViewWrite) rename(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// shutdownNow signals the handler to shut down
-func (w *ViewWrite) shutdownNow() {
+// ShutdownNow signals the handler to shut down
+func (w *ViewWrite) ShutdownNow() {
 	close(w.Shutdown)
 }
 
