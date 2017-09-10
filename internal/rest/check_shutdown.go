@@ -1,4 +1,11 @@
-package main
+/*-
+ * Copyright (c) 2016-2017, Jörg Pernfuß
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package rest
 
 import (
 	"net/http"
@@ -8,7 +15,8 @@ import (
 	metrics "github.com/rcrowley/go-metrics"
 )
 
-func Check(h httprouter.Handle) httprouter.Handle {
+// Check denies the request if a shutdown is in progress
+func (x *Rest) Check(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
 

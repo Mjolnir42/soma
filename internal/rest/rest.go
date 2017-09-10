@@ -12,7 +12,14 @@ import (
 	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/soma"
+	metrics "github.com/rcrowley/go-metrics"
 )
+
+// ShutdownInProgress indicates a pending service shutdown
+var ShutdownInProgress bool
+
+// Metrics is the map of runtime metric registries
+var Metrics = make(map[string]metrics.Registry)
 
 // Rest holds the required state for the REST interface
 type Rest struct {

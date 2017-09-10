@@ -181,6 +181,7 @@ func main() {
 		// to Histogram.Clear()
 		metrics.NewTimer())
 	soma.Metrics = Metrics
+	rest.Metrics = Metrics
 
 	/*
 	 * Construct listen address
