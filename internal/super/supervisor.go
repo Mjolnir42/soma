@@ -110,7 +110,7 @@ func (s *Supervisor) Register(c *sql.DB, l ...*logrus.Logger) {
 	s.errLog = l[2]
 }
 
-// Run ...
+// Run is the event loop for Supervisor
 func (s *Supervisor) Run() {
 	var err error
 
@@ -248,12 +248,14 @@ func (s *Supervisor) process(q *msg.Request) {
 	case msg.SectionAction:
 		s.action(q)
 
+		//
 	case `cache`:
 		s.cache(q)
 	}
 }
 
-func (s *Supervisor) shutdownNow() {
+// ShutdownNow signals the handler to stop
+func (s *Supervisor) ShutdownNow() {
 	close(s.Shutdown)
 }
 
