@@ -30,7 +30,7 @@ The following code is nearly verbatim the example code from the httprouter
 distribution. Therefor copyright is set to the license text of that distribution.
 */
 
-package main
+package rest
 
 import (
 	"bytes"
@@ -46,20 +46,21 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func BasicAuth(h httprouter.Handle) httprouter.Handle {
+// XXX logging
+func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
 		const basicAuthPrefix string = "Basic "
 
 		// if the supervisor is not available, no requests are accepted
-		if _, ok := handlerMap[`supervisor`]; !ok {
+		if h := x.handlerMap.Get(`supervisor`); h == nil {
 			http.Error(w, `Authentication supervisor not available`,
 				http.StatusServiceUnavailable)
 			return
 		}
 
 		// disable authentication much?
-		if SomaCfg.OpenInstance {
+		if x.conf.OpenInstance {
 			ps = append(ps, httprouter.Param{
 				Key:   `AuthenticatedUser`,
 				Value: `AnonymousCoward`,
@@ -78,10 +79,10 @@ func BasicAuth(h httprouter.Handle) httprouter.Handle {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
 				if len(pair) == 2 {
 					returnChannel := make(chan msg.Result)
-					super := handlerMap[`supervisor`].(*super.Supervisor)
+					super := x.handlerMap.Get(`supervisor`).(*super.Supervisor)
 					super.Input <- msg.Request{
-						Section:    `authenticate`,
-						Action:     `basic`,
+						Section:    msg.SectionSupervisor,
+						Action:     msg.ActionAuthenticate,
 						RemoteAddr: extractAddress(r.RemoteAddr),
 						Reply:      returnChannel,
 						Super: &msg.Supervisor{
@@ -98,7 +99,7 @@ func BasicAuth(h httprouter.Handle) httprouter.Handle {
 					result := <-returnChannel
 					if result.Error != nil {
 						// log authentication errors
-						log.Printf(LogStrErr,
+						log.Printf(msg.LogStrErr,
 							result.Section,
 							fmt.Sprintf("%s (%s)",
 								result.Action,
