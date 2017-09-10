@@ -44,6 +44,7 @@ func New(
 	return &x
 }
 
+// Run is the event server for Rest
 func (x *Rest) Run() {
 	router := httprouter.New()
 

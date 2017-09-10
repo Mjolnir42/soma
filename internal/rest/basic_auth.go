@@ -47,6 +47,8 @@ import (
 )
 
 // XXX logging
+
+// BasicAuth handles HTTP BasicAuth on requests
 func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
