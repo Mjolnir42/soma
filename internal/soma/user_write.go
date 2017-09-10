@@ -100,7 +100,7 @@ func (w *UserWrite) process(q *msg.Request) {
 		// supervisor must be notified of user change
 		go func() {
 			super := w.soma.getSupervisor()
-			super.Update <- notify
+			super.Update <- msg.CacheUpdateFromRequest(q)
 		}()
 	}
 	q.Reply <- result
