@@ -78,7 +78,7 @@ func (c *Cache) Perform(q *msg.Request) {
 		c.performCluster(q)
 	case `group`:
 		c.performGroup(q)
-	case `node`:
+	case `node-config`:
 		c.performNode(q)
 	case `permission`:
 		c.performPermission(q)
