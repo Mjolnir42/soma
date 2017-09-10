@@ -23,11 +23,10 @@ func IsAuthorized(q *msg.Request) bool {
 	returnChannel := make(chan msg.Result)
 	singleton.Input <- msg.Request{
 		ID:      q.ID,
-		Section: `supervisor`,
-		Action:  `supervisor`,
+		Section: msg.SectionSupervisor,
+		Action:  msg.ActionAuthorize,
 		Reply:   returnChannel,
 		Super: &msg.Supervisor{
-			Task:      `authorize`,
 			Authorize: q,
 		},
 	}
@@ -42,8 +41,9 @@ func IsAuthorized(q *msg.Request) bool {
 	// the request is not authorized
 	// XXX should be auditlog
 	singleton.errLog.Printf(
-		"Section=%s, Task=%s, InternalCode=%d, Error=%s",
-		`supervisor`, `authorize`,
+		"Section=%s, Action=%s, InternalCode=%d, Error=%s",
+		msg.SectionSupervisor,
+		msg.ActionAuthorize,
 		result.Super.Verdict,
 		fmt.Sprintf("Forbidden: %s, %s, %s/%s",
 			q.AuthUser,
