@@ -83,14 +83,6 @@ func (w *UserWrite) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 	msgRequest(w.reqLog, q)
 
-	// supervisor must be notified of user change
-	super := w.soma.handlerMap.Get(`supervisor`).(*super.Supervisor)
-	notify := msg.Request{
-		Section: msg.SectionSupervisor,
-		Action:  msg.ActionCacheUpdate,
-		Cache:   q,
-	}
-
 	switch q.Action {
 	case msg.ActionCreate:
 		w.add(q, &result)
@@ -104,9 +96,12 @@ func (w *UserWrite) process(q *msg.Request) {
 		result.UnknownRequest(q)
 	}
 
-	// send supervisor notify
 	if result.IsOK() {
-		super.Update <- notify
+		// supervisor must be notified of user change
+		go func() {
+			super := w.soma.getSupervisor()
+			super.Update <- notify
+		}()
 	}
 	q.Reply <- result
 }
