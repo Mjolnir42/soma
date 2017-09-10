@@ -157,13 +157,15 @@ const (
 	ActionVersions       = `versions`
 )
 
-// Actions in section
+// Section supervisor handles AAA requests outside the permission
+// model
 const (
 	SectionSupervisor  = `supervisor`
 	ActionActivate     = `activate`
 	ActionAuthenticate = `authenticate`
 	ActionAuthorize    = `authorize`
 	ActionBootstrap    = `bootstrap`
+	ActionCacheUpdate  = `cacheupdate`
 	ActionDeactivate   = `deactivate`
 	ActionKex          = `kex`
 	ActionPassword     = `password`

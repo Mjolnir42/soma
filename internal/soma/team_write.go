@@ -84,12 +84,9 @@ func (w *TeamWrite) process(q *msg.Request) {
 	// supervisor must be notified of user change
 	super := w.soma.handlerMap.Get(`supervisor`).(*super.Supervisor)
 	notify := msg.Request{
-		Section: `map`,
-		Action:  q.Action,
-		Super: &msg.Supervisor{
-			Object: `team`,
-			Team:   q.Team,
-		},
+		Section: msg.SectionSupervisor,
+		Action:  msg.ActionCacheUpdate,
+		Cache:   q,
 	}
 
 	switch q.Action {
@@ -105,7 +102,7 @@ func (w *TeamWrite) process(q *msg.Request) {
 
 	// send supervisor notify
 	if result.IsOK() {
-		super.Input <- notify
+		super.Update <- notify
 	}
 	q.Reply <- result
 }

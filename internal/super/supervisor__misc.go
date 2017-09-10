@@ -48,30 +48,6 @@ func (s *Supervisor) newKexMap() *svKexMap {
 	return &m
 }
 
-func (s *Supervisor) newLockMap() *svLockMap {
-	l := svLockMap{}
-	l.LockMap = make(map[string]string)
-	return &l
-}
-
-func (s *Supervisor) newGlobalPermMap() *svPermMapGlobal {
-	g := svPermMapGlobal{}
-	g.GMap = make(map[string]map[string]string)
-	return &g
-}
-
-func (s *Supervisor) newGlobalGrantMap() *svGrantMapGlobal {
-	g := svGrantMapGlobal{}
-	g.GMap = make(map[string][]string)
-	return &g
-}
-
-func (s *Supervisor) newLimitedPermMap() *svPermMapLimited {
-	l := svPermMapLimited{}
-	l.LMap = make(map[string]map[string][]string)
-	return &l
-}
-
 func (s *Supervisor) fetchTokenFromDB(token string) bool {
 	var (
 		err                       error

@@ -40,16 +40,11 @@ func (s *Supervisor) startupLoad() {
 
 	s.startupRoot()
 
-	s.startupUsersAndTeams()
-	s.startupPermissions()
-
 	if !s.readonly {
 		s.startupCredentials()
 	}
 
 	s.startupTokens()
-
-	s.startupGrants()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -110,7 +105,7 @@ func (s *Supervisor) startupCredentials() {
 	var (
 		err                  error
 		rows                 *sql.Rows
-		user_id, user, crypt string
+		userID, user, crypt  string
 		reset                bool
 		validFrom, expiresAt time.Time
 		id                   uuid.UUID
@@ -125,7 +120,7 @@ func (s *Supervisor) startupCredentials() {
 
 	for rows.Next() {
 		if err = rows.Scan(
-			&user_id,
+			&userID,
 			&crypt,
 			&reset,
 			&validFrom,
@@ -135,7 +130,7 @@ func (s *Supervisor) startupCredentials() {
 			s.errLog.Fatal(`supervisor/load-credentials,scan: `, err)
 		}
 
-		if id, err = uuid.FromString(user_id); err != nil {
+		if id, err = uuid.FromString(userID); err != nil {
 			s.errLog.Fatal(`supervisor/string-to-uuid: `, err)
 		}
 		if mcf, err = scrypth64.FromString(crypt); err != nil {
@@ -181,117 +176,6 @@ func (s *Supervisor) startupTokens() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-tokens,next: `, err)
-	}
-}
-
-func (s *Supervisor) startupUsersAndTeams() {
-	var (
-		err                                    error
-		userUUID, userName, teamUUID, teamName string
-		rows                                   *sql.Rows
-	)
-
-	rows, err = s.conn.Query(stmt.LoadUserTeamMapping)
-	if err != nil {
-		s.errLog.Fatal(`supervisor/load-user-team-mapping,query: `, err)
-	}
-	defer rows.Close()
-
-	// reduce lock overhead by locking here once and then using the
-	// unlocked bulk interface
-	s.mapUserID.lock()
-	defer s.mapUserID.unlock()
-	s.mapUserIDReverse.lock()
-	defer s.mapUserIDReverse.unlock()
-	s.mapTeamID.lock()
-	defer s.mapTeamID.unlock()
-	s.mapUserTeamID.lock()
-	defer s.mapUserTeamID.unlock()
-
-	for rows.Next() {
-		if err = rows.Scan(
-			&userUUID,
-			&userName,
-			&teamUUID,
-			&teamName,
-		); err != nil {
-			s.errLog.Fatal(`supervisor/load-user-team-mapping,scan: `, err)
-		}
-		s.mapUserID.load(userUUID, userName)
-		s.mapUserIDReverse.load(userName, userUUID)
-		s.mapTeamID.load(teamUUID, teamName)
-		s.mapUserTeamID.load(userUUID, teamUUID)
-	}
-	if err = rows.Err(); err != nil {
-		s.errLog.Fatal(`supervisor/load-user-team-mapping,next: `, err)
-	}
-}
-
-func (s *Supervisor) startupPermissions() {
-	var (
-		err                error
-		permUUID, permName string
-		rows               *sql.Rows
-	)
-
-	rows, err = s.conn.Query(stmt.LoadPermissions)
-	if err != nil {
-		s.errLog.Fatal(`supervisor/load-permissions,query: `, err)
-	}
-	defer rows.Close()
-
-	// reduce lock overhead by locking here once and then using the
-	// unlocked bulk interface
-	s.mapPermissionID.lock()
-	defer s.mapPermissionID.unlock()
-
-	for rows.Next() {
-		if err = rows.Scan(
-			&permUUID,
-			&permName,
-		); err != nil {
-			s.errLog.Fatal(`supervisor/load-permissions,scan: `, err)
-		}
-		s.mapPermissionID.load(permName, permUUID)
-	}
-	if err = rows.Err(); err != nil {
-		s.errLog.Fatal(`supervisor/load-permissions,next: `, err)
-	}
-}
-
-func (s *Supervisor) startupGrants() {
-	var (
-		err                           error
-		grantUUID, permUUID, userUUID string
-		rows                          *sql.Rows
-	)
-
-	rows, err = s.conn.Query(stmt.LoadGlobalOrSystemUserGrants)
-	if err != nil {
-		s.errLog.Fatal(`supervisor/load-user-systemglobal-grants,query: `, err)
-	}
-	defer rows.Close()
-
-	// reduce lock overhead by locking here once and then using the
-	// unlocked load method
-	s.globalPermissions.lock()
-	defer s.globalPermissions.unlock()
-	s.globalGrants.lock()
-	defer s.globalGrants.unlock()
-
-	for rows.Next() {
-		if err = rows.Scan(
-			&grantUUID,
-			&userUUID,
-			&permUUID,
-		); err != nil {
-			s.errLog.Fatal(`supervisor/load-user-systemglobal-grants,scan: `, err)
-		}
-		s.globalPermissions.load(userUUID, permUUID, grantUUID)
-		s.globalGrants.load(userUUID, permUUID, grantUUID)
-	}
-	if err = rows.Err(); err != nil {
-		s.errLog.Fatal(`supervisor/load-user-systemglobal-grants,next: `, err)
 	}
 }
 

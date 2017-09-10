@@ -43,14 +43,6 @@ type Supervisor struct {
 	kex                               *svKexMap
 	tokens                            *svTokenMap
 	credentials                       *svCredMap
-	globalPermissions                 *svPermMapGlobal
-	globalGrants                      *svGrantMapGlobal
-	limitedPermissions                *svPermMapLimited
-	mapUserID                         *svLockMap
-	mapUserIDReverse                  *svLockMap
-	mapTeamID                         *svLockMap
-	mapPermissionID                   *svLockMap
-	mapUserTeamID                     *svLockMap
 	permCache                         *perm.Cache
 	stmtTokenSelect                   *sql.Stmt
 	stmtFindUserID                    *sql.Stmt
@@ -148,17 +140,9 @@ func (s *Supervisor) Run() {
 	auth.KexExpirySeconds = s.kexExpiry
 
 	// initialize maps
-	s.mapUserID = s.newLockMap()
-	s.mapUserIDReverse = s.newLockMap()
-	s.mapTeamID = s.newLockMap()
-	s.mapPermissionID = s.newLockMap()
-	s.mapUserTeamID = s.newLockMap()
 	s.tokens = s.newTokenMap()
 	s.credentials = s.newCredentialMap()
 	s.kex = s.newKexMap()
-	s.globalPermissions = s.newGlobalPermMap()
-	s.globalGrants = s.newGlobalGrantMap()
-	s.limitedPermissions = s.newLimitedPermMap()
 
 	// start permission cache
 	s.permCache = perm.New()
@@ -237,49 +221,36 @@ runloop:
 }
 
 func (s *Supervisor) process(q *msg.Request) {
-	switch q.Super.Task {
-	case `kex`:
-		go func() { s.kexInit(q) }()
-
-	case `bootstrap`:
-		s.bootstrapRoot(q)
-
-	case `authenticate`:
-		go func() { s.validateBasicAuth(q) }()
-
-	case `token`:
-		go func() { s.issueToken(q) }()
-
-	case `activate`:
-		go func() { s.activateUser(q) }()
-
-	case `password`:
-		go func() { s.userPassword(q) }()
-
-	case `authorize`:
-		go func() { s.authorize(q) }()
-
-	case `map`:
-		go func() { s.updateMap(q) }()
-
+	switch q.Section {
+	case msg.SectionSupervisor:
+		switch q.Action {
+		case msg.ActionKex:
+			go func() { s.kexInit(q) }()
+		case msg.ActionBootstrap:
+			s.bootstrapRoot(q)
+		case msg.ActionAuthenticate:
+			go func() { s.validateBasicAuth(q) }()
+		case msg.ActionToken:
+			go func() { s.issueToken(q) }()
+		case msg.ActionActivate:
+			go func() { s.activateUser(q) }()
+		case msg.ActionPassword:
+			go func() { s.userPassword(q) }()
+		case msg.ActionAuthorize:
+			go func() { s.authorize(q) }()
+		case msg.ActionCacheUpdate:
+			s.cache(q)
+		}
 	case msg.SectionCategory:
 		s.category(q)
-
 	case msg.SectionPermission:
 		s.permission(q)
-
 	case msg.SectionRight:
 		s.right(q)
-
 	case msg.SectionSection:
 		s.section(q)
-
 	case msg.SectionAction:
 		s.action(q)
-
-		//
-	case `cache`:
-		s.cache(q)
 	}
 }
 
