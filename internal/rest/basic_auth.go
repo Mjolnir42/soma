@@ -51,9 +51,10 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
 		const basicAuthPrefix string = "Basic "
+		var supervisor *super.Supervisor
 
 		// if the supervisor is not available, no requests are accepted
-		if h := x.handlerMap.Get(`supervisor`); h == nil {
+		if supervisor = x.handlerMap.Get(`supervisor`).(*super.Supervisor); supervisor == nil {
 			http.Error(w, `Authentication supervisor not available`,
 				http.StatusServiceUnavailable)
 			return
@@ -79,8 +80,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
 				if len(pair) == 2 {
 					returnChannel := make(chan msg.Result)
-					super := x.handlerMap.Get(`supervisor`).(*super.Supervisor)
-					super.Input <- msg.Request{
+					supervisor.Input <- msg.Request{
 						Section:    msg.SectionSupervisor,
 						Action:     msg.ActionAuthenticate,
 						RemoteAddr: extractAddress(r.RemoteAddr),
