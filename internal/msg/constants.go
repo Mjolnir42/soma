@@ -187,6 +187,14 @@ const (
 	EntityNode       = `node`
 )
 
+// Subject types
+const (
+	SubjectAdmin = `admin`
+	SubjectUser  = `user`
+	SubjectTool  = `tool`
+	SubjectTeam  = `team`
+)
+
 const (
 	// RFC3339Milli is a format string for millisecond precision RFC3339
 	RFC3339Milli string = "2006-01-02T15:04:05.000Z07:00"
