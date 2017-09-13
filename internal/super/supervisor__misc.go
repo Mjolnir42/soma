@@ -114,15 +114,4 @@ func (s *Supervisor) checkIV(iv string) error {
 	return nil
 }
 
-func (s *Supervisor) requestLog(q *msg.Request) {
-	s.reqLog.Printf(msg.LogStrSRq,
-		fmt.Sprintf("supervisor/%s",
-			q.Section,
-		),
-		q.Action,
-		q.AuthUser,
-		q.RemoteAddr,
-	)
-}
-
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
