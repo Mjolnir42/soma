@@ -63,6 +63,12 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 			s.rightRevokeMonitoring(q, mr)
 		}
 	}
+
+	if mr.IsOK() {
+		go func() {
+			s.Update <- msg.CacheUpdateFromRequest(q)
+		}()
+	}
 }
 
 func (s *Supervisor) rightGrantGlobal(q *msg.Request, mr *msg.Result) {
