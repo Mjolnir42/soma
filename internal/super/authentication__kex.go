@@ -16,9 +16,11 @@ import (
 
 func (s *Supervisor) kexInit(q *msg.Request) {
 	result := msg.FromRequest(q)
-	result.Action = `reply`
+	q.Log(s.reqLog)
+
 	kex := q.Super.Kex
 	var err error
+	var attemptIV int
 
 	// kexInit is a master instance function
 	if s.readonly {
@@ -26,11 +28,25 @@ func (s *Supervisor) kexInit(q *msg.Request) {
 		goto dispatch
 	}
 
-	// check the client submitted IV for fishyness
+	// generate new initialization vector
+	err = kex.GenerateNewVector()
+	for err != nil {
+		attemptIV++
+		if attemptIV > 5 {
+			result.ServerError(err, q.Section)
+			goto dispatch
+		}
+		err = kex.GenerateNewVector()
+	}
+
+	// check no bad IV was generated, with bad being defined
+	// as likely to use 0 as counter
 	err = s.checkIV(kex.InitializationVector)
 	for err != nil {
-		if err = kex.GenerateNewVector(); err != nil {
-			continue
+		attemptIV++
+		if attemptIV > 5 {
+			result.ServerError(err, q.Section)
+			goto dispatch
 		}
 		err = s.checkIV(kex.InitializationVector)
 	}
