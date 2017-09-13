@@ -17,6 +17,14 @@ import (
 )
 
 func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
+	if s.readonly {
+		mr.BadRequest(
+			fmt.Errorf(`Readonly instance`),
+			q.Section,
+		)
+		return
+	}
+
 	// admin accounts can only receive system permissions
 	if q.Grant.RecipientType == msg.SubjectAdmin && q.Grant.Category != msg.CategorySystem {
 		mr.BadRequest(fmt.Errorf(
