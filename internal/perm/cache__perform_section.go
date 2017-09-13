@@ -13,111 +13,115 @@ import "github.com/mjolnir42/soma/internal/msg"
 
 func (c *Cache) performAction(q *msg.Request) {
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		c.performActionAdd(q)
-	case `remove`:
+	case msg.ActionRemove:
 		c.performActionRemove(q)
 	}
 }
 
 func (c *Cache) performBucket(q *msg.Request) {
 	switch q.Action {
-	case `create`:
+	case msg.ActionCreate:
 		c.performBucketCreate(q)
-	case `destroy`:
+	case msg.ActionDestroy:
 		c.performBucketDestroy(q)
 	}
 }
 
 func (c *Cache) performCategory(q *msg.Request) {
 	switch q.Action {
-	case `remove`:
+	case msg.ActionRemove:
 		c.performCategoryRemove(q)
 	}
 }
 
 func (c *Cache) performCluster(q *msg.Request) {
 	switch q.Action {
-	case `create`:
+	case msg.ActionCreate:
 		c.performClusterCreate(q)
-	case `destroy`:
+	case msg.ActionDestroy:
 		c.performClusterDestroy(q)
 	}
 }
 
 func (c *Cache) performGroup(q *msg.Request) {
 	switch q.Action {
-	case `create`:
+	case msg.ActionCreate:
 		c.performGroupCreate(q)
-	case `destroy`:
+	case msg.ActionDestroy:
 		c.performGroupDestroy(q)
 	}
 }
 
 func (c *Cache) performNode(q *msg.Request) {
 	switch q.Action {
-	case `assign`:
+	case msg.ActionAssign:
 		c.performNodeAssign(q)
-	case `unassign`:
+	case msg.ActionUnassign:
 		c.performNodeUnassign(q)
 	}
 }
 
 func (c *Cache) performPermission(q *msg.Request) {
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		c.performPermissionAdd(q)
-	case `remove`:
+	case msg.ActionRemove:
 		c.performPermissionRemove(q)
-	case `map`:
+	case msg.ActionMap:
 		c.performPermissionMap(q)
-	case `unmap`:
+	case msg.ActionUnmap:
 		c.performPermissionUnmap(q)
 	}
 }
 
 func (c *Cache) performRepository(q *msg.Request) {
 	switch q.Action {
-	case `create`:
+	case msg.ActionCreate:
 		c.performRepositoryCreate(q)
-	case `destroy`:
+	case msg.ActionDestroy:
 		c.performRepositoryDestroy(q)
 	}
 }
 
 func (c *Cache) performRight(q *msg.Request) {
 	switch q.Action {
-	case `grant`:
+	case msg.ActionGrant:
 		c.performRightGrant(q)
-	case `revoke`:
+	case msg.ActionRevoke:
 		c.performRightRevoke(q)
 	}
 }
 
 func (c *Cache) performSection(q *msg.Request) {
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		c.performSectionAdd(q)
-	case `remove`:
+	case msg.ActionRemove:
 		c.performSectionRemove(q)
 	}
 }
 
 func (c *Cache) performTeam(q *msg.Request) {
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		c.performTeamAdd(q)
-	case `remove`:
+	case msg.ActionRemove:
 		c.performTeamRemove(q)
+	case msg.ActionUpdate:
+		// XXX TODO
 	}
 }
 
 func (c *Cache) performUser(q *msg.Request) {
 	switch q.Action {
-	case `add`:
+	case msg.ActionAdd:
 		c.performUserAdd(q)
-	case `remove`:
+	case msg.ActionRemove, msg.ActionPurge:
 		c.performUserRemove(q)
+	case msg.ActionUpdate:
+		// XXX TODO
 	}
 }
 
