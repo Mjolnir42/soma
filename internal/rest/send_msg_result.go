@@ -44,27 +44,22 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		}
 		goto dispatchJSON
 	case `bootstrap`, `activate`, `token`, `password`:
-		// for this request type, errors are masked in responses
+		// for these request types, response codes are masked. they are also
+		// not behind basic auth
 		switch r.Code {
 		case 200:
 			if r.Super.Verdict == 200 {
 				log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 				goto dispatchOCTET
 			}
-			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 401)
-			dispatchUnauthorized(w, nil)
-		case 400:
-			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 400)
-			dispatchBadRequest(w, nil)
-		case 404:
-			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 404)
-			dispatchNotFound(w, r.Error)
+			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 403)
+			dispatchForbidden(w, nil)
 		case 406:
 			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 406)
 			dispatchConflict(w, r.Error)
 		default:
-			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 401)
-			dispatchUnauthorized(w, nil)
+			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 403)
+			dispatchForbidden(w, nil)
 		}
 		return
 	case `category`:

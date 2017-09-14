@@ -50,14 +50,12 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 
 	// -> get kex
 	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
-		//    --> reply 404 if not found
-		result.NotFound(fmt.Errorf(`Key exchange not found`))
+		result.Forbidden(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 	// -> check kex.SameSource
 	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		//    --> reply 404 if !SameSource
-		result.NotFound(fmt.Errorf(`Key exchange not found`))
+		result.Forbidden(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 	// -> delete kex from s.kex (kex is now used)
@@ -78,13 +76,13 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 	// -> check token.UserName != `root`
 	if token.UserName == `root` {
 		//    --> reply 401
-		result.Unauthorized(fmt.Errorf(`Cannot activate root`))
+		result.Forbidden(fmt.Errorf(`Cannot activate root`))
 		goto dispatch
 	}
 
 	// check we have the user
 	if err = s.stmtFindUserID.QueryRow(token.UserName).Scan(&userID); err == sql.ErrNoRows {
-		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
+		result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
 		goto dispatch
 	} else if err != nil {
 		result.ServerError(err)
@@ -93,11 +91,11 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 
 	// check the user is not already active
 	if err = s.stmtCheckUserActive.QueryRow(userID).Scan(&active); err == sql.ErrNoRows {
-		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
+		result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
 		goto dispatch
 	}
 	if active {
-		result.Conflict(fmt.Errorf("User %s (%s) is already active", token.UserName, userID))
+		result.Forbidden(fmt.Errorf("User %s (%s) is already active", token.UserName, userID))
 		goto dispatch
 	}
 
@@ -109,13 +107,13 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 				result.ServerError(err)
 				goto dispatch
 			} else if !ok {
-				result.Unauthorized(fmt.Errorf(`Invalid LDAP credentials`))
+				result.Forbidden(fmt.Errorf(`Invalid LDAP credentials`))
 				goto dispatch
 			}
 			// fail activation if local password is the same as the
-			// upstream password
+			// upstream password. This error _IS_ sent to the user!
 			if token.Token == token.Password {
-				result.Unauthorized(fmt.Errorf("User %s denied: matching local/upstream passwords", token.UserName))
+				result.Conflict(fmt.Errorf("User %s denied: matching local/upstream passwords", token.UserName))
 				goto dispatch
 			}
 		case `token`: // TODO
@@ -131,7 +129,7 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 
 	// -> scrypth64.Digest(Password, nil)
 	if mcf, err = scrypth64.Digest(token.Password, nil); err != nil {
-		result.Unauthorized(nil)
+		result.ServerError(err)
 		goto dispatch
 	}
 	// -> generate token

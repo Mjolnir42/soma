@@ -44,12 +44,12 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 
 	// -> get kex
 	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
-		result.NotFound(fmt.Errorf(`Key exchange not found`))
+		result.Forbidden(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 	// check kex.SameSource
 	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		result.NotFound(fmt.Errorf(`Key exchange not found`))
+		result.Forbidden(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 	// delete kex from s.kex (kex is now used)
@@ -73,16 +73,16 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.RemoteAddr)
 
 	if cred = s.credentials.read(token.UserName); cred == nil {
-		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
+		result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
 		goto dispatch
 	}
 	if !cred.isActive {
-		result.Unauthorized(fmt.Errorf("Inactive user: %s", token.UserName))
+		result.Forbidden(fmt.Errorf("Inactive user: %s", token.UserName))
 		goto dispatch
 	}
 	if time.Now().UTC().Before(cred.validFrom.UTC()) ||
 		time.Now().UTC().After(cred.expiresAt.UTC()) {
-		result.Unauthorized(fmt.Errorf("Expired: %s", token.UserName))
+		result.Forbidden(fmt.Errorf("Expired: %s", token.UserName))
 		goto dispatch
 	}
 	// generate token if the provided credentials are valid

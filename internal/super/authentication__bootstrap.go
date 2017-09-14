@@ -51,7 +51,7 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 
 	// check if root is not already active
 	if s.credentials.read(msg.SubjectRoot) != nil {
-		result.BadRequest(fmt.Errorf(`Root account is already active`))
+		result.Forbidden(fmt.Errorf(`Root account is already active`))
 		// delete kex, this is done
 		s.kex.remove(kexID)
 		goto returnImmediate
@@ -59,15 +59,13 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 
 	// lookup requested key exchange
 	if kex = s.kex.read(kexID); kex == nil {
-		result.NotFound(fmt.Errorf(`Key exchange not found`))
+		result.Forbidden(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 
 	// check kex.SameSource to counter enumerating IDs
 	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		// reply NotFound if !SameSource, do not leak that the ID
-		// was valid
-		result.NotFound(fmt.Errorf(`Key exchange not found`))
+		result.Forbidden(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 

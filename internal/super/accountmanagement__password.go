@@ -43,12 +43,12 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 
 	// get kex
 	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
-		result.NotFound(fmt.Errorf(`Key exchange not found`))
+		result.Forbidden(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 
 	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		result.NotFound(fmt.Errorf(`Key exchange not found`))
+		result.Forbidden(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
 
@@ -74,7 +74,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 
 	if err = s.stmtFindUserID.QueryRow(token.UserName).
 		Scan(&userID); err == sql.ErrNoRows {
-		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
+		result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
 		goto dispatch
 	} else if err != nil {
 		result.ServerError(err)
@@ -84,11 +84,11 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	// user has to be active
 	if err = s.stmtCheckUserActive.QueryRow(userID).
 		Scan(&active); err == sql.ErrNoRows {
-		result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
+		result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
 		goto dispatch
 	}
 	if !active {
-		result.Conflict(fmt.Errorf("User %s (%s) is not active", token.UserName, userID))
+		result.Forbidden(fmt.Errorf("User %s (%s) is not active", token.UserName, userID))
 		goto dispatch
 	}
 
@@ -101,7 +101,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 				result.ServerError(err)
 				goto dispatch
 			} else if !ok {
-				result.Unauthorized(fmt.Errorf(`Invalid LDAP credentials`))
+				result.Forbidden(fmt.Errorf(`Invalid LDAP credentials`))
 				goto dispatch
 			}
 		case `token`:
@@ -114,23 +114,23 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 		}
 	case `change`:
 		if cred = s.credentials.read(token.UserName); cred == nil {
-			result.Unauthorized(fmt.Errorf("Unknown user: %s", token.UserName))
+			result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
 			goto dispatch
 		}
 		if !cred.isActive {
-			result.Unauthorized(fmt.Errorf("Inactive user: %s", token.UserName))
+			result.Forbidden(fmt.Errorf("Inactive user: %s", token.UserName))
 			goto dispatch
 		}
 		if time.Now().UTC().Before(cred.validFrom.UTC()) ||
 			time.Now().UTC().After(cred.expiresAt.UTC()) {
-			result.Unauthorized(fmt.Errorf("Expired: %s", token.UserName))
+			result.Forbidden(fmt.Errorf("Expired: %s", token.UserName))
 			goto dispatch
 		}
 		if ok, err = scrypth64.Verify(token.Token, cred.cryptMCF); err != nil {
 			result.ServerError(err)
 			goto dispatch
 		} else if !ok {
-			result.Unauthorized(fmt.Errorf(`Invalid credentials`))
+			result.Forbidden(fmt.Errorf(`Invalid credentials`))
 			goto dispatch
 		}
 	default:
@@ -140,7 +140,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	// OK: validation success
 
 	if mcf, err = scrypth64.Digest(token.Password, nil); err != nil {
-		result.Unauthorized(nil)
+		result.Forbidden(err)
 		goto dispatch
 	}
 
