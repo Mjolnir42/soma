@@ -16,6 +16,7 @@ import (
 
 func (s *Supervisor) kexInit(q *msg.Request) {
 	result := msg.FromRequest(q)
+	result.Super.Verdict = 401
 	q.Log(s.reqLog)
 
 	kex := q.Super.Kex
@@ -70,7 +71,7 @@ func (s *Supervisor) kexInit(q *msg.Request) {
 	s.kex.insert(kex)
 
 	// send out reply
-	result.Super = &msg.Supervisor{
+	result.Super = msg.Supervisor{
 		Verdict: 200,
 		Kex: auth.Kex{
 			Public:               kex.Public,

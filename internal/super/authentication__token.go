@@ -20,6 +20,7 @@ import (
 
 func (s *Supervisor) issueToken(q *msg.Request) {
 	result := msg.FromRequest(q)
+	result.Super.Verdict = 401
 	var (
 		cred                 *svCredential
 		err                  error
@@ -130,7 +131,7 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 		goto dispatch
 	}
 	// -> send sdata reply
-	result.Super = &msg.Supervisor{
+	result.Super = msg.Supervisor{
 		Verdict: 200,
 		Encrypted: struct {
 			KexID string

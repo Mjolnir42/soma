@@ -23,7 +23,7 @@ type Result struct {
 	Error   error
 	JobId   string
 
-	Super *Supervisor
+	Super Supervisor
 
 	ActionObj      []proto.Action
 	Attribute      []proto.Attribute

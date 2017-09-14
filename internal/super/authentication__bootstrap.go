@@ -22,6 +22,7 @@ import (
 
 func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 	result := msg.FromRequest(q)
+	result.Super.Verdict = 401
 	kexID := q.Super.Encrypted.KexID
 	data := q.Super.Encrypted.Data
 	var kex *auth.Kex
@@ -161,7 +162,7 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 		goto dispatch
 	}
 	// -> send sdata reply
-	result.Super = &msg.Supervisor{
+	result.Super = msg.Supervisor{
 		Verdict: 200,
 		Encrypted: struct {
 			KexID string

@@ -18,6 +18,7 @@ import (
 func (s *Supervisor) validateBasicAuth(q *msg.Request) {
 	var tok *svToken
 	result := msg.FromRequest(q)
+	result.Super.Verdict = 401
 
 	// basic auth always fails for root if root is disabled
 	if q.Super.BasicAuth.User == `root` && s.rootDisabled {
@@ -56,13 +57,11 @@ func (s *Supervisor) validateBasicAuth(q *msg.Request) {
 	if auth.VerifyExtracted(q.Super.BasicAuth.User, q.RemoteAddr, tok.binToken, s.key,
 		s.seed, tok.binExpiresAt, tok.salt) {
 		// valid token
-		result.Super = &msg.Supervisor{Verdict: 200}
-		result.OK()
-		q.Reply <- result
+		result.Super.Verdict = 200
 	}
+	result.OK()
 
 unauthorized:
-	result.Super = &msg.Supervisor{Verdict: 401}
 	q.Reply <- result
 }
 

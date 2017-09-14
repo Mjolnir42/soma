@@ -15,7 +15,7 @@ import (
 
 func (s *Supervisor) userPassword(q *msg.Request) {
 	result := msg.FromRequest(q)
-	result.Super = &msg.Supervisor{}
+	result.Super.Verdict = 401
 
 	var (
 		cred                                                  *svCredential
