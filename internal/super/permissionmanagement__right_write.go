@@ -18,10 +18,7 @@ import (
 
 func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 	if s.readonly {
-		mr.BadRequest(
-			fmt.Errorf(`Readonly instance`),
-			q.Section,
-		)
+		mr.ReadOnly()
 		return
 	}
 

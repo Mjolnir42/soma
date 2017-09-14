@@ -34,8 +34,8 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	data := q.Super.Encrypted.Data
 
 	if s.readonly {
-		result.Conflict(fmt.Errorf(`Readonly instance`))
-		goto conflict
+		result.ReadOnly()
+		goto returnImmediate
 	}
 
 	timer = time.NewTimer(1 * time.Second)
@@ -236,7 +236,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 dispatch:
 	<-timer.C
 
-conflict:
+returnImmediate:
 	q.Reply <- result
 }
 

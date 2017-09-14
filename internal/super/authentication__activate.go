@@ -40,8 +40,8 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 	data := q.Super.Encrypted.Data
 
 	if s.readonly {
-		result.Conflict(fmt.Errorf(`Readonly instance`))
-		goto conflict
+		result.ReadOnly()
+		goto returnImmediate
 	}
 
 	// start response timer
@@ -213,7 +213,7 @@ func (s *Supervisor) activateUser(q *msg.Request) {
 dispatch:
 	<-timer.C
 
-conflict:
+returnImmediate:
 	q.Reply <- result
 }
 

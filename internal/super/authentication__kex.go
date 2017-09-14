@@ -8,8 +8,6 @@
 package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
-	"fmt"
-
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/auth"
 )
@@ -25,7 +23,7 @@ func (s *Supervisor) kexInit(q *msg.Request) {
 
 	// kexInit is a master instance function
 	if s.readonly {
-		result.Conflict(fmt.Errorf(`Readonly instance`))
+		result.ReadOnly()
 		goto dispatch
 	}
 
