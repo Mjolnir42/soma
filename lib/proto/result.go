@@ -123,7 +123,9 @@ func (r *Result) NotFound() {
 func (r *Result) NotFoundErr(err error) {
 	r.StatusCode = StatusNotFound
 	r.StatusText = DisplayStatus[StatusNotFound]
-	r.Errors = &[]string{err.Error()}
+	if err != nil {
+		r.Errors = &[]string{err.Error()}
+	}
 }
 
 func (r *Result) Accepted() {
@@ -157,6 +159,22 @@ func (r *Result) Clean() {
 
 	if r.DeploymentsList == nil || len(*r.DeploymentsList) == 0 {
 		r.DeploymentsList = nil
+	}
+}
+
+func (r *Result) BadRequest(err error) {
+	r.StatusCode = StatusBadRequest
+	r.StatusText = DisplayStatus[StatusBadRequest]
+	if err != nil {
+		r.Errors = &[]string{err.Error()}
+	}
+}
+
+func (r *Result) Forbidden(err error) {
+	r.StatusCode = StatusForbidden
+	r.StatusText = DisplayStatus[StatusForbidden]
+	if err != nil {
+		r.Errors = &[]string{err.Error()}
 	}
 }
 

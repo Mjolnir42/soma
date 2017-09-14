@@ -137,28 +137,22 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		result.JobId = r.JobId
 		result.Accepted()
 	case 400:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 400)
-		dispatchBadRequest(w, nil)
-		return
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
+		result.BadRequest(r.Error)
 	case 403:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 403)
-		dispatchForbidden(w, r.Error)
-		return
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
+		result.Forbidden(r.Error)
 	case 404:
 		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
-		result.NotFound()
-	case 406:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 406)
-		dispatchConflict(w, r.Error)
-		return
+		result.NotFoundErr(r.Error)
 	case 500:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 500)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.Error(r.Error)
 	case 501:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 501)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.NotImplemented()
 	case 503:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 503)
+		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.Unavailable()
 	default:
 		log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, `Unhandled internal result code`)
