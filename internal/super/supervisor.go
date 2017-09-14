@@ -227,7 +227,7 @@ func (s *Supervisor) process(q *msg.Request) {
 		case msg.ActionKex:
 			go func() { s.kexInit(q) }()
 		case msg.ActionBootstrap:
-			s.bootstrapRoot(q)
+			s.bootstrap(q)
 		case msg.ActionAuthenticate:
 			go func() { s.validateBasicAuth(q) }()
 		case msg.ActionToken:

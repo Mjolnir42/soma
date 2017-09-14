@@ -20,89 +20,99 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-func (s *Supervisor) bootstrapRoot(q *msg.Request) {
+func (s *Supervisor) bootstrap(q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Super.Verdict = 401
+	q.Log(s.reqLog)
+
 	kexID := q.Super.Encrypted.KexID
 	data := q.Super.Encrypted.Data
-	var kex *auth.Kex
-	var err error
-	var plain []byte
-	var token auth.Token
-	var rootToken string
-	var mcf scrypth64.Mcf
-	var tx *sql.Tx
-	var validFrom, expiresAt time.Time
-	var timer *time.Timer
+	var (
+		kex                  *auth.Kex
+		err                  error
+		plain                []byte
+		token                auth.Token
+		rootToken            string
+		mcf                  scrypth64.Mcf
+		tx                   *sql.Tx
+		validFrom, expiresAt time.Time
+		timer                *time.Timer
+	)
 
 	// bootstrapRoot is a master instance function
 	if s.readonly {
-		result.Conflict(fmt.Errorf(`Readonly instance`))
-		goto conflict
+		result.ReadOnly()
+		goto returnImmediate
 	}
 
 	// start response timer
 	timer = time.NewTimer(1 * time.Second)
 	defer timer.Stop()
 
-	// -> check if root is not already active
-	if s.credentials.read(`root`) != nil {
+	// check if root is not already active
+	if s.credentials.read(msg.SubjectRoot) != nil {
 		result.BadRequest(fmt.Errorf(`Root account is already active`))
-		//    --> delete kex
+		// delete kex, this is done
 		s.kex.remove(kexID)
-		goto dispatch
+		goto returnImmediate
 	}
-	// -> get kex
+
+	// lookup requested key exchange
 	if kex = s.kex.read(kexID); kex == nil {
-		//    --> reply 404 if not found
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
-	// -> check kex.SameSource
+
+	// check kex.SameSource to counter enumerating IDs
 	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		//    --> reply 404 if !SameSource
+		// reply NotFound if !SameSource, do not leak that the ID
+		// was valid
 		result.NotFound(fmt.Errorf(`Key exchange not found`))
 		goto dispatch
 	}
-	// -> delete kex from s.kex (kex is now used)
+
+	// valid kex is referenced from the correct source, its one time
+	// use is now over.
 	s.kex.remove(kexID)
-	// -> rdata = kex.DecodeAndDecrypt(data)
+
 	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}
-	// -> json.Unmarshal(rdata, &token)
+
 	if err = json.Unmarshal(plain, &token); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}
-	// -> check token.UserName == `root`
-	if token.UserName != `root` {
-		//    --> reply 401
-		result.Unauthorized(nil)
+
+	if token.UserName != msg.SubjectRoot {
+		result.Forbidden(nil)
 		goto dispatch
 	}
-	if token.UserName == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
-		result.ServerError(
-			fmt.Errorf(`Root bootstrap requested on unrestricted endpoint`))
+
+	if s.rootRestricted && !q.Super.RestrictedEndpoint {
+		result.ServerError(fmt.Errorf(
+			`Root bootstrap requested on unrestricted endpoint`))
 		goto dispatch
 	}
-	// -> check token.Token is correct bearer token
+
 	if rootToken, err = s.fetchRootToken(); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}
 	if token.Token != rootToken || len(token.Password) == 0 {
-		//    --> reply 401
-		result.Unauthorized(nil)
+		result.Forbidden(nil)
 		goto dispatch
 	}
-	// -> scrypth64.Digest(Password, nil)
+
+	// generate password hash that the server will store
 	if mcf, err = scrypth64.Digest(token.Password, nil); err != nil {
-		result.Unauthorized(nil)
+		result.ServerError(nil)
 		goto dispatch
 	}
-	// -> generate token
+
+	// generate a token for the user that can be used for further
+	// requests
 	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(mcf, s.key, s.seed); err != nil {
 		result.ServerError(err)
@@ -111,12 +121,13 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
 	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 
-	// -> DB Insert: root password data
 	if tx, err = s.conn.Begin(); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}
 	defer tx.Rollback()
+
+	// insert hashed root password
 	if _, err = tx.Exec(
 		stmt.SetRootCredentials,
 		uuid.Nil,
@@ -126,7 +137,8 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	// -> DB Insert: token data
+
+	// insert generated token
 	if _, err = tx.Exec(
 		stmt.InsertToken,
 		token.Token,
@@ -137,20 +149,33 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	// -> s.credentials Update
-	s.credentials.insert(`root`, uuid.Nil, validFrom.UTC(),
-		msg.PosTimeInf.UTC(), mcf)
-	// -> s.tokens Update
-	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
-		token.Salt); err != nil {
+
+	// update credential store
+	s.credentials.insert(
+		msg.SubjectRoot,
+		uuid.Nil,
+		validFrom.UTC(),
+		msg.PosTimeInf.UTC(),
+		mcf,
+	)
+
+	// update token store
+	if err = s.tokens.insert(
+		token.Token,
+		token.ValidFrom,
+		token.ExpiresAt,
+		token.Salt,
+	); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}
+
 	if err = tx.Commit(); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}
-	// -> sdata = kex.EncryptAndEncode(&token)
+
+	// send encrypted reply
 	plain = []byte{}
 	data = []byte{}
 	if plain, err = json.Marshal(token); err != nil {
@@ -161,7 +186,6 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	// -> send sdata reply
 	result.Super = msg.Supervisor{
 		Verdict: 200,
 		Encrypted: struct {
@@ -176,7 +200,7 @@ func (s *Supervisor) bootstrapRoot(q *msg.Request) {
 dispatch:
 	<-timer.C
 
-conflict:
+returnImmediate:
 	q.Reply <- result
 }
 

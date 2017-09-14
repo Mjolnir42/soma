@@ -189,6 +189,7 @@ const (
 
 // Subject types
 const (
+	SubjectRoot  = `root`
 	SubjectAdmin = `admin`
 	SubjectUser  = `user`
 	SubjectTool  = `tool`

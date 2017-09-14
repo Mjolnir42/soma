@@ -258,4 +258,9 @@ func (r *Result) UnknownRequest(q *Request) {
 		" %s/%s", q.Section, q.Action))
 }
 
+func (r *Result) ReadOnly() {
+	r.Code = 418
+	r.SetError(fmt.Errorf(`Modification request against a readonly server`))
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
