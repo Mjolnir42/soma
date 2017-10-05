@@ -28,6 +28,7 @@ type svToken struct {
 	binToken     []byte
 	binExpiresAt []byte
 	salt         []byte
+	gcMark       bool
 }
 
 // read/write locked map of tokens
@@ -116,6 +117,7 @@ type svCredential struct {
 	cryptMCF    scrypth64.Mcf
 	resetActive bool
 	isActive    bool
+	gcMark      bool
 }
 
 type svCredMap struct {
@@ -191,6 +193,7 @@ func (c *svCredMap) runlock() {
 type svKexMap struct {
 	// kexid(uuid.string) -> auth.Kex
 	KMap  map[string]auth.Kex
+	gcMap map[string]bool
 	mutex sync.RWMutex
 }
 
@@ -219,6 +222,20 @@ func (k *svKexMap) remove(kexRequest string) {
 	defer k.unlock()
 
 	delete(k.KMap, kexRequest)
+	delete(k.gcMap, kexRequest)
+}
+
+// removeUnlocked
+func (k *svKexMap) removeUnlocked(kexRequest string) {
+	delete(k.KMap, kexRequest)
+	delete(k.gcMap, kexRequest)
+}
+
+func (k *svKexMap) sweepUnlocked() {
+	for id := range k.gcMap {
+		delete(k.KMap, id)
+		delete(k.gcMap, id)
+	}
 }
 
 // set writelock
@@ -239,6 +256,22 @@ func (k *svKexMap) unlock() {
 // release readlock
 func (k *svKexMap) runlock() {
 	k.mutex.RUnlock()
+}
+
+// markUnlocked sets the garbage collection mark on expired key echanges
+func (k *svKexMap) markUnlocked(kexID string) {
+	k.gcMap[kexID] = true
+}
+
+// iterateUnlocked returns all current key exchanges in a channel
+func (k *svKexMap) interateUnlocked() chan auth.Kex {
+	ret := make(chan auth.Kex, len(k.KMap)+1)
+
+	for id := range k.KMap {
+		ret <- k.KMap[id]
+	}
+
+	return ret
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

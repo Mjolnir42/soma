@@ -197,6 +197,13 @@ func (s *Supervisor) Run() {
 		}
 	}
 
+	// TODO start cleanup ticker (5min)
+	// s.cleanup() must:
+	// - purge expired KEX in s.kex
+	// - purge expired Tokens in s.tokens
+	// - purge expired credentials in s.credentials
+	// - deactivate accounts with expired credentials?
+
 runloop:
 	for {
 		// handle cache updates before handling user requests
@@ -210,7 +217,12 @@ runloop:
 
 		// handle whatever request comes in
 		select {
+		// case <-cleanup.Ticker:
+		// go func() {
+		//	 s.Update <- cleanupRequest
+		// }
 		case <-s.Shutdown:
+			// cleanup.Ticker.Stop()
 			break runloop
 		case req := <-s.Update:
 			s.process(&req)
@@ -240,6 +252,9 @@ func (s *Supervisor) process(q *msg.Request) {
 			go func() { s.authorize(q) }()
 		case msg.ActionCacheUpdate:
 			s.cache(q)
+			// TODO
+			// case cleanup:
+			// s.cleanup()
 		}
 	case msg.SectionCategory:
 		s.category(q)
