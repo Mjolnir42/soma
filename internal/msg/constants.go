@@ -167,6 +167,7 @@ const (
 	ActionBootstrap    = `bootstrap`
 	ActionCacheUpdate  = `cacheupdate`
 	ActionDeactivate   = `deactivate`
+	ActionGC           = `gc`
 	ActionKex          = `kex`
 	ActionPassword     = `password`
 	ActionToken        = `token`

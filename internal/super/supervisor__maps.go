@@ -31,6 +31,11 @@ type svToken struct {
 	gcMark       bool
 }
 
+// isExpired returns if a token is expired
+func (t *svToken) isExpired() bool {
+	return time.Now().UTC().After(t.expiresAt.UTC())
+}
+
 // read/write locked map of tokens
 type svTokenMap struct {
 	// token(hex.string) -> svToken
@@ -87,6 +92,51 @@ func (t *svTokenMap) insert(token, valid, expires, salt string) error {
 	return nil
 }
 
+// remove deletes a token from the token map
+func (t *svTokenMap) remove(token string) {
+	// acquire write lock
+	t.lock()
+	defer t.unlock()
+
+	delete(t.TMap, token)
+}
+
+// removeUnlock deletes a token from the token map without acquiring the
+// mutex lock
+func (t *svTokenMap) removeUnlocked(token string) {
+	delete(t.TMap, token)
+}
+
+// sweepUnlocked deletes all tokens marked for garbage collection
+// without acquiring the mutex lock
+func (t *svTokenMap) sweepUnlocked() {
+	for id := range t.TMap {
+		if t.TMap[id].gcMark {
+			t.removeUnlocked(id)
+		}
+	}
+}
+
+// iterateUnlocked returns all current tokens in a channel without
+// acquiring the mutex lock
+func (t *svTokenMap) iterateUnlocked() chan svToken {
+	ret := make(chan svToken, len(t.TMap)+1)
+
+	for id := range t.TMap {
+		ret <- t.TMap[id]
+	}
+
+	return ret
+}
+
+// markUnlocked sets the garbage collection mark on an expired tokens
+// without acquiring the mutex lock
+func (t *svTokenMap) markUnlocked(token string) {
+	tok := t.TMap[token]
+	tok.gcMark = true
+	t.TMap[token] = tok
+}
+
 // set writelock
 func (t *svTokenMap) lock() {
 	t.mutex.Lock()
@@ -112,12 +162,18 @@ func (t *svTokenMap) runlock() {
 // supervisor internal storage format for credentials
 type svCredential struct {
 	id          uuid.UUID
+	name        string
 	validFrom   time.Time
 	expiresAt   time.Time
 	cryptMCF    scrypth64.Mcf
 	resetActive bool
 	isActive    bool
 	gcMark      bool
+}
+
+// isExpired returns if a token is expired
+func (c *svCredential) isExpired() bool {
+	return time.Now().UTC().After(c.expiresAt.UTC())
 }
 
 type svCredMap struct {
@@ -140,6 +196,7 @@ func (c *svCredMap) insert(user string, uid uuid.UUID, valid, expires time.Time,
 	defer c.unlock()
 	c.CMap[user] = svCredential{
 		id:          uid,
+		name:        user,
 		validFrom:   valid,
 		expiresAt:   expires,
 		cryptMCF:    mcf,
@@ -165,6 +222,42 @@ func (c *svCredMap) revoke(user string) {
 	c.lock()
 	defer c.unlock()
 	delete(c.CMap, user)
+}
+
+// revokeUnlocked deletes a user's credentials without acquiring the
+// mutex lock
+func (c *svCredMap) revokeUnlocked(user string) {
+	delete(c.CMap, user)
+}
+
+// iterateUnlocked returns all current credentials in a channel without
+// acquiring the mutex lock
+func (c *svCredMap) iterateUnlocked() chan svCredential {
+	ret := make(chan svCredential, len(c.CMap)+1)
+
+	for user := range c.CMap {
+		ret <- c.CMap[user]
+	}
+
+	return ret
+}
+
+// markUnlocked sets the garbage collection mark on an expired
+// credential without acquiring the mutex lock
+func (c *svCredMap) markUnlocked(user string) {
+	cred := c.CMap[user]
+	cred.gcMark = true
+	c.CMap[user] = cred
+}
+
+// sweepUnlocked deletes all credentials marked for garbage collection
+// without acquiring the mutex lock
+func (c *svCredMap) sweepUnlocked() {
+	for user := range c.CMap {
+		if c.CMap[user].gcMark {
+			c.revokeUnlocked(user)
+		}
+	}
 }
 
 // set writelock
@@ -231,6 +324,8 @@ func (k *svKexMap) removeUnlocked(kexRequest string) {
 	delete(k.gcMap, kexRequest)
 }
 
+// sweepUnlocked deletes all key exchanges marked for garbage collection
+// without acquiring the mutex lock
 func (k *svKexMap) sweepUnlocked() {
 	for id := range k.gcMap {
 		delete(k.KMap, id)
@@ -258,12 +353,14 @@ func (k *svKexMap) runlock() {
 	k.mutex.RUnlock()
 }
 
-// markUnlocked sets the garbage collection mark on expired key echanges
+// markUnlocked sets the garbage collection mark on an expired key echange
+// without acquiring the mutex lock
 func (k *svKexMap) markUnlocked(kexID string) {
 	k.gcMap[kexID] = true
 }
 
 // iterateUnlocked returns all current key exchanges in a channel
+// without acquiring the mutex lock
 func (k *svKexMap) interateUnlocked() chan auth.Kex {
 	ret := make(chan auth.Kex, len(k.KMap)+1)
 

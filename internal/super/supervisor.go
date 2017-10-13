@@ -10,6 +10,7 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 import (
 	"database/sql"
 	"encoding/hex"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/config"
@@ -197,12 +198,8 @@ func (s *Supervisor) Run() {
 		}
 	}
 
-	// TODO start cleanup ticker (5min)
-	// s.cleanup() must:
-	// - purge expired KEX in s.kex
-	// - purge expired Tokens in s.tokens
-	// - purge expired credentials in s.credentials
-	// - deactivate accounts with expired credentials?
+	// start 5-min garbage collection timer
+	gc := time.NewTicker(5 * time.Minute)
 
 runloop:
 	for {
@@ -217,12 +214,15 @@ runloop:
 
 		// handle whatever request comes in
 		select {
-		// case <-cleanup.Ticker:
-		// go func() {
-		//	 s.Update <- cleanupRequest
-		// }
+		case <-gc.C:
+			go func() {
+				s.Update <- msg.Request{
+					Section: msg.SectionSupervisor,
+					Action:  msg.ActionGC,
+				}
+			}()
 		case <-s.Shutdown:
-			// cleanup.Ticker.Stop()
+			gc.Stop()
 			break runloop
 		case req := <-s.Update:
 			s.process(&req)
@@ -252,9 +252,8 @@ func (s *Supervisor) process(q *msg.Request) {
 			go func() { s.authorize(q) }()
 		case msg.ActionCacheUpdate:
 			s.cache(q)
-			// TODO
-			// case cleanup:
-			// s.cleanup()
+		case msg.ActionGC:
+			s.gc()
 		}
 	case msg.SectionCategory:
 		s.category(q)
