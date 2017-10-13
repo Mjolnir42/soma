@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Supervisor) validateBasicAuth(q *msg.Request) {
-	var tok *svToken
+	var tok *token
 	result := msg.FromRequest(q)
 	result.Super.Verdict = 401
 
