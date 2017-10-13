@@ -16,25 +16,7 @@ import (
 
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
-	"github.com/mjolnir42/soma/lib/auth"
 )
-
-// TODO: timer, delete all expired key exchanges
-func (s *Supervisor) pruneKex() {
-	s.kex.lock()
-	defer s.kex.unlock()
-	for kexID, kex := range s.kex.KMap {
-		if kex.IsExpired() {
-			delete(s.kex.KMap, kexID)
-		}
-	}
-}
-
-func (s *Supervisor) newKexMap() *svKexMap {
-	m := svKexMap{}
-	m.KMap = make(map[string]auth.Kex)
-	return &m
-}
 
 func (s *Supervisor) fetchTokenFromDB(token string) bool {
 	var (

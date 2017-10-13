@@ -41,7 +41,7 @@ type Supervisor struct {
 	activation                        string
 	rootDisabled                      bool
 	rootRestricted                    bool
-	kex                               *svKexMap
+	kex                               *kexMap
 	tokens                            *tokenMap
 	credentials                       *credentialMap
 	permCache                         *perm.Cache
@@ -143,7 +143,7 @@ func (s *Supervisor) Run() {
 	// initialize maps
 	s.tokens = newTokenMap()
 	s.credentials = newCredentialMap()
-	s.kex = s.newKexMap()
+	s.kex = newKexMap()
 
 	// start permission cache
 	s.permCache = perm.New()
