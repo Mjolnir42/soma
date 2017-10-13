@@ -101,13 +101,13 @@ func (c *credentialMap) revoke(user string) {
 // Garbage collection bulk functions with external locking
 
 // removeUnlocked deletes a user's credentials from credentialMap without
-// acquiring the mutex lock
+// acquiring the mutex lock. Locking must be done externally.
 func (c *credentialMap) removeUnlocked(user string) {
 	delete(c.CMap, user)
 }
 
 // iterateUnlocked returns all current credentials in a channel without
-// acquiring the mutex lock
+// acquiring the mutex lock. Locking must be done externally.
 func (c *credentialMap) iterateUnlocked() chan credential {
 	ret := make(chan credential, len(c.CMap)+1)
 
@@ -119,7 +119,7 @@ func (c *credentialMap) iterateUnlocked() chan credential {
 }
 
 // markUnlocked sets the garbage collection mark on an expired
-// credential without acquiring the mutex lock
+// credential without acquiring the mutex lock. Locking must be done externally.
 func (c *credentialMap) markUnlocked(user string) {
 	cred := c.CMap[user]
 	cred.gcMark = true
@@ -127,7 +127,7 @@ func (c *credentialMap) markUnlocked(user string) {
 }
 
 // sweepUnlocked deletes all credentials marked for garbage collection
-// without acquiring the mutex lock
+// without acquiring the mutex lock. Locking must be done externally.
 func (c *credentialMap) sweepUnlocked() {
 	for user := range c.CMap {
 		if c.CMap[user].gcMark {
@@ -138,22 +138,22 @@ func (c *credentialMap) sweepUnlocked() {
 
 // Locking
 
-// set writelock
+// lock acquires the writelock on credentialMap c
 func (c *credentialMap) lock() {
 	c.mutex.Lock()
 }
 
-// set readlock
+// rlock acquires the readlock on credentialMap c
 func (c *credentialMap) rlock() {
 	c.mutex.RLock()
 }
 
-// release writelock
+// unlock releases the writelock on credentialMap c
 func (c *credentialMap) unlock() {
 	c.mutex.Unlock()
 }
 
-// release readlock
+// runlock releases the readlock on credentialMap c
 func (c *credentialMap) runlock() {
 	c.mutex.RUnlock()
 }
