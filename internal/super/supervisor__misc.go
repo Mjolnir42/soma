@@ -30,12 +30,6 @@ func (s *Supervisor) pruneKex() {
 	}
 }
 
-func (s *Supervisor) newCredentialMap() *svCredMap {
-	m := svCredMap{}
-	m.CMap = make(map[string]svCredential)
-	return &m
-}
-
 func (s *Supervisor) newKexMap() *svKexMap {
 	m := svKexMap{}
 	m.KMap = make(map[string]auth.Kex)

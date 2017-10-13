@@ -22,7 +22,7 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Super.Verdict = 401
 	var (
-		cred                 *svCredential
+		cred                 *credential
 		err                  error
 		kex                  *auth.Kex
 		plain                []byte

@@ -18,7 +18,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	result.Super.Verdict = 401
 
 	var (
-		cred                                                  *svCredential
+		cred                                                  *credential
 		err                                                   error
 		kex                                                   *auth.Kex
 		plain                                                 []byte

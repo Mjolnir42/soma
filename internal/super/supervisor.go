@@ -43,7 +43,7 @@ type Supervisor struct {
 	rootRestricted                    bool
 	kex                               *svKexMap
 	tokens                            *tokenMap
-	credentials                       *svCredMap
+	credentials                       *credentialMap
 	permCache                         *perm.Cache
 	stmtTokenSelect                   *sql.Stmt
 	stmtFindUserID                    *sql.Stmt
@@ -142,7 +142,7 @@ func (s *Supervisor) Run() {
 
 	// initialize maps
 	s.tokens = newTokenMap()
-	s.credentials = s.newCredentialMap()
+	s.credentials = newCredentialMap()
 	s.kex = s.newKexMap()
 
 	// start permission cache
