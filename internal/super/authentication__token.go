@@ -37,6 +37,10 @@ func (s *Supervisor) token(q *msg.Request) {
 	switch q.Super.Task {
 	case msg.TaskRequest:
 		s.tokenRequest(q, &result)
+	case msg.TaskInvalidateAll:
+		s.tokenInvalidateAll(q, &result)
+	case msg.TaskInvalidate:
+		s.tokenInvalidate(q, &result)
 	default:
 		result.UnknownRequest(q)
 		goto returnImmediate
@@ -205,8 +209,16 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	}
 	logEntry.WithField(`Code`, mr.Super.Verdict).Infoln(`Successfully issued token`)
 	mr.OK()
+}
 
+// tokenInvalidateAll invalidates all tokens
+func (s *Supervisor) tokenInvalidateAll(q *msg.Request, mr *msg.Result) {
+	// XXX TODO
+}
 
+// tokenInvalidate marks all tokens of a user as invalidate-on-use
+func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result) {
+	// XXX TODO
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
