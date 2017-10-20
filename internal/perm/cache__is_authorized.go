@@ -19,7 +19,7 @@ import (
 func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	result := msg.FromRequest(q)
 	// default action is to deny
-	result.Super.Verdict = 401
+	result.Super.Verdict = 403
 
 	var user *proto.User
 	var subjType, category, actionID, sectionID string
