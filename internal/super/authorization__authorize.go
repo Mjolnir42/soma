@@ -32,25 +32,24 @@ func IsAuthorized(q *msg.Request) bool {
 	}
 	result := <-returnChannel
 
-	// the request is authorized
-	if result.Super.Verdict == 200 {
-		// TODO auditlog
+	logEntry := singleton.auditLog.
+		WithField(`Type`, fmt.Sprintf("%s/%s", msg.SectionSupervisor, msg.ActionAuthorize)).
+		WithField(`RequestID`, q.ID.String()).
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action).
+		WithField(`User`, q.AuthUser).
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`Code`, result.Super.Verdict)
+
+	switch result.Super.Verdict {
+	case 200:
+		// the request is authorized
+		logEntry.Infoln(`Request authorized`)
 		return true
+	default:
+		logEntry.Warningln(`Request forbidden`)
 	}
 
-	// the request is not authorized
-	// XXX should be auditlog
-	singleton.errLog.Printf(
-		"Section=%s, Action=%s, InternalCode=%d, Error=%s",
-		msg.SectionSupervisor,
-		msg.ActionAuthorize,
-		result.Super.Verdict,
-		fmt.Sprintf("Forbidden: %s, %s, %s/%s",
-			q.AuthUser,
-			q.RemoteAddr,
-			q.Section,
-			q.Action),
-	)
 	return false
 }
 
