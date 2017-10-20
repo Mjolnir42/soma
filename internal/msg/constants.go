@@ -173,6 +173,7 @@ const (
 	ActionToken        = `token`
 	TaskChange         = `change`
 	TaskInvalidate     = `invalidate`
+	TaskInvalidateAll  = `invalidate-all`
 	TaskNone           = `none`
 	TaskRequest        = `request`
 	TaskReset          = `reset`
