@@ -77,6 +77,7 @@ type Supervisor struct {
 	appLog                            *logrus.Logger
 	reqLog                            *logrus.Logger
 	errLog                            *logrus.Logger
+	auditLog                          *logrus.Logger
 	conf                              *config.Config
 }
 
@@ -130,6 +131,11 @@ func (s *Supervisor) Register(c *sql.DB, l ...*logrus.Logger) {
 	s.appLog = l[0]
 	s.reqLog = l[1]
 	s.errLog = l[2]
+}
+
+// RegisterAuditLog initializes the audit log provided by the Soma app
+func (s *Supervisor) RegisterAuditLog(a *logrus.Logger) {
+	s.auditLog = a
 }
 
 // Run is the event loop for Supervisor

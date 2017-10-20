@@ -58,15 +58,15 @@ func init() {
 
 func main() {
 	var (
-		configFlag, configFile, obsRepoFlag       string
-		noPokeFlag, forcedCorruption, versionFlag bool
-		err                                       error
-		appLog, reqLog, errLog                    *log.Logger
-		lfhGlobal, lfhApp, lfhReq, lfhErr         *reopen.FileWriter
-		app                                       *soma.Soma
-		hm                                        soma.HandlerMap
-		lm                                        soma.LogHandleMap
-		rst                                       *rest.Rest
+		configFlag, configFile, obsRepoFlag         string
+		noPokeFlag, forcedCorruption, versionFlag   bool
+		err                                         error
+		appLog, reqLog, errLog, auditLog            *log.Logger
+		lfhGlobal, lfhApp, lfhReq, lfhErr, lfhAudit *reopen.FileWriter
+		app                                         *soma.Soma
+		hm                                          soma.HandlerMap
+		lm                                          soma.LogHandleMap
+		rst                                         *rest.Rest
 	)
 
 	// Daemon command line flags
@@ -131,6 +131,15 @@ func main() {
 	}
 	errLog.Out = lfhErr
 	logFileMap[`error`] = lfhErr
+
+	auditLog = log.New()
+	if lfhAudit, err = reopen.NewFileWriter(
+		filepath.Join(SomaCfg.LogPath, `audit.log`),
+	); err != nil {
+		log.Fatalf("Unable to open audit log: %s", err)
+	}
+	auditLog.Out = lfhAudit
+	logFileMap[`audit`] = lfhAudit
 
 	// signal handler will reopen all logfiles on USR2
 	sigChanLogRotate := make(chan os.Signal, 1)
@@ -214,7 +223,7 @@ func main() {
 	hm = soma.HandlerMap{}
 	lm = soma.LogHandleMap{}
 
-	app = soma.New(&hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog)
+	app = soma.New(&hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog, auditLog)
 	app.Start()
 
 	rst = rest.New(super.IsAuthorized, &hm, &SomaCfg)

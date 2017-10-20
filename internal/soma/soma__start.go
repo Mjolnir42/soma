@@ -13,8 +13,16 @@ import "github.com/mjolnir42/soma/internal/super"
 func (s *Soma) Start() {
 	// grimReaper and supervisor must run first
 	s.handlerMap.Add(`grimreaper`, newGrimReaper(1, s))
-	s.handlerMap.Add(`supervisor`, super.New(s.conf))
+	s.handlerMap.Register(`grimreaper`, s.dbConnection, s.exportLogger())
+	s.handlerMap.Run(`grimreaper`)
 
+	sv := super.New(s.conf)
+	sv.RegisterAuditLog(s.auditLog)
+	s.handlerMap.Add(`supervisor`, sv)
+	s.handlerMap.Register(`supervisor`, s.dbConnection, s.exportLogger())
+	s.handlerMap.Run(`supervisor`)
+
+	// start regular handlers
 	s.handlerMap.Add(`attribute_r`, newAttributeRead(s.conf.QueueLen))
 	s.handlerMap.Add(`bucket_r`, newBucketRead(s.conf.QueueLen))
 	s.handlerMap.Add(`capability_r`, newCapabilityRead(s.conf.QueueLen))

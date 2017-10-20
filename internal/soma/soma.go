@@ -25,6 +25,7 @@ type Soma struct {
 	appLog       *logrus.Logger
 	reqLog       *logrus.Logger
 	errLog       *logrus.Logger
+	auditLog     *logrus.Logger
 }
 
 // New returns a new SOMA application
@@ -33,7 +34,7 @@ func New(
 	logHandleMap *LogHandleMap,
 	dbConnection *sql.DB,
 	conf *config.Config,
-	appLog, reqLog, errLog *logrus.Logger,
+	appLog, reqLog, errLog, auditLog *logrus.Logger,
 ) *Soma {
 	s := Soma{}
 	s.handlerMap = appHandlerMap
@@ -43,6 +44,7 @@ func New(
 	s.appLog = appLog
 	s.reqLog = reqLog
 	s.errLog = errLog
+	s.auditLog = auditLog
 	return &s
 }
 
