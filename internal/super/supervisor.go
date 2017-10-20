@@ -249,7 +249,7 @@ func (s *Supervisor) process(q *msg.Request) {
 		case msg.ActionAuthenticate:
 			go func() { s.authenticate(q) }()
 		case msg.ActionToken:
-			go func() { s.issueToken(q) }()
+			go func() { s.token(q) }()
 		case msg.ActionActivate:
 			go func() { s.activateUser(q) }()
 		case msg.ActionPassword:

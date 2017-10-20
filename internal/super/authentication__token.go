@@ -18,87 +18,142 @@ import (
 	"github.com/mjolnir42/soma/lib/auth"
 )
 
-func (s *Supervisor) issueToken(q *msg.Request) {
+// token handles supervisor requests for token and calls the correct
+// function depending on the requested task
+func (s *Supervisor) token(q *msg.Request) {
 	result := msg.FromRequest(q)
-	result.Super.Verdict = 401
+	result.Super.Verdict = 403
+
+	// start response delay timer
+	timer := time.NewTimer(1 * time.Second)
+
+	// tokenRequest/tokenInvalidate are master instance functions
+	if s.readonly {
+		result.ReadOnly()
+		goto returnImmediate
+	}
+
+	// select correct taskhandler
+	switch q.Super.Task {
+	case msg.TaskRequest:
+		s.tokenRequest(q, &result)
+	default:
+		result.UnknownRequest(q)
+		goto returnImmediate
+	}
+
+	// wait for delay timer to trigger
+	<-timer.C
+
+returnImmediate:
+	// cleanup delay timer
+	if !timer.Stop() {
+		<-timer.C
+	}
+	q.Reply <- result
+}
+
+// tokenRequest handles requests for new tokens to be issued
+func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	var (
 		cred                 *credential
 		err                  error
 		kex                  *auth.Kex
 		plain                []byte
-		timer                *time.Timer
 		token                auth.Token
 		tx                   *sql.Tx
 		validFrom, expiresAt time.Time
 	)
 	data := q.Super.Encrypted.Data
 
-	// issue_token is a master instance function
-	if s.readonly {
-		result.ReadOnly()
-		goto returnImmediate
-	}
-	// start response timer
-	timer = time.NewTimer(1 * time.Second)
-	defer timer.Stop()
+	// start assembly of auditlog entry
+	logEntry := singleton.auditLog.
+		WithField(`Type`, fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task)).
+		WithField(`RequestID`, q.ID.String()).
+		WithField(`KexID`, q.Super.Encrypted.KexID).
+		WithField(`IPAddr`, q.RemoteAddr)
 
-	// -> get kex
+	// lookup requested KeyExchange by provided KeyExchangeID
 	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
-		result.Forbidden(fmt.Errorf(`Key exchange not found`))
-		goto dispatch
+		mr.Forbidden(fmt.Errorf(`Key exchange not found`))
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Key exchange not found`)
+		return
 	}
-	// check kex.SameSource
+
+	// check KeyExchange is used by the same source that negotiated it
 	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		result.Forbidden(fmt.Errorf(`Key exchange not found`))
-		goto dispatch
+		mr.Forbidden(fmt.Errorf(`Key exchange not found`))
+		logEntry.WithField(`Code`, mr.Super.Verdict).Errorln(`KexID referenced from wrong source system`)
+		return
 	}
-	// delete kex from s.kex (kex is now used)
+
+	// KeyExchanges are single-use and this KexID now has been used,
+	// remove it.
 	s.kex.remove(q.Super.Encrypted.KexID)
-	// decrypt request
+
+	// attempt decrypting the request data
 	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
+		return
 	}
-	// -> json.Unmarshal(rdata, &token)
+
+	// unmarshal the decrypted request data into a auth.Token protocol datastructure
 	if err = json.Unmarshal(plain, &token); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
+		return
 	}
+
+	// check if root is available
 	if token.UserName == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
-		result.ServerError(
-			fmt.Errorf(`Root token requested on unrestricted endpoint`))
-		goto dispatch
+		mr.ServerError(
+			fmt.Errorf(`Restricted-mode root token requested on unrestricted endpoint`))
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Restricted-mode root token requested on unrestricted endpoint`)
+		return
 	}
 
-	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.RemoteAddr)
-
+	// check if the user exists
 	if cred = s.credentials.read(token.UserName); cred == nil {
-		result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
-		goto dispatch
+		mr.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(fmt.Errorf("Unknown user: %s", token.UserName))
+		return
 	}
+	logEntry = logEntry.WithField(`User`, token.UserName)
+
+	// check if the user is active
 	if !cred.isActive {
-		result.Forbidden(fmt.Errorf("Inactive user: %s", token.UserName))
-		goto dispatch
+		mr.Forbidden(fmt.Errorf("Inactive user: %s", token.UserName))
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`User is inactive`)
+		return
 	}
+
+	// check if the token has either expired or not become valid yet
 	if time.Now().UTC().Before(cred.validFrom.UTC()) ||
 		time.Now().UTC().After(cred.expiresAt.UTC()) {
-		result.Forbidden(fmt.Errorf("Expired: %s", token.UserName))
-		goto dispatch
+		mr.Forbidden(fmt.Errorf(`Token expired`))
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Token expired`)
+		return
 	}
+
 	// generate token if the provided credentials are valid
 	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(cred.cryptMCF, s.key, s.seed); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
+		return
 	}
+
+	// persist generated token into database
 	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
 	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
-	// -> DB Insert: token data
 	if tx, err = s.conn.Begin(); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Database error`)
+		return
 	}
 	defer tx.Rollback()
+
 	if _, err = tx.Exec(
 		stmt.InsertToken,
 		token.Token,
@@ -106,32 +161,40 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 		validFrom.UTC(),
 		expiresAt.UTC(),
 	); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Database error`)
+		return
 	}
-	// -> s.tokens Update
+
+	// store token in inmemory token map while db transaction is still
+	// open
 	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
 		token.Salt); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		return
 	}
 	if err = tx.Commit(); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
+		return
 	}
-	// -> sdata = kex.EncryptAndEncode(&token)
+
+	// encrypt generated token for client transmission
 	plain = []byte{}
 	data = []byte{}
 	if plain, err = json.Marshal(token); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
+		return
 	}
 	if err = kex.EncryptAndEncode(&plain, &data); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err)
+		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
+		return
 	}
-	// -> send sdata reply
-	result.Super = msg.Supervisor{
+
+	// prepare result for client transmission
+	mr.Super = msg.Supervisor{
 		Verdict: 200,
 		Encrypted: struct {
 			KexID string
@@ -140,13 +203,10 @@ func (s *Supervisor) issueToken(q *msg.Request) {
 			Data: data,
 		},
 	}
-	result.OK()
+	logEntry.WithField(`Code`, mr.Super.Verdict).Infoln(`Successfully issued token`)
+	mr.OK()
 
-dispatch:
-	<-timer.C
 
-returnImmediate:
-	q.Reply <- result
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
