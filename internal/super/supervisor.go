@@ -247,7 +247,7 @@ func (s *Supervisor) process(q *msg.Request) {
 		case msg.ActionBootstrap:
 			s.bootstrap(q)
 		case msg.ActionAuthenticate:
-			go func() { s.validateBasicAuth(q) }()
+			go func() { s.authenticate(q) }()
 		case msg.ActionToken:
 			go func() { s.issueToken(q) }()
 		case msg.ActionActivate:

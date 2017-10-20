@@ -15,7 +15,7 @@ import (
 	"github.com/mjolnir42/soma/lib/auth"
 )
 
-func (s *Supervisor) validateBasicAuth(q *msg.Request) {
+func (s *Supervisor) authenticate(q *msg.Request) {
 	var tok *token
 	result := msg.FromRequest(q)
 	result.Super.Verdict = 401
