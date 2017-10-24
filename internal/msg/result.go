@@ -214,14 +214,20 @@ func (r *Result) BadRequest(err error, section ...string) {
 	}
 }
 
-func (r *Result) Unauthorized(err error) {
+func (r *Result) Unauthorized(err error, section ...string) {
 	r.Code = 401
 	r.SetError(err)
+	if len(section) > 0 {
+		r.Clear(section[0])
+	}
 }
 
-func (r *Result) Forbidden(err error) {
+func (r *Result) Forbidden(err error, section ...string) {
 	r.Code = 403
 	r.SetError(err)
+	if len(section) > 0 {
+		r.Clear(section[0])
+	}
 }
 
 func (r *Result) NotFound(err error, section ...string) {
@@ -232,9 +238,12 @@ func (r *Result) NotFound(err error, section ...string) {
 	}
 }
 
-func (r *Result) Conflict(err error) {
+func (r *Result) Conflict(err error, section ...string) {
 	r.Code = 406
 	r.SetError(err)
+	if len(section) > 0 {
+		r.Clear(section[0])
+	}
 }
 
 func (r *Result) ServerError(err error, section ...string) {
@@ -245,9 +254,12 @@ func (r *Result) ServerError(err error, section ...string) {
 	}
 }
 
-func (r *Result) NotImplemented(err error) {
+func (r *Result) NotImplemented(err error, section ...string) {
 	r.Code = 501
 	r.SetError(err)
+	if len(section) > 0 {
+		r.Clear(section[0])
+	}
 }
 
 func (r *Result) Unavailable(err error) {
