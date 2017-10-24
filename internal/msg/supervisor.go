@@ -40,4 +40,23 @@ type Supervisor struct {
 	GrantId string
 }
 
+func (s *Supervisor) Clear() {
+	// Task and Verdict are kept intact
+	s.RestrictedEndpoint = true
+	s.Kex = auth.Kex{}
+	s.Encrypted = struct {
+		KexID string
+		Data  []byte
+	}{}
+	s.BasicAuth = struct {
+		User  string
+		Token string
+	}{}
+	s.Authorize = nil
+	s.Object = ``
+	s.User = proto.User{}
+	s.Team = proto.Team{}
+	s.GrantId = ``
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

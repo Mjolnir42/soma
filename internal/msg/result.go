@@ -168,6 +168,8 @@ func (r *Result) Clear(s string) {
 		r.Status = []proto.Status{}
 	case `system`:
 		r.System = []proto.SystemOperation{}
+	case SectionSupervisor:
+		r.Super.Clear()
 	case `team`:
 		r.Team = []proto.Team{}
 	case `unit`:
