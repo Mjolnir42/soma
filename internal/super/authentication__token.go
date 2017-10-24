@@ -63,12 +63,11 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 		cred                 *credential
 		err                  error
 		kex                  *auth.Kex
-		plain                []byte
-		token                auth.Token
+		token                *auth.Token
+		ok                   bool
 		tx                   *sql.Tx
 		validFrom, expiresAt time.Time
 	)
-	data := q.Super.Encrypted.Data
 
 	// start assembly of auditlog entry
 	logEntry := singleton.auditLog.
@@ -77,35 +76,8 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 		WithField(`KexID`, q.Super.Encrypted.KexID).
 		WithField(`IPAddr`, q.RemoteAddr)
 
-	// lookup requested KeyExchange by provided KeyExchangeID
-	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
-		mr.Forbidden(fmt.Errorf(`Key exchange not found`))
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Key exchange not found`)
-		return
-	}
-
-	// check KeyExchange is used by the same source that negotiated it
-	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		mr.Forbidden(fmt.Errorf(`Key exchange not found`))
-		logEntry.WithField(`Code`, mr.Super.Verdict).Errorln(`KexID referenced from wrong source system`)
-		return
-	}
-
-	// KeyExchanges are single-use and this KexID now has been used,
-	// remove it.
-	s.kex.remove(q.Super.Encrypted.KexID)
-
-	// attempt decrypting the request data
-	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
-		mr.ServerError(err)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
-		return
-	}
-
-	// unmarshal the decrypted request data into a auth.Token protocol datastructure
-	if err = json.Unmarshal(plain, &token); err != nil {
-		mr.ServerError(err)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
+	// decrypt e2e encrypted request
+	if token, ok = s.decrypt(q, mr, logEntry); !ok {
 		return
 	}
 
@@ -184,8 +156,8 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	}
 
 	// encrypt generated token for client transmission
-	plain = []byte{}
-	data = []byte{}
+	plain := []byte{}
+	data := []byte{}
 	if plain, err = json.Marshal(token); err != nil {
 		mr.ServerError(err)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
