@@ -24,6 +24,8 @@ import (
 // calls the correct function depending on the requested task
 func (s *Supervisor) activate(q *msg.Request) {
 	result := msg.FromRequest(q)
+	// default result is for the request to fail
+	result.Code = 403
 	result.Super.Verdict = 403
 
 	// start response delay timer
@@ -33,11 +35,18 @@ func (s *Supervisor) activate(q *msg.Request) {
 	logEntry := singleton.auditLog.
 		WithField(`RequestID`, q.ID.String()).
 		WithField(`KexID`, q.Super.Encrypted.KexID).
-		WithField(`IPAddr`, q.RemoteAddr)
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`UserName`, `AnonymousCoward`).
+		WithField(`UserID`, `ffffffff-ffff-ffff-ffff-ffffffffffff`).
+		WithField(`Code`, result.Code).
+		WithField(`Verdict`, result.Super.Verdict).
+		WithField(`RequestType`, fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task))
 
 	// account activations are master instance functions
 	if s.readonly {
 		result.ReadOnly()
+		logEntry.WithField(`Code`, result.Code).
+			Warningln(result.Error)
 		goto returnImmediate
 	}
 
@@ -45,13 +54,11 @@ func (s *Supervisor) activate(q *msg.Request) {
 	switch q.Super.Task {
 	case msg.SubjectUser:
 	default:
-		result.UnknownRequest(q)
+		result.UnknownTask(q)
+		logEntry.WithField(`Code`, result.Code).
+			Warningln(result.Error)
 		goto returnImmediate
 	}
-
-	// update auditlog entry
-	logEntry = logEntry.WithField(`Type`,
-		fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task))
 
 	// select correct taskhandler
 	switch q.Super.Task {

@@ -63,7 +63,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		str := `Invalid user activation: root`
 
 		mr.BadRequest(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(str)
 		return
 	}
@@ -77,12 +77,12 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		str := fmt.Sprintf("Unknown user: %s", token.UserName)
 
 		mr.NotFound(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(str)
 		return
 	} else if err != nil {
 		mr.ServerError(err)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -100,12 +100,12 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		str := fmt.Sprintf("Unknown user: %s", token.UserName)
 
 		mr.NotFound(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(str)
 		return
 	} else if err != nil {
 		mr.ServerError(err)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -114,7 +114,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 			token.UserName, userID)
 
 		mr.BadRequest(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(str)
 		return
 	}
@@ -129,14 +129,14 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 				token.Token,
 			); err != nil {
 				mr.ServerError(err)
-				audit.WithField(`Code`, mr.Super.Verdict).
+				audit.WithField(`Code`, mr.Code).
 					Warningln(err)
 				return
 			} else if !ok {
 				str := `Invalid LDAP credentials`
 
 				mr.Unauthorized(fmt.Errorf(str), q.Section)
-				audit.WithField(`Code`, mr.Super.Verdict).
+				audit.WithField(`Code`, mr.Code).
 					Warningln(str)
 				return
 			}
@@ -148,7 +148,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 					token.UserName)
 
 				mr.Conflict(fmt.Errorf(str), q.Section)
-				audit.WithField(`Code`, mr.Super.Verdict).
+				audit.WithField(`Code`, mr.Code).
 					Warningln(str)
 				return
 			}
@@ -156,7 +156,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 			str := `Mailtoken activation is not implemented`
 
 			mr.NotImplemented(fmt.Errorf(str), q.Section)
-			audit.WithField(`Code`, mr.Super.Verdict).
+			audit.WithField(`Code`, mr.Code).
 				Errorln(str)
 			return
 		default:
@@ -164,7 +164,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 				s.conf.Auth.Activation)
 
 			mr.ServerError(fmt.Errorf(str), q.Section)
-			audit.WithField(`Code`, mr.Super.Verdict).
+			audit.WithField(`Code`, mr.Code).
 				Errorln(str)
 			return
 		}
@@ -174,7 +174,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	// calculate the scrypt KDF hash using scrypth64.DefaultParams()
 	if mcf, err = scrypth64.Digest(token.Password, nil); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -186,7 +186,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(mcf, s.key, s.seed); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -199,7 +199,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	// open multi statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -214,7 +214,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		credExpiresAt.UTC(),
 	); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -225,7 +225,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		userUUID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -239,7 +239,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		expiresAt.UTC(),
 	); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -252,7 +252,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
 		token.Salt); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -260,7 +260,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	// commit transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -271,13 +271,13 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	data = []byte{}
 	if plain, err = json.Marshal(token); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
 	if err = kex.EncryptAndEncode(&plain, &data); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
+		audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -286,7 +286,8 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	mr.Super.Verdict = 200
 	mr.Super.Encrypted.Data = data
 	mr.OK()
-	audit.WithField(`Code`, mr.Super.Verdict).
+	audit.WithField(`Verdict`, mr.Super.Verdict).
+		WithField(`Code`, mr.Code).
 		Infoln(`Successfully activated user`)
 }
 
