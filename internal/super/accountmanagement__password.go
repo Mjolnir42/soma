@@ -39,8 +39,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	defer timer.Stop()
 
 	// decrypt e2e encrypted request
-	// XXX BUG: send auditlog
-	if token, kex, ok = s.decrypt(q, &result, nil); !ok {
+	if token, kex, ok = s.decrypt(q, &result); !ok {
 		return
 	}
 
@@ -54,8 +53,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.RemoteAddr)
 
 	// check the user exists and is active
-	// XXX BUG: add auditlog
-	if userID, err = s.checkUser(token.UserName, &result, nil, true); err != nil {
+	if userID, err = s.checkUser(token.UserName, &result, true); err != nil {
 		goto dispatch
 	}
 	userUUID, _ = uuid.FromString(userID)
@@ -186,8 +184,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 		goto dispatch
 	}
 
-	// XXX BUG: send auditlog entry
-	if err = s.encrypt(kex, token, &result, nil); err != nil {
+	if err = s.encrypt(kex, token, &result); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}

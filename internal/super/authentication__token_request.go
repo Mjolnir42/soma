@@ -12,14 +12,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/auth"
 )
 
 // tokenRequest handles requests for new tokens to be issued
-func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result, audit *logrus.Entry) {
+func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	var (
 		cred                 *credential
 		err                  error
@@ -32,28 +31,28 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result, audit *logrus.
 	)
 
 	// decrypt e2e encrypted request
-	if token, kex, ok = s.decrypt(q, mr, audit); !ok {
+	if token, kex, ok = s.decrypt(q, mr); !ok {
 		return
 	}
 
 	// update auditlog entry
-	audit = audit.WithField(`UserName`, token.UserName)
+	mr.Super.Audit = mr.Super.Audit.WithField(`UserName`, token.UserName)
 
 	// check if root is available
 	if token.UserName == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
 		str := `Restricted-mode root token requested on ` +
 			`unrestricted endpoint`
 		mr.BadRequest(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 
 	// check the user exists and is active
-	if userID, err = s.checkUser(token.UserName, mr, audit, true); err != nil {
+	if userID, err = s.checkUser(token.UserName, mr, true); err != nil {
 		return
 	}
 	// update auditlog entry
-	audit = audit.WithField(`UserID`, userID)
+	mr.Super.Audit = mr.Super.Audit.WithField(`UserID`, userID)
 
 	// fetch user credentials, checked to exist by checkUser()
 	cred = s.credentials.read(token.UserName)
@@ -62,7 +61,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result, audit *logrus.
 	if time.Now().UTC().Before(cred.validFrom.UTC()) ||
 		time.Now().UTC().After(cred.expiresAt.UTC()) {
 		mr.Forbidden(fmt.Errorf(`Cred expired`), q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(`Token expired`)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(`Token expired`)
 		return
 	}
 
@@ -70,7 +69,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result, audit *logrus.
 	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(cred.cryptMCF, s.key, s.seed); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -79,7 +78,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result, audit *logrus.
 	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	defer tx.Rollback()
@@ -92,7 +91,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result, audit *logrus.
 		expiresAt.UTC(),
 	); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -101,23 +100,23 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result, audit *logrus.
 	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
 		token.Salt); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	// encrypt generated token for client transmission
-	if err = s.encrypt(kex, token, mr, audit); err != nil {
+	if err = s.encrypt(kex, token, mr); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
-	audit.Infoln(`Successfully issued token`)
+	mr.Super.Audit.Infoln(`Successfully issued token`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

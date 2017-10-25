@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/auth"
 )
@@ -23,7 +22,7 @@ import (
 // are used only for serverside logging.
 
 // decrypt returns the decrypted auth.Token embedded in msg.Request
-func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry) (*auth.Token, *auth.Kex, bool) {
+func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result) (*auth.Token, *auth.Kex, bool) {
 	var (
 		err   error
 		kex   *auth.Kex
@@ -35,7 +34,7 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
 		str := `Key exchange not found`
 		mr.NotFound(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return nil, nil, false
 	}
 
@@ -43,7 +42,7 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
 		str := `KexID referenced from wrong source system`
 		mr.BadRequest(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
 		return nil, nil, false
 	}
 
@@ -57,14 +56,14 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 		&plain,
 	); err != nil {
 		mr.ServerError(err)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return nil, nil, false
 	}
 
 	// unmarshal the decrypted request data into a auth.Token protocol datastructure
 	if err = json.Unmarshal(plain, token); err != nil {
 		mr.ServerError(err)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return nil, nil, false
 	}
 
@@ -72,7 +71,7 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 }
 
 // encrypt embeds the encrypted token into mr
-func (s *Supervisor) encrypt(kex *auth.Kex, token *auth.Token, mr *msg.Result, audit *logrus.Entry) error {
+func (s *Supervisor) encrypt(kex *auth.Kex, token *auth.Token, mr *msg.Result) error {
 	var plain, data []byte
 	var err error
 
@@ -90,7 +89,7 @@ func (s *Supervisor) encrypt(kex *auth.Kex, token *auth.Token, mr *msg.Result, a
 	mr.Super.Verdict = 200
 	mr.Super.Encrypted.Data = data
 	mr.OK()
-	audit = audit.WithField(`Verdict`, mr.Super.Verdict).
+	mr.Super.Audit = mr.Super.Audit.WithField(`Verdict`, mr.Super.Verdict).
 		WithField(`Code`, mr.Code)
 	return nil
 }

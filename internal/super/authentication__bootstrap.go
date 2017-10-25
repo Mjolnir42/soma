@@ -56,8 +56,7 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 	}
 
 	// decrypt e2e encrypted request
-	// XXX BUG: send auditlog
-	if token, kex, ok = s.decrypt(q, &result, nil); !ok {
+	if token, kex, ok = s.decrypt(q, &result); !ok {
 		return
 	}
 
@@ -152,8 +151,7 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 	}
 
 	// send encrypted reply
-	// XXX BUG: send auditlog entry instead of nil
-	if err = s.encrypt(kex, token, &result, nil); err != nil {
+	if err = s.encrypt(kex, token, &result); err != nil {
 		result.ServerError(err, q.Section)
 		goto dispatch
 	}

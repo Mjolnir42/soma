@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/scrypth64"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
@@ -27,7 +26,7 @@ import (
 // are used only for serverside logging.
 
 // activateUser handles requests to activate inactive user accounts
-func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.Entry) {
+func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 
 	var (
 		err                                 error
@@ -42,29 +41,29 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	)
 
 	// decrypt e2e encrypted request
-	if token, kex, ok = s.decrypt(q, mr, audit); !ok {
+	if token, kex, ok = s.decrypt(q, mr); !ok {
 		return
 	}
 
 	// update auditlog entry
-	audit = audit.WithField(`UserName`, token.UserName)
+	mr.Super.Audit = mr.Super.Audit.WithField(`UserName`, token.UserName)
 
 	// root can not be activated via the user handler
 	if token.UserName == msg.SubjectRoot {
 		str := `Invalid user activation: root`
 
 		mr.BadRequest(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(str)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(str)
 		return
 	}
 
 	// check the user exists and is not active
-	if userID, err = s.checkUser(token.UserName, mr, audit, false); err != nil {
+	if userID, err = s.checkUser(token.UserName, mr, false); err != nil {
 		return
 	}
 
 	// update auditlog entry
-	audit = audit.WithField(`UserID`, userID)
+	mr.Super.Audit = mr.Super.Audit.WithField(`UserID`, userID)
 	userUUID, _ = uuid.FromString(userID)
 
 	// TODO: refactor ownership verification
@@ -77,14 +76,14 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 				token.Token,
 			); err != nil {
 				mr.ServerError(err)
-				audit.WithField(`Code`, mr.Code).
+				mr.Super.Audit.WithField(`Code`, mr.Code).
 					Warningln(err)
 				return
 			} else if !ok {
 				str := `Invalid LDAP credentials`
 
 				mr.Unauthorized(fmt.Errorf(str), q.Section)
-				audit.WithField(`Code`, mr.Code).
+				mr.Super.Audit.WithField(`Code`, mr.Code).
 					Warningln(str)
 				return
 			}
@@ -96,7 +95,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 					token.UserName)
 
 				mr.Conflict(fmt.Errorf(str), q.Section)
-				audit.WithField(`Code`, mr.Code).
+				mr.Super.Audit.WithField(`Code`, mr.Code).
 					Warningln(str)
 				return
 			}
@@ -104,7 +103,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 			str := `Mailtoken activation is not implemented`
 
 			mr.NotImplemented(fmt.Errorf(str), q.Section)
-			audit.WithField(`Code`, mr.Code).
+			mr.Super.Audit.WithField(`Code`, mr.Code).
 				Errorln(str)
 			return
 		default:
@@ -112,7 +111,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 				s.conf.Auth.Activation)
 
 			mr.ServerError(fmt.Errorf(str), q.Section)
-			audit.WithField(`Code`, mr.Code).
+			mr.Super.Audit.WithField(`Code`, mr.Code).
 				Errorln(str)
 			return
 		}
@@ -122,7 +121,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	// calculate the scrypt KDF hash using scrypth64.DefaultParams()
 	if mcf, err = scrypth64.Digest(token.Password, nil); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
+		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -134,7 +133,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(mcf, s.key, s.seed); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
+		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -147,7 +146,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	// open multi statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
+		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -162,7 +161,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		credExpiresAt.UTC(),
 	); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
+		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -173,7 +172,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		userUUID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
+		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -187,7 +186,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		expiresAt.UTC(),
 	); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
+		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
 		return
 	}
@@ -200,24 +199,24 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
 		token.Salt); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	// commit transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	// encrypt e2e encrypted result and store it in mr
-	if err = s.encrypt(kex, token, mr, audit); err != nil {
+	if err = s.encrypt(kex, token, mr); err != nil {
 		mr.ServerError(err, mr.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(err)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
-	audit.Infoln(`Successfully activated user`)
+	mr.Super.Audit.Infoln(`Successfully activated user`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

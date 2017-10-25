@@ -14,7 +14,6 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 )
@@ -87,7 +86,7 @@ func (s *Supervisor) checkIV(iv string) error {
 
 // checkUser verifies that a user exists and is either active or
 // inactive depending on the target state
-func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry, target bool) (string, error) {
+func (s *Supervisor) checkUser(name string, mr *msg.Result, target bool) (string, error) {
 	var (
 		userID string
 		active bool
@@ -103,11 +102,11 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry,
 	); err == sql.ErrNoRows {
 		str := fmt.Sprintf("Unknown user: %s", name)
 		mr.NotFound(fmt.Errorf(str), mr.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return ``, mr.Error
 	} else if err != nil {
 		mr.ServerError(err, mr.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return ``, mr.Error
 	}
 
@@ -119,11 +118,11 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry,
 	); err == sql.ErrNoRows {
 		str := fmt.Sprintf("Unknown user: %s", name)
 		mr.NotFound(fmt.Errorf(str), mr.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return ``, mr.Error
 	} else if err != nil {
 		mr.ServerError(err, mr.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return ``, mr.Error
 	}
 
@@ -132,7 +131,7 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry,
 		str := fmt.Sprintf("User %s (%s) is active: %t",
 			name, userID, target)
 		mr.BadRequest(fmt.Errorf(str), mr.Section)
-		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return ``, mr.Error
 	}
 
@@ -143,7 +142,7 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry,
 			str := fmt.Sprintf("Active user not found in credentials"+
 				" cache: %s (%s)", name, userID)
 			mr.ServerError(fmt.Errorf(str), mr.Section)
-			audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
 			return ``, mr.Error
 		}
 
@@ -151,7 +150,7 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry,
 			str := fmt.Sprintf("Active user inactive in credentials"+
 				" cache: %s (%s)", name, userID)
 			mr.ServerError(fmt.Errorf(str), mr.Section)
-			audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
 			return ``, mr.Error
 		}
 	}

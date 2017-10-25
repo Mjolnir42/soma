@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
@@ -27,7 +26,7 @@ func (s *Supervisor) token(q *msg.Request) {
 	timer := time.NewTimer(1 * time.Second)
 
 	// start assembly of auditlog entry
-	audit := singleton.auditLog.
+	result.Super.Audit = singleton.auditLog.
 		WithField(`RequestID`, q.ID.String()).
 		WithField(`KexID`, q.Super.Encrypted.KexID).
 		WithField(`IPAddr`, q.RemoteAddr).
@@ -40,7 +39,7 @@ func (s *Supervisor) token(q *msg.Request) {
 	// tokenRequest/tokenInvalidate are master instance functions
 	if s.readonly {
 		result.ReadOnly()
-		audit.WithField(`Code`, result.Code).Warningln(result.Error)
+		result.Super.Audit.WithField(`Code`, result.Code).Warningln(result.Error)
 		goto returnImmediate
 	}
 
@@ -51,18 +50,18 @@ func (s *Supervisor) token(q *msg.Request) {
 	case msg.TaskInvalidate:
 	default:
 		result.UnknownTask(q)
-		audit.WithField(`Code`, result.Code).Warningln(result.Error)
+		result.Super.Audit.WithField(`Code`, result.Code).Warningln(result.Error)
 		goto returnImmediate
 	}
 
 	// select correct taskhandler
 	switch q.Super.Task {
 	case msg.TaskRequest:
-		s.tokenRequest(q, &result, audit)
+		s.tokenRequest(q, &result)
 	case msg.TaskInvalidateAll:
-		s.tokenInvalidateAll(q, &result, audit)
+		s.tokenInvalidateAll(q, &result)
 	case msg.TaskInvalidate:
-		s.tokenInvalidate(q, &result, audit)
+		s.tokenInvalidate(q, &result)
 	}
 
 	// wait for delay timer to trigger
@@ -77,12 +76,12 @@ returnImmediate:
 }
 
 // tokenInvalidateAll invalidates all tokens
-func (s *Supervisor) tokenInvalidateAll(q *msg.Request, mr *msg.Result, audit *logrus.Entry) {
+func (s *Supervisor) tokenInvalidateAll(q *msg.Request, mr *msg.Result) {
 	// XXX TODO
 }
 
 // tokenInvalidate marks all tokens of a user as invalidate-on-use
-func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result, audit *logrus.Entry) {
+func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result) {
 	// XXX TODO
 }
 

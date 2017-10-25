@@ -32,7 +32,7 @@ func (s *Supervisor) activate(q *msg.Request) {
 	timer := time.NewTimer(1 * time.Second)
 
 	// start assembly of auditlog entry
-	audit := singleton.auditLog.
+	result.Super.Audit = singleton.auditLog.
 		WithField(`RequestID`, q.ID.String()).
 		WithField(`KexID`, q.Super.Encrypted.KexID).
 		WithField(`IPAddr`, q.RemoteAddr).
@@ -45,7 +45,7 @@ func (s *Supervisor) activate(q *msg.Request) {
 	// account activations are master instance functions
 	if s.readonly {
 		result.ReadOnly()
-		audit.WithField(`Code`, result.Code).Warningln(result.Error)
+		result.Super.Audit.WithField(`Code`, result.Code).Warningln(result.Error)
 		goto returnImmediate
 	}
 
@@ -54,14 +54,14 @@ func (s *Supervisor) activate(q *msg.Request) {
 	case msg.SubjectUser:
 	default:
 		result.UnknownTask(q)
-		audit.WithField(`Code`, result.Code).Warningln(result.Error)
+		result.Super.Audit.WithField(`Code`, result.Code).Warningln(result.Error)
 		goto returnImmediate
 	}
 
 	// select correct taskhandler
 	switch q.Super.Task {
 	case msg.SubjectUser:
-		s.activateUser(q, &result, audit)
+		s.activateUser(q, &result)
 	}
 
 	// wait for delay timer to trigger
