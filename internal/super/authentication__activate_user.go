@@ -41,11 +41,6 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		tx                                  *sql.Tx
 	)
 
-	if s.readonly {
-		mr.ReadOnly()
-		return
-	}
-
 	// decrypt e2e encrypted request
 	if token, kex, ok = s.decrypt(q, mr, audit); !ok {
 		return
@@ -59,8 +54,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		str := `Invalid user activation: root`
 
 		mr.BadRequest(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(str)
+		audit.WithField(`Code`, mr.Code).Warningln(str)
 		return
 	}
 

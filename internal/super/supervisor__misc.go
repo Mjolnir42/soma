@@ -131,7 +131,6 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry,
 	if active != target {
 		str := fmt.Sprintf("User %s (%s) is active: %t",
 			name, userID, target)
-
 		mr.BadRequest(fmt.Errorf(str), mr.Section)
 		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return ``, mr.Error

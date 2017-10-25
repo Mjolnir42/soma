@@ -8,41 +8,61 @@
 package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/stmt"
-	"github.com/mjolnir42/soma/lib/auth"
 )
 
 // token handles supervisor requests for token and calls the correct
 // function depending on the requested task
 func (s *Supervisor) token(q *msg.Request) {
 	result := msg.FromRequest(q)
+	// default result is for the request to fail
+	result.Code = 403
 	result.Super.Verdict = 403
 
 	// start response delay timer
 	timer := time.NewTimer(1 * time.Second)
 
+	// start assembly of auditlog entry
+	audit := singleton.auditLog.
+		WithField(`RequestID`, q.ID.String()).
+		WithField(`KexID`, q.Super.Encrypted.KexID).
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`UserName`, `AnonymousCoward`).
+		WithField(`UserID`, `ffffffff-ffff-ffff-ffff-ffffffffffff`).
+		WithField(`Code`, result.Code).
+		WithField(`Verdict`, result.Super.Verdict).
+		WithField(`RequestType`, fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task))
+
 	// tokenRequest/tokenInvalidate are master instance functions
 	if s.readonly {
 		result.ReadOnly()
+		audit.WithField(`Code`, result.Code).Warningln(result.Error)
+		goto returnImmediate
+	}
+
+	// filter requests with invalid task
+	switch q.Super.Task {
+	case msg.TaskRequest:
+	case msg.TaskInvalidateAll:
+	case msg.TaskInvalidate:
+	default:
+		result.UnknownTask(q)
+		audit.WithField(`Code`, result.Code).Warningln(result.Error)
 		goto returnImmediate
 	}
 
 	// select correct taskhandler
 	switch q.Super.Task {
 	case msg.TaskRequest:
-		s.tokenRequest(q, &result)
+		s.tokenRequest(q, &result, audit)
 	case msg.TaskInvalidateAll:
-		s.tokenInvalidateAll(q, &result)
+		s.tokenInvalidateAll(q, &result, audit)
 	case msg.TaskInvalidate:
-		s.tokenInvalidate(q, &result)
-	default:
-		result.UnknownRequest(q)
-		goto returnImmediate
+		s.tokenInvalidate(q, &result, audit)
 	}
 
 	// wait for delay timer to trigger
@@ -56,115 +76,13 @@ returnImmediate:
 	q.Reply <- result
 }
 
-// tokenRequest handles requests for new tokens to be issued
-func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
-	var (
-		cred                 *credential
-		err                  error
-		kex                  *auth.Kex
-		token                *auth.Token
-		ok                   bool
-		tx                   *sql.Tx
-		validFrom, expiresAt time.Time
-	)
-
-	// start assembly of auditlog entry
-	logEntry := singleton.auditLog.
-		WithField(`Type`, fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task)).
-		WithField(`RequestID`, q.ID.String()).
-		WithField(`KexID`, q.Super.Encrypted.KexID).
-		WithField(`IPAddr`, q.RemoteAddr)
-
-	// decrypt e2e encrypted request
-	if token, kex, ok = s.decrypt(q, mr, logEntry); !ok {
-		return
-	}
-
-	// check if root is available
-	if token.UserName == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
-		mr.ServerError(
-			fmt.Errorf(`Restricted-mode root token requested on unrestricted endpoint`), q.Section)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Restricted-mode root token requested on unrestricted endpoint`)
-		return
-	}
-
-	// check the user exists and is active
-	if _, err = s.checkUser(token.UserName, mr, logEntry, true); err != nil {
-		return
-	}
-	logEntry = logEntry.WithField(`User`, token.UserName)
-
-	// fetch user credentials, checked to exist by checkUser()
-	cred = s.credentials.read(token.UserName)
-
-	// check if the cred has either expired or not become valid yet
-	if time.Now().UTC().Before(cred.validFrom.UTC()) ||
-		time.Now().UTC().After(cred.expiresAt.UTC()) {
-		mr.Forbidden(fmt.Errorf(`Cred expired`), q.Section)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Token expired`)
-		return
-	}
-
-	// generate token if the provided credentials are valid
-	token.SetIPAddressExtractedString(q.RemoteAddr)
-	if err = token.Generate(cred.cryptMCF, s.key, s.seed); err != nil {
-		mr.ServerError(err, q.Section)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
-		return
-	}
-
-	// persist generated token into database
-	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
-	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
-	if tx, err = s.conn.Begin(); err != nil {
-		mr.ServerError(err, q.Section)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Database error`)
-		return
-	}
-	defer tx.Rollback()
-
-	if _, err = tx.Exec(
-		stmt.InsertToken,
-		token.Token,
-		token.Salt,
-		validFrom.UTC(),
-		expiresAt.UTC(),
-	); err != nil {
-		mr.ServerError(err, q.Section)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Database error`)
-		return
-	}
-
-	// store token in inmemory token map while db transaction is still
-	// open
-	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
-		token.Salt); err != nil {
-		mr.ServerError(err, q.Section)
-		return
-	}
-	if err = tx.Commit(); err != nil {
-		mr.ServerError(err, q.Section)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
-		return
-	}
-
-	// encrypt generated token for client transmission
-	if err = s.encrypt(kex, token, mr, logEntry); err != nil {
-		mr.ServerError(err, q.Section)
-		logEntry.WithField(`Code`, mr.Code).Warningln(err)
-		return
-	}
-
-	logEntry.Infoln(`Successfully issued token`)
-}
-
 // tokenInvalidateAll invalidates all tokens
-func (s *Supervisor) tokenInvalidateAll(q *msg.Request, mr *msg.Result) {
+func (s *Supervisor) tokenInvalidateAll(q *msg.Request, mr *msg.Result, audit *logrus.Entry) {
 	// XXX TODO
 }
 
 // tokenInvalidate marks all tokens of a user as invalidate-on-use
-func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result) {
+func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result, audit *logrus.Entry) {
 	// XXX TODO
 }
 
