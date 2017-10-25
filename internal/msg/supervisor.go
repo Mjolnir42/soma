@@ -9,6 +9,7 @@
 package msg
 
 import (
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/lib/auth"
 	"github.com/mjolnir42/soma/lib/proto"
 )
@@ -31,6 +32,8 @@ type Supervisor struct {
 	}
 	// Request to be authorized
 	Authorize *Request
+	// AuditLog Entry for this supervisor task
+	Audit *logrus.Entry
 	// XXX Everything below is deprecated
 	// Fields for map update notifications
 	Object string
