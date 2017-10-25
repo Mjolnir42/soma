@@ -97,10 +97,10 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	// fetch user credentials, checked to exist by checkUser()
 	cred = s.credentials.read(token.UserName)
 
-	// check if the token has either expired or not become valid yet
+	// check if the cred has either expired or not become valid yet
 	if time.Now().UTC().Before(cred.validFrom.UTC()) ||
 		time.Now().UTC().After(cred.expiresAt.UTC()) {
-		mr.Forbidden(fmt.Errorf(`Token expired`), q.Section)
+		mr.Forbidden(fmt.Errorf(`Cred expired`), q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Token expired`)
 		return
 	}
