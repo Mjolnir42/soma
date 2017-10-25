@@ -22,7 +22,8 @@ import (
 // returned to the client as 403/Forbidden. Provided error details
 // are used only for serverside logging.
 
-func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry) (*auth.Token, bool) {
+// decrypt returns the decrypted auth.Token embedded in msg.Request
+func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry) (*auth.Token, *auth.Kex, bool) {
 	var (
 		err   error
 		kex   *auth.Kex
@@ -37,7 +38,7 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 		mr.NotFound(fmt.Errorf(str), q.Section)
 		audit.WithField(`Code`, mr.Super.Verdict).
 			Warningln(str)
-		return nil, false
+		return nil, nil, false
 	}
 
 	// check KeyExchange is used by the same source that negotiated it
@@ -47,7 +48,7 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 		mr.BadRequest(fmt.Errorf(str), q.Section)
 		audit.WithField(`Code`, mr.Super.Verdict).
 			Errorln(str)
-		return nil, false
+		return nil, nil, false
 	}
 
 	// KeyExchanges are single-use and this KexID now has been used,
@@ -60,7 +61,7 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 		mr.ServerError(err)
 		audit.WithField(`Code`, mr.Super.Verdict).
 			Warningln(err)
-		return nil, false
+		return nil, nil, false
 	}
 
 	// unmarshal the decrypted request data into a auth.Token protocol datastructure
@@ -68,10 +69,10 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 		mr.ServerError(err)
 		audit.WithField(`Code`, mr.Super.Verdict).
 			Warningln(err)
-		return nil, false
+		return nil, nil, false
 	}
 
-	return token, true
+	return token, kex, true
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

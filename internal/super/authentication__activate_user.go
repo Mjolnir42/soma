@@ -50,7 +50,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	}
 
 	// decrypt e2e encrypted request
-	if token, ok = s.decrypt(q, mr, audit); !ok {
+	if token, kex, ok = s.decrypt(q, mr, audit); !ok {
 		return
 	}
 

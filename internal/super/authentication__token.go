@@ -77,7 +77,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 		WithField(`IPAddr`, q.RemoteAddr)
 
 	// decrypt e2e encrypted request
-	if token, ok = s.decrypt(q, mr, logEntry); !ok {
+	if token, kex, ok = s.decrypt(q, mr, logEntry); !ok {
 		return
 	}
 
