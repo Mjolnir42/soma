@@ -34,20 +34,16 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 	// lookup requested KeyExchange by provided KeyExchangeID
 	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
 		str := `Key exchange not found`
-
 		mr.NotFound(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
-			Warningln(str)
+		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return nil, nil, false
 	}
 
 	// check KeyExchange is used by the same source that negotiated it
 	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
 		str := `KexID referenced from wrong source system`
-
 		mr.BadRequest(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Super.Verdict).
-			Errorln(str)
+		audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
 		return nil, nil, false
 	}
 
@@ -56,19 +52,19 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 	s.kex.remove(q.Super.Encrypted.KexID)
 
 	// attempt decrypting the request data
-	if err = kex.DecodeAndDecrypt(&q.Super.Encrypted.Data,
-		&plain); err != nil {
+	if err = kex.DecodeAndDecrypt(
+		&q.Super.Encrypted.Data,
+		&plain,
+	); err != nil {
 		mr.ServerError(err)
-		audit.WithField(`Code`, mr.Super.Verdict).
-			Warningln(err)
+		audit.WithField(`Code`, mr.Code).Warningln(err)
 		return nil, nil, false
 	}
 
 	// unmarshal the decrypted request data into a auth.Token protocol datastructure
 	if err = json.Unmarshal(plain, token); err != nil {
 		mr.ServerError(err)
-		audit.WithField(`Code`, mr.Super.Verdict).
-			Warningln(err)
+		audit.WithField(`Code`, mr.Code).Warningln(err)
 		return nil, nil, false
 	}
 

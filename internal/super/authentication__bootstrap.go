@@ -9,7 +9,6 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -26,17 +25,16 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 	q.Log(s.reqLog)
 
 	kexID := q.Super.Encrypted.KexID
-	data := q.Super.Encrypted.Data
 	var (
 		kex                  *auth.Kex
 		err                  error
-		plain                []byte
-		token                auth.Token
+		token                *auth.Token
 		rootToken            string
 		mcf                  scrypth64.Mcf
 		tx                   *sql.Tx
 		validFrom, expiresAt time.Time
 		timer                *time.Timer
+		ok                   bool
 	)
 
 	// bootstrapRoot is a master instance function
@@ -57,30 +55,10 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 		goto returnImmediate
 	}
 
-	// lookup requested key exchange
-	if kex = s.kex.read(kexID); kex == nil {
-		result.Forbidden(fmt.Errorf(`Key exchange not found`))
-		goto dispatch
-	}
-
-	// check kex.SameSource to counter enumerating IDs
-	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		result.Forbidden(fmt.Errorf(`Key exchange not found`))
-		goto dispatch
-	}
-
-	// valid kex is referenced from the correct source, its one time
-	// use is now over.
-	s.kex.remove(kexID)
-
-	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
-		result.ServerError(err)
-		goto dispatch
-	}
-
-	if err = json.Unmarshal(plain, &token); err != nil {
-		result.ServerError(err)
-		goto dispatch
+	// decrypt e2e encrypted request
+	// XXX BUG: send auditlog
+	if token, kex, ok = s.decrypt(q, &result, nil); !ok {
+		return
 	}
 
 	if token.UserName != msg.SubjectRoot {
@@ -175,7 +153,7 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 
 	// send encrypted reply
 	// XXX BUG: send auditlog entry instead of nil
-	if err = s.encrypt(kex, &token, &result, nil); err != nil {
+	if err = s.encrypt(kex, token, &result, nil); err != nil {
 		result.ServerError(err, q.Section)
 		goto dispatch
 	}

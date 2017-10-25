@@ -2,7 +2,6 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -21,9 +20,8 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 		cred                                                  *credential
 		err                                                   error
 		kex                                                   *auth.Kex
-		plain                                                 []byte
 		timer                                                 *time.Timer
-		token                                                 auth.Token
+		token                                                 *auth.Token
 		tx                                                    *sql.Tx
 		validFrom, expiresAt, credExpiresAt, credDeactivateAt time.Time
 		userID                                                string
@@ -31,7 +29,6 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 		mcf                                                   scrypth64.Mcf
 		ok, active                                            bool
 	)
-	data := q.Super.Encrypted.Data
 
 	if s.readonly {
 		result.ReadOnly()
@@ -41,28 +38,12 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	timer = time.NewTimer(1 * time.Second)
 	defer timer.Stop()
 
-	// get kex
-	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
-		result.Forbidden(fmt.Errorf(`Key exchange not found`))
-		goto dispatch
+	// decrypt e2e encrypted request
+	// XXX BUG: send auditlog
+	if token, kex, ok = s.decrypt(q, &result, nil); !ok {
+		return
 	}
 
-	if !kex.IsSameSourceExtractedString(q.RemoteAddr) {
-		result.Forbidden(fmt.Errorf(`Key exchange not found`))
-		goto dispatch
-	}
-
-	s.kex.remove(q.Super.Encrypted.KexID)
-
-	if err = kex.DecodeAndDecrypt(&data, &plain); err != nil {
-		result.ServerError(err)
-		goto dispatch
-	}
-
-	if err = json.Unmarshal(plain, &token); err != nil {
-		result.ServerError(err)
-		goto dispatch
-	}
 	// token.UserName is the username
 	// token.Password is the _NEW_ password that should be set
 	// token.Token    is either:
@@ -219,7 +200,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 	}
 
 	// XXX BUG: send auditlog entry
-	if err = s.encrypt(kex, &token, &result, nil); err != nil {
+	if err = s.encrypt(kex, token, &result, nil); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}
