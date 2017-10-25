@@ -36,7 +36,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		token                               *auth.Token
 		userID                              string
 		userUUID                            uuid.UUID
-		ok, active                          bool
+		ok                                  bool
 		mcf                                 scrypth64.Mcf
 		tx                                  *sql.Tx
 	)
@@ -54,7 +54,6 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	// update auditlog entry
 	audit = audit.WithField(`UserName`, token.UserName)
 
-	// TODO: refactor user verification?
 	// root can not be activated via the user handler
 	if token.UserName == msg.SubjectRoot {
 		str := `Invalid user activation: root`
@@ -65,56 +64,14 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		return
 	}
 
-	// verify the user to activate exists
-	if err = s.stmtFindUserID.QueryRow(
-		token.UserName,
-	).Scan(
-		&userID,
-	); err == sql.ErrNoRows {
-		str := fmt.Sprintf("Unknown user: %s", token.UserName)
-
-		mr.NotFound(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(str)
-		return
-	} else if err != nil {
-		mr.ServerError(err)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(err)
+	// check the user exists and is not active
+	if userID, err = s.checkUser(token.UserName, mr, audit, false); err != nil {
 		return
 	}
 
 	// update auditlog entry
 	audit = audit.WithField(`UserID`, userID)
 	userUUID, _ = uuid.FromString(userID)
-
-	// verify the user is not already active
-	if err = s.stmtCheckUserActive.QueryRow(
-		userID,
-	).Scan(
-		&active,
-	); err == sql.ErrNoRows {
-		str := fmt.Sprintf("Unknown user: %s", token.UserName)
-
-		mr.NotFound(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(str)
-		return
-	} else if err != nil {
-		mr.ServerError(err)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(err)
-		return
-	}
-	if active {
-		str := fmt.Sprintf("User %s (%s) is already active",
-			token.UserName, userID)
-
-		mr.BadRequest(fmt.Errorf(str), q.Section)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(str)
-		return
-	}
 
 	// TODO: refactor ownership verification
 	// no account ownership verification in open mode

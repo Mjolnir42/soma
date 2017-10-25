@@ -27,7 +27,7 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 		userID                                                string
 		userUUID                                              uuid.UUID
 		mcf                                                   scrypth64.Mcf
-		ok, active                                            bool
+		ok                                                    bool
 	)
 
 	if s.readonly {
@@ -53,25 +53,12 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 
 	s.reqLog.Printf(msg.LogStrSRq, q.Section, q.Action, token.UserName, q.RemoteAddr)
 
-	if err = s.stmtFindUserID.QueryRow(token.UserName).
-		Scan(&userID); err == sql.ErrNoRows {
-		result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
+	// check the user exists and is active
+	// XXX BUG: add auditlog
+	if userID, err = s.checkUser(token.UserName, &result, nil, true); err != nil {
 		goto dispatch
-	} else if err != nil {
-		result.ServerError(err)
 	}
 	userUUID, _ = uuid.FromString(userID)
-
-	// user has to be active
-	if err = s.stmtCheckUserActive.QueryRow(userID).
-		Scan(&active); err == sql.ErrNoRows {
-		result.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
-		goto dispatch
-	}
-	if !active {
-		result.Forbidden(fmt.Errorf("User %s (%s) is not active", token.UserName, userID))
-		goto dispatch
-	}
 
 	// change of password or reset of password?
 	switch q.Action {
