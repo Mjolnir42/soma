@@ -88,20 +88,14 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// check if the user exists
-	if cred = s.credentials.read(token.UserName); cred == nil {
-		mr.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName), q.Section)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(fmt.Errorf("Unknown user: %s", token.UserName))
+	// check the user exists and is active
+	if _, err = s.checkUser(token.UserName, mr, logEntry, true); err != nil {
 		return
 	}
 	logEntry = logEntry.WithField(`User`, token.UserName)
 
-	// check if the user is active
-	if !cred.isActive {
-		mr.Forbidden(fmt.Errorf("Inactive user: %s", token.UserName), q.Section)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`User is inactive`)
-		return
-	}
+	// fetch user credentials, checked to exist by checkUser()
+	cred = s.credentials.read(token.UserName)
 
 	// check if the token has either expired or not become valid yet
 	if time.Now().UTC().Before(cred.validFrom.UTC()) ||

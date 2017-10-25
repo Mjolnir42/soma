@@ -92,6 +92,7 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry,
 		userID string
 		active bool
 		err    error
+		cred   *credential
 	)
 
 	// verify the user to activate exists
@@ -134,6 +135,26 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, audit *logrus.Entry,
 		mr.BadRequest(fmt.Errorf(str), mr.Section)
 		audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return ``, mr.Error
+	}
+
+	// if the user should already be active, it should also
+	// be in the credentials cache and active there as well
+	if target {
+		if cred = s.credentials.read(name); cred == nil {
+			str := fmt.Sprintf("Active user not found in credentials"+
+				" cache: %s (%s)", name, userID)
+			mr.ServerError(fmt.Errorf(str), mr.Section)
+			audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+			return ``, mr.Error
+		}
+
+		if !cred.isActive {
+			str := fmt.Sprintf("Active user inactive in credentials"+
+				" cache: %s (%s)", name, userID)
+			mr.ServerError(fmt.Errorf(str), mr.Section)
+			audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+			return ``, mr.Error
+		}
 	}
 
 	return userID, nil
