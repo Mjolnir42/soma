@@ -9,7 +9,6 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -31,7 +30,6 @@ import (
 func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.Entry) {
 
 	var (
-		plain                               []byte
 		err                                 error
 		kex                                 *auth.Kex
 		validFrom, expiresAt, credExpiresAt time.Time
@@ -42,7 +40,6 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 		mcf                                 scrypth64.Mcf
 		tx                                  *sql.Tx
 	)
-	data := q.Super.Encrypted.Data
 
 	if s.readonly {
 		mr.ReadOnly()
@@ -252,43 +249,24 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result, audit *logrus.
 	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
 		token.Salt); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(err)
+		audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	// commit transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(err)
+		audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
-	// TODO: refactor result encryption
-	// encrypt e2e encrypted result
-	plain = []byte{}
-	data = []byte{}
-	if plain, err = json.Marshal(token); err != nil {
-		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(err)
+	// encrypt e2e encrypted result and store it in mr
+	if err = s.encrypt(kex, token, mr, audit); err != nil {
+		mr.ServerError(err, mr.Section)
+		audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
-	if err = kex.EncryptAndEncode(&plain, &data); err != nil {
-		mr.ServerError(err, q.Section)
-		audit.WithField(`Code`, mr.Code).
-			Warningln(err)
-		return
-	}
-
-	// update result for dispatching encrypted result data
-	mr.Super.Verdict = 200
-	mr.Super.Encrypted.Data = data
-	mr.OK()
-	audit.WithField(`Verdict`, mr.Super.Verdict).
-		WithField(`Code`, mr.Code).
-		Infoln(`Successfully activated user`)
+	audit.Infoln(`Successfully activated user`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

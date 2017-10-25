@@ -9,7 +9,6 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -156,31 +155,13 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	}
 
 	// encrypt generated token for client transmission
-	plain := []byte{}
-	data := []byte{}
-	if plain, err = json.Marshal(token); err != nil {
-		mr.ServerError(err)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
-		return
-	}
-	if err = kex.EncryptAndEncode(&plain, &data); err != nil {
-		mr.ServerError(err)
-		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
+	if err = s.encrypt(kex, token, mr, logEntry); err != nil {
+		mr.ServerError(err, q.Section)
+		logEntry.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
-	// prepare result for client transmission
-	mr.Super = msg.Supervisor{
-		Verdict: 200,
-		Encrypted: struct {
-			KexID string
-			Data  []byte
-		}{
-			Data: data,
-		},
-	}
-	logEntry.WithField(`Code`, mr.Super.Verdict).Infoln(`Successfully issued token`)
-	mr.OK()
+	logEntry.Infoln(`Successfully issued token`)
 }
 
 // tokenInvalidateAll invalidates all tokens

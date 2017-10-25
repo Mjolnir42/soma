@@ -75,4 +75,28 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result, audit *logrus.Entry
 	return token, kex, true
 }
 
+// encrypt embeds the encrypted token into mr
+func (s *Supervisor) encrypt(kex *auth.Kex, token *auth.Token, mr *msg.Result, audit *logrus.Entry) error {
+	var plain, data []byte
+	var err error
+
+	// serialize token
+	if plain, err = json.Marshal(token); err != nil {
+		return err
+	}
+
+	// encrypt serialized token
+	if err = kex.EncryptAndEncode(&plain, &data); err != nil {
+		return err
+	}
+
+	// update result for dispatching encrypted result data
+	mr.Super.Verdict = 200
+	mr.Super.Encrypted.Data = data
+	mr.OK()
+	audit = audit.WithField(`Verdict`, mr.Super.Verdict).
+		WithField(`Code`, mr.Code)
+	return nil
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

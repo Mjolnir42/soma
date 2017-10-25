@@ -217,21 +217,13 @@ func (s *Supervisor) userPassword(q *msg.Request) {
 		result.ServerError(err)
 		goto dispatch
 	}
-	// -> sdata = kex.EncryptAndEncode(&token)
-	plain = []byte{}
-	data = []byte{}
-	if plain, err = json.Marshal(token); err != nil {
+
+	// XXX BUG: send auditlog entry
+	if err = s.encrypt(kex, &token, &result, nil); err != nil {
 		result.ServerError(err)
 		goto dispatch
 	}
-	if err = kex.EncryptAndEncode(&plain, &data); err != nil {
-		result.ServerError(err)
-		goto dispatch
-	}
-	// -> send sdata reply
-	result.Super.Verdict = 200
-	result.Super.Encrypted.Data = data
-	result.OK()
+	// XXX BUG: write out auditlog entry
 
 dispatch:
 	<-timer.C

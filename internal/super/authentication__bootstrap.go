@@ -174,26 +174,12 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 	}
 
 	// send encrypted reply
-	plain = []byte{}
-	data = []byte{}
-	if plain, err = json.Marshal(token); err != nil {
-		result.ServerError(err)
+	// XXX BUG: send auditlog entry instead of nil
+	if err = s.encrypt(kex, &token, &result, nil); err != nil {
+		result.ServerError(err, q.Section)
 		goto dispatch
 	}
-	if err = kex.EncryptAndEncode(&plain, &data); err != nil {
-		result.ServerError(err)
-		goto dispatch
-	}
-	result.Super = msg.Supervisor{
-		Verdict: 200,
-		Encrypted: struct {
-			KexID string
-			Data  []byte
-		}{
-			Data: data,
-		},
-	}
-	result.OK()
+	// XXX BUG: write out auditlog entry
 
 dispatch:
 	<-timer.C
