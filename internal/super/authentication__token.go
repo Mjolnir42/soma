@@ -83,14 +83,14 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	// check if root is available
 	if token.UserName == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
 		mr.ServerError(
-			fmt.Errorf(`Restricted-mode root token requested on unrestricted endpoint`))
+			fmt.Errorf(`Restricted-mode root token requested on unrestricted endpoint`), q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Restricted-mode root token requested on unrestricted endpoint`)
 		return
 	}
 
 	// check if the user exists
 	if cred = s.credentials.read(token.UserName); cred == nil {
-		mr.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName))
+		mr.Forbidden(fmt.Errorf("Unknown user: %s", token.UserName), q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(fmt.Errorf("Unknown user: %s", token.UserName))
 		return
 	}
@@ -98,7 +98,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 
 	// check if the user is active
 	if !cred.isActive {
-		mr.Forbidden(fmt.Errorf("Inactive user: %s", token.UserName))
+		mr.Forbidden(fmt.Errorf("Inactive user: %s", token.UserName), q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`User is inactive`)
 		return
 	}
@@ -106,7 +106,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	// check if the token has either expired or not become valid yet
 	if time.Now().UTC().Before(cred.validFrom.UTC()) ||
 		time.Now().UTC().After(cred.expiresAt.UTC()) {
-		mr.Forbidden(fmt.Errorf(`Token expired`))
+		mr.Forbidden(fmt.Errorf(`Token expired`), q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Token expired`)
 		return
 	}
@@ -114,7 +114,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	// generate token if the provided credentials are valid
 	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(cred.cryptMCF, s.key, s.seed); err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
 		return
 	}
@@ -123,7 +123,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
 	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 	if tx, err = s.conn.Begin(); err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Database error`)
 		return
 	}
@@ -136,7 +136,7 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 		validFrom.UTC(),
 		expiresAt.UTC(),
 	); err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(`Database error`)
 		return
 	}
@@ -145,11 +145,11 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	// open
 	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
 		token.Salt); err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		return
 	}
 	if err = tx.Commit(); err != nil {
-		mr.ServerError(err)
+		mr.ServerError(err, q.Section)
 		logEntry.WithField(`Code`, mr.Super.Verdict).Warningln(err)
 		return
 	}
