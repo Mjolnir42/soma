@@ -272,6 +272,11 @@ func (r *Result) UnknownRequest(q *Request) {
 		" %s/%s", q.Section, q.Action))
 }
 
+func (r *Result) UnknownTask(q *Request) {
+	r.NotImplemented(fmt.Errorf("Unknown requested task:"+
+		" %s/%s:%s", q.Section, q.Action, q.Super.Task))
+}
+
 func (r *Result) ReadOnly() {
 	r.Code = 418
 	r.SetError(fmt.Errorf(`Modification request against a readonly server`))
