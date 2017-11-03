@@ -38,9 +38,12 @@ func (s *Supervisor) activate(q *msg.Request) {
 		WithField(`IPAddr`, q.RemoteAddr).
 		WithField(`UserName`, `AnonymousCoward`).
 		WithField(`UserID`, `ffffffff-ffff-ffff-ffff-ffffffffffff`).
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action).
 		WithField(`Code`, result.Code).
 		WithField(`Verdict`, result.Super.Verdict).
-		WithField(`RequestType`, fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task))
+		WithField(`RequestType`, fmt.Sprintf("%s/%s", q.Section, q.Action)).
+		WithField(`Supervisor`, fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task))
 
 	// account activations are master instance functions
 	if s.readonly {

@@ -34,7 +34,10 @@ func (s *Supervisor) token(q *msg.Request) {
 		WithField(`UserID`, `ffffffff-ffff-ffff-ffff-ffffffffffff`).
 		WithField(`Code`, result.Code).
 		WithField(`Verdict`, result.Super.Verdict).
-		WithField(`RequestType`, fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task))
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action).
+		WithField(`RequestType`, fmt.Sprintf("%s/%s", q.Section, q.Action)).
+		WithField(`Supervisor`, fmt.Sprintf("%s/%s:%s", q.Section, q.Action, q.Super.Task))
 
 	// tokenRequest/tokenInvalidate are master instance functions
 	if s.readonly {
