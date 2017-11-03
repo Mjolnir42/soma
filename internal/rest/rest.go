@@ -30,6 +30,7 @@ type Rest struct {
 	isAuthorized func(*msg.Request) bool
 	handlerMap   *soma.HandlerMap
 	conf         *config.Config
+	restricted   bool
 }
 
 // New returns a new REST interface
@@ -40,6 +41,7 @@ func New(
 ) *Rest {
 	x := Rest{}
 	x.isAuthorized = authorizationFunction
+	x.restricted = false
 	x.handlerMap = appHandlerMap
 	x.conf = conf
 	return &x
