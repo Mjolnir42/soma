@@ -42,6 +42,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/super"
+	"github.com/satori/go.uuid"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -54,6 +55,13 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 		ps httprouter.Params) {
 		const basicAuthPrefix string = "Basic "
 		var supervisor *super.Supervisor
+
+		// generate and record the requestID
+		requestID := uuid.NewV4()
+		ps = append(ps, httprouter.Param{
+			Key:   `RequestID`,
+			Value: requestID.String(),
+		})
 
 		// if the supervisor is not available, no requests are accepted
 		if supervisor = x.handlerMap.Get(`supervisor`).(*super.Supervisor); supervisor == nil {
@@ -83,6 +91,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 				if len(pair) == 2 {
 					returnChannel := make(chan msg.Result)
 					supervisor.Input <- msg.Request{
+						ID:         requestID,
 						Section:    msg.SectionSupervisor,
 						Action:     msg.ActionAuthenticate,
 						RemoteAddr: extractAddress(r.RemoteAddr),
