@@ -18,12 +18,26 @@ import (
 func (s *Supervisor) authenticate(q *msg.Request) {
 	var tok *token
 	result := msg.FromRequest(q)
+	result.Code = 401
 	result.Super.Verdict = 401
+
+	// assembly of the auditlog entry
+	audit := s.auditLog.
+		WithField(`RequestID`, q.ID.String()).
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`UserName`, q.Super.BasicAuth.User).
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action).
+		WithField(`Code`, result.Code).
+		WithField(`Verdict`, result.Super.Verdict).
+		WithField(`RequestType`, fmt.Sprintf("%s/%s", q.Section, q.Action)).
+		WithField(`Supervisor`, fmt.Sprintf("%s/%s:%s", msg.SectionSupervisor, msg.ActionAuthenticate, `basicAuth`))
 
 	// basic auth always fails for root if root is disabled
 	if q.Super.BasicAuth.User == `root` && s.rootDisabled {
-		result.Forbidden(
-			fmt.Errorf(`Attempted authentication on disabled root account`))
+		err := fmt.Errorf(`Attempted authentication on disabled root account`)
+		result.Forbidden(err)
+		audit.WithField(`Code`, result.Code).Warningln(err)
 		goto unauthorized
 	}
 
@@ -31,8 +45,9 @@ func (s *Supervisor) authenticate(q *msg.Request) {
 	// the request comes from an unrestricted endpoint. Note: there
 	// are currently no restricted endpoints (https over unix socket)
 	if q.Super.BasicAuth.User == `root` && s.rootRestricted && !q.Super.RestrictedEndpoint {
-		result.Forbidden(
-			fmt.Errorf(`Attempted root authentication on unrestricted endpoint`))
+		err := fmt.Errorf(`Attempted root authentication on unrestricted endpoint`)
+		result.Forbidden(err)
+		audit.WithField(`Code`, result.Code).Warningln(err)
 		goto unauthorized
 	}
 
@@ -40,19 +55,25 @@ func (s *Supervisor) authenticate(q *msg.Request) {
 	if tok == nil && !s.readonly {
 		// rw instance knows every token
 		// 404 is only logged, BasicAuth always replies 401 on error
-		result.NotFound(fmt.Errorf(`Unknown Token (TokenMap)`))
+		err := fmt.Errorf(`Unknown Token: not found in in-memory TokenMap`)
+		result.NotFound(err)
+		audit.WithField(`Code`, result.Code).Warningln(err)
 		goto unauthorized
 	} else if tok == nil {
 		if !s.fetchTokenFromDB(q.Super.BasicAuth.Token) {
 			// 404 is only logged, BasicAuth always replies 401 on error
-			result.NotFound(fmt.Errorf(`Unknown Token (pgSQL)`))
+			err := fmt.Errorf(`Unknown Token: not found in pgSQL database`)
+			result.NotFound(err)
+			audit.WithField(`Code`, result.Code).Warningln(err)
 			goto unauthorized
 		}
 		tok = s.tokens.read(q.Super.BasicAuth.Token)
 	}
 	if time.Now().UTC().Before(tok.validFrom.UTC()) ||
 		time.Now().UTC().After(tok.expiresAt.UTC()) {
-		result.Forbidden(fmt.Errorf(`Token expired`))
+		err := fmt.Errorf(`Authentication failed, token invalid: expired or not valid yet`)
+		result.Unauthorized(err)
+		audit.WithField(`Code`, result.Code).Warningln(err)
 		goto unauthorized
 	}
 
@@ -60,8 +81,13 @@ func (s *Supervisor) authenticate(q *msg.Request) {
 		s.seed, tok.binExpiresAt, tok.salt) {
 		// valid token
 		result.Super.Verdict = 200
+		result.OK()
+		audit.WithField(`Code`, result.Code).
+			WithField(`Verdict`, result.Super.Verdict).
+			Infoln(`Authentication OK`)
+	} else {
+		audit.WithField(`Code`, result.Code).Warningln(`Authentication failed`)
 	}
-	result.OK()
 
 unauthorized:
 	q.Reply <- result
