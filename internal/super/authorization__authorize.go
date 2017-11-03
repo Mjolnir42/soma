@@ -18,6 +18,18 @@ func IsAuthorized(q *msg.Request) bool {
 		return true
 	}
 
+	// assembly of the auditlog entry
+	audit := singleton.auditLog.
+		WithField(`RequestID`, q.ID.String()).
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`UserName`, q.AuthUser).
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action).
+		WithField(`Code`, 403).
+		WithField(`Verdict`, 403).
+		WithField(`RequestType`, fmt.Sprintf("%s/%s", q.Section, q.Action)).
+		WithField(`Supervisor`, fmt.Sprintf("%s/%s:%s", msg.SectionSupervisor, msg.ActionAuthorize, msg.ActionAuthorize))
+
 	// the original request is wrapped because the http handler
 	// is reading from q.Reply
 	returnChannel := make(chan msg.Result)
@@ -32,22 +44,17 @@ func IsAuthorized(q *msg.Request) bool {
 	}
 	result := <-returnChannel
 
-	logEntry := singleton.auditLog.
-		WithField(`Type`, fmt.Sprintf("%s/%s", msg.SectionSupervisor, msg.ActionAuthorize)).
-		WithField(`RequestID`, q.ID.String()).
-		WithField(`Section`, q.Section).
-		WithField(`Action`, q.Action).
-		WithField(`User`, q.AuthUser).
-		WithField(`IPAddr`, q.RemoteAddr).
-		WithField(`Code`, result.Super.Verdict)
-
 	switch result.Super.Verdict {
 	case 200:
 		// the request is authorized
-		logEntry.Infoln(`Request authorized`)
+		audit.WithField(`Code`, result.Code).
+			WithField(`Verdict`, result.Super.Verdict).
+			Infoln(`Request authorized`)
 		return true
 	default:
-		logEntry.Warningln(`Request forbidden`)
+		audit.WithField(`Code`, result.Code).
+			WithField(`Verdict`, result.Super.Verdict).
+			Warningln(`Request forbidden`)
 	}
 
 	return false
