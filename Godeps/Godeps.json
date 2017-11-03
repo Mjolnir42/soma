@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/1and1/soma",
+	"ImportPath": "github.com/mjolnir42/soma",
 	"GoVersion": "go1.7",
 	"GodepVersion": "v74",
 	"Packages": [
