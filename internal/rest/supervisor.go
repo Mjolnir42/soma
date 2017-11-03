@@ -59,6 +59,14 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
+// SupervisorTokenInvalidateGlobal TODO unencrypted admin function
+func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Request,
+	_ httprouter.Params) {
+	defer panicCatcher(w)
+
+	// XXX
+}
+
 // SupervisorBootstrap is the encrypted endpoint used during
 // service setup to access the builtin root account
 func (x *Rest) SupervisorBootstrap(w http.ResponseWriter, r *http.Request,
@@ -104,6 +112,22 @@ func (x *Rest) SupervisorPasswordReset(w http.ResponseWriter, r *http.Request,
 	x.SupervisorEncryptedData(&w, r, &params, `password/reset`)
 }
 
+// SupervisorTokenInvalidateAccount TODO
+func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	x.SupervisorEncryptedData(&w, r, &params, `token/invalidate-account`)
+}
+
+// SupervisorTokenInvalidate TODO
+func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	x.SupervisorEncryptedData(&w, r, &params, `token/invalidate`)
+}
+
 // SupervisorEncryptedData is the generic function for
 // encrypted endpoints
 func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
@@ -146,7 +170,7 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 				KexID string
 				Data  []byte
 			}{
-				KexID: params.ByName(`uuid`),
+				KexID: params.ByName(`kexID`),
 				Data:  data,
 			},
 		},

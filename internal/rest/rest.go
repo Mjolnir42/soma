@@ -55,16 +55,19 @@ func (x *Rest) Run() {
 	router.HEAD(`/authenticate/validate/`, x.Check(x.BasicAuth(x.SupervisorValidate)))
 
 	if !x.conf.ReadOnly {
-		router.POST(`/authenticate/`, x.Check(x.SupervisorKex))
-		router.PUT(`/authenticate/token/:uuid`, x.Check(x.SupervisorTokenRequest))
+		router.POST(`/kex/`, x.Check(x.SupervisorKex))
+		router.PUT(`/tokens/request/:kexID`, x.Check(x.SupervisorTokenRequest))
 
 		if !x.conf.Observer {
+			router.DELETE(`/accounts/tokens/:kexID`, x.Check(x.SupervisorTokenInvalidateAccount))
 			router.DELETE(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtRemove)))
-			router.PATCH(`/authenticate/user/password/:uuid`, x.Check(x.SupervisorPasswordChange))
+			router.DELETE(`/tokens/active/:kexID`, x.Check(x.SupervisorTokenInvalidate))
+			router.DELETE(`/tokens/global`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidateGlobal)))
+			router.PATCH(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordChange))
 			router.POST(`/node/`, x.Check(x.BasicAuth(x.NodeMgmtAdd)))
-			router.PUT(`/authenticate/activate/:uuid`, x.Check(x.SupervisorActivateUser))
-			router.PUT(`/authenticate/bootstrap/:uuid`, x.Check(x.SupervisorBootstrap))
-			router.PUT(`/authenticate/user/password/:uuid`, x.Check(x.SupervisorPasswordReset))
+			router.PUT(`/accounts/activate/:kexID`, x.Check(x.SupervisorActivateUser))
+			router.PUT(`/accounts/bootstrap/:kexID`, x.Check(x.SupervisorBootstrap))
+			router.PUT(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordReset))
 			router.PUT(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtUpdate)))
 		}
 	}

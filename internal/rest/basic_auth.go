@@ -126,6 +126,11 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 							Key:   `AuthenticatedUser`,
 							Value: string(pair[0]),
 						})
+						// record the used token for supervisor:token/invalidate
+						ps = append(ps, httprouter.Param{
+							Key:   `AuthenticatedToken`,
+							Value: string(pair[1]),
+						})
 						// Delegate request to given handle
 						h(w, r, ps)
 						return
