@@ -17,8 +17,8 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-// NodeAdd function
-func (x *Rest) NodeAdd(w http.ResponseWriter, r *http.Request,
+// NodeMgmtAdd function
+func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
@@ -65,8 +65,8 @@ func (x *Rest) NodeAdd(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
-// NodeSync function
-func (x *Rest) NodeSync(w http.ResponseWriter, r *http.Request,
+// NodeMgmtSync function
+func (x *Rest) NodeMgmtSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
@@ -91,8 +91,8 @@ func (x *Rest) NodeSync(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
-// NodeUpdate function
-func (x *Rest) NodeUpdate(w http.ResponseWriter, r *http.Request,
+// NodeMgmtUpdate function
+func (x *Rest) NodeMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
@@ -133,8 +133,8 @@ func (x *Rest) NodeUpdate(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
-// NodeRemove function
-func (x *Rest) NodeRemove(w http.ResponseWriter, r *http.Request,
+// NodeMgmtRemove function
+func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 

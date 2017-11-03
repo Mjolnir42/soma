@@ -51,7 +51,7 @@ func New(
 func (x *Rest) Run() {
 	router := httprouter.New()
 
-	router.GET(`/sync/node/`, x.Check(x.BasicAuth(x.NodeSync)))
+	router.GET(`/sync/node/`, x.Check(x.BasicAuth(x.NodeMgmtSync)))
 	router.HEAD(`/authenticate/validate/`, x.Check(x.BasicAuth(x.SupervisorValidate)))
 
 	if !x.conf.ReadOnly {
@@ -59,13 +59,13 @@ func (x *Rest) Run() {
 		router.PUT(`/authenticate/token/:uuid`, x.Check(x.SupervisorTokenRequest))
 
 		if !x.conf.Observer {
-			router.DELETE(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeRemove)))
+			router.DELETE(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtRemove)))
 			router.PATCH(`/authenticate/user/password/:uuid`, x.Check(x.SupervisorPasswordChange))
-			router.POST(`/node/`, x.Check(x.BasicAuth(x.NodeAdd)))
+			router.POST(`/node/`, x.Check(x.BasicAuth(x.NodeMgmtAdd)))
 			router.PUT(`/authenticate/activate/:uuid`, x.Check(x.SupervisorActivateUser))
 			router.PUT(`/authenticate/bootstrap/:uuid`, x.Check(x.SupervisorBootstrap))
 			router.PUT(`/authenticate/user/password/:uuid`, x.Check(x.SupervisorPasswordReset))
-			router.PUT(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeUpdate)))
+			router.PUT(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtUpdate)))
 		}
 	}
 
