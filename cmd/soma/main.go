@@ -229,11 +229,9 @@ func main() {
 	rst = rest.New(super.IsAuthorized, &hm, &SomaCfg)
 
 	router.HEAD(`/`, Check(Ping))
-	router.HEAD(`/authenticate/validate/`, Check(BasicAuth(AuthenticationValidate)))
 
 	router.GET(`/attributes/:attribute`, Check(BasicAuth(AttributeShow)))
 	router.GET(`/attributes/`, Check(BasicAuth(AttributeList)))
-	router.GET(`/authenticate/validate/`, Check(BasicAuth(AuthenticationValidate)))
 	router.GET(`/buckets/:bucket/instances/`, Check(BasicAuth(InstanceList)))
 	router.GET(`/buckets/:bucket/tree/:tree`, Check(BasicAuth(OutputTree)))
 	router.GET(`/buckets/:bucket`, Check(BasicAuth(BucketShow)))
@@ -354,8 +352,6 @@ func main() {
 	router.POST(`/hostdeployment/:system/:assetid`, Check(HostDeploymentAssemble))
 
 	if !SomaCfg.ReadOnly {
-		router.POST(`/authenticate/`, Check(AuthenticationKex))
-		router.PUT(`/authenticate/token/:uuid`, Check(AuthenticationIssueToken))
 
 		if !SomaCfg.Observer {
 			router.DELETE(`/attributes/:attribute`, Check(BasicAuth(AttributeRemove)))
@@ -397,7 +393,6 @@ func main() {
 			router.GET(`/deployments/id/:uuid`, Check(DeploymentDetailsInstance))
 			router.GET(`/deployments/monitoring/:uuid/:all`, Check(DeploymentDetailsMonitoring))
 			router.GET(`/deployments/monitoring/:uuid`, Check(DeploymentDetailsMonitoring))
-			router.PATCH(`/authenticate/user/password/:uuid`, Check(AuthenticationChangeUserPassword))
 			router.PATCH(`/category/:category/permissions/:permission`, Check(BasicAuth(PermissionEdit)))
 			router.PATCH(`/deployments/id/:uuid/:result`, Check(DeploymentDetailsUpdate))
 			router.PATCH(`/oncall/:oncall`, Check(BasicAuth(OncallUpdate)))
@@ -448,9 +443,6 @@ func main() {
 			router.POST(`/users/`, Check(BasicAuth(UserAdd)))
 			router.POST(`/validity/`, Check(BasicAuth(ValidityAdd)))
 			router.POST(`/views/`, Check(BasicAuth(ViewAdd)))
-			router.PUT(`/authenticate/activate/:uuid`, Check(AuthenticationActivateUser))
-			router.PUT(`/authenticate/bootstrap/:uuid`, Check(AuthenticationBootstrapRoot))
-			router.PUT(`/authenticate/user/password/:uuid`, Check(AuthenticationResetUserPassword))
 			router.PUT(`/datacenters/:datacenter`, Check(BasicAuth(DatacenterRename)))
 			router.PUT(`/entity/:entity`, Check(BasicAuth(EntityRename)))
 			router.PUT(`/environments/:environment`, Check(BasicAuth(EnvironmentRename)))
