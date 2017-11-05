@@ -253,7 +253,7 @@ func (s *Supervisor) process(q *msg.Request) {
 		case msg.ActionActivate:
 			go func() { s.activate(q) }()
 		case msg.ActionPassword:
-			go func() { s.userPassword(q) }()
+			go func() { s.password(q) }()
 		case msg.ActionAuthorize:
 			go func() { s.authorize(q) }()
 		case msg.ActionCacheUpdate:
