@@ -126,6 +126,7 @@ func (s *Supervisor) passwordModify(q *msg.Request, mr *msg.Result) {
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		tx.Rollback()
 		return
 	}
 
