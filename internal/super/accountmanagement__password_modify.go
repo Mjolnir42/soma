@@ -119,7 +119,8 @@ func (s *Supervisor) passwordModify(q *msg.Request, mr *msg.Result) {
 		tx.Rollback()
 		return
 	}
-	if err = s.tokens.insert(token.Token,
+	if err = s.tokens.insert(
+		token.Token,
 		token.ValidFrom,
 		token.ExpiresAt,
 		token.Salt,

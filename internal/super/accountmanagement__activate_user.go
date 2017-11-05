@@ -128,7 +128,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 
 	// TODO: refactor token generation
 	// generate a token for the user. This checks the provided credentials
-	// which always always succeeds since mcf was just computed from token.Password,
+	// which always succeeds since mcf was just computed from token.Password,
 	// but causes a second scrypt computation delay
 	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(mcf, s.key, s.seed); err != nil {
@@ -196,8 +196,8 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 		credExpiresAt.UTC(), mcf)
 
 	// update supervisor private in-memory token store
-	if err = s.tokens.insert(token.Token, token.ValidFrom, token.ExpiresAt,
-		token.Salt); err != nil {
+	if err = s.tokens.insert(token.Token, token.ValidFrom,
+		token.ExpiresAt, token.Salt); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
