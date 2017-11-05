@@ -14,8 +14,11 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/mjolnir42/scrypth64"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/lib/auth"
+	uuid "github.com/satori/go.uuid"
 )
 
 func (s *Supervisor) fetchTokenFromDB(token string) bool {
@@ -175,17 +178,41 @@ func (s *Supervisor) saveToken(tx *sql.Tx, token *auth.Token, mr *msg.Result) bo
 		return false
 	}
 
-	if err = s.tokens.insert(
+	if err := s.tokens.insert(
 		token.Token,
 		token.ValidFrom,
 		token.ExpiresAt,
 		token.Salt,
 	); err != nil {
-		mr.ServerError(err, q.Section)
+		mr.ServerError(err, mr.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return false
 	}
 
+	return true
+}
+
+// saveCred persists newly generated credentials
+func (s *Supervisor) saveCred(tx *sql.Tx, user, subject string, userUUID uuid.UUID, mcf scrypth64.Mcf, validFrom, expiresAt time.Time, mr *msg.Result) bool {
+	// Insert new credentials
+	if s.txInsertCred(
+		tx,
+		userUUID,
+		user,
+		mcf.String(),
+		validFrom,
+		expiresAt,
+		mr,
+	) {
+		return false
+	}
+	s.credentials.insert(
+		user,
+		userUUID,
+		validFrom,
+		expiresAt,
+		mcf,
+	)
 	return true
 }
 

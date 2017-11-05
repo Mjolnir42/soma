@@ -32,7 +32,7 @@ func (s *Supervisor) passwordModify(q *msg.Request, mr *msg.Result) {
 		kex                                   *auth.Kex
 		token                                 *auth.Token
 		tx                                    *sql.Tx
-		validFrom, expiresAt                  time.Time
+		validFrom                             time.Time
 		newCredExpiresAt, oldCredDeactivateAt time.Time
 		userID                                string
 		userUUID                              uuid.UUID
@@ -86,7 +86,6 @@ func (s *Supervisor) passwordModify(q *msg.Request, mr *msg.Result) {
 	}
 
 	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
-	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 
 	// old, changed credentials expire 1 second before the new
 	// token was issued
@@ -110,16 +109,11 @@ func (s *Supervisor) passwordModify(q *msg.Request, mr *msg.Result) {
 	s.credentials.revoke(token.UserName)
 
 	// Insert new credentials
-	if s.txInsertCred(tx, userUUID, msg.SubjectUser, mcf.String(), validFrom.UTC(), newCredExpiresAt, mr) {
+	if !s.saveCred(tx, token.UserName, msg.SubjectUser, userUUID,
+		mcf, validFrom.UTC(), newCredExpiresAt, mr) {
 		tx.Rollback()
 		return
 	}
-	s.credentials.insert(token.UserName,
-		userUUID,
-		validFrom.UTC(),
-		newCredExpiresAt,
-		mcf,
-	)
 
 	// Insert issued token
 	if !s.saveToken(tx, token, mr) {

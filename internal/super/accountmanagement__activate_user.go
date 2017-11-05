@@ -29,15 +29,15 @@ import (
 func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 
 	var (
-		err                                 error
-		kex                                 *auth.Kex
-		validFrom, expiresAt, credExpiresAt time.Time
-		token                               *auth.Token
-		userID                              string
-		userUUID                            uuid.UUID
-		ok                                  bool
-		mcf                                 scrypth64.Mcf
-		tx                                  *sql.Tx
+		err                      error
+		kex                      *auth.Kex
+		validFrom, credExpiresAt time.Time
+		token                    *auth.Token
+		userID                   string
+		userUUID                 uuid.UUID
+		ok                       bool
+		mcf                      scrypth64.Mcf
+		tx                       *sql.Tx
 	)
 
 	// decrypt e2e encrypted request
@@ -140,7 +140,6 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 
 	// prepare data required for storing the user activation
 	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
-	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 	credExpiresAt = validFrom.Add(time.Duration(s.credExpiry) * time.Hour * 24).UTC()
 
 	// open multi statement transaction
@@ -151,17 +150,15 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// persist accepted credentials for the user
-	if _, err = tx.Exec(
-		stmt.SetUserCredential,
-		userUUID,
-		mcf.String(),
-		validFrom.UTC(),
-		credExpiresAt.UTC(),
-	); err != nil {
-		mr.ServerError(err, q.Section)
-		mr.Super.Audit.WithField(`Code`, mr.Code).
-			Warningln(err)
+	// Insert new credentials
+	if !s.saveCred(tx, token.UserName, msg.SubjectUser, userUUID,
+		mcf, validFrom.UTC(), credExpiresAt, mr) {
+		tx.Rollback()
+		return
+	}
+
+	// Insert issued token
+	if !s.saveToken(tx, token, mr) {
 		tx.Rollback()
 		return
 	}
@@ -174,16 +171,6 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
-		tx.Rollback()
-		return
-	}
-
-	// update supervisor private in-memory credentials store
-	s.credentials.insert(token.UserName, userUUID, validFrom.UTC(),
-		credExpiresAt.UTC(), mcf)
-
-	// Insert issued token
-	if !s.saveToken(tx, token, mr) {
 		tx.Rollback()
 		return
 	}

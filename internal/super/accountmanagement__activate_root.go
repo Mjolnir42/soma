@@ -22,13 +22,13 @@ import (
 func (s *Supervisor) activateRoot(q *msg.Request, mr *msg.Result) {
 
 	var (
-		kex                  *auth.Kex
-		err                  error
-		token                *auth.Token
-		mcf                  scrypth64.Mcf
-		tx                   *sql.Tx
-		validFrom, expiresAt time.Time
-		ok                   bool
+		kex       *auth.Kex
+		err       error
+		token     *auth.Token
+		mcf       scrypth64.Mcf
+		tx        *sql.Tx
+		validFrom time.Time
+		ok        bool
 	)
 
 	// decrypt e2e encrypted request
@@ -91,7 +91,6 @@ func (s *Supervisor) activateRoot(q *msg.Request, mr *msg.Result) {
 
 	// prepare data required for storing the user activation
 	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
-	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 
 	// open multi statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
@@ -102,25 +101,11 @@ func (s *Supervisor) activateRoot(q *msg.Request, mr *msg.Result) {
 	}
 
 	// Insert new credentials
-	if s.txInsertCred(
-		tx,
-		uuid.Nil,
-		msg.SubjectRoot,
-		mcf.String(),
-		validFrom.UTC(),
-		msg.PosTimeInf.UTC(),
-		mr,
-	) {
+	if !s.saveCred(tx, msg.SubjectRoot, msg.SubjectRoot, uuid.Nil,
+		mcf, validFrom.UTC(), msg.PosTimeInf.UTC(), mr) {
 		tx.Rollback()
 		return
 	}
-	s.credentials.insert(
-		msg.SubjectRoot,
-		uuid.Nil,
-		validFrom.UTC(),
-		msg.PosTimeInf.UTC(),
-		mcf,
-	)
 
 	// Insert issued token
 	if !s.saveToken(tx, token, mr) {
