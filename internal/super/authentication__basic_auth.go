@@ -51,6 +51,8 @@ func (s *Supervisor) authenticate(q *msg.Request) {
 		goto unauthorized
 	}
 
+	// unknown or incorrect provided hmac authentication token will fail here, since it
+	// will neither be found within the in-memory map or the database
 	tok = s.tokens.read(q.Super.BasicAuth.Token)
 	if tok == nil && !s.readonly {
 		// rw instance knows every token
@@ -69,6 +71,8 @@ func (s *Supervisor) authenticate(q *msg.Request) {
 		}
 		tok = s.tokens.read(q.Super.BasicAuth.Token)
 	}
+
+	// the token hmac does not contain tok.validFrom, only tok.expiresAt, so test both here
 	if time.Now().UTC().Before(tok.validFrom.UTC()) ||
 		time.Now().UTC().After(tok.expiresAt.UTC()) {
 		err := fmt.Errorf(`Authentication failed, token invalid: expired or not valid yet`)
@@ -77,6 +81,9 @@ func (s *Supervisor) authenticate(q *msg.Request) {
 		goto unauthorized
 	}
 
+	// recalculate hmac and compare with the the binary version of the provided token, this
+	// checks that the known token that was provided is used by the correct user and from
+	// the source IP address it was issued to.
 	if auth.VerifyExtracted(q.Super.BasicAuth.User, q.RemoteAddr, tok.binToken, s.key,
 		s.seed, tok.binExpiresAt, tok.salt) {
 		// valid token
