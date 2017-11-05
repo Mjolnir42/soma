@@ -150,7 +150,6 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 			Warningln(err)
 		return
 	}
-	defer tx.Rollback()
 
 	// persist accepted credentials for the user
 	if _, err = tx.Exec(
@@ -163,6 +162,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
+		tx.Rollback()
 		return
 	}
 
@@ -174,6 +174,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
+		tx.Rollback()
 		return
 	}
 
@@ -188,6 +189,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).
 			Warningln(err)
+		tx.Rollback()
 		return
 	}
 
@@ -200,6 +202,7 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 		token.ExpiresAt, token.Salt); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		tx.Rollback()
 		return
 	}
 
