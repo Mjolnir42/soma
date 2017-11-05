@@ -244,8 +244,6 @@ func (s *Supervisor) process(q *msg.Request) {
 		switch q.Action {
 		case msg.ActionKex:
 			go func() { s.kexInit(q) }()
-		case msg.ActionBootstrap:
-			s.bootstrap(q)
 		case msg.ActionAuthenticate:
 			go func() { s.authenticate(q) }()
 		case msg.ActionToken:

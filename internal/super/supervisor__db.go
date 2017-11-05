@@ -29,14 +29,28 @@ func (s *Supervisor) txExpireCred(tx *sql.Tx, at time.Time, user uuid.UUID, mr *
 	return false
 }
 
-func (s *Supervisor) txInsertCred(tx *sql.Tx, user uuid.UUID, mcf string, validFrom, expireAt time.Time, mr *msg.Result) bool {
-	if _, err := tx.Exec(
-		stmt.SetUserCredential,
-		user,
-		mcf,
-		validFrom,
-		expireAt,
-	); err != nil {
+func (s *Supervisor) txInsertCred(tx *sql.Tx, user uuid.UUID, subject, mcf string, validFrom, expireAt time.Time, mr *msg.Result) bool {
+	var err error
+
+	switch subject {
+	case msg.SubjectUser:
+		_, err = tx.Exec(
+			stmt.SetUserCredential,
+			user,
+			mcf,
+			validFrom,
+			expireAt,
+		)
+	case msg.SubjectRoot:
+		_, err = tx.Exec(
+			stmt.SetRootCredentials,
+			user,
+			mcf,
+			validFrom,
+		)
+	}
+
+	if err != nil {
 		mr.ServerError(err, mr.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return true

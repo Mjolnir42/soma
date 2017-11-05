@@ -14,118 +14,106 @@ import (
 
 	"github.com/mjolnir42/scrypth64"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/auth"
 	"github.com/satori/go.uuid"
 )
 
-func (s *Supervisor) bootstrap(q *msg.Request) {
-	result := msg.FromRequest(q)
-	result.Super.Verdict = 401
-	q.Log(s.reqLog)
+// activateRoot handles requests to unlock the root account
+func (s *Supervisor) activateRoot(q *msg.Request, mr *msg.Result) {
 
-	kexID := q.Super.Encrypted.KexID
 	var (
 		kex                  *auth.Kex
 		err                  error
 		token                *auth.Token
-		rootToken            string
 		mcf                  scrypth64.Mcf
 		tx                   *sql.Tx
 		validFrom, expiresAt time.Time
-		timer                *time.Timer
 		ok                   bool
 	)
 
-	// bootstrapRoot is a master instance function
-	if s.readonly {
-		result.ReadOnly()
-		goto returnImmediate
-	}
-
-	// start response timer
-	timer = time.NewTimer(1 * time.Second)
-	defer timer.Stop()
-
-	// check if root is not already active
-	if s.credentials.read(msg.SubjectRoot) != nil {
-		result.Forbidden(fmt.Errorf(`Root account is already active`))
-		// delete kex, this is done
-		s.kex.remove(kexID)
-		goto returnImmediate
-	}
-
 	// decrypt e2e encrypted request
-	if token, kex, ok = s.decrypt(q, &result); !ok {
+	if token, kex, ok = s.decrypt(q, mr); !ok {
 		return
 	}
 
+	// check that the encrypted username is actually root
 	if token.UserName != msg.SubjectRoot {
-		result.Forbidden(nil)
-		goto dispatch
+		mr.BadRequest(fmt.Errorf(`Root activation attempted with`+
+			" account: %s", token.UserName), q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return
 	}
 
+	// update auditlog entry
+	mr.Super.Audit = mr.Super.Audit.
+		WithField(`UserName`, token.UserName).
+		WithField(`UserID`, uuid.Nil.String())
+
+	// check if the request came in on a valid endpoint
 	if s.rootRestricted && !q.Super.RestrictedEndpoint {
-		result.ServerError(fmt.Errorf(
-			`Root bootstrap requested on unrestricted endpoint`))
-		goto dispatch
+		mr.ServerError(fmt.Errorf(
+			`Root bootstrap requested on unrestricted endpoint`),
+			q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return
 	}
 
-	if rootToken, err = s.fetchRootToken(); err != nil {
-		result.ServerError(err)
-		goto dispatch
-	}
-	if token.Token != rootToken || len(token.Password) == 0 {
-		result.Forbidden(nil)
-		goto dispatch
+	// check if root is not already active, which means there are
+	// credentials stored for it
+	if s.credentials.read(msg.SubjectRoot) != nil {
+		mr.Forbidden(fmt.Errorf(`Root account is already active`))
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return
 	}
 
-	// generate password hash that the server will store
+	// verify provided RootToken is correct
+	if !s.authenticateRootToken(token, mr) {
+		return
+	}
+	// OK: validation success
+
+	// calculate the scrypt KDF hash using scrypth64.DefaultParams()
 	if mcf, err = scrypth64.Digest(token.Password, nil); err != nil {
-		result.ServerError(nil)
-		goto dispatch
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
 	}
 
-	// generate a token for the user that can be used for further
-	// requests
+	// generate a token for root. This checks the provided credentials
+	// which always always succeeds since mcf was just computed from
+	// token.Password, but causes a second scrypt computation delay
 	token.SetIPAddressExtractedString(q.RemoteAddr)
 	if err = token.Generate(mcf, s.key, s.seed); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
 	}
+
+	// prepare data required for storing the user activation
 	validFrom, _ = time.Parse(msg.RFC3339Milli, token.ValidFrom)
 	expiresAt, _ = time.Parse(msg.RFC3339Milli, token.ExpiresAt)
 
+	// open multi statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).
+			Warningln(err)
+		return
 	}
-	defer tx.Rollback()
 
-	// insert hashed root password
-	if _, err = tx.Exec(
-		stmt.SetRootCredentials,
+	// Insert new credentials
+	if s.txInsertCred(
+		tx,
 		uuid.Nil,
+		msg.SubjectRoot,
 		mcf.String(),
 		validFrom.UTC(),
-	); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		msg.PosTimeInf.UTC(),
+		mr,
+	) {
+		tx.Rollback()
+		return
 	}
-
-	// insert generated token
-	if _, err = tx.Exec(
-		stmt.InsertToken,
-		token.Token,
-		token.Salt,
-		validFrom.UTC(),
-		expiresAt.UTC(),
-	); err != nil {
-		result.ServerError(err)
-		goto dispatch
-	}
-
-	// update credential store
 	s.credentials.insert(
 		msg.SubjectRoot,
 		uuid.Nil,
@@ -134,34 +122,45 @@ func (s *Supervisor) bootstrap(q *msg.Request) {
 		mcf,
 	)
 
-	// update token store
+	// Insert issued token
+	if s.txInsertToken(
+		tx,
+		token.Token,
+		token.Salt,
+		validFrom.UTC(),
+		expiresAt.UTC(),
+		mr,
+	) {
+		tx.Rollback()
+		return
+	}
 	if err = s.tokens.insert(
 		token.Token,
 		token.ValidFrom,
 		token.ExpiresAt,
 		token.Salt,
 	); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		tx.Rollback()
+		return
 	}
 
+	// commit transaction
 	if err = tx.Commit(); err != nil {
-		result.ServerError(err)
-		goto dispatch
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
 	}
 
-	// send encrypted reply
-	if err = s.encrypt(kex, token, &result); err != nil {
-		result.ServerError(err, q.Section)
-		goto dispatch
+	// encrypt e2e encrypted result and store it in mr
+	if err = s.encrypt(kex, token, mr); err != nil {
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
 	}
-	// XXX BUG: write out auditlog entry
 
-dispatch:
-	<-timer.C
-
-returnImmediate:
-	q.Reply <- result
+	mr.Super.Audit.Infoln(`Successfully activated root account`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

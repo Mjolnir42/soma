@@ -65,8 +65,8 @@ func (x *Rest) Run() {
 			router.DELETE(`/tokens/global`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidateGlobal)))
 			router.PATCH(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordChange))
 			router.POST(`/node/`, x.Check(x.BasicAuth(x.NodeMgmtAdd)))
-			router.PUT(`/accounts/activate/:kexID`, x.Check(x.SupervisorActivateUser))
-			router.PUT(`/accounts/bootstrap/:kexID`, x.Check(x.SupervisorBootstrap))
+			router.PUT(`/accounts/activate/user/:kexID`, x.Check(x.SupervisorActivateUser))
+			router.PUT(`/accounts/activate/root/:kexID`, x.Check(x.SupervisorActivateRoot))
 			router.PUT(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordReset))
 			router.PUT(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtUpdate)))
 		}

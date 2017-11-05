@@ -67,15 +67,6 @@ func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Re
 	// XXX
 }
 
-// SupervisorBootstrap is the encrypted endpoint used during
-// service setup to access the builtin root account
-func (x *Rest) SupervisorBootstrap(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer panicCatcher(w)
-
-	x.SupervisorEncryptedData(&w, r, &params, msg.ActionBootstrap)
-}
-
 // SupervisorTokenRequest is the encrypted endpoint used to
 // request a password token
 func (x *Rest) SupervisorTokenRequest(w http.ResponseWriter, r *http.Request,
@@ -92,6 +83,15 @@ func (x *Rest) SupervisorActivateUser(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	x.SupervisorEncryptedData(&w, r, &params, `activate/user`)
+}
+
+// SupervisorActivateRoot is the encrypted endpoint used to
+// activate the root account using external ownership verification
+func (x *Rest) SupervisorActivateRoot(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	x.SupervisorEncryptedData(&w, r, &params, `activate/root`)
 }
 
 // SupervisorPasswordChange is the encrypted endpoint used
@@ -140,9 +140,6 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 	var action, task string
 	section := msg.SectionSupervisor
 	switch reqType {
-	case msg.ActionBootstrap:
-		action = msg.ActionBootstrap
-		task = msg.TaskNone
 	case `token/request`:
 		action = msg.ActionToken
 		task = msg.TaskRequest
@@ -154,7 +151,10 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 		task = msg.TaskChange
 	case `activate/user`:
 		action = msg.ActionActivate
-		task = msg.TaskUser
+		task = msg.SubjectUser
+	case `activate/root`:
+		action = msg.ActionActivate
+		task = msg.SubjectRoot
 	}
 
 	returnChannel := make(chan msg.Result)

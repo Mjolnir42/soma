@@ -103,7 +103,7 @@ func (s *Supervisor) passwordModify(q *msg.Request, mr *msg.Result) {
 	s.credentials.revoke(token.UserName)
 
 	// Insert new credentials
-	if s.txInsertCred(tx, userUUID, mcf.String(), validFrom.UTC(), newCredExpiresAt, mr) {
+	if s.txInsertCred(tx, userUUID, msg.SubjectUser, mcf.String(), validFrom.UTC(), newCredExpiresAt, mr) {
 		tx.Rollback()
 		return
 	}

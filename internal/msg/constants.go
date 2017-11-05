@@ -164,7 +164,6 @@ const (
 	ActionActivate     = `activate`
 	ActionAuthenticate = `authenticate`
 	ActionAuthorize    = `authorize`
-	ActionBootstrap    = `bootstrap`
 	ActionCacheUpdate  = `cacheupdate`
 	ActionDeactivate   = `deactivate`
 	ActionGC           = `gc`

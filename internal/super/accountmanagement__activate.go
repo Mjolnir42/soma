@@ -58,6 +58,7 @@ func (s *Supervisor) activate(q *msg.Request) {
 
 	// filter requests with invalid task
 	switch q.Super.Task {
+	case msg.SubjectRoot:
 	case msg.SubjectUser:
 	default:
 		result.UnknownTask(q)
@@ -69,6 +70,8 @@ func (s *Supervisor) activate(q *msg.Request) {
 
 	// select correct taskhandler
 	switch q.Super.Task {
+	case msg.SubjectRoot:
+		s.activateRoot(q, &result)
 	case msg.SubjectUser:
 		s.activateUser(q, &result)
 	}
