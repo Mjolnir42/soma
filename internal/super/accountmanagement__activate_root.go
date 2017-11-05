@@ -123,25 +123,7 @@ func (s *Supervisor) activateRoot(q *msg.Request, mr *msg.Result) {
 	)
 
 	// Insert issued token
-	if s.txInsertToken(
-		tx,
-		token.Token,
-		token.Salt,
-		validFrom.UTC(),
-		expiresAt.UTC(),
-		mr,
-	) {
-		tx.Rollback()
-		return
-	}
-	if err = s.tokens.insert(
-		token.Token,
-		token.ValidFrom,
-		token.ExpiresAt,
-		token.Salt,
-	); err != nil {
-		mr.ServerError(err, q.Section)
-		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+	if !s.saveToken(tx, token, mr) {
 		tx.Rollback()
 		return
 	}

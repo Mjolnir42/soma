@@ -178,30 +178,12 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// persist generated token
-	if _, err = tx.Exec(
-		stmt.InsertToken,
-		token.Token,
-		token.Salt,
-		validFrom.UTC(),
-		expiresAt.UTC(),
-	); err != nil {
-		mr.ServerError(err, q.Section)
-		mr.Super.Audit.WithField(`Code`, mr.Code).
-			Warningln(err)
-		tx.Rollback()
-		return
-	}
-
 	// update supervisor private in-memory credentials store
 	s.credentials.insert(token.UserName, userUUID, validFrom.UTC(),
 		credExpiresAt.UTC(), mcf)
 
-	// update supervisor private in-memory token store
-	if err = s.tokens.insert(token.Token, token.ValidFrom,
-		token.ExpiresAt, token.Salt); err != nil {
-		mr.ServerError(err, q.Section)
-		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+	// Insert issued token
+	if !s.saveToken(tx, token, mr) {
 		tx.Rollback()
 		return
 	}

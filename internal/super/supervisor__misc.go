@@ -158,4 +158,35 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, target bool) (string
 	return userID, nil
 }
 
+// saveToken persists a newly generated token
+func (s *Supervisor) saveToken(tx *sql.Tx, token *auth.Token, mr *msg.Result) bool {
+	validFrom, _ := time.Parse(msg.RFC3339Milli, token.ValidFrom)
+	expiresAt, _ := time.Parse(msg.RFC3339Milli, token.ExpiresAt)
+
+	// Insert issued token
+	if s.txInsertToken(
+		tx,
+		token.Token,
+		token.Salt,
+		validFrom.UTC(),
+		expiresAt.UTC(),
+		mr,
+	) {
+		return false
+	}
+
+	if err = s.tokens.insert(
+		token.Token,
+		token.ValidFrom,
+		token.ExpiresAt,
+		token.Salt,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return false
+	}
+
+	return true
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
