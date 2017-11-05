@@ -15,8 +15,42 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/lib/auth"
 	"gopkg.in/ldap.v2"
 )
+
+// authenticateLdap verifies credentials provided in token
+// against LDAP
+func (s *Supervisor) authenticateLdap(token *auth.Token, mr *msg.Result) bool {
+	// check provided password via simple bind
+	if ok, err := validateLdapCredentials(
+		token.UserName,
+		token.Token,
+	); err != nil {
+		mr.ServerError(err, mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return false
+	} else if !ok {
+		mr.Unauthorized(fmt.Errorf(`Invalid LDAP credentials`),
+			mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return false
+	}
+
+	// fail activation if local password is the same as the
+	// upstream password. This error _IS_ sent to the user!
+	if token.Token == token.Password {
+		mr.Conflict(fmt.Errorf(
+			"User %s denied: matching local/upstream passwords",
+			token.UserName), mr.Section)
+		mr.Super.Audit.
+			WithField(`Code`, mr.Code).
+			Warningln(mr.Error)
+		return false
+	}
+	return true
+}
 
 func validateLdapCredentials(user, password string) (bool, error) {
 	var (

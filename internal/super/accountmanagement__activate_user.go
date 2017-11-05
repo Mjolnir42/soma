@@ -66,40 +66,14 @@ func (s *Supervisor) activateUser(q *msg.Request, mr *msg.Result) {
 	mr.Super.Audit = mr.Super.Audit.WithField(`UserID`, userID)
 	userUUID, _ = uuid.FromString(userID)
 
-	// TODO: refactor ownership verification
 	// no account ownership verification in open mode
 	if !s.conf.OpenInstance {
 		switch s.activation {
 		case `ldap`:
-			if ok, err = validateLdapCredentials(
-				token.UserName,
-				token.Token,
-			); err != nil {
-				mr.ServerError(err)
-				mr.Super.Audit.WithField(`Code`, mr.Code).
-					Warningln(err)
-				return
-			} else if !ok {
-				str := `Invalid LDAP credentials`
-
-				mr.Unauthorized(fmt.Errorf(str), q.Section)
-				mr.Super.Audit.WithField(`Code`, mr.Code).
-					Warningln(str)
+			if !s.authenticateLdap(token, mr) {
 				return
 			}
-			// fail activation if local password is the same as the
-			// upstream password. This error _IS_ sent to the user!
-			if token.Token == token.Password {
-				str := fmt.Sprintf(
-					"User %s denied: matching local/upstream passwords",
-					token.UserName)
-
-				mr.Conflict(fmt.Errorf(str), q.Section)
-				mr.Super.Audit.WithField(`Code`, mr.Code).
-					Warningln(str)
-				return
-			}
-		case `token`: // TODO
+		case `token`:
 			str := `Mailtoken activation is not implemented`
 
 			mr.NotImplemented(fmt.Errorf(str), q.Section)
