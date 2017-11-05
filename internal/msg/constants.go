@@ -171,6 +171,7 @@ const (
 	ActionKex          = `kex`
 	ActionPassword     = `password`
 	ActionToken        = `token`
+	TaskBasicAuth      = `basic-auth`
 	TaskChange         = `change`
 	TaskInvalidate     = `invalidate`
 	TaskInvalidateAll  = `invalidate-all`

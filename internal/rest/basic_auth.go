@@ -1,6 +1,6 @@
 /*-
 Copyright (c) 2013 Julien Schmidt. All rights reserved.
-Copyright (c) 2016 Jörg Pernfuß <joerg.pernfuss@1und1.de>
+Copyright (c) 2016-2017 Jörg Pernfuß <joerg.pernfuss@1und1.de>
 
 
 Redistribution and use in source and binary forms, with or without
@@ -98,6 +98,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 						Reply:      returnChannel,
 						Super: &msg.Supervisor{
 							RestrictedEndpoint: false,
+							Task:               msg.TaskBasicAuth,
 							BasicAuth: struct {
 								User  string
 								Token string
