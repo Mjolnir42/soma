@@ -32,7 +32,7 @@ func (s *Supervisor) fetchTokenFromDB(token string) bool {
 	if err == sql.ErrNoRows {
 		return false
 	} else if err != nil {
-		// XXX log error
+		s.errLog.WithField(`Function`, `fetchTokenFromDB`).Errorln(err)
 		return false
 	}
 
