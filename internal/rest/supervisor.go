@@ -59,6 +59,35 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
+// SupervisorTokenInvalidate is the rest endpoint to invalidate
+// the current access token used during BasicAuth
+func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	returnChannel := make(chan msg.Result)
+	request := msg.Request{
+		ID:         requestID(params),
+		Section:    msg.SectionSupervisor,
+		Action:     msg.ActionToken,
+		Reply:      returnChannel,
+		RemoteAddr: extractAddress(r.RemoteAddr),
+		AuthUser:   params.ByName(`AuthenticatedUser`),
+		Super: &msg.Supervisor{
+			Task:      msg.TaskInvalidate,
+			AuthToken: params.ByName(`AuthenticatedToken`),
+		},
+	}
+
+	// authorization to invalidate the token is implicit from being
+	// able to use it for BasicAuth authentication
+
+	handler := x.handlerMap.Get(`supervisor`).(*super.Supervisor)
+	handler.Input <- request
+	result := <-returnChannel
+	sendMsgResult(&w, &result)
+}
+
 // SupervisorTokenInvalidateGlobal TODO unencrypted admin function
 func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Request,
 	_ httprouter.Params) {
@@ -118,14 +147,6 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 	defer panicCatcher(w)
 
 	x.SupervisorEncryptedData(&w, r, &params, `token/invalidate-account`)
-}
-
-// SupervisorTokenInvalidate TODO
-func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer panicCatcher(w)
-
-	x.SupervisorEncryptedData(&w, r, &params, `token/invalidate`)
 }
 
 // SupervisorEncryptedData is the generic function for

@@ -35,6 +35,14 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 	}
 
 	switch r.Section {
+	case msg.SectionSupervisor:
+		switch r.Action {
+		case msg.ActionToken:
+			switch r.Super.Task {
+			case msg.TaskInvalidate:
+				result = proto.NewResult()
+			}
+		}
 	case `kex`:
 		k = r.Super.Kex
 		if bjson, err = json.Marshal(&k); err != nil {

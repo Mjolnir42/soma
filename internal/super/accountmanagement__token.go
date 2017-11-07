@@ -86,11 +86,6 @@ func (s *Supervisor) tokenInvalidateGlobal(q *msg.Request, mr *msg.Result) {
 	// XXX TODO
 }
 
-// tokenInvalidate marks all tokens of a user as invalidate-on-use
-func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result) {
-	// XXX TODO
-}
-
 // tokenInvalidateAccount marks all tokens of a user as invalidate-on-use
 func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 	// XXX TODO
