@@ -32,6 +32,9 @@ func (s *Supervisor) gc() {
 
 	// mark records for garbage collection during the next run
 	s.gcMarkForNext()
+
+	// remove old token expire entries
+	s.tokens.cleanExpireUnlocked()
 }
 
 // gcMarkForNext marks data structures for deletion during the next
