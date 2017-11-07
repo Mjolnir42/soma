@@ -49,7 +49,8 @@ func (s *Supervisor) token(q *msg.Request) {
 	// filter requests with invalid task
 	switch q.Super.Task {
 	case msg.TaskRequest:
-	case msg.TaskInvalidateAll:
+	case msg.TaskInvalidateGlobal:
+	case msg.TaskInvalidateAccount:
 	case msg.TaskInvalidate:
 	default:
 		result.UnknownTask(q)
@@ -61,8 +62,10 @@ func (s *Supervisor) token(q *msg.Request) {
 	switch q.Super.Task {
 	case msg.TaskRequest:
 		s.tokenRequest(q, &result)
-	case msg.TaskInvalidateAll:
-		s.tokenInvalidateAll(q, &result)
+	case msg.TaskInvalidateGlobal:
+		s.tokenInvalidateGlobal(q, &result)
+	case msg.TaskInvalidateAccount:
+		s.tokenInvalidateAccount(q, &result)
 	case msg.TaskInvalidate:
 		s.tokenInvalidate(q, &result)
 	}
@@ -78,13 +81,18 @@ returnImmediate:
 	q.Reply <- result
 }
 
-// tokenInvalidateAll invalidates all tokens
-func (s *Supervisor) tokenInvalidateAll(q *msg.Request, mr *msg.Result) {
+// tokenInvalidateGlobal invalidates all tokens
+func (s *Supervisor) tokenInvalidateGlobal(q *msg.Request, mr *msg.Result) {
 	// XXX TODO
 }
 
 // tokenInvalidate marks all tokens of a user as invalidate-on-use
 func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result) {
+	// XXX TODO
+}
+
+// tokenInvalidateAccount marks all tokens of a user as invalidate-on-use
+func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 	// XXX TODO
 }
 

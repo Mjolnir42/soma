@@ -160,24 +160,25 @@ const (
 // Section supervisor handles AAA requests outside the permission
 // model
 const (
-	SectionSupervisor  = `supervisor`
-	ActionActivate     = `activate`
-	ActionAuthenticate = `authenticate`
-	ActionAuthorize    = `authorize`
-	ActionCacheUpdate  = `cacheupdate`
-	ActionDeactivate   = `deactivate`
-	ActionGC           = `gc`
-	ActionKex          = `kex`
-	ActionPassword     = `password`
-	ActionToken        = `token`
-	TaskBasicAuth      = `basic-auth`
-	TaskChange         = `change`
-	TaskInvalidate     = `invalidate`
-	TaskInvalidateAll  = `invalidate-all`
-	TaskNone           = `none`
-	TaskRequest        = `request`
-	TaskReset          = `reset`
-	TaskUser           = `user`
+	SectionSupervisor     = `supervisor`
+	ActionActivate        = `activate`
+	ActionAuthenticate    = `authenticate`
+	ActionAuthorize       = `authorize`
+	ActionCacheUpdate     = `cacheupdate`
+	ActionDeactivate      = `deactivate`
+	ActionGC              = `gc`
+	ActionKex             = `kex`
+	ActionPassword        = `password`
+	ActionToken           = `token`
+	TaskBasicAuth         = `basic-auth`
+	TaskChange            = `change`
+	TaskInvalidate        = `invalidate`
+	TaskInvalidateAccount = `invalidate-account`
+	TaskInvalidateGlobal  = `invalidate-global`
+	TaskNone              = `none`
+	TaskRequest           = `request`
+	TaskReset             = `reset`
+	TaskUser              = `user`
 )
 
 // Entity types
