@@ -61,7 +61,7 @@ func (x *Rest) Run() {
 		if !x.conf.Observer {
 			router.DELETE(`/accounts/tokens/:kexID`, x.Check(x.SupervisorTokenInvalidateAccount))
 			router.DELETE(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtRemove)))
-			router.DELETE(`/tokens/active/:kexID`, x.Check(x.SupervisorTokenInvalidate))
+			router.DELETE(`/tokens/active`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidate)))
 			router.DELETE(`/tokens/global`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidateGlobal)))
 			router.PATCH(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordChange))
 			router.POST(`/node/`, x.Check(x.BasicAuth(x.NodeMgmtAdd)))
