@@ -30,6 +30,8 @@ type Supervisor struct {
 		User  string
 		Token string
 	}
+	// The active token to be invalidated
+	AuthToken string
 	// Request to be authorized
 	Authorize *Request
 	// AuditLog Entry for this supervisor task
