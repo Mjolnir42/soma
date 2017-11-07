@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016, Jörg Pernfuß
+ * Copyright (c) 2016-2017, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -33,8 +33,10 @@ func (t *token) isExpired() bool {
 // tokenMap is a read/write locked map of tokens
 type tokenMap struct {
 	// token(hex.string) -> token
-	TMap  map[string]token
-	mutex sync.RWMutex
+	TMap map[string]token
+	// username -> revocation time
+	Expire map[string]time.Time
+	mutex  sync.RWMutex
 }
 
 // newTokenMap returns a new tokenMap
@@ -106,6 +108,27 @@ func (t *tokenMap) remove(token string) {
 	delete(t.TMap, token)
 }
 
+// expireAccount marks the account as having all tokens issued
+// until now expired
+func (t *tokenMap) expireAccount(user string) {
+	// acquire write lock
+	t.lock()
+	defer t.unlock()
+
+	t.Expire[user] = time.Now().UTC()
+}
+
+// isExpired returns if and when the tokens for this account have
+// been expired
+func (t *tokenMap) isExpired(user string) (time.Time, bool) {
+	t.rlock()
+	defer t.runlock()
+	if t, ok := t.Expire[user]; ok {
+		return t, ok
+	}
+	return time.Time{}, false
+}
+
 // Garbage collection bulk functions with external locking
 
 // removeUnlock deletes a token from the token map without acquiring the
@@ -140,6 +163,22 @@ func (t *tokenMap) sweepUnlocked() {
 	for id := range t.TMap {
 		if t.TMap[id].gcMark {
 			t.removeUnlocked(id)
+		}
+	}
+}
+
+// cleanExpireUnlocked deletes all account revocation markers that are
+// older than the expiry time the tokens, since all tokens affected by
+// the revocation are no longer valid anyway. It does not acquire the
+// mutex lock. Locking must be done externally.
+func (t *tokenMap) cleanExpireUnlocked() {
+	now := time.Now().UTC()
+	offset := time.Duration(singleton.conf.Auth.TokenExpirySeconds) *
+		time.Second
+
+	for user, expiredAt := range t.Expire {
+		if now.After(expiredAt.UTC().Add(offset)) {
+			delete(t.Expire, user)
 		}
 	}
 }
