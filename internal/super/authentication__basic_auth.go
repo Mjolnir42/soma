@@ -96,6 +96,38 @@ func (s *Supervisor) authenticateBasicAuth(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	// check if the tokens for the user have been revoked
+	if revokedAt, revoked := s.tokens.isExpired(
+		q.Super.BasicAuth.User,
+	); revoked {
+		// token was issued prior to the revocation
+		if tk.validFrom.UTC().Before(revokedAt.UTC()) {
+			// issue invalidate request for this specific token
+			returnChannel := make(chan msg.Result)
+			request := msg.Request{
+				ID:         q.ID,
+				Section:    msg.SectionSupervisor,
+				Action:     msg.ActionToken,
+				Reply:      returnChannel,
+				RemoteAddr: q.RemoteAddr,
+				AuthUser:   q.Super.BasicAuth.User,
+				Super: &msg.Supervisor{
+					Task:      msg.TaskInvalidate,
+					AuthToken: q.Super.BasicAuth.Token,
+				},
+			}
+			s.Input <- request
+			<-returnChannel
+
+			mr.Unauthorized(fmt.Errorf(
+				`Authentication failed, tokens for user are revoked`))
+			mr.Super.Audit.
+				WithField(`Code`, mr.Code).
+				Warningln(mr.Error)
+			return
+		}
+	}
+
 	// the provided hmac token was valid
 	mr.OK()
 	mr.Super.Verdict = 200
