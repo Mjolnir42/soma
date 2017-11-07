@@ -67,6 +67,16 @@ type Result struct {
 }
 
 func FromRequest(rq *Request) Result {
+	if rq.Section == SectionSupervisor && rq.Super != nil {
+		return Result{
+			ID:      rq.ID,
+			Section: rq.Section,
+			Action:  rq.Action,
+			Super: Supervisor{
+				Task: rq.Super.Task,
+			},
+		}
+	}
 	return Result{
 		ID:      rq.ID,
 		Section: rq.Section,
