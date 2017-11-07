@@ -41,9 +41,16 @@ SELECT token,
        valid_until
 FROM   auth.tokens
 WHERE  NOW() < valid_until;`
+
+	// expire a token
+	ExpireToken = `
+UPDATE auth.tokens
+SET    valid_until = $1::timestamptz
+WHERE  token = $1::varchar;`
 )
 
 func init() {
+	m[ExpireToken] = `ExpireToken`
 	m[InsertToken] = `InsertToken`
 	m[LoadAllTokens] = `LoadAllTokens`
 	m[SelectToken] = `SelectToken`
