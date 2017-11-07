@@ -178,6 +178,13 @@ func (r *Result) Forbidden(err error) {
 	}
 }
 
+// NewResult returns a blank proto.Result
+func NewResult() Result {
+	return Result{
+		Errors: &[]string{},
+	}
+}
+
 // Legacy interface
 func (r *Result) ErrorMark(err error, imp bool, found bool,
 	length int, jobid, jobtype string) bool {
