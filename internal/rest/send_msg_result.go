@@ -43,6 +43,16 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 				result = proto.NewResult()
 			}
 		}
+	case msg.SectionSystemOperation:
+		switch r.Action {
+		case msg.ActionRevokeTokens:
+			switch r.Super.Task {
+			case msg.TaskInvalidateAccount:
+				result = proto.NewResult()
+			}
+		}
+
+	// XXX below are legacy definitions
 	case `kex`:
 		k = r.Super.Kex
 		if bjson, err = json.Marshal(&k); err != nil {
