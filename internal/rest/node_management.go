@@ -13,7 +13,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/soma"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -59,8 +58,8 @@ func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
-	handler.Input <- request
+	handler := x.handlerMap.Get(`node_w`)
+	handler.Intake() <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -85,8 +84,8 @@ func (x *Rest) NodeMgmtSync(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`node_r`).(*soma.NodeRead)
-	handler.Input <- request
+	handler := x.handlerMap.Get(`node_r`)
+	handler.Intake() <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -127,8 +126,8 @@ func (x *Rest) NodeMgmtUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
-	handler.Input <- request
+	handler := x.handlerMap.Get(`node_w`)
+	handler.Intake() <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -168,8 +167,8 @@ func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`node_w`).(*soma.NodeWrite)
-	handler.Input <- request
+	handler := x.handlerMap.Get(`node_w`)
+	handler.Intake() <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }

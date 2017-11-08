@@ -13,7 +13,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/lib/auth"
 	"github.com/satori/go.uuid"
 )
@@ -53,8 +52,8 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 		},
 	}
 
-	handler := x.handlerMap.Get(`supervisor`).(*super.Supervisor)
-	handler.Input <- request
+	handler := x.handlerMap.Get(`supervisor`)
+	handler.Intake() <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -82,8 +81,8 @@ func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
 	// authorization to invalidate the token is implicit from being
 	// able to use it for BasicAuth authentication
 
-	handler := x.handlerMap.Get(`supervisor`).(*super.Supervisor)
-	handler.Input <- request
+	handler := x.handlerMap.Get(`supervisor`)
+	handler.Intake() <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -120,8 +119,8 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	handler := x.handlerMap.Get(`supervisor`).(*super.Supervisor)
-	handler.Input <- request
+	handler := x.handlerMap.Get(`supervisor`)
+	handler.Intake() <- request
 	result := <-returnChannel
 	sendMsgResult(&w, &result)
 }
@@ -227,8 +226,8 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 		},
 	}
 
-	handler := x.handlerMap.Get(`supervisor`).(*super.Supervisor)
-	handler.Input <- request
+	handler := x.handlerMap.Get(`supervisor`)
+	handler.Intake() <- request
 	result := <-returnChannel
 	sendMsgResult(w, &result)
 }

@@ -41,7 +41,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/super"
+	"github.com/mjolnir42/soma/internal/soma"
 	"github.com/satori/go.uuid"
 
 	"github.com/julienschmidt/httprouter"
@@ -54,7 +54,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
 		const basicAuthPrefix string = "Basic "
-		var supervisor *super.Supervisor
+		var supervisor soma.Handler
 
 		// generate and record the requestID
 		requestID := uuid.NewV4()
@@ -64,7 +64,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 		})
 
 		// if the supervisor is not available, no requests are accepted
-		if supervisor = x.handlerMap.Get(`supervisor`).(*super.Supervisor); supervisor == nil {
+		if supervisor = x.handlerMap.Get(`supervisor`); supervisor == nil {
 			http.Error(w, `Authentication supervisor not available`,
 				http.StatusServiceUnavailable)
 			return
@@ -90,7 +90,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
 				if len(pair) == 2 {
 					returnChannel := make(chan msg.Result)
-					supervisor.Input <- msg.Request{
+					supervisor.Intake() <- msg.Request{
 						ID:         requestID,
 						Section:    msg.SectionSupervisor,
 						Action:     msg.ActionAuthenticate,
