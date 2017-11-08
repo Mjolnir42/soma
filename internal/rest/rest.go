@@ -55,20 +55,19 @@ func (x *Rest) Run() {
 	router.HEAD(`/authenticate/validate/`, x.Check(x.BasicAuth(x.SupervisorValidate)))
 
 	if !x.conf.ReadOnly {
-		router.POST(`/kex/`, x.Check(x.SupervisorKex))
-		router.PUT(`/tokens/request/:kexID`, x.Check(x.SupervisorTokenRequest))
-
 		if !x.conf.Observer {
 			router.DELETE(`/accounts/tokens/:kexID`, x.Check(x.SupervisorTokenInvalidateAccount))
 			router.DELETE(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtRemove)))
 			router.DELETE(`/tokens/active`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidate)))
 			router.DELETE(`/tokens/global`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidateGlobal)))
 			router.PATCH(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordChange))
+			router.POST(`/kex/`, x.Check(x.SupervisorKex))
 			router.POST(`/node/`, x.Check(x.BasicAuth(x.NodeMgmtAdd)))
 			router.PUT(`/accounts/activate/user/:kexID`, x.Check(x.SupervisorActivateUser))
 			router.PUT(`/accounts/activate/root/:kexID`, x.Check(x.SupervisorActivateRoot))
 			router.PUT(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordReset))
 			router.PUT(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtUpdate)))
+			router.PUT(`/tokens/request/:kexID`, x.Check(x.SupervisorTokenRequest))
 		}
 	}
 
