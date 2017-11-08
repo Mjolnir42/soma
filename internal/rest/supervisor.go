@@ -88,6 +88,14 @@ func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
+// SupervisorTokenInvalidateSelf function
+func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+	defer panicCatcher(w)
+
+	// TODO
+}
+
 // SupervisorTokenInvalidateGlobal TODO unencrypted admin function
 func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Request,
 	_ httprouter.Params) {
