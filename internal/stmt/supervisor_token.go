@@ -25,6 +25,15 @@ INSERT INTO auth.tokens (
     $3::timestamptz,
     $4::timestamptz);`
 
+	// insert the revocation of a users's tokens
+	RevokeTokensForUser = `
+INSERT INTO auth.token_revocations (
+    user_id,
+    revoked_at
+) VALUES (
+    $1::uuid,
+    $2::timestamptz);`
+
 	// lookup a specific token (readonly instances)
 	SelectToken = `
 SELECT salt,
@@ -53,6 +62,7 @@ func init() {
 	m[ExpireToken] = `ExpireToken`
 	m[InsertToken] = `InsertToken`
 	m[LoadAllTokens] = `LoadAllTokens`
+	m[RevokeTokensForUser] = `RevokeTokensForUser`
 	m[SelectToken] = `SelectToken`
 }
 
