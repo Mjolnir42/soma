@@ -138,6 +138,7 @@ const (
 	ActionRepoStop       = `stop-repository`
 	ActionRetry          = `retry`
 	ActionRevoke         = `revoke`
+	ActionRevokeTokens   = `revoke-tokens`
 	ActionSearch         = `search`
 	ActionSearchAll      = `search/all`
 	ActionSearchByAsset  = `search/asset`
