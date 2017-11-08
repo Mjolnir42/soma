@@ -87,12 +87,33 @@ func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
-// SupervisorTokenInvalidateSelf function
+// SupervisorTokenInvalidateSelf is the rest endpoint for all users
+// to invalidate all current access tokens of theirselves
 func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
-	// TODO
+	returnChannel := make(chan msg.Result)
+	request := msg.Request{
+		ID:         requestID(params),
+		Section:    msg.SectionSystemOperation,
+		Action:     msg.ActionRevokeTokens,
+		Reply:      returnChannel,
+		RemoteAddr: extractAddress(r.RemoteAddr),
+		AuthUser:   params.ByName(`AuthenticatedUser`),
+		Super: &msg.Supervisor{
+			Task:            msg.TaskInvalidateAccount,
+			RevokeTokensFor: params.ByName(`AuthenticatedUser`),
+		},
+	}
+
+	// authorization to invalidate all tokens is implicit from being
+	// able to authenticate with this account
+
+	handler := x.handlerMap.Get(`supervisor`)
+	handler.Intake() <- request
+	result := <-returnChannel
+	sendMsgResult(&w, &result)
 }
 
 // SupervisorTokenInvalidateAccount is the rest endpoint for admins
