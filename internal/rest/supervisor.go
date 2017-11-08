@@ -95,7 +95,8 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	// TODO
 }
 
-// SupervisorTokenInvalidateAccount TODO unencrypted admin function
+// SupervisorTokenInvalidateAccount is the rest endpoint for admins
+// to invalidate all current access tokens for another user
 func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)

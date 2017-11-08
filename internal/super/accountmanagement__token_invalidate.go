@@ -9,6 +9,7 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/mjolnir42/soma/internal/msg"
@@ -84,6 +85,79 @@ func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result) {
 		WithField(`Verdict`, mr.Super.Verdict).
 		WithField(`Code`, mr.Code).
 		Infoln(`Successfully revoked token`)
+}
+
+// tokenInvalidateAccount marks all tokens of a user as
+// invalidate-on-use
+func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
+	var (
+		userID, victimID string
+		err              error
+		res              sql.Result
+		cnt              int64
+	)
+
+	// check the user exists and is active, this is for updating
+	// the auditlog only
+	if userID, err = s.checkUser(q.AuthUser, mr, true); err != nil {
+		return
+	}
+
+	// check the user to revoke exists and is active
+	if victimID, err = s.checkUser(
+		q.Super.RevokeTokensFor,
+		mr,
+		true,
+	); err != nil {
+		return
+	}
+
+	// update auditlog entry
+	mr.Super.Audit = mr.Super.Audit.
+		WithField(`UserName`, q.AuthUser).
+		WithField(`UserID`, userID).
+		WithField(`KexID`, `none`)
+
+	// insert revocation into database
+	if res, err = s.conn.Exec(
+		stmt.RevokeTokensForUser,
+		victimID,
+		time.Now().UTC(),
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return
+	}
+
+	// check how many rows were inserted
+	if cnt, err = res.RowsAffected(); err != nil {
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return
+	}
+	switch cnt {
+	case 1:
+	default:
+		mr.ServerError(fmt.Errorf(
+			"Revocation inserted %d rows, expected 1", cnt),
+			q.Section,
+		)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return
+	}
+
+	// add revocation to in-memory map
+	s.tokens.expireAccount(q.Super.RevokeTokensFor)
+
+	mr.Super.Verdict = 200
+	mr.OK()
+	mr.Super.Audit.
+		WithField(`Verdict`, mr.Super.Verdict).
+		WithField(`Code`, mr.Code).
+		Infof(
+			"Successfully marked tokens for %s as revoked",
+			q.Super.RevokeTokensFor,
+		)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
