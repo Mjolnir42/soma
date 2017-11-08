@@ -16,6 +16,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 	"auth": map[int]func(int, string, bool) int{
 		201605060001: upgrade_auth_to_201605150002,
 		201605150002: upgrade_auth_to_201605190001,
+		201605190001: upgrade_auth_to_201711080001,
 	},
 	"soma": map[int]func(int, string, bool) int{
 		201605060001: upgrade_soma_to_201605210001,
@@ -120,6 +121,25 @@ func upgrade_auth_to_201605190001(curr int, tool string, printOnly bool) int {
 	executeUpgrades(stmts, printOnly)
 
 	return 201605190001
+}
+
+func upgrade_auth_to_201711080001(curr int, tool string, printOnly bool) int {
+	if curr != 201605190001 {
+		return 0
+	}
+
+	stmts := []string{
+		`CREATE TABLE IF NOT EXISTS auth.token_revocations ( user_id uuid NOT NULL REFERENCES inventory.users ( user_id ) ON DELETE CASCADE DEFERRABLE, revoked_at timestamptz(3) NOT NULL, CHECK( EXTRACT( TIMEZONE FROM revoked_at ) = '0' ) );`,
+		`INSERT INTO inventory.users ( user_id, user_uid, user_first_name, user_last_name, user_employee_number, user_mail_address, user_is_active, user_is_system, user_is_deleted, organizational_team_id ) VALUES ( 'ffffffff-ffff-ffff-ffff-ffffffffffff', 'AnonymousCoward', 'Anonymous', 'Coward', 9999999999999999, 'devzero@example.com', 'yes', 'yes', 'no', '00000000-0000-0000-0000-000000000000' );`,
+		`CREATE INDEX CONCURRENTLY _token_revocations_user_id ON auth.token_revocations ( user_id );`,
+		`CREATE INDEX CONCURRENTLY _token_revocations_revoked_at ON auth.token_revocations ( revoked_at DESC );`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('auth', 201711080001, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+
+	return 201711080001
 }
 
 func upgrade_soma_to_201605210001(curr int, tool string, printOnly bool) int {
@@ -585,4 +605,4 @@ func getCurrentSchemaVersion(schema string) int {
 	return version
 }
 
-// vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
+// vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix synmaxcol=8000

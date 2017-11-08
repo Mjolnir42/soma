@@ -33,6 +33,29 @@ create table if not exists auth.tokens (
 	queries[idx] = "createTableTokenAuthentication"
 	idx++
 
+	queryMap[`createTableTokenRevocation`] = `
+create table if not exists auth.token_revocations (
+    user_id                     uuid            NOT NULL REFERENCES inventory.users ( user_id ) ON DELETE CASCADE DEFERRABLE,
+    revoked_at                  timestamptz(3)  NOT NULL,
+    CHECK( EXTRACT( TIMEZONE FROM revoked_at ) = '0' )
+);`
+	queries[idx] = `createTableTokenRevocation`
+	idx++
+
+	queryMap[`createIndexTokenRevocationUserID`] = `
+create index _token_revocations_user_id
+    on auth.token_revocations ( user_id )
+;`
+	queries[idx] = `createIndexTokenRevocationUserID`
+	idx++
+
+	queryMap[`createIndexTokenRevocationRevokedAt`] = `
+create index _token_revocations_revoked_at
+    on auth.token_revocations ( revoked_at DESC )
+;`
+	queries[idx] = `createIndexTokenRevocationRevokedAt`
+	idx++
+
 	queryMap["createTableUserKeys"] = `
 create table if not exists auth.user_keys (
     user_id                     uuid            NOT NULL REFERENCES inventory.users ( user_id ) ON DELETE CASCADE DEFERRABLE,

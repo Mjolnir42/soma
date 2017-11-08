@@ -25,7 +25,7 @@ INSERT INTO inventory.organizational_teams (
 	queries[idx] = "insertSystemGroupWheel"
 	idx++
 
-	queryMap["insertSystemUserRoot"] = `
+	queryMap["insertSystemUserRootAndFriends"] = `
 INSERT INTO inventory.users (
             user_id,
             user_uid,
@@ -48,8 +48,20 @@ INSERT INTO inventory.users (
             'yes',
             'no',
             '00000000-0000-0000-0000-000000000000'
+),
+(
+            'ffffffff-ffff-ffff-ffff-ffffffffffff',
+            'AnonymousCoward',
+            'Anonymous',
+            'Coward',
+            9999999999999999,
+            'devzero@example.com',
+            'yes',
+            'yes',
+            'no',
+            '00000000-0000-0000-0000-000000000000'
 );`
-	queries[idx] = "insertSystemUserRoot"
+	queries[idx] = "insertSystemUserRootAndFriends"
 	idx++
 
 	queryMap["insertCategoryOmnipotence"] = `
@@ -230,7 +242,7 @@ INSERT INTO public.schema_versions (
             description
 ) VALUES (
             'auth',
-            201605190001,
+            201711080001,
             'Initial create - somadbctl %s'
 );`, version)
 	queryMap["insertAuthSchemaVersion"] = authString
