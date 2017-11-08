@@ -107,6 +107,11 @@ func (tk *TreeKeeper) Register(c *sql.DB, l ...*logrus.Logger) {
 	// TreeKeeper does not use the global error log
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (tk *TreeKeeper) Intake() chan msg.Request {
+	return tk.Input
+}
+
 // Run is the method a treeKeeper executes in its background
 // go-routine. It checks and handles the input channels and reacts
 // appropriately.

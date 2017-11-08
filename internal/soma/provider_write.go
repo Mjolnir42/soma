@@ -45,6 +45,11 @@ func (w *ProviderWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (w *ProviderWrite) Intake() chan msg.Request {
+	return w.Input
+}
+
 // Run is the event loop for ProviderWrite
 func (w *ProviderWrite) Run() {
 	var err error

@@ -46,6 +46,11 @@ func (w *EntityWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (w *EntityWrite) Intake() chan msg.Request {
+	return w.Input
+}
+
 // Run is the event loop for EntityWrite
 func (w *EntityWrite) Run() {
 	var err error

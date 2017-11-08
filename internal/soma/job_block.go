@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
 )
 
 // JobBlock handles requests to block a client until an asynchronous job
@@ -54,6 +55,13 @@ func (j *JobBlock) Register(c *sql.DB, l ...*logrus.Logger) {
 	j.appLog = l[0]
 	j.reqLog = l[1]
 	j.errLog = l[2]
+}
+
+// Intake exposes a dummy channel required to fulfull the Handler
+// interface
+func (j *JobBlock) Intake() chan msg.Request {
+	c := make(chan msg.Request)
+	return c
 }
 
 // Run is the event loop for JobBlock

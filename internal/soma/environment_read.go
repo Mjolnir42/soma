@@ -46,6 +46,11 @@ func (r *EnvironmentRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (r *EnvironmentRead) Intake() chan msg.Request {
+	return r.Input
+}
+
 // Run is the event loop for EnvironmentRead
 func (r *EnvironmentRead) Run() {
 	var err error

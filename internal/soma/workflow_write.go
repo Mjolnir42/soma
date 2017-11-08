@@ -46,6 +46,11 @@ func (w *WorkflowWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (w *WorkflowWrite) Intake() chan msg.Request {
+	return w.Input
+}
+
 // Run is the event loop for WorkflowWrite
 func (w *WorkflowWrite) Run() {
 	var err error

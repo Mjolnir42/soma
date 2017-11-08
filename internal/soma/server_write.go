@@ -48,6 +48,11 @@ func (w *ServerWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (w *ServerWrite) Intake() chan msg.Request {
+	return w.Input
+}
+
 // Run is the event loop for ServerWrite
 func (w *ServerWrite) Run() {
 	var err error

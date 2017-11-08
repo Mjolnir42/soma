@@ -45,6 +45,11 @@ func (r *PredicateRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (r *PredicateRead) Intake() chan msg.Request {
+	return r.Input
+}
+
 // Run is the event loop for PredicateRead
 func (r *PredicateRead) Run() {
 	var err error

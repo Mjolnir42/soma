@@ -79,6 +79,11 @@ runloop:
 	}
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (r *MonitoringRead) Intake() chan msg.Request {
+	return r.Input
+}
+
 // process is the request dispatcher
 func (r *MonitoringRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)

@@ -50,6 +50,11 @@ func (r *RepositoryRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (r *RepositoryRead) Intake() chan msg.Request {
+	return r.Input
+}
+
 // Run is the event loop for RepositoryRead
 func (r *RepositoryRead) Run() {
 	var err error

@@ -46,6 +46,11 @@ func (w *ViewWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (w *ViewWrite) Intake() chan msg.Request {
+	return w.Input
+}
+
 // Run is the event loop for ViewWrite
 func (w *ViewWrite) Run() {
 	var err error

@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"gopkg.in/resty.v0"
 )
@@ -61,6 +62,13 @@ func (lc *LifeCycle) Register(c *sql.DB, l ...*logrus.Logger) {
 	lc.appLog = l[0]
 	lc.reqLog = l[1]
 	lc.errLog = l[2]
+}
+
+// Intake exposes a dummy channel required to fulfull the Handler
+// interface
+func (lc *LifeCycle) Intake() chan msg.Request {
+	c := make(chan msg.Request)
+	return c
 }
 
 // Run is the loop for LifeCycle

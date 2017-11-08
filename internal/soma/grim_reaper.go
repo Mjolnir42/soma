@@ -54,6 +54,11 @@ func (grim *GrimReaper) Register(c *sql.DB, l ...*logrus.Logger) {
 	grim.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (grim *GrimReaper) Intake() chan msg.Request {
+	return grim.Input
+}
+
 // Run is the event loop for GrimReaper
 func (grim *GrimReaper) Run() {
 	// defer calls stack in LIFO order

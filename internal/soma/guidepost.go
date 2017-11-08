@@ -63,6 +63,11 @@ func (g *GuidePost) Register(c *sql.DB, l ...*logrus.Logger) {
 	g.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (g *GuidePost) Intake() chan msg.Request {
+	return g.Input
+}
+
 // Run is the event loop for GuidePost
 func (g *GuidePost) Run() {
 	var err error

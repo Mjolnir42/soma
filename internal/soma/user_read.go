@@ -47,6 +47,11 @@ func (r *UserRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (r *UserRead) Intake() chan msg.Request {
+	return r.Input
+}
+
 // Run is the event loop for UserRead
 func (r *UserRead) Run() {
 	var err error

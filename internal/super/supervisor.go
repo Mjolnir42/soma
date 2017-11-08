@@ -138,6 +138,11 @@ func (s *Supervisor) RegisterAuditLog(a *logrus.Logger) {
 	s.auditLog = a
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (s *Supervisor) Intake() chan msg.Request {
+	return s.Input
+}
+
 // Run is the event loop for Supervisor
 func (s *Supervisor) Run() {
 	var err error

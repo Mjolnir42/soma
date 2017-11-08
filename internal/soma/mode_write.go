@@ -45,6 +45,11 @@ func (w *ModeWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (w *ModeWrite) Intake() chan msg.Request {
+	return w.Input
+}
+
 // Run is the event loop for ModeWrite
 func (w *ModeWrite) Run() {
 	var err error

@@ -56,6 +56,11 @@ func (f *ForestCustodian) Register(c *sql.DB, l ...*logrus.Logger) {
 	f.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (f *ForestCustodian) Intake() chan msg.Request {
+	return f.Input
+}
+
 // Run is the event loop for ForestCustodian
 func (f *ForestCustodian) Run() {
 	var err error

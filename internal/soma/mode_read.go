@@ -45,6 +45,11 @@ func (r *ModeRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (r *ModeRead) Intake() chan msg.Request {
+	return r.Input
+}
+
 // Run is the event loop for ModeRead
 func (r *ModeRead) Run() {
 	var err error

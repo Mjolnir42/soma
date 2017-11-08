@@ -79,6 +79,11 @@ func (r *TreeRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.errLog = l[2]
 }
 
+// Intake exposes the Input channel as part of the handler interface
+func (r *TreeRead) Intake() chan msg.Request {
+	return r.Input
+}
+
 // Run is the event loop for TreeRead
 func (r *TreeRead) Run() {
 	var err error
