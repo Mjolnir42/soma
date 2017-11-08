@@ -96,6 +96,36 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	// TODO
 }
 
+// SupervisorTokenInvalidateAccount TODO unencrypted admin function
+func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	returnChannel := make(chan msg.Result)
+	request := msg.Request{
+		ID:         requestID(params),
+		Section:    msg.SectionSystemOperation,
+		Action:     msg.ActionRevokeTokens,
+		Reply:      returnChannel,
+		RemoteAddr: extractAddress(r.RemoteAddr),
+		AuthUser:   params.ByName(`AuthenticatedUser`),
+		Super: &msg.Supervisor{
+			Task:            msg.TaskInvalidateAccount,
+			RevokeTokensFor: params.ByName(`account`),
+		},
+	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	handler := x.handlerMap.Get(`supervisor`).(*super.Supervisor)
+	handler.Input <- request
+	result := <-returnChannel
+	sendMsgResult(&w, &result)
+}
+
 // SupervisorTokenInvalidateGlobal TODO unencrypted admin function
 func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Request,
 	_ httprouter.Params) {
@@ -147,14 +177,6 @@ func (x *Rest) SupervisorPasswordReset(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	x.SupervisorEncryptedData(&w, r, &params, `password/reset`)
-}
-
-// SupervisorTokenInvalidateAccount TODO
-func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer panicCatcher(w)
-
-	x.SupervisorEncryptedData(&w, r, &params, `token/invalidate-account`)
 }
 
 // SupervisorEncryptedData is the generic function for

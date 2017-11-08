@@ -269,6 +269,8 @@ func (s *Supervisor) process(q *msg.Request) {
 		s.section(q)
 	case msg.SectionAction:
 		s.action(q)
+	case msg.SectionSystemOperation:
+		s.token(q)
 	}
 }
 
