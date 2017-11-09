@@ -40,7 +40,9 @@ func ActivateAccount(c *resty.Client, a *auth.Token) (*auth.Token, error) {
 		SetHeader(`Content-Type`, `application/octet-stream`).
 		SetBody(*cipher).
 		Put(fmt.Sprintf(
-			"/authenticate/activate/%s", kex.Request.String())); err != nil {
+			"/accounts/activate/user/%s",
+			kex.Request.String()),
+		); err != nil {
 		return nil, err
 	} else if resp.StatusCode() != 200 {
 		return nil, fmt.Errorf("Activation failed: %s[%d], %s", http.StatusText(resp.StatusCode()), resp.StatusCode(), resp.String())

@@ -38,7 +38,7 @@ func ChangeAccountPassword(c *resty.Client, r bool, a *auth.Token) (*auth.Token,
 
 	// Send request
 	path = fmt.Sprintf(
-		"/authenticate/user/password/%s",
+		"/accounts/password/%s",
 		kex.Request.String(),
 	)
 	if r {

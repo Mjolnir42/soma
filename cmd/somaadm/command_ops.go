@@ -127,7 +127,7 @@ Alright. Let's sully that pristine database. Here we go!  `)
 	fmt.Println(adm.GREEN+adm.SUCCESS+adm.CLEAR, ` OK`)
 
 	fmt.Printf(`Initiating key exchange: `)
-	if resp, err = Client.R().SetBody(kex).Post(`/authenticate/`); err != nil {
+	if resp, err = Client.R().SetBody(kex).Post(`/kex/`); err != nil {
 		fmt.Fprintln(os.Stderr, adm.RED+adm.FAILURE+adm.CLEAR, err)
 		os.Exit(1)
 	}
@@ -169,7 +169,9 @@ Alright. Let's sully that pristine database. Here we go!  `)
 		SetHeader(`Content-Type`, `application/octet-stream`).
 		SetBody(*cipher).
 		Put(fmt.Sprintf(
-			"/authenticate/bootstrap/%s", kex.Request.String())); err != nil {
+			"/accounts/activate/root/%s",
+			kex.Request.String()),
+		); err != nil {
 		fmt.Fprintln(os.Stderr, adm.RED+adm.FAILURE+adm.CLEAR, err)
 		os.Exit(1)
 	}

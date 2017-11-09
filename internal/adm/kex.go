@@ -17,7 +17,7 @@ func KeyExchange(c *resty.Client) (*auth.Kex, error) {
 
 	kex = auth.NewKex()
 	kex.SetTimeUTC()
-	if resp, err = c.R().SetBody(kex).Post(`/authenticate/`); err != nil {
+	if resp, err = c.R().SetBody(kex).Post(`/kex/`); err != nil {
 		goto fail
 	} else if resp.StatusCode() != 200 {
 		err = fmt.Errorf("Incorrect response code from SOMA, expected 200, got: %d",

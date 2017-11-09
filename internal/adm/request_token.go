@@ -65,7 +65,7 @@ func RequestToken(c *resty.Client, a *auth.Token) (*auth.Token, error) {
 		SetHeader(`Content-Type`, `application/octet-stream`).
 		SetBody(*cipher).
 		Put(fmt.Sprintf(
-			"/authenticate/token/%s", kex.Request.String())); err != nil {
+			"/tokens/request/%s", kex.Request.String())); err != nil {
 		return nil, err
 	} else if resp.StatusCode() != 200 {
 		return nil, fmt.Errorf("Token request failed with status code: %d", resp.StatusCode())
