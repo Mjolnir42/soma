@@ -7,12 +7,12 @@ import (
 
 	"gopkg.in/resty.v0"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/auth"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerOps(app cli.App) *cli.App {
@@ -192,7 +192,7 @@ Alright. Let's sully that pristine database. Here we go!  `)
 	fmt.Printf(`Validating received token: `)
 	if resp, err = Client.R().
 		SetBasicAuth(`root`, tCred.Token).
-		Get(`/authenticate/validate/`); err != nil || resp.StatusCode() != 204 {
+		Head(`/authenticate/validate`); err != nil || resp.StatusCode() != 204 {
 
 		fmt.Fprintln(os.Stderr, adm.RED+adm.FAILURE+adm.CLEAR+` FAILED`, resp.String())
 		os.Exit(1)

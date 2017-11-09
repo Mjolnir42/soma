@@ -83,7 +83,7 @@ func RequestToken(c *resty.Client, a *auth.Token) (*auth.Token, error) {
 	// validate token
 	if resp, err = c.R().
 		SetBasicAuth(a.UserName, cred.Token).
-		Get(`/authenticate/validate/`); err != nil {
+		Head(`/authenticate/validate`); err != nil {
 		return nil, err
 	} else if resp.StatusCode() != 204 {
 		return nil, fmt.Errorf("Token invalid (Code: %d)", resp.StatusCode())

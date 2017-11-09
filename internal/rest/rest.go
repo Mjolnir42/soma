@@ -52,7 +52,7 @@ func (x *Rest) Run() {
 	router := httprouter.New()
 
 	router.GET(`/sync/node/`, x.Check(x.BasicAuth(x.NodeMgmtSync)))
-	router.HEAD(`/authenticate/validate/`, x.Check(x.BasicAuth(x.SupervisorValidate)))
+	router.HEAD(`/authenticate/validate`, x.Check(x.BasicAuth(x.SupervisorValidate)))
 
 	if !x.conf.ReadOnly {
 		if !x.conf.Observer {

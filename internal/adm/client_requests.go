@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/codegangsta/cli"
+	"github.com/mjolnir42/soma/lib/proto"
 	"gopkg.in/resty.v0"
 )
 
@@ -29,6 +29,8 @@ func Perform(rqType, path, tmpl string, body interface{}, c *cli.Context) error 
 	switch rqType {
 	case `get`:
 		resp, err = GetReq(path)
+	case `head`:
+		resp, err = HeadReq(path)
 	case `delete`:
 		resp, err = DeleteReq(path)
 	case `deletebody`:
@@ -72,6 +74,11 @@ func DeleteReqBody(body interface{}, p string) (*resty.Response, error) {
 // GET
 func GetReq(p string) (*resty.Response, error) {
 	return handleRequestOptions(client.R().Get(p))
+}
+
+// HEAD
+func HeadReq(p string) (*resty.Response, error) {
+	return handleRequestOptions(client.R().Head(p))
 }
 
 // PATCH
