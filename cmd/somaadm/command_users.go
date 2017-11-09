@@ -95,6 +95,12 @@ func registerUsers(app cli.App) *cli.App {
 					},
 				},
 			}, // end users
+			{
+				Name:        `login`,
+				Usage:       `Authenticate with the SOMA middleware`,
+				Description: help.Text(`Login`),
+				Action:      runtime(cmdUserLogin),
+			},
 		}...,
 	)
 	return &app
@@ -482,6 +488,15 @@ password_read:
 		return err
 	}
 	return nil
+}
+
+func cmdUserLogin(c *cli.Context) error {
+	if err := adm.VerifyNoArgument(c); err != nil {
+		return err
+	}
+
+	path := `/authenticate/validate`
+	return adm.Perform(`head`, path, `list`, nil, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
