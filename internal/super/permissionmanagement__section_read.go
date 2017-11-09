@@ -35,6 +35,7 @@ func (s *Supervisor) sectionList(q *msg.Request, mr *msg.Result) {
 
 	if rows, err = s.stmtSectionList.Query(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -45,6 +46,7 @@ func (s *Supervisor) sectionList(q *msg.Request, mr *msg.Result) {
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			return
 		}
 		mr.SectionObj = append(mr.SectionObj, proto.Section{
@@ -54,9 +56,11 @@ func (s *Supervisor) sectionList(q *msg.Request, mr *msg.Result) {
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 func (s *Supervisor) sectionShow(q *msg.Request, mr *msg.Result) {
@@ -76,9 +80,11 @@ func (s *Supervisor) sectionShow(q *msg.Request, mr *msg.Result) {
 		&ts,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	} else if err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mr.SectionObj = append(mr.SectionObj, proto.Section{
@@ -91,6 +97,7 @@ func (s *Supervisor) sectionShow(q *msg.Request, mr *msg.Result) {
 		},
 	})
 	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 func (s *Supervisor) sectionSearch(q *msg.Request, mr *msg.Result) {
@@ -104,6 +111,7 @@ func (s *Supervisor) sectionSearch(q *msg.Request, mr *msg.Result) {
 		q.SectionObj.Name,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -114,6 +122,7 @@ func (s *Supervisor) sectionSearch(q *msg.Request, mr *msg.Result) {
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			return
 		}
 		mr.SectionObj = append(mr.SectionObj, proto.Section{
@@ -123,9 +132,11 @@ func (s *Supervisor) sectionSearch(q *msg.Request, mr *msg.Result) {
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

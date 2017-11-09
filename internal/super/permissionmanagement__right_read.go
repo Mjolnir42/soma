@@ -52,9 +52,11 @@ func (s *Supervisor) rightSearchGlobal(q *msg.Request, mr *msg.Result) {
 		&grantID,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	} else if err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mr.Grant = append(mr.Grant, proto.Grant{
@@ -65,6 +67,7 @@ func (s *Supervisor) rightSearchGlobal(q *msg.Request, mr *msg.Result) {
 		RecipientType: q.Grant.RecipientType,
 	})
 	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
@@ -96,9 +99,11 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
 		&grantID,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	} else if err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mr.Grant = append(mr.Grant, proto.Grant{
@@ -111,6 +116,7 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
 		ObjectId:      q.Grant.ObjectId,
 	})
 	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

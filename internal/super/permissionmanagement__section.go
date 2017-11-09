@@ -13,7 +13,14 @@ import (
 
 func (s *Supervisor) section(q *msg.Request) {
 	result := msg.FromRequest(q)
-	q.Log(s.reqLog)
+
+	// start assembly of auditlog entry
+	result.Super.Audit = s.auditLog.
+		WithField(`RequestID`, q.ID.String()).
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`UserName`, q.AuthUser).
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action)
 
 	switch q.Action {
 	case msg.ActionList, msg.ActionShow, msg.ActionSearch:
@@ -22,6 +29,9 @@ func (s *Supervisor) section(q *msg.Request) {
 		s.sectionWrite(q, &result)
 	default:
 		result.UnknownRequest(q)
+		result.Super.Audit.
+			WithField(`Code`, result.Code).
+			Warningln(result.Error)
 	}
 
 	q.Reply <- result

@@ -35,6 +35,7 @@ func (s *Supervisor) actionList(q *msg.Request, mr *msg.Result) {
 
 	if rows, err = s.stmtActionList.Query(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -46,6 +47,7 @@ func (s *Supervisor) actionList(q *msg.Request, mr *msg.Result) {
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			return
 		}
 		mr.ActionObj = append(mr.ActionObj, proto.Action{
@@ -56,9 +58,11 @@ func (s *Supervisor) actionList(q *msg.Request, mr *msg.Result) {
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 func (s *Supervisor) actionShow(q *msg.Request, mr *msg.Result) {
@@ -81,9 +85,11 @@ func (s *Supervisor) actionShow(q *msg.Request, mr *msg.Result) {
 		&ts,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	} else if err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mr.ActionObj = append(mr.ActionObj, proto.Action{
@@ -98,6 +104,7 @@ func (s *Supervisor) actionShow(q *msg.Request, mr *msg.Result) {
 		},
 	})
 	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 func (s *Supervisor) actionSearch(q *msg.Request, mr *msg.Result) {
@@ -112,6 +119,7 @@ func (s *Supervisor) actionSearch(q *msg.Request, mr *msg.Result) {
 		q.ActionObj.SectionId,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -123,6 +131,7 @@ func (s *Supervisor) actionSearch(q *msg.Request, mr *msg.Result) {
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			return
 		}
 		mr.ActionObj = append(mr.ActionObj, proto.Action{
@@ -133,9 +142,11 @@ func (s *Supervisor) actionSearch(q *msg.Request, mr *msg.Result) {
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -21,6 +21,7 @@ import (
 func (s *Supervisor) categoryWrite(q *msg.Request, mr *msg.Result) {
 	if s.readonly {
 		mr.ReadOnly()
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 
@@ -49,6 +50,7 @@ func (s *Supervisor) categoryAdd(q *msg.Request, mr *msg.Result) {
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -61,6 +63,7 @@ func (s *Supervisor) categoryAdd(q *msg.Request, mr *msg.Result) {
 			err = fmt.Errorf("s.CategoryTx.Prepare(%s) error: %s",
 				name, err.Error())
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			tx.Rollback()
 			return
 		}
@@ -68,11 +71,13 @@ func (s *Supervisor) categoryAdd(q *msg.Request, mr *msg.Result) {
 
 	if res, err = s.categoryAddTx(q, txMap); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
 	// sets r.OK()
 	if !mr.RowCnt(res.RowsAffected()) {
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
@@ -80,10 +85,14 @@ func (s *Supervisor) categoryAdd(q *msg.Request, mr *msg.Result) {
 	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	mr.Category = append(mr.Category, q.Category)
+	mr.Super.Audit.WithField(`Code`, mr.Code).
+		Infoln(fmt.Sprintf(
+			"Successfully added category %s", q.Category.Name))
 }
 
 func (s *Supervisor) categoryAddTx(q *msg.Request,
@@ -132,6 +141,7 @@ func (s *Supervisor) categoryRemove(q *msg.Request, mr *msg.Result) {
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -160,6 +170,7 @@ func (s *Supervisor) categoryRemove(q *msg.Request, mr *msg.Result) {
 			err = fmt.Errorf("s.CategoryTx.Prepare(%s) error: %s",
 				name, err.Error())
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			tx.Rollback()
 			return
 		}
@@ -167,12 +178,14 @@ func (s *Supervisor) categoryRemove(q *msg.Request, mr *msg.Result) {
 
 	if res, err = s.categoryRemoveTx(q, txMap); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
 
 	// sets r.OK()
 	if !mr.RowCnt(res.RowsAffected()) {
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
@@ -180,10 +193,14 @@ func (s *Supervisor) categoryRemove(q *msg.Request, mr *msg.Result) {
 	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	mr.Category = append(mr.Category, q.Category)
+	mr.Super.Audit.WithField(`Code`, mr.Code).
+		Infoln(fmt.Sprintf(
+			"Successfully removed category %s", q.Category.Name))
 }
 
 func (s *Supervisor) categoryRemoveTx(q *msg.Request,

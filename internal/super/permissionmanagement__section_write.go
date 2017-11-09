@@ -19,6 +19,9 @@ import (
 func (s *Supervisor) sectionWrite(q *msg.Request, mr *msg.Result) {
 	if s.readonly {
 		mr.ReadOnly()
+		mr.Super.Audit.
+			WithField(`Code`, mr.Code).
+			Warningln(mr.Error)
 		return
 	}
 
@@ -50,11 +53,16 @@ func (s *Supervisor) sectionAdd(q *msg.Request, mr *msg.Result) {
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.SectionObj = append(mr.SectionObj, q.SectionObj)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(fmt.Sprintf(
+			"Successfully added section %s", q.SectionObj.Name))
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 }
 
 func (s *Supervisor) sectionRemove(q *msg.Request, mr *msg.Result) {
@@ -68,6 +76,7 @@ func (s *Supervisor) sectionRemove(q *msg.Request, mr *msg.Result) {
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -83,6 +92,7 @@ func (s *Supervisor) sectionRemove(q *msg.Request, mr *msg.Result) {
 			err = fmt.Errorf("s.SectionTx.Prepare(%s) error: %s",
 				name, err.Error())
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			tx.Rollback()
 			return
 		}
@@ -91,12 +101,14 @@ func (s *Supervisor) sectionRemove(q *msg.Request, mr *msg.Result) {
 	if res, err = s.sectionRemoveTx(q.SectionObj.Id,
 		txMap); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
 
 	// sets r.OK()
 	if !mr.RowCnt(res.RowsAffected()) {
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
@@ -104,10 +116,15 @@ func (s *Supervisor) sectionRemove(q *msg.Request, mr *msg.Result) {
 	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	mr.ActionObj = append(mr.ActionObj, q.ActionObj)
+	mr.Super.Audit.WithField(`Code`, mr.Code).
+		Infoln(fmt.Sprintf(
+			"Successfully removed section %s", q.SectionObj.Id))
+	return
 }
 
 func (s *Supervisor) sectionRemoveTx(id string,

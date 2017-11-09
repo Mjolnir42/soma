@@ -19,6 +19,7 @@ import (
 func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 	if s.readonly {
 		mr.ReadOnly()
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 
@@ -27,6 +28,7 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 		mr.BadRequest(fmt.Errorf(
 			"Admin accounts can not receive grants"+
 				" in category %s", q.Grant.Category))
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 
@@ -78,6 +80,7 @@ func (s *Supervisor) rightGrantGlobal(q *msg.Request, mr *msg.Result) {
 	if q.Grant.ObjectType != `` || q.Grant.ObjectId != `` {
 		mr.BadRequest(fmt.Errorf(
 			`Invalid global grant specification`))
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 
@@ -108,11 +111,15 @@ func (s *Supervisor) rightGrantGlobal(q *msg.Request, mr *msg.Result) {
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Grant = append(mr.Grant, q.Grant)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 }
 
 func (s *Supervisor) rightGrantRepository(q *msg.Request, mr *msg.Result) {
@@ -138,9 +145,11 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request, mr *msg.Result) {
 			repoName,
 		); err == sql.ErrNoRows {
 			mr.NotFound(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 			return
 		} else if err != nil {
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 			return
 		}
 
@@ -149,10 +158,12 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request, mr *msg.Result) {
 	case msg.EntityGroup, msg.EntityCluster, msg.EntityNode:
 		mr.NotImplemented(fmt.Errorf(
 			`Deep repository grants currently not implemented.`))
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	default:
 		mr.BadRequest(fmt.Errorf(
 			`Invalid repository grant specification`))
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 
@@ -185,11 +196,15 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request, mr *msg.Result) {
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Grant = append(mr.Grant, q.Grant)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 }
 
 func (s *Supervisor) rightGrantTeam(q *msg.Request, mr *msg.Result) {
@@ -223,11 +238,15 @@ func (s *Supervisor) rightGrantTeam(q *msg.Request, mr *msg.Result) {
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Grant = append(mr.Grant, q.Grant)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 }
 
 func (s *Supervisor) rightGrantMonitoring(q *msg.Request, mr *msg.Result) {
@@ -261,11 +280,15 @@ func (s *Supervisor) rightGrantMonitoring(q *msg.Request, mr *msg.Result) {
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Grant = append(mr.Grant, q.Grant)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 }
 
 func (s *Supervisor) rightRevokeGlobal(q *msg.Request, mr *msg.Result) {
@@ -278,11 +301,15 @@ func (s *Supervisor) rightRevokeGlobal(q *msg.Request, mr *msg.Result) {
 		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Grant = append(mr.Grant, q.Grant)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 }
 
 func (s *Supervisor) rightRevokeRepository(q *msg.Request, mr *msg.Result) {
@@ -295,11 +322,15 @@ func (s *Supervisor) rightRevokeRepository(q *msg.Request, mr *msg.Result) {
 		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Grant = append(mr.Grant, q.Grant)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 }
 
 func (s *Supervisor) rightRevokeTeam(q *msg.Request, mr *msg.Result) {
@@ -312,11 +343,15 @@ func (s *Supervisor) rightRevokeTeam(q *msg.Request, mr *msg.Result) {
 		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Grant = append(mr.Grant, q.Grant)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 }
 
 func (s *Supervisor) rightRevokeMonitoring(q *msg.Request, mr *msg.Result) {
@@ -329,11 +364,15 @@ func (s *Supervisor) rightRevokeMonitoring(q *msg.Request, mr *msg.Result) {
 		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Grant = append(mr.Grant, q.Grant)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

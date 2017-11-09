@@ -15,13 +15,23 @@ import (
 
 func (s *Supervisor) right(q *msg.Request) {
 	result := msg.FromRequest(q)
-	q.Log(s.reqLog)
+
+	// start assembly of auditlog entry
+	result.Super.Audit = s.auditLog.
+		WithField(`RequestID`, q.ID.String()).
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`UserName`, q.AuthUser).
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action)
 
 	if q.Grant.RecipientType != msg.SubjectUser {
 		result.NotImplemented(
 			fmt.Errorf("Rights for recipient type"+
 				" %s are currently not implemented",
 				q.Grant.RecipientType))
+		result.Super.Audit.
+			WithField(`Code`, result.Code).
+			Warningln(result.Error)
 		goto dispatch
 	}
 
@@ -32,6 +42,9 @@ func (s *Supervisor) right(q *msg.Request) {
 		s.rightRead(q, &result)
 	default:
 		result.UnknownRequest(q)
+		result.Super.Audit.
+			WithField(`Code`, result.Code).
+			Warningln(result.Error)
 	}
 
 dispatch:

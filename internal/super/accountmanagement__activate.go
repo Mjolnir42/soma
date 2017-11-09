@@ -32,7 +32,7 @@ func (s *Supervisor) activate(q *msg.Request) {
 	timer := time.NewTimer(1 * time.Second)
 
 	// start assembly of auditlog entry
-	result.Super.Audit = singleton.auditLog.
+	result.Super.Audit = s.auditLog.
 		WithField(`RequestID`, q.ID.String()).
 		WithField(`KexID`, q.Super.Encrypted.KexID).
 		WithField(`IPAddr`, q.RemoteAddr).

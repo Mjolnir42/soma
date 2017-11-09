@@ -20,6 +20,7 @@ import (
 func (s *Supervisor) permissionWrite(q *msg.Request, mr *msg.Result) {
 	if s.readonly {
 		mr.ReadOnly()
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 
@@ -36,6 +37,9 @@ func (s *Supervisor) permissionWrite(q *msg.Request, mr *msg.Result) {
 		default:
 			// Omnipotence, System, Typo, ...
 			mr.ServerError(fmt.Errorf(`Illegal category`))
+			mr.Super.Audit.WithField(`Code`, mr.Code).
+				Warningln(mr.Error)
+			return
 		}
 	case msg.ActionRemove:
 		switch q.Permission.Category {
@@ -49,6 +53,9 @@ func (s *Supervisor) permissionWrite(q *msg.Request, mr *msg.Result) {
 		default:
 			// Omnipotence, System, Typo, ...
 			mr.ServerError(fmt.Errorf(`Illegal category`))
+			mr.Super.Audit.WithField(`Code`, mr.Code).
+				Warningln(mr.Error)
+			return
 		}
 	case msg.ActionMap:
 		s.permissionMap(q, mr)
@@ -74,6 +81,7 @@ func (s *Supervisor) permissionAdd(q *msg.Request, mr *msg.Result) {
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -86,6 +94,7 @@ func (s *Supervisor) permissionAdd(q *msg.Request, mr *msg.Result) {
 			err = fmt.Errorf("s.PermissionTx.Prepare(%s) error: %s",
 				name, err.Error())
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			tx.Rollback()
 			return
 		}
@@ -93,11 +102,13 @@ func (s *Supervisor) permissionAdd(q *msg.Request, mr *msg.Result) {
 
 	if res, err = s.permissionAddTx(q, txMap); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
 	// sets r.OK()
 	if !mr.RowCnt(res.RowsAffected()) {
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
@@ -105,10 +116,14 @@ func (s *Supervisor) permissionAdd(q *msg.Request, mr *msg.Result) {
 	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	mr.Permission = append(mr.Permission, q.Permission)
+	mr.Super.Audit.WithField(`Code`, mr.Code).
+		Infoln(fmt.Sprintf(
+			"Successfully added permission %s", q.Permission.Name))
 }
 
 func (s *Supervisor) permissionRemove(q *msg.Request, mr *msg.Result) {
@@ -122,6 +137,7 @@ func (s *Supervisor) permissionRemove(q *msg.Request, mr *msg.Result) {
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -140,6 +156,7 @@ func (s *Supervisor) permissionRemove(q *msg.Request, mr *msg.Result) {
 			err = fmt.Errorf("s.PermissionTx.Prepare(%s) error: %s",
 				name, err.Error())
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			tx.Rollback()
 			return
 		}
@@ -147,11 +164,13 @@ func (s *Supervisor) permissionRemove(q *msg.Request, mr *msg.Result) {
 
 	if res, err = s.permissionRemoveTx(q, txMap); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
 	// sets r.OK()
 	if !mr.RowCnt(res.RowsAffected()) {
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
@@ -159,10 +178,14 @@ func (s *Supervisor) permissionRemove(q *msg.Request, mr *msg.Result) {
 	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	mr.Permission = append(mr.Permission, q.Permission)
+	mr.Super.Audit.WithField(`Code`, mr.Code).
+		Infoln(fmt.Sprintf(
+			"Successfully removed permission %s", q.Permission.Id))
 }
 
 func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
@@ -184,6 +207,7 @@ func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
 		sectionID.Valid = true
 	} else {
 		mr.ServerError(fmt.Errorf(`Nothing to map`), q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	mapID = uuid.NewV4().String()
@@ -196,13 +220,18 @@ func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
 		actionID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	// sets mr.OK()
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Permission = append(mr.Permission, q.Permission)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(
+			`Successfully mapped to permission`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 }
 
 func (s *Supervisor) permissionUnmap(q *msg.Request, mr *msg.Result) {
@@ -223,6 +252,7 @@ func (s *Supervisor) permissionUnmap(q *msg.Request, mr *msg.Result) {
 		sectionID.Valid = true
 	} else {
 		mr.ServerError(fmt.Errorf(`Nothing to map`), q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -233,13 +263,18 @@ func (s *Supervisor) permissionUnmap(q *msg.Request, mr *msg.Result) {
 		actionID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	// sets mr.OK()
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Permission = append(mr.Permission, q.Permission)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(
+			`Successfully unmapped from permission`)
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 }
 
 func (s *Supervisor) permissionAddTx(q *msg.Request,

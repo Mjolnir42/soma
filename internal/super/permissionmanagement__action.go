@@ -13,7 +13,14 @@ import (
 
 func (s *Supervisor) action(q *msg.Request) {
 	result := msg.FromRequest(q)
-	q.Log(s.reqLog)
+
+	// start assembly of auditlog entry
+	result.Super.Audit = s.auditLog.
+		WithField(`RequestID`, q.ID.String()).
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`UserName`, q.AuthUser).
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action)
 
 	switch q.Action {
 	case msg.ActionList, msg.ActionShow, msg.ActionSearch:

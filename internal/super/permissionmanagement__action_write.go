@@ -19,6 +19,7 @@ import (
 func (s *Supervisor) actionWrite(q *msg.Request, mr *msg.Result) {
 	if s.readonly {
 		mr.ReadOnly()
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 		return
 	}
 
@@ -50,11 +51,16 @@ func (s *Supervisor) actionAdd(q *msg.Request, mr *msg.Result) {
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.ActionObj = append(mr.ActionObj, q.ActionObj)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(fmt.Sprintf(
+			"Successfully added action %s", q.ActionObj.Name))
+		return
 	}
+	mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 }
 
 func (s *Supervisor) actionRemove(q *msg.Request, mr *msg.Result) {
@@ -68,6 +74,7 @@ func (s *Supervisor) actionRemove(q *msg.Request, mr *msg.Result) {
 	// open multi-statement transaction
 	if tx, err = s.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
@@ -80,6 +87,7 @@ func (s *Supervisor) actionRemove(q *msg.Request, mr *msg.Result) {
 			err = fmt.Errorf("s.ActionTx.Prepare(%s) error: %s",
 				name, err.Error())
 			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 			tx.Rollback()
 			return
 		}
@@ -88,12 +96,14 @@ func (s *Supervisor) actionRemove(q *msg.Request, mr *msg.Result) {
 	if res, err = s.actionRemoveTx(q.ActionObj.Id,
 		txMap); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
 
 	// sets r.OK()
 	if !mr.RowCnt(res.RowsAffected()) {
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		tx.Rollback()
 		return
 	}
@@ -101,10 +111,14 @@ func (s *Supervisor) actionRemove(q *msg.Request, mr *msg.Result) {
 	// close transaction
 	if err = tx.Commit(); err != nil {
 		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
 
 	mr.ActionObj = append(mr.ActionObj, q.ActionObj)
+	mr.Super.Audit.WithField(`Code`, mr.Code).
+		Infoln(fmt.Sprintf(
+			"Successfully removed action %s", q.ActionObj.Id))
 }
 
 func (s *Supervisor) actionRemoveTx(id string,
