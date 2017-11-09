@@ -101,6 +101,18 @@ func registerUsers(app cli.App) *cli.App {
 				Description: help.Text(`Login`),
 				Action:      runtime(cmdUserLogin),
 			},
+			{
+				Name:        `logout`,
+				Usage:       `Revoke currently used password token`,
+				Action:      runtime(cmdUserLogout),
+				Description: help.Text(`Logout`),
+				Flags: []cli.Flag{
+					cli.BoolFlag{
+						Name:  `all, a`,
+						Usage: `Revoke all active tokens for the account`,
+					},
+				},
+			},
 		}...,
 	)
 	return &app
@@ -497,6 +509,21 @@ func cmdUserLogin(c *cli.Context) error {
 
 	path := `/authenticate/validate`
 	return adm.Perform(`head`, path, `list`, nil, c)
+}
+
+func cmdUserLogout(c *cli.Context) error {
+	if err := adm.VerifyNoArgument(c); err != nil {
+		return err
+	}
+
+	var path string
+	switch c.Bool(`all`) {
+	case true:
+		path = `/tokens/self/all`
+	case false:
+		path = `/tokens/self/active`
+	}
+	return adm.Perform(`delete`, path, `list`, nil, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

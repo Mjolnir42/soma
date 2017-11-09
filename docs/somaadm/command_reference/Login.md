@@ -12,6 +12,8 @@ somaadm login
 
 # PERMISSIONS
 
+This command requires no permissions.
+
 # EXAMPLES
 
 ```
