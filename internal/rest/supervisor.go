@@ -147,12 +147,34 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 	sendMsgResult(&w, &result)
 }
 
-// SupervisorTokenInvalidateGlobal TODO unencrypted admin function
+// SupervisorTokenInvalidateGlobal is the rest endpoint for admins
+// to invalidate all current access tokens
 func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Request,
-	_ httprouter.Params) {
+	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	// XXX
+	returnChannel := make(chan msg.Result)
+	request := msg.Request{
+		ID:         requestID(params),
+		Section:    msg.SectionSystemOperation,
+		Action:     msg.ActionRevokeTokens,
+		Reply:      returnChannel,
+		RemoteAddr: extractAddress(r.RemoteAddr),
+		AuthUser:   params.ByName(`AuthenticatedUser`),
+		Super: &msg.Supervisor{
+			Task: msg.TaskInvalidateGlobal,
+		},
+	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	handler := x.handlerMap.Get(`supervisor`)
+	handler.Intake() <- request
+	result := <-returnChannel
+	sendMsgResult(&w, &result)
 }
 
 // SupervisorTokenRequest is the encrypted endpoint used to

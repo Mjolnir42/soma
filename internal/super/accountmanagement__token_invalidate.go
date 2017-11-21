@@ -160,4 +160,77 @@ func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 		)
 }
 
+// tokenInvalidateGlobal invalidates all tokens
+func (s *Supervisor) tokenInvalidateGlobal(q *msg.Request, mr *msg.Result) {
+	var (
+		userID string
+		err    error
+		res    sql.Result
+		cnt    int64
+	)
+
+	// check the user exists and is active, this is for updating
+	// the auditlog only
+	if userID, err = s.checkUser(q.AuthUser, mr, true); err != nil {
+		return
+	}
+
+	// update auditlog entry
+	mr.Super.Audit = mr.Super.Audit.
+		WithField(`UserName`, q.AuthUser).
+		WithField(`UserID`, userID).
+		WithField(`KexID`, `none`)
+
+	// revocation time for the tokens
+	revokeAt := time.Now().UTC()
+
+	// lock the token map externally once for the entire job
+	s.tokens.lock()
+	defer s.tokens.unlock()
+
+	for tokenID := range s.tokens.iterateStringUnlocked(revokeAt) {
+		// update token in database
+		if res, err = s.conn.Exec(
+			stmt.ExpireToken,
+			revokeAt,
+			tokenID,
+		); err != nil {
+			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+			return
+		}
+
+		// token row has unique constraint
+		if cnt, err = res.RowsAffected(); err != nil {
+			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+			return
+		}
+		switch cnt {
+		case 1:
+		default:
+			// the token to invalidate was not found in the database,
+			// the authentication system is corrupt. HARD crash.
+			s.errLog.Errorln(`Supervisor corrupted, emergency crash. Check supervisor audit log`)
+			mr.Super.Audit.Fatalf("Supervisor corruption detected! "+
+				"Token %s to be invalidated was found in the database %d times!",
+				tokenID,
+				cnt,
+			)
+		}
+
+		// remove the token from the in-memory map. the r/w master instance
+		// has the authoritative copy of all tokens in memory and does
+		// not load them from the database at runtime
+		s.tokens.removeUnlocked(tokenID)
+	}
+
+	mr.Super.Verdict = 200
+	mr.OK()
+	mr.Super.Audit.
+		WithField(`Verdict`, mr.Super.Verdict).
+		WithField(`Code`, mr.Code).
+		Infoln(`Successfully revoked token`)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -141,9 +141,28 @@ func (t *tokenMap) removeUnlocked(token string) {
 // acquiring the mutex lock. Locking must be done externally.
 func (t *tokenMap) iterateUnlocked() chan token {
 	ret := make(chan token, len(t.TMap)+1)
+	defer close(ret)
 
 	for id := range t.TMap {
 		ret <- t.TMap[id]
+	}
+
+	return ret
+}
+
+// iterateStringUnlocked returns all current tokens that expire after
+// revokeAt as strings in a channel without acquiring the mutex lock.
+// Locking must be done externally.
+func (t *tokenMap) iterateStringUnlocked(revokeAt time.Time) chan string {
+	ret := make(chan string, len(t.TMap)+1)
+	defer close(ret)
+
+	for id := range t.TMap {
+		// no need to return tokens that have already expired but have not yet
+		// been garbage collected
+		if revokeAt.Before(t.TMap[id].expiresAt) {
+			ret <- id
+		}
 	}
 
 	return ret
