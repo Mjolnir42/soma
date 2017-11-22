@@ -34,23 +34,17 @@ func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 		serverID = `00000000-0000-0000-0000-000000000000`
 	}
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         requestID(params),
-		Section:    msg.SectionNodeMgmt,
-		Action:     msg.ActionAdd,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Node: proto.Node{
-			AssetId:   cReq.Node.AssetId,
-			Name:      cReq.Node.Name,
-			TeamId:    cReq.Node.TeamId,
-			ServerId:  serverID,
-			State:     `unassigned`,
-			IsOnline:  cReq.Node.IsOnline,
-			IsDeleted: false,
-		},
+	request := newRequest(r, params)
+	request.Section = msg.SectionNodeMgmt
+	request.Action = msg.ActionAdd
+	request.Node = proto.Node{
+		AssetId:   cReq.Node.AssetId,
+		Name:      cReq.Node.Name,
+		TeamId:    cReq.Node.TeamId,
+		ServerId:  serverID,
+		State:     `unassigned`,
+		IsOnline:  cReq.Node.IsOnline,
+		IsDeleted: false,
 	}
 
 	if !x.isAuthorized(&request) {
@@ -60,7 +54,7 @@ func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 
 	handler := x.handlerMap.Get(`node_w`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 
@@ -69,15 +63,9 @@ func (x *Rest) NodeMgmtSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         requestID(params),
-		Section:    msg.SectionNodeMgmt,
-		Action:     msg.ActionSync,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-	}
+	request := newRequest(r, params)
+	request.Section = msg.SectionNodeMgmt
+	request.Action = msg.ActionSync
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -86,7 +74,7 @@ func (x *Rest) NodeMgmtSync(w http.ResponseWriter, r *http.Request,
 
 	handler := x.handlerMap.Get(`node_r`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 
@@ -96,29 +84,22 @@ func (x *Rest) NodeMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	cReq := proto.NewNodeRequest()
-	err := decodeJSONBody(r, &cReq)
-	if err != nil {
+	if err := decodeJSONBody(r, &cReq); err != nil {
 		dispatchBadRequest(&w, err)
 		return
 	}
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         requestID(params),
-		Section:    msg.SectionNodeMgmt,
-		Action:     msg.ActionUpdate,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Node: proto.Node{
-			Id:        cReq.Node.Id,
-			AssetId:   cReq.Node.AssetId,
-			Name:      cReq.Node.Name,
-			TeamId:    cReq.Node.TeamId,
-			ServerId:  cReq.Node.ServerId,
-			IsOnline:  cReq.Node.IsOnline,
-			IsDeleted: cReq.Node.IsDeleted,
-		},
+	request := newRequest(r, params)
+	request.Section = msg.SectionNodeMgmt
+	request.Action = msg.ActionUpdate
+	request.Node = proto.Node{
+		Id:        cReq.Node.Id,
+		AssetId:   cReq.Node.AssetId,
+		Name:      cReq.Node.Name,
+		TeamId:    cReq.Node.TeamId,
+		ServerId:  cReq.Node.ServerId,
+		IsOnline:  cReq.Node.IsOnline,
+		IsDeleted: cReq.Node.IsDeleted,
 	}
 
 	if !x.isAuthorized(&request) {
@@ -128,7 +109,7 @@ func (x *Rest) NodeMgmtUpdate(w http.ResponseWriter, r *http.Request,
 
 	handler := x.handlerMap.Get(`node_w`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 
@@ -148,17 +129,11 @@ func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 		action = msg.ActionPurge
 	}
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         requestID(params),
-		Section:    msg.SectionNodeMgmt,
-		Action:     action,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Node: proto.Node{
-			Id: params.ByName(`nodeID`),
-		},
+	request := newRequest(r, params)
+	request.Section = msg.SectionNodeMgmt
+	request.Action = action
+	request.Node = proto.Node{
+		Id: params.ByName(`nodeID`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -168,7 +143,7 @@ func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 
 	handler := x.handlerMap.Get(`node_w`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 

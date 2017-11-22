@@ -89,26 +89,22 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 			if err == nil {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
 				if len(pair) == 2 {
-					returnChannel := make(chan msg.Result)
-					supervisor.Intake() <- msg.Request{
-						ID:         requestID,
-						Section:    msg.SectionSupervisor,
-						Action:     msg.ActionAuthenticate,
-						RemoteAddr: extractAddress(r.RemoteAddr),
-						Reply:      returnChannel,
-						Super: &msg.Supervisor{
-							RestrictedEndpoint: false,
-							Task:               msg.TaskBasicAuth,
-							BasicAuth: struct {
-								User  string
-								Token string
-							}{
-								User:  string(pair[0]),
-								Token: string(pair[1]),
-							},
+					request := newRequest(r, ps)
+					request.Section = msg.SectionSupervisor
+					request.Action = msg.ActionAuthenticate
+					request.Super = &msg.Supervisor{
+						RestrictedEndpoint: false,
+						Task:               msg.TaskBasicAuth,
+						BasicAuth: struct {
+							User  string
+							Token string
+						}{
+							User:  string(pair[0]),
+							Token: string(pair[1]),
 						},
 					}
-					result := <-returnChannel
+					supervisor.Intake() <- request
+					result := <-request.Reply
 					if result.Error != nil {
 						// log authentication errors
 						log.Printf(msg.LogStrErr,

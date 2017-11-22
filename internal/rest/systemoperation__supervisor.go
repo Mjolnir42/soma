@@ -27,34 +27,34 @@ func (x *Rest) SupervisorValidate(w http.ResponseWriter, _ *http.Request,
 // SupervisorKex is used by the client to initiate a key exchange
 // that can the be used for one of the encrypted endpoints
 func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
-	_ httprouter.Params) {
+	params httprouter.Params) {
 	defer panicCatcher(w)
 
 	kex := auth.Kex{}
-	err := decodeJSONBody(r, &kex)
-	if err != nil {
+	if err := decodeJSONBody(r, &kex); err != nil {
 		dispatchBadRequest(&w, err)
 		return
 	}
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         uuid.NewV4(),
-		Section:    msg.SectionSupervisor,
-		Action:     msg.ActionKex,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Super: &msg.Supervisor{
-			Kex: auth.Kex{
-				Public:               kex.Public,
-				InitializationVector: kex.InitializationVector,
-			},
+	// generate RequestID
+	params = append(params, httprouter.Param{
+		Key:   `RequestID`,
+		Value: uuid.NewV4().String(),
+	})
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionSupervisor
+	request.Action = msg.ActionKex
+	request.Super = &msg.Supervisor{
+		Kex: auth.Kex{
+			Public:               kex.Public,
+			InitializationVector: kex.InitializationVector,
 		},
 	}
 
 	handler := x.handlerMap.Get(`supervisor`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 
@@ -64,18 +64,12 @@ func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         requestID(params),
-		Section:    msg.SectionSupervisor,
-		Action:     msg.ActionToken,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Super: &msg.Supervisor{
-			Task:      msg.TaskInvalidate,
-			AuthToken: params.ByName(`AuthenticatedToken`),
-		},
+	request := newRequest(r, params)
+	request.Section = msg.SectionSupervisor
+	request.Action = msg.ActionToken
+	request.Super = &msg.Supervisor{
+		Task:      msg.TaskInvalidate,
+		AuthToken: params.ByName(`AuthenticatedToken`),
 	}
 
 	// authorization to invalidate the token is implicit from being
@@ -83,7 +77,7 @@ func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
 
 	handler := x.handlerMap.Get(`supervisor`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 
@@ -93,18 +87,12 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         requestID(params),
-		Section:    msg.SectionSupervisor,
-		Action:     msg.ActionRevokeTokens,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Super: &msg.Supervisor{
-			Task:            msg.TaskInvalidateAccount,
-			RevokeTokensFor: params.ByName(`AuthenticatedUser`),
-		},
+	request := newRequest(r, params)
+	request.Section = msg.SectionSupervisor
+	request.Action = msg.ActionRevokeTokens
+	request.Super = &msg.Supervisor{
+		Task:            msg.TaskInvalidateAccount,
+		RevokeTokensFor: params.ByName(`AuthenticatedUser`),
 	}
 
 	// authorization to invalidate all tokens is implicit from being
@@ -112,7 +100,7 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 
 	handler := x.handlerMap.Get(`supervisor`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 
@@ -122,18 +110,12 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         requestID(params),
-		Section:    msg.SectionSystemOperation,
-		Action:     msg.ActionRevokeTokens,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Super: &msg.Supervisor{
-			Task:            msg.TaskInvalidateAccount,
-			RevokeTokensFor: params.ByName(`account`),
-		},
+	request := newRequest(r, params)
+	request.Section = msg.SectionSystemOperation
+	request.Action = msg.ActionRevokeTokens
+	request.Super = &msg.Supervisor{
+		Task:            msg.TaskInvalidateAccount,
+		RevokeTokensFor: params.ByName(`account`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -143,7 +125,7 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 
 	handler := x.handlerMap.Get(`supervisor`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 
@@ -153,17 +135,11 @@ func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Re
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		ID:         requestID(params),
-		Section:    msg.SectionSystemOperation,
-		Action:     msg.ActionRevokeTokens,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Super: &msg.Supervisor{
-			Task: msg.TaskInvalidateGlobal,
-		},
+	request := newRequest(r, params)
+	request.Section = msg.SectionSystemOperation
+	request.Action = msg.ActionRevokeTokens
+	request.Super = &msg.Supervisor{
+		Task: msg.TaskInvalidateGlobal,
 	}
 
 	if !x.isAuthorized(&request) {
@@ -173,7 +149,7 @@ func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Re
 
 	handler := x.handlerMap.Get(`supervisor`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
 
@@ -251,28 +227,24 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 		task = msg.SubjectRoot
 	}
 
-	returnChannel := make(chan msg.Result)
-	request := msg.Request{
-		Section:    section,
-		Action:     action,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Super: &msg.Supervisor{
-			RestrictedEndpoint: x.restricted,
-			Task:               task,
-			Encrypted: struct {
-				KexID string
-				Data  []byte
-			}{
-				KexID: params.ByName(`kexID`),
-				Data:  data,
-			},
+	request := newRequest(r, *params)
+	request.Section = section
+	request.Action = action
+	request.Super = &msg.Supervisor{
+		RestrictedEndpoint: x.restricted,
+		Task:               task,
+		Encrypted: struct {
+			KexID string
+			Data  []byte
+		}{
+			KexID: params.ByName(`kexID`),
+			Data:  data,
 		},
 	}
 
 	handler := x.handlerMap.Get(`supervisor`)
 	handler.Intake() <- request
-	result := <-returnChannel
+	result := <-request.Reply
 	sendMsgResult(w, &result)
 }
 
