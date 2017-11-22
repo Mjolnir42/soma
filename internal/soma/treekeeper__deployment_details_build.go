@@ -388,35 +388,35 @@ deploymentbuilder:
 			// fetch the node object
 			detail.Server = &proto.Server{}
 			detail.Node = &proto.Node{
-				Id: objID,
+				ID: objID,
 			}
 			tk.stmtNode.QueryRow(objID).Scan(
-				&detail.Node.AssetId,
+				&detail.Node.AssetID,
 				&detail.Node.Name,
-				&detail.Node.TeamId,
-				&detail.Node.ServerId,
+				&detail.Node.TeamID,
+				&detail.Node.ServerID,
 				&detail.Node.State,
 				&detail.Node.IsOnline,
 				&detail.Node.IsDeleted,
 				&detail.Bucket,
 				&detail.Environment,
 				&detail.Repository,
-				&detail.Server.AssetId,
+				&detail.Server.AssetID,
 				&detail.Server.Datacenter,
 				&detail.Server.Location,
 				&detail.Server.Name,
 				&detail.Server.IsOnline,
 				&detail.Server.IsDeleted,
 			)
-			detail.Server.Id = detail.Node.ServerId
+			detail.Server.ID = detail.Node.ServerID
 			detail.Datacenter = detail.Server.Datacenter
 			// fetch team information
 			detail.Team = &proto.Team{
-				Id: detail.Node.TeamId,
+				Id: detail.Node.TeamID,
 			}
 			// fetch oncall information if the property is set,
 			// otherwise cleanup detail.Oncall
-			err = tk.stmtNodeOncall.QueryRow(detail.Node.Id, detail.View).Scan(
+			err = tk.stmtNodeOncall.QueryRow(detail.Node.ID, detail.View).Scan(
 				&detail.Oncall.Id,
 				&detail.Oncall.Name,
 				&detail.Oncall.Number,
@@ -450,7 +450,7 @@ deploymentbuilder:
 			}
 			// fetch system properties
 			detail.Properties = &[]proto.PropertySystem{}
-			nSysProps, _ = tk.stmtNodeSysProp.Query(detail.Node.Id, detail.View)
+			nSysProps, _ = tk.stmtNodeSysProp.Query(detail.Node.ID, detail.View)
 			defer nSysProps.Close()
 
 			for nSysProps.Next() {
@@ -470,7 +470,7 @@ deploymentbuilder:
 			}
 			// fetch custom properties
 			detail.CustomProperties = &[]proto.PropertyCustom{}
-			nCustProps, _ = tk.stmtNodeCustProp.Query(detail.Node.Id, detail.View)
+			nCustProps, _ = tk.stmtNodeCustProp.Query(detail.Node.ID, detail.View)
 			defer nCustProps.Close()
 
 			for nCustProps.Next() {

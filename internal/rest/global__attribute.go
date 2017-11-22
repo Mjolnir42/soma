@@ -25,7 +25,7 @@ func (x *Rest) AttributeList(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionList
 	request.ActionObj = proto.Action{
-		SectionId: params.ByName(`section`),
+		SectionID: params.ByName(`section`),
 	}
 
 	if !x.isAuthorized(&request) {

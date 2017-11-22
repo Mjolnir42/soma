@@ -10,11 +10,11 @@
 package proto
 
 type Node struct {
-	Id         string      `json:"id,omitempty"`
-	AssetId    uint64      `json:"assetId,omitempty"`
+	ID         string      `json:"id,omitempty"`
+	AssetID    uint64      `json:"assetID,omitempty"`
 	Name       string      `json:"name,omitempty"`
-	TeamId     string      `json:"teamId,omitempty"`
-	ServerId   string      `json:"serverId,omitempty"`
+	TeamID     string      `json:"teamID,omitempty"`
+	ServerID   string      `json:"serverID,omitempty"`
 	State      string      `json:"state,omitempty"`
 	IsOnline   bool        `json:"isOnline,omitempty"`
 	IsDeleted  bool        `json:"isDeleted,omitempty"`
@@ -23,10 +23,27 @@ type Node struct {
 	Properties *[]Property `json:"properties,omitempty"`
 }
 
+func (p *Node) Clone() Node {
+	clone := Node{
+		ID:        p.ID,
+		AssetID:   p.AssetID,
+		Name:      p.Name,
+		TeamID:    p.TeamID,
+		ServerID:  p.ServerID,
+		State:     p.State,
+		IsOnline:  p.IsOnline,
+		IsDeleted: p.IsDeleted,
+		Details:   p.Details.Clone(),
+	}
+	// XXX Config
+	// XXX Properties
+	return clone
+}
+
 type NodeFilter struct {
 	Name       string `json:"name,omitempty"`
-	TeamId     string `json:"teamId,omitempty"`
-	ServerId   string `json:"serverId,omitempty"`
+	TeamID     string `json:"teamID,omitempty"`
+	ServerID   string `json:"serverID,omitempty"`
 	IsOnline   bool   `json:"isOnline,omitempty"`
 	NotOnline  bool   `json:"notOnline,omitempty"`
 	Deleted    bool   `json:"isDeleted,omitempty"`
@@ -39,18 +56,18 @@ type NodeFilter struct {
 }
 
 type NodeConfig struct {
-	RepositoryId string `json:"repositoryId,omitempty"`
-	BucketId     string `json:"bucketId,omitempty"`
+	RepositoryID string `json:"repositoryID,omitempty"`
+	BucketID     string `json:"bucketID,omitempty"`
 }
 
-//
+// DeepCompare function
 func (p *Node) DeepCompare(a *Node) bool {
 	if a == nil {
 		return false
 	}
 
-	if p.Id != a.Id || p.AssetId != a.AssetId || p.Name != a.Name ||
-		p.TeamId != a.TeamId || p.ServerId != a.ServerId || p.State != a.State ||
+	if p.ID != a.ID || p.AssetID != a.AssetID || p.Name != a.Name ||
+		p.TeamID != a.TeamID || p.ServerID != a.ServerID || p.State != a.State ||
 		p.IsOnline != a.IsOnline || p.IsDeleted != a.IsDeleted {
 		return false
 	}

@@ -216,9 +216,9 @@ func (s *Supervisor) permissionShowTx(q *msg.Request,
 			return proto.Permission{}, err
 		}
 		*perm.Actions = append(*perm.Actions, proto.Action{
-			Id:          actionID,
+			ID:          actionID,
 			Name:        actionName,
-			SectionId:   sectionID,
+			SectionID:   sectionID,
 			SectionName: sectionName,
 			Category:    category,
 		})

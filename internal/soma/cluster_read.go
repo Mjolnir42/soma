@@ -251,7 +251,7 @@ func (r *ClusterRead) memberList(q *msg.Request, mr *msg.Result) {
 		}
 		cluster.Name = clusterName
 		*cluster.Members = append(*cluster.Members, proto.Node{
-			Id:   memberNodeID,
+			ID:   memberNodeID,
 			Name: memberNodeName,
 		})
 	}

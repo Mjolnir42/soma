@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerClusters(app cli.App) *cli.App {
@@ -337,10 +337,10 @@ func cmdClusterMemberAdd(c *cli.Context) error {
 
 	req := proto.Request{}
 	conf := proto.NodeConfig{
-		BucketId: bucketId,
+		BucketID: bucketId,
 	}
 	node := proto.Node{
-		Id:     nodeId,
+		ID:     nodeId,
 		Config: &conf,
 	}
 	req.Cluster = &proto.Cluster{

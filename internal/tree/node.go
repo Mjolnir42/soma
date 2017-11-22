@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -249,16 +249,16 @@ func (ten *Node) ClearLoadInfo() {
 func (ten *Node) export() proto.Node {
 	bucket := ten.Parent.(Bucketeer).GetBucket()
 	return proto.Node{
-		Id:        ten.Id.String(),
-		AssetId:   ten.AssetId,
+		ID:        ten.Id.String(),
+		AssetID:   ten.AssetId,
 		Name:      ten.Name,
-		TeamId:    ten.Team.String(),
-		ServerId:  ten.ServerId.String(),
+		TeamID:    ten.Team.String(),
+		ServerID:  ten.ServerId.String(),
 		State:     ten.State,
 		IsOnline:  ten.Online,
 		IsDeleted: ten.Deleted,
 		Config: &proto.NodeConfig{
-			BucketId: bucket.(Builder).GetID(),
+			BucketID: bucket.(Builder).GetID(),
 		},
 	}
 }

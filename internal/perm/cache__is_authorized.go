@@ -62,8 +62,8 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	); action == nil {
 		goto dispatch
 	} else {
-		sectionID = action.SectionId
-		actionID = action.Id
+		sectionID = action.SectionID
+		actionID = action.ID
 	}
 
 	// check if the user has the correct system permission
@@ -159,7 +159,7 @@ permloop:
 			case `property_service_team`:
 				objID = q.Property.Service.TeamId
 			case `node`:
-				objID = q.Node.TeamId
+				objID = q.Node.TeamID
 			case `repository`, `instance`, `node-config`,
 				`property_custom`:
 				objID = q.Repository.Id

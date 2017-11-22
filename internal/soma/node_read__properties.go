@@ -24,7 +24,7 @@ func (r *NodeRead) oncallProperties(node *proto.Node) error {
 	)
 
 	if rows, err = r.stmtPropOncall.Query(
-		node.Id,
+		node.ID,
 	); err != nil {
 		return err
 	}
@@ -42,8 +42,8 @@ func (r *NodeRead) oncallProperties(node *proto.Node) error {
 		}
 		*node.Properties = append(*node.Properties, proto.Property{
 			Type:             `oncall`,
-			RepositoryId:     node.Config.RepositoryId,
-			BucketId:         node.Config.BucketId,
+			RepositoryId:     node.Config.RepositoryID,
+			BucketId:         node.Config.BucketID,
 			InstanceId:       instanceID,
 			SourceInstanceId: sourceInstanceID,
 			View:             view,
@@ -67,7 +67,7 @@ func (r *NodeRead) serviceProperties(node *proto.Node) error {
 	)
 
 	if rows, err = r.stmtPropService.Query(
-		node.Id,
+		node.ID,
 	); err != nil {
 		return err
 	}
@@ -84,8 +84,8 @@ func (r *NodeRead) serviceProperties(node *proto.Node) error {
 		}
 		*node.Properties = append(*node.Properties, proto.Property{
 			Type:             `service`,
-			RepositoryId:     node.Config.RepositoryId,
-			BucketId:         node.Config.BucketId,
+			RepositoryId:     node.Config.RepositoryID,
+			BucketId:         node.Config.BucketID,
 			InstanceId:       instanceID,
 			SourceInstanceId: sourceInstanceID,
 			View:             view,
@@ -108,7 +108,7 @@ func (r *NodeRead) systemProperties(node *proto.Node) error {
 	)
 
 	if rows, err = r.stmtPropSystem.Query(
-		node.Id,
+		node.ID,
 	); err != nil {
 		return err
 	}
@@ -126,8 +126,8 @@ func (r *NodeRead) systemProperties(node *proto.Node) error {
 		}
 		*node.Properties = append(*node.Properties, proto.Property{
 			Type:             `system`,
-			RepositoryId:     node.Config.RepositoryId,
-			BucketId:         node.Config.BucketId,
+			RepositoryId:     node.Config.RepositoryID,
+			BucketId:         node.Config.BucketID,
 			InstanceId:       instanceID,
 			SourceInstanceId: sourceInstanceID,
 			View:             view,
@@ -151,7 +151,7 @@ func (r *NodeRead) customProperties(node *proto.Node) error {
 	)
 
 	if rows, err = r.stmtPropCustom.Query(
-		node.Id,
+		node.ID,
 	); err != nil {
 		return err
 	}
@@ -170,8 +170,8 @@ func (r *NodeRead) customProperties(node *proto.Node) error {
 		}
 		*node.Properties = append(*node.Properties, proto.Property{
 			Type:             `custom`,
-			RepositoryId:     node.Config.RepositoryId,
-			BucketId:         node.Config.BucketId,
+			RepositoryId:     node.Config.RepositoryID,
+			BucketId:         node.Config.BucketID,
 			InstanceId:       instanceID,
 			SourceInstanceId: sourceInstanceID,
 			View:             view,

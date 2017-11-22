@@ -328,7 +328,7 @@ func (r *GroupRead) memberList(q *msg.Request, mr *msg.Result) {
 		}
 		*group.MemberNodes = append(*group.MemberNodes,
 			proto.Node{
-				Id:   memberNodeID,
+				ID:   memberNodeID,
 				Name: memberNodeName,
 			})
 	}

@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerServers(app cli.App) *cli.App {
@@ -89,7 +89,7 @@ func cmdServerCreate(c *cli.Context) error {
 	req := proto.NewServerRequest()
 	req.Server.Name = c.Args().First()
 	if err := adm.ValidateLBoundUint64(opts[`assetid`][0],
-		&req.Server.AssetId, 1); err != nil {
+		&req.Server.AssetID, 1); err != nil {
 		return err
 	}
 	req.Server.Datacenter = opts[`datacenter`][0]
@@ -154,12 +154,12 @@ func cmdServerUpdate(c *cli.Context) error {
 	}
 
 	req := proto.NewServerRequest()
-	req.Server.Id = c.Args().First()
+	req.Server.ID = c.Args().First()
 	req.Server.Name = opts[`name`][0]
 	req.Server.Datacenter = opts[`datacenter`][0]
 	req.Server.Location = opts[`location`][0]
 	if err := adm.ValidateLBoundUint64(opts[`assetid`][0],
-		&req.Server.AssetId, 1); err != nil {
+		&req.Server.AssetID, 1); err != nil {
 		return err
 	}
 	if err := adm.ValidateBool(opts[`online`][0],
@@ -217,7 +217,7 @@ func cmdServerNull(c *cli.Context) error {
 	}
 
 	req := proto.NewServerRequest()
-	req.Server.Id = "00000000-0000-0000-0000-000000000000"
+	req.Server.ID = "00000000-0000-0000-0000-000000000000"
 	req.Server.Datacenter = opts["datacenter"][0]
 
 	return adm.Perform(`postbody`, `/servers/null`, `command`, req, c)

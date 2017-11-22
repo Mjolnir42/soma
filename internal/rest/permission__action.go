@@ -26,7 +26,7 @@ func (x *Rest) ActionList(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionList
 	request.ActionObj = proto.Action{
-		SectionId: params.ByName(`section`),
+		SectionID: params.ByName(`section`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -50,8 +50,8 @@ func (x *Rest) ActionShow(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionShow
 	request.ActionObj = proto.Action{
-		Id:        params.ByName(`action`),
-		SectionId: params.ByName(`section`),
+		ID:        params.ByName(`action`),
+		SectionID: params.ByName(`section`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -77,7 +77,7 @@ func (x *Rest) ActionSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Action.SectionId == `` || cReq.Action.Name == `` {
+	if cReq.Action.SectionID == `` || cReq.Action.Name == `` {
 		dispatchBadRequest(&w,
 			fmt.Errorf(`Invalid action search specification`))
 		return
@@ -88,7 +88,7 @@ func (x *Rest) ActionSearch(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionSearch
 	request.ActionObj = proto.Action{
 		Name:      cReq.Action.Name,
-		SectionId: cReq.Action.SectionId,
+		SectionID: cReq.Action.SectionID,
 	}
 
 	if !x.isAuthorized(&request) {
@@ -113,9 +113,9 @@ func (x *Rest) ActionAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Action.SectionId != params.ByName(`section`) {
+	if cReq.Action.SectionID != params.ByName(`section`) {
 		dispatchBadRequest(&w, fmt.Errorf("SectionId mismatch: %s, %s",
-			cReq.Action.SectionId, params.ByName(`section`)))
+			cReq.Action.SectionID, params.ByName(`section`)))
 		return
 	}
 
@@ -124,7 +124,7 @@ func (x *Rest) ActionAdd(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionAdd
 	request.ActionObj = proto.Action{
 		Name:      cReq.Action.Name,
-		SectionId: cReq.Action.SectionId,
+		SectionID: cReq.Action.SectionID,
 	}
 
 	if !x.isAuthorized(&request) {
@@ -147,8 +147,8 @@ func (x *Rest) ActionRemove(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionRemove
 	request.ActionObj = proto.Action{
-		Id:        params.ByName(`action`),
-		SectionId: params.ByName(`section`),
+		ID:        params.ByName(`action`),
+		SectionID: params.ByName(`section`),
 	}
 
 	if !x.isAuthorized(&request) {

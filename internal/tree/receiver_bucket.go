@@ -94,7 +94,7 @@ func (teb *Bucket) receiveNode(r ReceiveRequest) {
 			teb.actionAssignNode(Action{
 				ChildType: "node",
 				ChildNode: proto.Node{
-					Id: r.Node.GetID(),
+					ID: r.Node.GetID(),
 				},
 			})
 		default:

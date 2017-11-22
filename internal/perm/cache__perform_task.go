@@ -58,8 +58,8 @@ func (c *Cache) performCategoryRemoveTask(category string) {
 func (c *Cache) performPermissionMapAction(q *msg.Request) {
 	for _, a := range *q.Permission.Actions {
 		c.pmap.mapAction(
-			a.SectionId,
-			a.Id,
+			a.SectionID,
+			a.ID,
 			q.Permission.Id,
 		)
 	}
@@ -113,8 +113,8 @@ func (c *Cache) performPermissionRemoveTask(permID string) {
 func (c *Cache) performPermissionUnmapAction(q *msg.Request) {
 	for _, a := range *q.Permission.Actions {
 		c.pmap.unmapAction(
-			a.SectionId,
-			a.Id,
+			a.SectionID,
+			a.ID,
 			q.Permission.Id,
 		)
 	}

@@ -28,8 +28,8 @@ func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	var serverID string
-	if cReq.Node.ServerId != `` {
-		serverID = cReq.Node.ServerId
+	if cReq.Node.ServerID != `` {
+		serverID = cReq.Node.ServerID
 	} else {
 		serverID = `00000000-0000-0000-0000-000000000000`
 	}
@@ -38,10 +38,10 @@ func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNodeMgmt
 	request.Action = msg.ActionAdd
 	request.Node = proto.Node{
-		AssetId:   cReq.Node.AssetId,
+		AssetID:   cReq.Node.AssetID,
 		Name:      cReq.Node.Name,
-		TeamId:    cReq.Node.TeamId,
-		ServerId:  serverID,
+		TeamID:    cReq.Node.TeamID,
+		ServerID:  serverID,
 		State:     `unassigned`,
 		IsOnline:  cReq.Node.IsOnline,
 		IsDeleted: false,
@@ -93,11 +93,11 @@ func (x *Rest) NodeMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNodeMgmt
 	request.Action = msg.ActionUpdate
 	request.Node = proto.Node{
-		Id:        cReq.Node.Id,
-		AssetId:   cReq.Node.AssetId,
+		ID:        cReq.Node.ID,
+		AssetID:   cReq.Node.AssetID,
 		Name:      cReq.Node.Name,
-		TeamId:    cReq.Node.TeamId,
-		ServerId:  cReq.Node.ServerId,
+		TeamID:    cReq.Node.TeamID,
+		ServerID:  cReq.Node.ServerID,
 		IsOnline:  cReq.Node.IsOnline,
 		IsDeleted: cReq.Node.IsDeleted,
 	}
@@ -133,7 +133,7 @@ func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNodeMgmt
 	request.Action = action
 	request.Node = proto.Node{
-		Id: params.ByName(`nodeID`),
+		ID: params.ByName(`nodeID`),
 	}
 
 	if !x.isAuthorized(&request) {

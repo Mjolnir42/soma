@@ -10,17 +10,28 @@
 package proto
 
 type Action struct {
-	Id          string           `json:"id,omitempty"`
+	ID          string           `json:"ID,omitempty"`
 	Name        string           `json:"name,omitempty"`
-	SectionId   string           `json:"sectionId,omitempty"`
+	SectionID   string           `json:"sectionID,omitempty"`
 	SectionName string           `json:"sectionName,omitempty"`
 	Category    string           `json:"category,omitempty"`
 	Details     *DetailsCreation `json:"details,omitempty"`
 }
 
+func (a *Action) Clone() Action {
+	return Action{
+		ID:          a.ID,
+		Name:        a.Name,
+		SectionID:   a.SectionID,
+		SectionName: a.SectionName,
+		Category:    a.Category,
+		Details:     a.Details.Clone(),
+	}
+}
+
 type ActionFilter struct {
 	Name      string `json:"name,omitempty"`
-	SectionId string `json:"sectionId,omitempty"`
+	SectionID string `json:"sectionID,omitempty"`
 }
 
 func NewActionRequest() Request {

@@ -683,8 +683,8 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		if config, err = adm.LookupNodeConfig(objectId); err != nil {
 			return err
 		}
-		repoId = config.RepositoryId
-		bucketId = config.BucketId
+		repoId = config.RepositoryID
+		bucketId = config.BucketID
 	case `cluster`:
 		bucketId, err = adm.LookupBucketId(opts["in"][0])
 		if err != nil {
@@ -807,7 +807,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	switch oType {
 	case `node`:
 		req = proto.NewNodeRequest()
-		req.Node.Id = objectId
+		req.Node.ID = objectId
 		req.Node.Config = config
 		req.Node.Properties = &[]proto.Property{prop}
 	case `cluster`:

@@ -127,8 +127,8 @@ func (m *permissionMapping) mapAction(sectionID, actionID,
 		m.action[sectionID][actionID], permissionID)
 	m.permAction[permissionID] = append(m.permAction[permissionID],
 		proto.Action{
-			Id:        actionID,
-			SectionId: sectionID,
+			ID:        actionID,
+			SectionID: sectionID,
 		})
 }
 
@@ -165,7 +165,7 @@ func (m *permissionMapping) unmapAction(sectionID, actionID,
 		return
 	}
 	for i, a := range m.permAction[permissionID] {
-		if a.Id != actionID {
+		if a.ID != actionID {
 			continue
 		}
 		m.permAction[permissionID] = append(
@@ -216,7 +216,7 @@ func (m *permissionMapping) removePermission(permissionID string) {
 		// while iterating over it
 		actions := [][2]string{}
 		for _, a := range m.permAction[permissionID] {
-			actions = append(actions, [2]string{a.SectionId, a.Id})
+			actions = append(actions, [2]string{a.SectionID, a.ID})
 		}
 		for _, a := range actions {
 			m.unmapAction(a[0], a[1], permissionID)

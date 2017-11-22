@@ -134,7 +134,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		`delete_custom_property_from_node`,
 		`delete_oncall_property_from_node`,
 		`delete_service_property_from_node`:
-		return q.Node.Config.RepositoryId, q.Node.Config.BucketId
+		return q.Node.Config.RepositoryID, q.Node.Config.BucketID
 	}
 	return ``, ``
 }

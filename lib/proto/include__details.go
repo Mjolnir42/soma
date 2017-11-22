@@ -16,4 +16,26 @@ type Details struct {
 	CheckConfigs *[]CheckConfig `json:"checkConfigs,omitempty"`
 }
 
+func (d *Details) Clone() *Details {
+	clone := &Details{
+		CreatedAt: d.CreatedAt,
+		CreatedBy: d.CreatedBy,
+		Server:    d.Server.Clone(),
+	}
+	// XXX CheckConfigs
+	return clone
+}
+
+type DetailsCreation struct {
+	CreatedAt string `json:"createdAt,omitempty"`
+	CreatedBy string `json:"createdBy,omitempty"`
+}
+
+func (d *DetailsCreation) Clone() *DetailsCreation {
+	return &DetailsCreation{
+		CreatedAt: d.CreatedAt,
+		CreatedBy: d.CreatedBy,
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

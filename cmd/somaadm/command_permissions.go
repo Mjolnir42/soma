@@ -13,11 +13,11 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerPermissions(app cli.App) *cli.App {
@@ -282,9 +282,9 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 	if !sectionMapping {
 		req.Permission.Actions = &[]proto.Action{
 			proto.Action{
-				Id:        actionId,
+				ID:        actionId,
 				Name:      action,
-				SectionId: sectionId,
+				SectionID: sectionId,
 				Category:  category,
 			},
 		}

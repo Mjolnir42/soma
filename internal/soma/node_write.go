@@ -107,16 +107,16 @@ func (w *NodeWrite) add(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.Node.Id = uuid.NewV4().String()
-	if q.Node.ServerId == `` {
-		q.Node.ServerId = `00000000-0000-0000-0000-000000000000`
+	q.Node.ID = uuid.NewV4().String()
+	if q.Node.ServerID == `` {
+		q.Node.ServerID = `00000000-0000-0000-0000-000000000000`
 	}
 	if res, err = w.stmtAdd.Exec(
-		q.Node.Id,
-		q.Node.AssetId,
+		q.Node.ID,
+		q.Node.AssetID,
 		q.Node.Name,
-		q.Node.TeamId,
-		q.Node.ServerId,
+		q.Node.TeamID,
+		q.Node.ServerID,
 		q.Node.State,
 		q.Node.IsOnline,
 		false,
@@ -138,7 +138,7 @@ func (w *NodeWrite) remove(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRemove.Exec(
-		q.Node.Id,
+		q.Node.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -156,13 +156,13 @@ func (w *NodeWrite) update(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtUpdate.Exec(
-		q.Node.AssetId,
+		q.Node.AssetID,
 		q.Node.Name,
-		q.Node.TeamId,
-		q.Node.ServerId,
+		q.Node.TeamID,
+		q.Node.ServerID,
 		q.Node.IsOnline,
 		q.Node.IsDeleted,
-		q.Node.Id,
+		q.Node.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -180,7 +180,7 @@ func (w *NodeWrite) purge(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtPurge.Exec(
-		q.Node.Id,
+		q.Node.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

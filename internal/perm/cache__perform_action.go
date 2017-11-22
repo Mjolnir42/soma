@@ -15,9 +15,9 @@ import "github.com/mjolnir42/soma/internal/msg"
 func (c *Cache) performActionAdd(q *msg.Request) {
 	c.lock.Lock()
 	c.action.add(
-		q.ActionObj.SectionId,
+		q.ActionObj.SectionID,
 		q.ActionObj.SectionName,
-		q.ActionObj.Id,
+		q.ActionObj.ID,
 		q.ActionObj.Name,
 		q.ActionObj.Category,
 	)
@@ -29,8 +29,8 @@ func (c *Cache) performActionAdd(q *msg.Request) {
 func (c *Cache) performActionRemove(q *msg.Request) {
 	c.lock.Lock()
 	c.performActionRemoveTask(
-		q.ActionObj.SectionId,
-		q.ActionObj.Id,
+		q.ActionObj.SectionID,
+		q.ActionObj.ID,
 	)
 	c.lock.Unlock()
 }
@@ -118,8 +118,8 @@ func (c *Cache) performGroupDestroy(q *msg.Request) {
 func (c *Cache) performNodeAssign(q *msg.Request) {
 	c.lock.Lock()
 	c.object.addNode(
-		q.Node.Config.BucketId,
-		q.Node.Id,
+		q.Node.Config.BucketID,
+		q.Node.ID,
 	)
 	c.lock.Unlock()
 }
@@ -128,12 +128,12 @@ func (c *Cache) performNodeAssign(q *msg.Request) {
 func (c *Cache) performNodeUnassign(q *msg.Request) {
 	c.lock.Lock()
 	// revoke all grants on the object to be deleted
-	grantIDs := c.grantRepository.getObjectGrantID(q.Node.Id)
+	grantIDs := c.grantRepository.getObjectGrantID(q.Node.ID)
 	for _, grantID := range grantIDs {
 		c.grantRepository.revoke(grantID)
 	}
 	// remove object
-	c.object.rmNode(q.Node.Id)
+	c.object.rmNode(q.Node.ID)
 	c.lock.Unlock()
 }
 

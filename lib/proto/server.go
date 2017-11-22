@@ -10,8 +10,8 @@
 package proto
 
 type Server struct {
-	Id         string         `json:"id,omitempty"`
-	AssetId    uint64         `json:"assetId,omitempty"`
+	ID         string         `json:"ID,omitempty"`
+	AssetID    uint64         `json:"assetID,omitempty"`
 	Datacenter string         `json:"datacenter,omitempty"`
 	Location   string         `json:"location,omitempty"`
 	Name       string         `json:"name,omitempty"`
@@ -20,11 +20,30 @@ type Server struct {
 	Details    *ServerDetails `json:"details,omitempty"`
 }
 
+func (s *Server) Clone() Server {
+	return Server{
+		ID:         s.ID,
+		AssetID:    s.AssetID,
+		Datacenter: s.Datacenter,
+		Location:   s.Location,
+		Name:       s.Name,
+		IsOnline:   s.IsOnline,
+		IsDeleted:  s.IsDeleted,
+		Details:    s.Details.Clone(),
+	}
+}
+
 type ServerDetails struct {
-	DetailsCreation
+	Creation *DetailsCreation
 	/*
 		Nodes     []string `json:"nodes,omitempty"`
 	*/
+}
+
+func (d *ServerDetails) Clone() *ServerDetails {
+	return &ServerDetails{
+		Creation: d.Creation.Clone(),
+	}
 }
 
 type ServerFilter struct {
@@ -34,13 +53,13 @@ type ServerFilter struct {
 	NotDeleted bool   `json:"notDeleted,omitempty"`
 	Datacenter string `json:"datacenter,omitempty"`
 	Name       string `json:"name,omitempty"`
-	AssetId    uint64 `json:"assetId,omitempty"`
+	AssetID    uint64 `json:"assetID,omitempty"`
 }
 
-func (p *Server) DeepCompare(a *Server) bool {
-	if p.Id != a.Id || p.AssetId != a.AssetId || p.Datacenter != a.Datacenter ||
-		p.Location != a.Location || p.Name != a.Name || p.IsOnline != a.IsOnline ||
-		p.IsDeleted != a.IsDeleted {
+func (s *Server) DeepCompare(a *Server) bool {
+	if s.ID != a.ID || s.AssetID != a.AssetID || s.Datacenter != a.Datacenter ||
+		s.Location != a.Location || s.Name != a.Name || s.IsOnline != a.IsOnline ||
+		s.IsDeleted != a.IsDeleted {
 		return false
 	}
 	return true

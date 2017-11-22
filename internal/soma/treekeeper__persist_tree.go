@@ -88,7 +88,7 @@ func (tk *TreeKeeper) txTreeUpdate(a *tree.Action,
 		newState = a.Cluster.ObjectState
 	case `node`:
 		statement = stm[`UpdateNodeState`]
-		id = a.Node.Id
+		id = a.Node.ID
 		newState = a.Node.State
 	}
 	_, err = statement.Exec(
@@ -112,9 +112,9 @@ func (tk *TreeKeeper) txTreeDelete(a *tree.Action,
 		)
 	case `node`:
 		if _, err = stm[`NodeUnassignFromBucket`].Exec(
-			a.Node.Id,
-			a.Node.Config.BucketId,
-			a.Node.TeamId,
+			a.Node.ID,
+			a.Node.Config.BucketID,
+			a.Node.TeamID,
 		); err != nil {
 			return err
 		}
@@ -134,7 +134,7 @@ func (tk *TreeKeeper) txTreeMemberNew(a *tree.Action,
 	switch a.Type {
 	case `bucket`:
 		_, err = stm[`BucketAssignNode`].Exec(
-			a.ChildNode.Id,
+			a.ChildNode.ID,
 			a.Bucket.ID,
 			a.Bucket.TeamID,
 		)
@@ -151,12 +151,12 @@ func (tk *TreeKeeper) txTreeMemberNew(a *tree.Action,
 			child = a.ChildCluster.Id
 		case `node`:
 			statement = stm[`GroupMemberNewNode`]
-			child = a.ChildNode.Id
+			child = a.ChildNode.ID
 		}
 	case `cluster`:
 		id = a.Cluster.Id
 		bucket = a.Cluster.BucketId
-		child = a.ChildNode.Id
+		child = a.ChildNode.ID
 		statement = stm[`ClusterMemberNew`]
 	}
 	_, err = statement.Exec(
@@ -187,11 +187,11 @@ func (tk *TreeKeeper) txTreeMemberRemoved(a *tree.Action,
 			child = a.ChildCluster.Id
 		case `node`:
 			statement = stm[`GroupMemberRemoveNode`]
-			child = a.ChildNode.Id
+			child = a.ChildNode.ID
 		}
 	case `cluster`:
 		id = a.Cluster.Id
-		child = a.ChildNode.Id
+		child = a.ChildNode.ID
 		statement = stm[`ClusterMemberRemove`]
 	}
 	_, err = statement.Exec(

@@ -582,12 +582,12 @@ func teamIdByNodeId(node string) (string, error) {
 	}
 
 	// check the received record against the input
-	if node != (*res.Nodes)[0].Id {
+	if node != (*res.Nodes)[0].ID {
 		err = fmt.Errorf("NodeId mismatch: %s vs %s",
-			node, (*res.Nodes)[0].Id)
+			node, (*res.Nodes)[0].ID)
 		goto abort
 	}
-	return (*res.Nodes)[0].TeamId, nil
+	return (*res.Nodes)[0].TeamID, nil
 
 abort:
 	return ``, fmt.Errorf("TeamId lookup failed: %s",
@@ -759,10 +759,10 @@ func serverIdByName(s string) (string, error) {
 	// save server in cacheDB
 	cache.Server(
 		(*res.Servers)[0].Name,
-		(*res.Servers)[0].Id,
-		strconv.Itoa(int((*res.Servers)[0].AssetId)),
+		(*res.Servers)[0].ID,
+		strconv.Itoa(int((*res.Servers)[0].AssetID)),
 	)
-	return (*res.Servers)[0].Id, nil
+	return (*res.Servers)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("ServerId lookup failed: %s",
@@ -776,7 +776,7 @@ func serverIdByAsset(s string, aid uint64) (string, error) {
 		return m[`id`], nil
 	}
 	req := proto.NewServerFilter()
-	req.Filter.Server.AssetId = aid
+	req.Filter.Server.AssetID = aid
 
 	res, err := fetchFilter(req, `/filter/servers/`)
 	if err != nil {
@@ -788,18 +788,18 @@ func serverIdByAsset(s string, aid uint64) (string, error) {
 		goto abort
 	}
 
-	if aid != (*res.Servers)[0].AssetId {
+	if aid != (*res.Servers)[0].AssetID {
 		err = fmt.Errorf("AssetId mismatch: %d vs %d",
-			aid, (*res.Servers)[0].AssetId)
+			aid, (*res.Servers)[0].AssetID)
 		goto abort
 	}
 	// save server in cacheDB
 	cache.Server(
 		(*res.Servers)[0].Name,
-		(*res.Servers)[0].Id,
-		strconv.Itoa(int((*res.Servers)[0].AssetId)),
+		(*res.Servers)[0].ID,
+		strconv.Itoa(int((*res.Servers)[0].AssetID)),
 	)
-	return (*res.Servers)[0].Id, nil
+	return (*res.Servers)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("ServerId lookup failed: %s",
@@ -915,7 +915,7 @@ func nodeIdByName(node string) (string, error) {
 			node, (*res.Nodes)[0].Name)
 		goto abort
 	}
-	return (*res.Nodes)[0].Id, nil
+	return (*res.Nodes)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("NodeId lookup failed: %s",
@@ -955,7 +955,7 @@ abort:
 func actionIdByName(action, section string) (string, error) {
 	req := proto.NewActionFilter()
 	req.Filter.Action.Name = action
-	req.Filter.Action.SectionId = section
+	req.Filter.Action.SectionID = section
 
 	res, err := fetchFilter(req, `/filter/actions/`)
 	if err != nil {
@@ -972,7 +972,7 @@ func actionIdByName(action, section string) (string, error) {
 			action, (*res.Actions)[0].Name)
 		goto abort
 	}
-	return (*res.Actions)[0].Id, nil
+	return (*res.Actions)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("ActionId lookup failed: %s",
@@ -1009,9 +1009,9 @@ func nodeConfigById(node string) (*proto.NodeConfig, error) {
 	}
 
 	// check the received record against the input
-	if node != (*res.Nodes)[0].Id {
+	if node != (*res.Nodes)[0].ID {
 		err = fmt.Errorf("NodeId mismatch: %s vs %s",
-			node, (*res.Nodes)[0].Id)
+			node, (*res.Nodes)[0].ID)
 		goto abort
 	}
 	return (*res.Nodes)[0].Config, nil

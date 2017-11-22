@@ -27,9 +27,9 @@ func newActionLookup() *actionLookup {
 // add inserts an action into the cache
 func (m *actionLookup) add(sID, sName, aID, aName, category string) {
 	a := &proto.Action{
-		Id:          aID,
+		ID:          aID,
 		Name:        aName,
-		SectionId:   sID,
+		SectionID:   sID,
 		SectionName: sName,
 		Category:    category,
 	}
@@ -73,12 +73,12 @@ func (m *actionLookup) rmActionByID(sID, aID string) {
 	if !ok {
 		return
 	}
-	if sID != a.SectionId || aID != a.Id {
+	if sID != a.SectionID || aID != a.ID {
 		return
 	}
 
 	delete(m.byName[a.SectionName], a.Name)
-	delete(m.byID[a.SectionId], a.Id)
+	delete(m.byID[a.SectionID], a.ID)
 }
 
 // rmActionByName removes and action from the cache. The action is
@@ -95,7 +95,7 @@ func (m *actionLookup) rmActionByName(sName, aName string) {
 		return
 	}
 
-	delete(m.byID[a.SectionId], a.Id)
+	delete(m.byID[a.SectionID], a.ID)
 	delete(m.byName[a.SectionName], a.Name)
 }
 
@@ -124,7 +124,7 @@ func (m *actionLookup) rmSectionByName(sName string) {
 	var sID string
 	for _, a := range m.byName[sName] {
 		// get the section name from the first found action
-		sID = a.SectionId
+		sID = a.SectionID
 		break
 	}
 	delete(m.byID, sID)

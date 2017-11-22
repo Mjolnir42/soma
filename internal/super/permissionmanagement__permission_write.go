@@ -198,9 +198,9 @@ func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
 
 	// determine if an entire section is mapped or a specific action
 	if q.Permission.Actions != nil {
-		sectionID.String = (*q.Permission.Actions)[0].SectionId
+		sectionID.String = (*q.Permission.Actions)[0].SectionID
 		sectionID.Valid = true
-		actionID.String = (*q.Permission.Actions)[0].Id
+		actionID.String = (*q.Permission.Actions)[0].ID
 		actionID.Valid = true
 	} else if q.Permission.Sections != nil {
 		sectionID.String = (*q.Permission.Sections)[0].Id
@@ -243,9 +243,9 @@ func (s *Supervisor) permissionUnmap(q *msg.Request, mr *msg.Result) {
 
 	// determine if an entire section is unmapped or a specific action
 	if q.Permission.Actions != nil {
-		sectionID.String = (*q.Permission.Actions)[0].SectionId
+		sectionID.String = (*q.Permission.Actions)[0].SectionID
 		sectionID.Valid = true
-		actionID.String = (*q.Permission.Actions)[0].Id
+		actionID.String = (*q.Permission.Actions)[0].ID
 		actionID.Valid = true
 	} else if q.Permission.Sections != nil {
 		sectionID.String = (*q.Permission.Sections)[0].Id

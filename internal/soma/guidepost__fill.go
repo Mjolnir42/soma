@@ -53,7 +53,7 @@ func (g *GuidePost) fillNode(q *msg.Request) (bool, error) {
 		ndAsset                  int64
 		ndOnline, ndDeleted      bool
 	)
-	if err = g.stmtNodeDetails.QueryRow(q.Node.Id).Scan(
+	if err = g.stmtNodeDetails.QueryRow(q.Node.ID).Scan(
 		&ndAsset,
 		&ndName,
 		&ndTeam,
@@ -62,14 +62,14 @@ func (g *GuidePost) fillNode(q *msg.Request) (bool, error) {
 		&ndDeleted,
 	); err != nil {
 		if err == sql.ErrNoRows {
-			return true, fmt.Errorf("Node not found: %s", q.Node.Id)
+			return true, fmt.Errorf("Node not found: %s", q.Node.ID)
 		}
 		return false, err
 	}
-	q.Node.AssetId = uint64(ndAsset)
+	q.Node.AssetID = uint64(ndAsset)
 	q.Node.Name = ndName
-	q.Node.TeamId = ndTeam
-	q.Node.ServerId = ndServer
+	q.Node.TeamID = ndTeam
+	q.Node.ServerID = ndServer
 	q.Node.IsOnline = ndOnline
 	q.Node.IsDeleted = ndDeleted
 	return false, nil

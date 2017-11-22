@@ -11,11 +11,11 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerAction(app cli.App) *cli.App {
@@ -89,7 +89,7 @@ func cmdActionAdd(c *cli.Context) error {
 
 	req := proto.NewActionRequest()
 	req.Action.Name = c.Args().First()
-	req.Action.SectionId = sectionId
+	req.Action.SectionID = sectionId
 	path := fmt.Sprintf("/sections/%s/actions/", sectionId)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }

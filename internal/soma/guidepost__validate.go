@@ -122,10 +122,10 @@ func (g *GuidePost) validateObjectMatch(q *msg.Request) (bool, error) {
 
 	switch q.Action {
 	case `add_node_to_cluster`:
-		nodeID = (*q.Cluster.Members)[0].Id
+		nodeID = (*q.Cluster.Members)[0].ID
 		clusterID = q.Cluster.Id
 	case `add_node_to_group`:
-		nodeID = (*q.Group.MemberNodes)[0].Id
+		nodeID = (*q.Group.MemberNodes)[0].ID
 		groupID = q.Group.Id
 	case `add_cluster_to_group`:
 		clusterID = (*q.Group.MemberClusters)[0].Id
@@ -225,7 +225,7 @@ func (g *GuidePost) validateCorrectBucket(q *msg.Request) (bool, error) {
 	switch q.Section {
 	case `node`:
 		err = g.stmtBucketForNodeID.QueryRow(
-			q.Node.Id,
+			q.Node.ID,
 		).Scan(
 			&bid,
 		)
@@ -252,7 +252,7 @@ func (g *GuidePost) validateCorrectBucket(q *msg.Request) (bool, error) {
 	}
 	switch q.Section {
 	case `node`:
-		if bid != q.Node.Config.BucketId {
+		if bid != q.Node.Config.BucketID {
 			return false, fmt.Errorf("Node assigned to different bucket %s",
 				bid)
 		}
@@ -274,7 +274,7 @@ func (g *GuidePost) validateCorrectBucket(q *msg.Request) (bool, error) {
 // on success.
 func (g *GuidePost) validateNodeUnassigned(q *msg.Request) (bool, error) {
 	var bid string
-	if err := g.stmtBucketForNodeID.QueryRow(q.Node.Id).Scan(
+	if err := g.stmtBucketForNodeID.QueryRow(q.Node.ID).Scan(
 		&bid,
 	); err != nil {
 		if err == sql.ErrNoRows {
@@ -292,8 +292,8 @@ func (g *GuidePost) validateNodeConfig(q *msg.Request) (bool, error) {
 		return false, fmt.Errorf("NodeConfig subobject missing")
 	}
 	return g.validateBucketInRepository(
-		q.Node.Config.RepositoryId,
-		q.Node.Config.BucketId,
+		q.Node.Config.RepositoryID,
+		q.Node.Config.BucketID,
 	)
 }
 

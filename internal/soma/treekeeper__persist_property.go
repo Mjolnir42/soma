@@ -76,7 +76,7 @@ func (tk *TreeKeeper) txPropertyNewCustom(a *tree.Action,
 		id = a.Cluster.Id
 	case `node`:
 		statement = stm[`NodePropertyCustomCreate`]
-		id = a.Node.Id
+		id = a.Node.ID
 	}
 	_, err = statement.Exec(
 		a.Property.InstanceId,
@@ -113,7 +113,7 @@ func (tk *TreeKeeper) txPropertyNewSystem(a *tree.Action,
 		id = a.Cluster.Id
 	case `node`:
 		statement = stm[`NodePropertySystemCreate`]
-		id = a.Node.Id
+		id = a.Node.ID
 	}
 	_, err = statement.Exec(
 		a.Property.InstanceId,
@@ -153,7 +153,7 @@ func (tk *TreeKeeper) txPropertyNewService(a *tree.Action,
 		id = a.Cluster.Id
 	case `node`:
 		statement = stm[`NodePropertyServiceCreate`]
-		id = a.Node.Id
+		id = a.Node.ID
 	}
 	_, err = statement.Exec(
 		a.Property.InstanceId,
@@ -191,7 +191,7 @@ func (tk *TreeKeeper) txPropertyNewOncall(a *tree.Action,
 		id = a.Cluster.Id
 	case `node`:
 		statement = stm[`NodePropertyOncallCreate`]
-		id = a.Node.Id
+		id = a.Node.ID
 	}
 	_, err = statement.Exec(
 		a.Property.InstanceId,

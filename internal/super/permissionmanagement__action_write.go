@@ -43,11 +43,11 @@ func (s *Supervisor) actionAdd(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.ActionObj.Id = uuid.NewV4().String()
+	q.ActionObj.ID = uuid.NewV4().String()
 	if res, err = s.stmtActionAdd.Exec(
-		q.ActionObj.Id,
+		q.ActionObj.ID,
 		q.ActionObj.Name,
-		q.ActionObj.SectionId,
+		q.ActionObj.SectionID,
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -93,7 +93,7 @@ func (s *Supervisor) actionRemove(q *msg.Request, mr *msg.Result) {
 		}
 	}
 
-	if res, err = s.actionRemoveTx(q.ActionObj.Id,
+	if res, err = s.actionRemoveTx(q.ActionObj.ID,
 		txMap); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
@@ -118,7 +118,7 @@ func (s *Supervisor) actionRemove(q *msg.Request, mr *msg.Result) {
 	mr.ActionObj = append(mr.ActionObj, q.ActionObj)
 	mr.Super.Audit.WithField(`Code`, mr.Code).
 		Infoln(fmt.Sprintf(
-			"Successfully removed action %s", q.ActionObj.Id))
+			"Successfully removed action %s", q.ActionObj.ID))
 }
 
 func (s *Supervisor) actionRemoveTx(id string,

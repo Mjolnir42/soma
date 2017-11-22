@@ -129,7 +129,7 @@ func (r *NodeRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Node = append(mr.Node, proto.Node{
-			Id:   nodeID,
+			ID:   nodeID,
 			Name: nodeName,
 		})
 	}
@@ -170,11 +170,11 @@ func (r *NodeRead) sync(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Node = append(mr.Node, proto.Node{
-			Id:        nodeID,
-			AssetId:   uint64(nodeAsset),
+			ID:        nodeID,
+			AssetID:   uint64(nodeAsset),
 			Name:      nodeName,
-			TeamId:    nodeTeam,
-			ServerId:  nodeServer,
+			TeamID:    nodeTeam,
+			ServerID:  nodeServer,
 			IsOnline:  nodeOnline,
 			IsDeleted: nodeDeleted,
 		})
@@ -200,7 +200,7 @@ func (r *NodeRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Node.Id,
+		q.Node.ID,
 	).Scan(
 		&nodeID,
 		&nodeAsset,
@@ -217,11 +217,11 @@ func (r *NodeRead) show(q *msg.Request, mr *msg.Result) {
 		goto fail
 	}
 	node = proto.Node{
-		Id:        nodeID,
-		AssetId:   uint64(nodeAsset),
+		ID:        nodeID,
+		AssetID:   uint64(nodeAsset),
 		Name:      nodeName,
-		TeamId:    nodeTeam,
-		ServerId:  nodeServer,
+		TeamID:    nodeTeam,
+		ServerID:  nodeServer,
 		State:     nodeState,
 		IsOnline:  nodeOnline,
 		IsDeleted: nodeDeleted,
@@ -229,7 +229,7 @@ func (r *NodeRead) show(q *msg.Request, mr *msg.Result) {
 
 	// add configuration data
 	if err = r.stmtShowConfig.QueryRow(
-		q.Node.Id,
+		q.Node.ID,
 	).Scan(
 		&nodeID,
 		&nodeName,
@@ -247,8 +247,8 @@ func (r *NodeRead) show(q *msg.Request, mr *msg.Result) {
 	}
 	// node is assigned in this codepath
 	node.Config = &proto.NodeConfig{
-		RepositoryId: repositoryID,
-		BucketId:     bucketID,
+		RepositoryID: repositoryID,
+		BucketID:     bucketID,
 	}
 
 	// fetch node properties
@@ -277,7 +277,7 @@ func (r *NodeRead) show(q *msg.Request, mr *msg.Result) {
 	}
 	if checkConfigs, err = exportCheckConfigObjectTX(
 		tx,
-		q.Node.Id,
+		q.Node.ID,
 	); err != nil {
 		tx.Rollback()
 		goto fail
@@ -303,7 +303,7 @@ func (r *NodeRead) showConfig(q *msg.Request, mr *msg.Result) {
 		nodeID, nodeName, repositoryID, bucketID string
 	)
 	if err = r.stmtShowConfig.QueryRow(
-		q.Node.Id,
+		q.Node.ID,
 	).Scan(
 		&nodeID,
 		&nodeName,
@@ -318,11 +318,11 @@ func (r *NodeRead) showConfig(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Node = append(mr.Node, proto.Node{
-		Id:   nodeID,
+		ID:   nodeID,
 		Name: nodeName,
 		Config: &proto.NodeConfig{
-			RepositoryId: repositoryID,
-			BucketId:     bucketID,
+			RepositoryID: repositoryID,
+			BucketID:     bucketID,
 		},
 	})
 	mr.OK()

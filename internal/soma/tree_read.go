@@ -480,11 +480,11 @@ func (r *TreeRead) node(id string, depth int) (*proto.Node, error) {
 	}
 
 	node := proto.Node{
-		Id:        id,
-		AssetId:   uint64(assetID),
+		ID:        id,
+		AssetID:   uint64(assetID),
 		Name:      name,
-		TeamId:    teamID,
-		ServerId:  serverID,
+		TeamID:    teamID,
+		ServerID:  serverID,
 		State:     state,
 		IsOnline:  isOnline,
 		IsDeleted: isDeleted,
@@ -493,8 +493,8 @@ func (r *TreeRead) node(id string, depth int) (*proto.Node, error) {
 			CreatedAt: createdAt.UTC().Format(time.RFC3339),
 		},
 		Config: &proto.NodeConfig{
-			RepositoryId: repositoryID,
-			BucketId:     bucketID,
+			RepositoryID: repositoryID,
+			BucketID:     bucketID,
 		},
 	}
 	return &node, nil

@@ -39,7 +39,7 @@ func (tk *TreeKeeper) convProperty(task string, q *msg.Request) (
 
 	switch q.Section {
 	case `node`:
-		id = q.Node.Id
+		id = q.Node.ID
 		prop = tk.pTT(task, (*q.Node.Properties)[0])
 	case `cluster`:
 		id = q.Cluster.Id

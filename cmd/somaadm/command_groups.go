@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerGroups(app cli.App) *cli.App {
@@ -467,7 +467,7 @@ func cmdGroupMemberAddNode(c *cli.Context) error {
 		return err
 	}
 
-	node.Id = mNodeId
+	node.ID = mNodeId
 	req.Group = &proto.Group{}
 	req.Group.Id = groupId
 	req.Group.BucketId = bucketId

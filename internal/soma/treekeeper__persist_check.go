@@ -157,7 +157,7 @@ func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 	case `cluster`:
 		id = a.Cluster.Id
 	case `node`:
-		id = a.Node.Id
+		id = a.Node.ID
 	}
 	statement := stm[`CreateCheck`]
 	_, err := statement.Exec(

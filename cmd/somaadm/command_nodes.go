@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerNodes(app cli.App) *cli.App {
@@ -209,17 +209,17 @@ func cmdNodeAdd(c *cli.Context) error {
 		req.Node.IsOnline = true
 	}
 	if _, ok := opts[`server`]; ok {
-		if req.Node.ServerId, err = adm.LookupServerId(
+		if req.Node.ServerID, err = adm.LookupServerId(
 			opts[`server`][0]); err != nil {
 			return err
 		}
 	}
 	if err = adm.ValidateLBoundUint64(opts[`assetid`][0],
-		&req.Node.AssetId, 1); err != nil {
+		&req.Node.AssetID, 1); err != nil {
 		return err
 	}
 	req.Node.Name = opts[`name`][0]
-	if req.Node.TeamId, err = adm.LookupTeamId(
+	if req.Node.TeamID, err = adm.LookupTeamId(
 		opts[`team`][0]); err != nil {
 		return nil
 	}
@@ -250,7 +250,7 @@ func cmdNodeUpdate(c *cli.Context) error {
 		return fmt.Errorf(
 			`Node/update command requires UUID as first argument`)
 	}
-	req.Node.Id = c.Args().First()
+	req.Node.ID = c.Args().First()
 	req.Node.Name = opts[`name`][0]
 	if err = adm.ValidateBool(opts[`online`][0],
 		&req.Node.IsOnline); err != nil {
@@ -260,19 +260,19 @@ func cmdNodeUpdate(c *cli.Context) error {
 		&req.Node.IsDeleted); err != nil {
 		return err
 	}
-	if req.Node.ServerId, err = adm.LookupServerId(
+	if req.Node.ServerID, err = adm.LookupServerId(
 		opts[`server`][0]); err != nil {
 		return err
 	}
 	if err = adm.ValidateLBoundUint64(opts[`assetid`][0],
-		&req.Node.AssetId, 1); err != nil {
+		&req.Node.AssetID, 1); err != nil {
 		return err
 	}
-	if req.Node.TeamId, err = adm.LookupTeamId(
+	if req.Node.TeamID, err = adm.LookupTeamId(
 		opts[`team`][0]); err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/nodes/%s", req.Node.Id)
+	path := fmt.Sprintf("/nodes/%s", req.Node.ID)
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -397,7 +397,7 @@ func cmdNodeRepo(c *cli.Context) error {
 
 	req := proto.Request{}
 	req.Node = &proto.Node{}
-	req.Node.TeamId = teamId
+	req.Node.TeamID = teamId
 
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
@@ -428,7 +428,7 @@ func cmdNodeMove(c *cli.Context) error {
 
 	req := proto.Request{}
 	req.Node = &proto.Node{}
-	req.Node.ServerId = serverId
+	req.Node.ServerID = serverId
 
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
@@ -509,10 +509,10 @@ func cmdNodeAssign(c *cli.Context) error {
 	}
 
 	req := proto.NewNodeRequest()
-	req.Node.Id = nodeId
+	req.Node.ID = nodeId
 	req.Node.Config = &proto.NodeConfig{}
-	req.Node.Config.RepositoryId = repoId
-	req.Node.Config.BucketId = bucketId
+	req.Node.Config.RepositoryID = repoId
+	req.Node.Config.BucketID = bucketId
 
 	path := fmt.Sprintf("/nodes/%s/config", nodeId)
 	return adm.Perform(`putbody`, path, `command`, req, c)
@@ -632,7 +632,7 @@ func cmdNodePropertyDelete(c *cli.Context, pType string) error {
 	}
 
 	req := proto.NewNodeRequest()
-	req.Node.Id = nodeId
+	req.Node.ID = nodeId
 	req.Node.Config = config
 
 	path := fmt.Sprintf("/nodes/%s/property/%s/%s",

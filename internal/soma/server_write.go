@@ -109,10 +109,10 @@ func (w *ServerWrite) add(q *msg.Request, mr *msg.Result) {
 		err error
 	)
 
-	q.Server.Id = uuid.NewV4().String()
+	q.Server.ID = uuid.NewV4().String()
 	if res, err = w.stmtAdd.Exec(
-		q.Server.Id,
-		q.Server.AssetId,
+		q.Server.ID,
+		q.Server.AssetID,
 		q.Server.Datacenter,
 		q.Server.Location,
 		q.Server.Name,
@@ -134,15 +134,15 @@ func (w *ServerWrite) insertNull(q *msg.Request, mr *msg.Result) {
 		err error
 	)
 
-	q.Server.Id = `00000000-0000-0000-0000-000000000000`
-	q.Server.AssetId = 0
+	q.Server.ID = `00000000-0000-0000-0000-000000000000`
+	q.Server.AssetID = 0
 	q.Server.Location = `none`
 	q.Server.Name = `soma-null-server`
 	q.Server.IsOnline = true
 	q.Server.IsDeleted = false
 	if res, err = w.stmtAdd.Exec(
-		q.Server.Id,
-		q.Server.AssetId,
+		q.Server.ID,
+		q.Server.AssetID,
 		q.Server.Datacenter,
 		q.Server.Location,
 		q.Server.Name,
@@ -165,7 +165,7 @@ func (w *ServerWrite) remove(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRemove.Exec(
-		q.Server.Id,
+		q.Server.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -183,7 +183,7 @@ func (w *ServerWrite) purge(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtPurge.Exec(
-		q.Server.Id,
+		q.Server.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -201,8 +201,8 @@ func (w *ServerWrite) update(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtUpdate.Exec(
-		q.Server.Id,
-		q.Server.AssetId,
+		q.Server.ID,
+		q.Server.AssetID,
 		q.Server.Datacenter,
 		q.Server.Location,
 		q.Server.Name,

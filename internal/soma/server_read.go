@@ -130,9 +130,9 @@ func (r *ServerRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Server = append(mr.Server, proto.Server{
-			Id:      serverID,
+			ID:      serverID,
 			Name:    serverName,
-			AssetId: uint64(serverAssetID),
+			AssetID: uint64(serverAssetID),
 		})
 	}
 	if err = rows.Err(); err != nil {
@@ -153,7 +153,7 @@ func (r *ServerRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Server.Id,
+		q.Server.ID,
 	).Scan(
 		&serverID,
 		&serverAssetID,
@@ -170,8 +170,8 @@ func (r *ServerRead) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Server = append(mr.Server, proto.Server{
-		Id:         serverID,
-		AssetId:    uint64(serverAssetID),
+		ID:         serverID,
+		AssetID:    uint64(serverAssetID),
 		Datacenter: serverDc,
 		Location:   serverDcLoc,
 		Name:       serverName,
@@ -213,8 +213,8 @@ func (r *ServerRead) sync(q *msg.Request, mr *msg.Result) {
 		}
 
 		mr.Server = append(mr.Server, proto.Server{
-			Id:         serverID,
-			AssetId:    uint64(serverAssetID),
+			ID:         serverID,
+			AssetID:    uint64(serverAssetID),
 			Datacenter: serverDc,
 			Location:   serverDcLoc,
 			Name:       serverName,
@@ -251,9 +251,9 @@ func (r *ServerRead) searchByName(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Server = append(mr.Server, proto.Server{
-		Id:      serverID,
+		ID:      serverID,
 		Name:    serverName,
-		AssetId: uint64(serverAssetID),
+		AssetID: uint64(serverAssetID),
 	})
 	mr.OK()
 }
@@ -267,7 +267,7 @@ func (r *ServerRead) searchByAssetID(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtSearchByAssetID.QueryRow(
-		q.Search.Server.AssetId,
+		q.Search.Server.AssetID,
 	).Scan(
 		&serverID,
 		&serverName,
@@ -280,9 +280,9 @@ func (r *ServerRead) searchByAssetID(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Server = append(mr.Server, proto.Server{
-		Id:      serverID,
+		ID:      serverID,
 		Name:    serverName,
-		AssetId: uint64(serverAssetID),
+		AssetID: uint64(serverAssetID),
 	})
 	mr.OK()
 }

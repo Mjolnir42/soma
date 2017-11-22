@@ -51,9 +51,9 @@ func (s *Supervisor) actionList(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.ActionObj = append(mr.ActionObj, proto.Action{
-			Id:        actionID,
+			ID:        actionID,
 			Name:      actionName,
-			SectionId: sectionID,
+			SectionID: sectionID,
 		})
 	}
 	if err = rows.Err(); err != nil {
@@ -74,7 +74,7 @@ func (s *Supervisor) actionShow(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = s.stmtActionShow.QueryRow(
-		q.ActionObj.Id,
+		q.ActionObj.ID,
 	).Scan(
 		&actionID,
 		&actionName,
@@ -93,9 +93,9 @@ func (s *Supervisor) actionShow(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.ActionObj = append(mr.ActionObj, proto.Action{
-		Id:          actionID,
+		ID:          actionID,
 		Name:        actionName,
-		SectionId:   sectionID,
+		SectionID:   sectionID,
 		SectionName: sectionName,
 		Category:    category,
 		Details: &proto.DetailsCreation{
@@ -116,7 +116,7 @@ func (s *Supervisor) actionSearch(q *msg.Request, mr *msg.Result) {
 
 	if rows, err = s.stmtActionSearch.Query(
 		q.ActionObj.Name,
-		q.ActionObj.SectionId,
+		q.ActionObj.SectionID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
@@ -135,9 +135,9 @@ func (s *Supervisor) actionSearch(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.ActionObj = append(mr.ActionObj, proto.Action{
-			Id:        actionID,
+			ID:        actionID,
 			Name:      actionName,
-			SectionId: sectionID,
+			SectionID: sectionID,
 		})
 	}
 	if err = rows.Err(); err != nil {
