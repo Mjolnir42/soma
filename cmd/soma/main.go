@@ -228,8 +228,6 @@ func main() {
 
 	router.HEAD(`/`, Check(Ping))
 
-	router.GET(`/attributes/:attribute`, Check(BasicAuth(AttributeShow)))
-	router.GET(`/attributes/`, Check(BasicAuth(AttributeList)))
 	router.GET(`/buckets/:bucket/instances/`, Check(BasicAuth(InstanceList)))
 	router.GET(`/buckets/:bucket/tree/:tree`, Check(BasicAuth(OutputTree)))
 	router.GET(`/buckets/:bucket`, Check(BasicAuth(BucketShow)))
@@ -349,7 +347,6 @@ func main() {
 	if !SomaCfg.ReadOnly {
 
 		if !SomaCfg.Observer {
-			router.DELETE(`/attributes/:attribute`, Check(BasicAuth(AttributeRemove)))
 			router.DELETE(`/buckets/:bucket/property/:type/:source`, Check(BasicAuth(BucketRemoveProperty)))
 			router.DELETE(`/capability/:capability`, Check(BasicAuth(CapabilityRemove)))
 			router.DELETE(`/category/:category/permissions/:permission/grant/:grant`, Check(BasicAuth(RightRevoke)))
@@ -393,7 +390,6 @@ func main() {
 			router.PATCH(`/views/:view`, Check(BasicAuth(ViewRename)))
 			router.PATCH(`/workflow/instanceconfig/:instanceconfig`, Check(BasicAuth(WorkflowSet)))
 			router.PATCH(`/workflow/retry`, Check(BasicAuth(WorkflowRetry)))
-			router.POST(`/attributes/`, Check(BasicAuth(AttributeAdd)))
 			router.POST(`/buckets/:bucket/property/:type/`, Check(BasicAuth(BucketAddProperty)))
 			router.POST(`/buckets/`, Check(BasicAuth(BucketCreate)))
 			router.POST(`/capability/`, Check(BasicAuth(CapabilityAdd)))

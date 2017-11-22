@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerAttributes(app cli.App) *cli.App {
@@ -83,7 +83,7 @@ func cmdAttributeCreate(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`postbody`, `/attributes/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/attribute/`, `command`, req, c)
 }
 
 func cmdAttributeDelete(c *cli.Context) error {
@@ -91,7 +91,7 @@ func cmdAttributeDelete(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/attributes/%s", c.Args().First())
+	path := fmt.Sprintf("/attribute/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -100,7 +100,7 @@ func cmdAttributeList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/attributes/`, `list`, nil, c)
+	return adm.Perform(`get`, `/attribute/`, `list`, nil, c)
 }
 
 func cmdAttributeShow(c *cli.Context) error {
@@ -108,7 +108,7 @@ func cmdAttributeShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/attributes/%s", c.Args().First())
+	path := fmt.Sprintf("/attribute/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
