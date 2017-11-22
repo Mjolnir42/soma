@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
@@ -15,7 +14,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/asaskevich/govalidator"
 	"github.com/client9/reopen"
-	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/rest"
 	"github.com/mjolnir42/soma/internal/soma"
@@ -301,8 +299,6 @@ func main() {
 	router.GET(`/repository/:repository/tree/:tree`, Check(BasicAuth(OutputTree)))
 	router.GET(`/repository/:repository`, Check(BasicAuth(RepositoryShow)))
 	router.GET(`/repository/`, Check(BasicAuth(RepositoryList)))
-	router.GET(`/sections/:section/actions/:action`, Check(BasicAuth(ActionShow)))
-	router.GET(`/sections/:section/actions/`, Check(BasicAuth(ActionList)))
 	router.GET(`/sections/:section`, Check(BasicAuth(SectionShow)))
 	router.GET(`/sections/`, Check(BasicAuth(SectionList)))
 	router.GET(`/servers/:server`, Check(BasicAuth(ServerShow)))
@@ -326,7 +322,6 @@ func main() {
 	router.GET(`/views/:view`, Check(BasicAuth(ViewShow)))
 	router.GET(`/views/`, Check(BasicAuth(ViewList)))
 	router.GET(`/workflow/summary`, Check(BasicAuth(WorkflowSummary)))
-	router.POST(`/filter/actions/`, Check(BasicAuth(ActionSearch)))
 	router.POST(`/filter/buckets/`, Check(BasicAuth(BucketList)))
 	router.POST(`/filter/capability/`, Check(BasicAuth(CapabilityList)))
 	router.POST(`/filter/checks/:repository/`, Check(BasicAuth(CheckConfigurationList)))
@@ -380,7 +375,6 @@ func main() {
 			router.DELETE(`/property/system/:system`, Check(BasicAuth(PropertyRemove)))
 			router.DELETE(`/providers/:provider`, Check(BasicAuth(ProviderRemove)))
 			router.DELETE(`/repository/:repository/property/:type/:source`, Check(BasicAuth(RepositoryRemoveProperty)))
-			router.DELETE(`/sections/:section/actions/:action`, Check(BasicAuth(ActionRemove)))
 			router.DELETE(`/sections/:section`, Check(BasicAuth(SectionRemove)))
 			router.DELETE(`/servers/:server`, Check(BasicAuth(ServerRemove)))
 			router.DELETE(`/states/:state`, Check(BasicAuth(StateRemove)))
@@ -431,7 +425,6 @@ func main() {
 			router.POST(`/providers/`, Check(BasicAuth(ProviderAdd)))
 			router.POST(`/repository/:repository/property/:type/`, Check(BasicAuth(RepositoryAddProperty)))
 			router.POST(`/repository/`, Check(BasicAuth(RepositoryCreate)))
-			router.POST(`/sections/:section/actions/`, Check(BasicAuth(ActionAdd)))
 			router.POST(`/sections/`, Check(BasicAuth(SectionAdd)))
 			router.POST(`/servers/:server`, Check(BasicAuth(ServerAddNull)))
 			router.POST(`/servers/`, Check(BasicAuth(ServerAdd)))

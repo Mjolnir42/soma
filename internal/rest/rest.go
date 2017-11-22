@@ -51,19 +51,24 @@ func New(
 func (x *Rest) Run() {
 	router := httprouter.New()
 
+	router.GET(`/sections/:section/actions/:action`, x.Check(x.BasicAuth(x.ActionShow)))
+	router.GET(`/sections/:section/actions/`, x.Check(x.BasicAuth(x.ActionList)))
 	router.GET(`/sync/node/`, x.Check(x.BasicAuth(x.NodeMgmtSync)))
 	router.HEAD(`/authenticate/validate`, x.Check(x.BasicAuth(x.SupervisorValidate)))
+	router.POST(`/filter/actions/`, x.Check(x.BasicAuth(x.ActionSearch)))
 
 	if !x.conf.ReadOnly {
 		if !x.conf.Observer {
 			router.DELETE(`/accounts/tokens/:account`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidateAccount)))
 			router.DELETE(`/node/:nodeID`, x.Check(x.BasicAuth(x.NodeMgmtRemove)))
+			router.DELETE(`/sections/:section/actions/:action`, x.Check(x.BasicAuth(x.ActionRemove)))
 			router.DELETE(`/tokens/global`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidateGlobal)))
 			router.DELETE(`/tokens/self/active`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidate)))
 			router.DELETE(`/tokens/self/all`, x.Check(x.BasicAuth(x.SupervisorTokenInvalidateSelf)))
 			router.PATCH(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordChange))
 			router.POST(`/kex/`, x.Check(x.SupervisorKex))
 			router.POST(`/node/`, x.Check(x.BasicAuth(x.NodeMgmtAdd)))
+			router.POST(`/sections/:section/actions/`, x.Check(x.BasicAuth(x.ActionAdd)))
 			router.PUT(`/accounts/activate/root/:kexID`, x.Check(x.SupervisorActivateRoot))
 			router.PUT(`/accounts/activate/user/:kexID`, x.Check(x.SupervisorActivateUser))
 			router.PUT(`/accounts/password/:kexID`, x.Check(x.SupervisorPasswordReset))

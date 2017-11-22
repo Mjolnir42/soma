@@ -138,8 +138,7 @@ func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	cReq := proto.NewNodeRequest()
-	err := decodeJSONBody(r, &cReq)
-	if err != nil {
+	if err := decodeJSONBody(r, &cReq); err != nil {
 		dispatchBadRequest(&w, err)
 		return
 	}
