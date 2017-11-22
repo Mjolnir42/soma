@@ -96,7 +96,7 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	returnChannel := make(chan msg.Result)
 	request := msg.Request{
 		ID:         requestID(params),
-		Section:    msg.SectionSystemOperation,
+		Section:    msg.SectionSupervisor,
 		Action:     msg.ActionRevokeTokens,
 		Reply:      returnChannel,
 		RemoteAddr: extractAddress(r.RemoteAddr),
