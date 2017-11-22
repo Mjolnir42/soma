@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -276,10 +276,10 @@ func (teb *Bucket) ClearLoadInfo() {
 //
 func (teb *Bucket) export() proto.Bucket {
 	return proto.Bucket{
-		Id:           teb.Id.String(),
+		ID:           teb.Id.String(),
 		Name:         teb.Name,
-		RepositoryId: teb.Repository.String(),
-		TeamId:       teb.Team.String(),
+		RepositoryID: teb.Repository.String(),
+		TeamID:       teb.Team.String(),
 		Environment:  teb.Environment,
 		IsDeleted:    teb.Deleted,
 		IsFrozen:     teb.Frozen,

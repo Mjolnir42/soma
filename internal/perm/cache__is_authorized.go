@@ -164,7 +164,7 @@ permloop:
 				`property_custom`:
 				objID = q.Repository.Id
 			case `bucket`, `clusters`, `checks`, `groups`:
-				objID = q.Bucket.Id
+				objID = q.Bucket.ID
 			default:
 				// invalid uuid
 				objID = `ffffffff-ffff-3fff-ffff-ffffffffffff`
@@ -189,7 +189,7 @@ permloop:
 			switch q.Section {
 			case `bucket`, `clusters`, `checks`, `groups`:
 				// permission could be on the repository
-				objID = c.object.repoForBucket(q.Bucket.Id)
+				objID = c.object.repoForBucket(q.Bucket.ID)
 				if objID == `` {
 					continue permloop
 				}

@@ -15,6 +15,9 @@ import (
 )
 
 func (tk *TreeKeeper) treeBucket(q *msg.Request) {
+	//XXX BUG convert to section/action model
+	//XXX BUG validate bucket request
+	//XXX BUG generate Bucket.UUID in Guidepost
 	switch q.Action {
 	case `create_bucket`:
 		tree.NewBucket(tree.BucketSpec{
@@ -24,7 +27,7 @@ func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 			Team:        tk.meta.teamID,
 			Deleted:     q.Bucket.IsDeleted,
 			Frozen:      q.Bucket.IsFrozen,
-			Repository:  q.Bucket.RepositoryId,
+			Repository:  q.Bucket.RepositoryID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `repository`,

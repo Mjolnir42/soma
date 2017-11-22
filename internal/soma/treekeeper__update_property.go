@@ -48,7 +48,7 @@ func (tk *TreeKeeper) convProperty(task string, q *msg.Request) (
 		id = q.Group.Id
 		prop = tk.pTT(task, (*q.Group.Properties)[0])
 	case `bucket`:
-		id = q.Bucket.Id
+		id = q.Bucket.ID
 		prop = tk.pTT(task, (*q.Bucket.Properties)[0])
 	case `repository`:
 		id = q.Repository.Id

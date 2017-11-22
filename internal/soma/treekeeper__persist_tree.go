@@ -39,13 +39,13 @@ func (tk *TreeKeeper) txTreeCreate(a *tree.Action,
 	switch a.Type {
 	case `bucket`:
 		_, err = stm[`CreateBucket`].Exec(
-			a.Bucket.Id,
+			a.Bucket.ID,
 			a.Bucket.Name,
 			a.Bucket.IsFrozen,
 			a.Bucket.IsDeleted,
-			a.Bucket.RepositoryId,
+			a.Bucket.RepositoryID,
 			a.Bucket.Environment,
-			a.Bucket.TeamId,
+			a.Bucket.TeamID,
 			user,
 		)
 	case `group`:
@@ -135,8 +135,8 @@ func (tk *TreeKeeper) txTreeMemberNew(a *tree.Action,
 	case `bucket`:
 		_, err = stm[`BucketAssignNode`].Exec(
 			a.ChildNode.Id,
-			a.Bucket.Id,
-			a.Bucket.TeamId,
+			a.Bucket.ID,
+			a.Bucket.TeamID,
 		)
 		goto exit
 	case `group`:

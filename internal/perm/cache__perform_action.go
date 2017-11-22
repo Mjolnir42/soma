@@ -39,8 +39,8 @@ func (c *Cache) performActionRemove(q *msg.Request) {
 func (c *Cache) performBucketCreate(q *msg.Request) {
 	c.lock.Lock()
 	c.object.addBucket(
-		q.Bucket.RepositoryId,
-		q.Bucket.Id,
+		q.Bucket.RepositoryID,
+		q.Bucket.ID,
 	)
 	c.lock.Unlock()
 }
@@ -49,12 +49,12 @@ func (c *Cache) performBucketCreate(q *msg.Request) {
 func (c *Cache) performBucketDestroy(q *msg.Request) {
 	c.lock.Lock()
 	// revoke all grants on the object to be deleted
-	grantIDs := c.grantRepository.getObjectGrantID(q.Bucket.Id)
+	grantIDs := c.grantRepository.getObjectGrantID(q.Bucket.ID)
 	for _, grantID := range grantIDs {
 		c.grantRepository.revoke(grantID)
 	}
 	// remove object
-	c.object.rmBucket(q.Bucket.Id)
+	c.object.rmBucket(q.Bucket.ID)
 	c.lock.Unlock()
 }
 

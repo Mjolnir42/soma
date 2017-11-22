@@ -9,11 +9,12 @@
 
 package proto
 
+// Bucket type
 type Bucket struct {
-	Id             string      `json:"id,omitempty"`
+	ID             string      `json:"ID,omitempty"`
 	Name           string      `json:"name,omitempty"`
-	RepositoryId   string      `json:"repositoryId,omitempty"`
-	TeamId         string      `json:"teamId,omitempty"`
+	RepositoryID   string      `json:"repositoryID,omitempty"`
+	TeamID         string      `json:"teamID,omitempty"`
 	Environment    string      `json:"environment,omitempty"`
 	IsDeleted      bool        `json:"isDeleted,omitempty"`
 	IsFrozen       bool        `json:"isFrozen,omitempty"`
@@ -24,14 +25,35 @@ type Bucket struct {
 	Properties     *[]Property `json:"properties,omitempty"`
 }
 
+// Clone function
+func (b *Bucket) Clone() Bucket {
+	clone := Bucket{
+		ID:           b.ID,
+		Name:         b.Name,
+		RepositoryID: b.RepositoryID,
+		TeamID:       b.TeamID,
+		Environment:  b.Environment,
+		IsDeleted:    b.IsDeleted,
+		IsFrozen:     b.IsFrozen,
+	}
+	// XXX MemberGroups
+	// XXX MemberClusters
+	// XXX MemberNodes
+	// XXX Details
+	// XXX Properties
+	return clone
+}
+
+// BucketFilter type
 type BucketFilter struct {
 	Name         string `json:"name,omitempty"`
-	Id           string `json:"id,omitempty"`
-	RepositoryId string `json:"repositoryId,omitempty"`
+	ID           string `json:"ID,omitempty"`
+	RepositoryID string `json:"repositoryID,omitempty"`
 	IsDeleted    bool   `json:"isDeleted,omitempty"`
 	IsFrozen     bool   `json:"isFrozen,omitempty"`
 }
 
+// NewBucketRequest function
 func NewBucketRequest() Request {
 	return Request{
 		Flags:  &Flags{},
@@ -39,6 +61,7 @@ func NewBucketRequest() Request {
 	}
 }
 
+// NewBucketFilter function
 func NewBucketFilter() Request {
 	return Request{
 		Filter: &Filter{
@@ -47,6 +70,7 @@ func NewBucketFilter() Request {
 	}
 }
 
+// NewBucketResult function
 func NewBucketResult() Result {
 	return Result{
 		Errors:  &[]string{},

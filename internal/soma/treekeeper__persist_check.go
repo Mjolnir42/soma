@@ -145,13 +145,13 @@ func (tk *TreeKeeper) txCheck(a *tree.Action,
 func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	var id string
-	bucket := sql.NullString{String: a.Bucket.Id, Valid: true}
+	bucket := sql.NullString{String: a.Bucket.ID, Valid: true}
 	switch a.Type {
 	case `repository`:
 		id = a.Repository.Id
 		bucket = sql.NullString{String: "", Valid: false}
 	case `bucket`:
-		id = a.Bucket.Id
+		id = a.Bucket.ID
 	case `group`:
 		id = a.Group.Id
 	case `cluster`:

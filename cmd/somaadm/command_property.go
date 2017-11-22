@@ -6,10 +6,10 @@ import (
 
 	resty "gopkg.in/resty.v0"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerProperty(app cli.App) *cli.App {
@@ -822,7 +822,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		req.Group.Properties = &[]proto.Property{prop}
 	case `bucket`:
 		req = proto.NewBucketRequest()
-		req.Bucket.Id = objectId
+		req.Bucket.ID = objectId
 		req.Bucket.Properties = &[]proto.Property{prop}
 	case `repository`:
 		req = proto.NewRepositoryRequest()

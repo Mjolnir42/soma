@@ -258,10 +258,10 @@ func (r *TreeRead) bucket(id string, depth int) (*proto.Bucket, error) {
 	}
 
 	bucket := proto.Bucket{
-		Id:           id,
+		ID:           id,
 		Name:         name,
-		RepositoryId: repositoryID,
-		TeamId:       teamID,
+		RepositoryID: repositoryID,
+		TeamID:       teamID,
 		Environment:  environment,
 		IsDeleted:    isDeleted,
 		IsFrozen:     isFrozen,

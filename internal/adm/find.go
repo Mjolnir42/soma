@@ -55,7 +55,7 @@ func FindBucketPropSrcID(pType, pName, view, bucketID string,
 		res    *proto.Result
 		bucket proto.Bucket
 	)
-	res, err = fetchObjList(fmt.Sprintf("/buckets/%s", bucketID))
+	res, err = fetchObjList(fmt.Sprintf("/bucket/%s", bucketID))
 	if err != nil {
 		goto abort
 	}

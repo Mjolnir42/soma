@@ -545,7 +545,7 @@ abort:
 // teamIdByBucketId implements the actual serverside lookup of
 // a bucket's TeamId
 func teamIdByBucketId(bucket string) (string, error) {
-	res, err := fetchObjList(fmt.Sprintf("/buckets/%s", bucket))
+	res, err := fetchObjList(fmt.Sprintf("/bucket/%s", bucket))
 	if err != nil {
 		goto abort
 	}
@@ -556,12 +556,12 @@ func teamIdByBucketId(bucket string) (string, error) {
 	}
 
 	// check the received record against the input
-	if bucket != (*res.Buckets)[0].Id {
+	if bucket != (*res.Buckets)[0].ID {
 		err = fmt.Errorf("BucketId mismatch: %s vs %s",
-			bucket, (*res.Buckets)[0].Id)
+			bucket, (*res.Buckets)[0].ID)
 		goto abort
 	}
-	return (*res.Buckets)[0].TeamId, nil
+	return (*res.Buckets)[0].TeamID, nil
 
 abort:
 	return ``, fmt.Errorf("TeamId lookup failed: %s",
@@ -626,7 +626,7 @@ abort:
 // repoIdByBucketId implements the actual serverside lookup of the
 // repo's UUID
 func repoIdByBucketId(bucket string) (string, error) {
-	res, err := fetchObjList(fmt.Sprintf("/buckets/%s", bucket))
+	res, err := fetchObjList(fmt.Sprintf("/bucket/%s", bucket))
 	if err != nil {
 		goto abort
 	}
@@ -637,12 +637,12 @@ func repoIdByBucketId(bucket string) (string, error) {
 	}
 
 	// check the received record against the input
-	if bucket != (*res.Buckets)[0].Id {
+	if bucket != (*res.Buckets)[0].ID {
 		err = fmt.Errorf("BucketId mismatch: %s vs %s",
-			bucket, (*res.Buckets)[0].Id)
+			bucket, (*res.Buckets)[0].ID)
 		goto abort
 	}
-	return (*res.Buckets)[0].RepositoryId, nil
+	return (*res.Buckets)[0].RepositoryID, nil
 
 abort:
 	return ``, fmt.Errorf("RepositoryId lookup failed: %s",
@@ -655,7 +655,7 @@ func bucketIdByName(bucket string) (string, error) {
 	req := proto.NewBucketFilter()
 	req.Filter.Bucket.Name = bucket
 
-	res, err := fetchFilter(req, `/filter/buckets/`)
+	res, err := fetchFilter(req, `/search/bucket/`)
 	if err != nil {
 		goto abort
 	}
@@ -671,7 +671,7 @@ func bucketIdByName(bucket string) (string, error) {
 			bucket, (*res.Buckets)[0].Name)
 		goto abort
 	}
-	return (*res.Buckets)[0].Id, nil
+	return (*res.Buckets)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("BucketId lookup failed: %s",

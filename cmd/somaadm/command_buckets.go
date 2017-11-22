@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerBuckets(app cli.App) *cli.App {
@@ -85,9 +85,9 @@ func registerBuckets(app cli.App) *cli.App {
 						Usage: "SUBCOMMANDS for properties",
 						Subcommands: []cli.Command{
 							{
-								Name:        "add",
-								Usage:       "SUBCOMMANDS for property add",
-								Description: help.Text(`BucketsPropertyAdd`),
+								Name:        `create`,
+								Usage:       `SUBCOMMANDS for property create`,
+								Description: help.Text(`BucketsPropertyCreate`),
 								Subcommands: []cli.Command{
 									{
 										Name:         "system",
@@ -183,7 +183,7 @@ func cmdBucketCreate(c *cli.Context) error {
 	req := proto.Request{
 		Bucket: &proto.Bucket{
 			Name:         c.Args().First(),
-			RepositoryId: repoId,
+			RepositoryID: repoId,
 			Environment:  opts["environment"][0],
 		},
 	}
@@ -193,7 +193,7 @@ func cmdBucketCreate(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`postbody`, `/buckets/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/bucket/`, `command`, req, c)
 }
 
 func cmdBucketDelete(c *cli.Context) error {
@@ -211,7 +211,7 @@ func cmdBucketDelete(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/buckets/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckId)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -236,7 +236,7 @@ func cmdBucketRestore(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/buckets/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckId)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -260,7 +260,7 @@ func cmdBucketPurge(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/buckets/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckId)
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 
@@ -285,7 +285,7 @@ func cmdBucketFreeze(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/buckets/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckId)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -310,7 +310,7 @@ func cmdBucketThaw(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/buckets/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckId)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -336,7 +336,7 @@ func cmdBucketRename(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/buckets/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckId)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -345,7 +345,7 @@ func cmdBucketList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/buckets/`, `list`, nil, c)
+	return adm.Perform(`get`, `/bucket/`, `list`, nil, c)
 }
 
 func cmdBucketShow(c *cli.Context) error {
@@ -357,7 +357,7 @@ func cmdBucketShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/buckets/%s", bucketId)
+	path := fmt.Sprintf("/bucket/%s", bucketId)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -370,7 +370,7 @@ func cmdBucketInstance(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/buckets/%s/instances/", bucketId)
+	path := fmt.Sprintf("/bucket/%s/instances/", bucketId)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
@@ -383,7 +383,7 @@ func cmdBucketTree(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/buckets/%s/tree/tree", bucketId)
+	path := fmt.Sprintf("/bucket/%s/tree/tree", bucketId)
 	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 
@@ -453,7 +453,7 @@ func cmdBucketPropertyDelete(c *cli.Context, pType string) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/buckets/%s/property/%s/%s",
+	path := fmt.Sprintf("/bucket/%s/property/%s/%s",
 		bucketId, pType, sourceId)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }

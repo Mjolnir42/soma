@@ -67,7 +67,7 @@ func (tk *TreeKeeper) txPropertyNewCustom(a *tree.Action,
 		id = a.Property.Custom.RepositoryId
 	case `bucket`:
 		statement = stm[`BucketPropertyCustomCreate`]
-		id = a.Bucket.Id
+		id = a.Bucket.ID
 	case `group`:
 		statement = stm[`GroupPropertyCustomCreate`]
 		id = a.Group.Id
@@ -104,7 +104,7 @@ func (tk *TreeKeeper) txPropertyNewSystem(a *tree.Action,
 		id = a.Repository.Id
 	case `bucket`:
 		statement = stm[`BucketPropertySystemCreate`]
-		id = a.Bucket.Id
+		id = a.Bucket.ID
 	case `group`:
 		statement = stm[`GroupPropertySystemCreate`]
 		id = a.Group.Id
@@ -144,7 +144,7 @@ func (tk *TreeKeeper) txPropertyNewService(a *tree.Action,
 		id = a.Repository.Id
 	case `bucket`:
 		statement = stm[`BucketPropertyServiceCreate`]
-		id = a.Bucket.Id
+		id = a.Bucket.ID
 	case `group`:
 		statement = stm[`GroupPropertyServiceCreate`]
 		id = a.Group.Id
@@ -182,7 +182,7 @@ func (tk *TreeKeeper) txPropertyNewOncall(a *tree.Action,
 		id = a.Repository.Id
 	case `bucket`:
 		statement = stm[`BucketPropertyOncallCreate`]
-		id = a.Bucket.Id
+		id = a.Bucket.ID
 	case `group`:
 		statement = stm[`GroupPropertyOncallCreate`]
 		id = a.Group.Id

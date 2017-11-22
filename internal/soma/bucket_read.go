@@ -125,7 +125,7 @@ func (r *BucketRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Bucket = append(mr.Bucket, proto.Bucket{
-			Id:   bucketID,
+			ID:   bucketID,
 			Name: bucketName,
 		})
 	}
@@ -145,7 +145,7 @@ func (r *BucketRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Bucket.Id,
+		q.Bucket.ID,
 	).Scan(
 		&ID,
 		&name,
@@ -162,10 +162,10 @@ func (r *BucketRead) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	bucket := proto.Bucket{
-		Id:           ID,
+		ID:           ID,
 		Name:         name,
-		RepositoryId: repoID,
-		TeamId:       teamID,
+		RepositoryID: repoID,
+		TeamID:       teamID,
 		Environment:  env,
 		IsDeleted:    isDeleted,
 		IsFrozen:     isFrozen,

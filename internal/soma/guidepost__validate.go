@@ -32,8 +32,8 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 		}
 	case `bucket`:
 		if nf, err := g.validateBucketInRepository(
-			q.Bucket.RepositoryId,
-			q.Bucket.Id,
+			q.Bucket.RepositoryID,
+			q.Bucket.ID,
 		); err != nil {
 			return nf, err
 		}

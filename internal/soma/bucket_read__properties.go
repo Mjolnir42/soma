@@ -24,7 +24,7 @@ func (r *BucketRead) oncallProperties(bucket *proto.Bucket) error {
 	)
 
 	if rows, err = r.stmtPropOncall.Query(
-		bucket.Id,
+		bucket.ID,
 	); err != nil {
 		return err
 	}
@@ -43,8 +43,8 @@ func (r *BucketRead) oncallProperties(bucket *proto.Bucket) error {
 		*bucket.Properties = append(*bucket.Properties,
 			proto.Property{
 				Type:             `oncall`,
-				RepositoryId:     bucket.RepositoryId,
-				BucketId:         bucket.Id,
+				RepositoryId:     bucket.RepositoryID,
+				BucketId:         bucket.ID,
 				InstanceId:       instanceID,
 				SourceInstanceId: sourceInstanceID,
 				View:             view,
@@ -71,7 +71,7 @@ func (r *BucketRead) serviceProperties(bucket *proto.Bucket) error {
 	)
 
 	if rows, err = r.stmtPropService.Query(
-		bucket.Id,
+		bucket.ID,
 	); err != nil {
 		return err
 	}
@@ -89,8 +89,8 @@ func (r *BucketRead) serviceProperties(bucket *proto.Bucket) error {
 		*bucket.Properties = append(*bucket.Properties,
 			proto.Property{
 				Type:             `service`,
-				RepositoryId:     bucket.RepositoryId,
-				BucketId:         bucket.Id,
+				RepositoryId:     bucket.RepositoryID,
+				BucketId:         bucket.ID,
 				InstanceId:       instanceID,
 				SourceInstanceId: sourceInstanceID,
 				View:             view,
@@ -116,7 +116,7 @@ func (r *BucketRead) systemProperties(bucket *proto.Bucket) error {
 	)
 
 	if rows, err = r.stmtPropSystem.Query(
-		bucket.Id,
+		bucket.ID,
 	); err != nil {
 		return err
 	}
@@ -135,8 +135,8 @@ func (r *BucketRead) systemProperties(bucket *proto.Bucket) error {
 		*bucket.Properties = append(*bucket.Properties,
 			proto.Property{
 				Type:             `system`,
-				RepositoryId:     bucket.RepositoryId,
-				BucketId:         bucket.Id,
+				RepositoryId:     bucket.RepositoryID,
+				BucketId:         bucket.ID,
 				InstanceId:       instanceID,
 				SourceInstanceId: sourceInstanceID,
 				View:             view,
@@ -163,7 +163,7 @@ func (r *BucketRead) customProperties(bucket *proto.Bucket) error {
 	)
 
 	if rows, err = r.stmtPropCustom.Query(
-		bucket.Id,
+		bucket.ID,
 	); err != nil {
 		return err
 	}
@@ -183,8 +183,8 @@ func (r *BucketRead) customProperties(bucket *proto.Bucket) error {
 		*bucket.Properties = append(*bucket.Properties,
 			proto.Property{
 				Type:             `custom`,
-				RepositoryId:     bucket.RepositoryId,
-				BucketId:         bucket.Id,
+				RepositoryId:     bucket.RepositoryID,
+				BucketId:         bucket.ID,
 				InstanceId:       instanceID,
 				SourceInstanceId: sourceInstanceID,
 				View:             view,
