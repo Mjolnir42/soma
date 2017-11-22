@@ -165,6 +165,9 @@ permloop:
 				objID = q.Repository.Id
 			case `bucket`, `clusters`, `checks`, `groups`:
 				objID = q.Bucket.Id
+			default:
+				// invalid uuid
+				objID = `ffffffff-ffff-3fff-ffff-ffffffffffff`
 			}
 		}
 
