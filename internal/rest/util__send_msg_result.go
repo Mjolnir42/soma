@@ -43,6 +43,7 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 				result = proto.NewResult()
 			}
 		}
+
 	case msg.SectionSystemOperation:
 		switch r.Action {
 		case msg.ActionRevokeTokens:
@@ -51,6 +52,10 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 				result = proto.NewResult()
 			}
 		}
+
+	case msg.SectionAction:
+		result = proto.NewActionResult()
+		*result.Actions = append(*result.Actions, r.ActionObj...)
 
 	case msg.SectionAttribute:
 		result = proto.NewAttributeResult()
@@ -96,9 +101,6 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 	case `section`:
 		result = proto.NewSectionResult()
 		*result.Sections = append(*result.Sections, r.SectionObj...)
-	case `action`:
-		result = proto.NewActionResult()
-		*result.Actions = append(*result.Actions, r.ActionObj...)
 	case `environment`:
 		result = proto.NewEnvironmentResult()
 		*result.Environments = append(*result.Environments, r.Environment...)
