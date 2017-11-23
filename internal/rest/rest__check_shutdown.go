@@ -15,8 +15,8 @@ import (
 	metrics "github.com/rcrowley/go-metrics"
 )
 
-// Check denies the request if a shutdown is in progress
-func (x *Rest) Check(h httprouter.Handle) httprouter.Handle {
+// CheckShutdown denies the request if a shutdown is in progress
+func (x *Rest) CheckShutdown(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
 
@@ -34,6 +34,18 @@ func (x *Rest) Check(h httprouter.Handle) httprouter.Handle {
 		http.Error(w, `Shutdown in progress`,
 			http.StatusServiceUnavailable)
 	}
+}
+
+// Verify is a wrapper for CheckShutdown and BasicAuth checks
+func (x *Rest) Verify(h httprouter.Handle) httprouter.Handle {
+	return x.CheckShutdown(
+		x.BasicAuth(
+			func(w http.ResponseWriter, r *http.Request,
+				ps httprouter.Params) {
+				h(w, r, ps)
+			},
+		),
+	)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
