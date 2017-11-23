@@ -69,6 +69,10 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		result = proto.NewCapabilityResult()
 		*result.Capabilities = append(*result.Capabilities, r.Capability...)
 
+	case msg.SectionCategory:
+		result = proto.NewCategoryResult()
+		*result.Categories = append(*result.Categories, r.Category...)
+
 	// XXX below are legacy definitions
 	case `kex`:
 		k = r.Super.Kex
@@ -97,9 +101,6 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 			dispatchForbidden(w, nil)
 		}
 		return
-	case `category`:
-		result = proto.NewCategoryResult()
-		*result.Categories = append(*result.Categories, r.Category...)
 	case `permission`:
 		result = proto.NewPermissionResult()
 		*result.Permissions = append(*result.Permissions, r.Permission...)

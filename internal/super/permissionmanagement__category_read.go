@@ -85,8 +85,10 @@ func (s *Supervisor) categoryShow(q *msg.Request, mr *msg.Result) {
 	mr.Category = append(mr.Category, proto.Category{
 		Name: category,
 		Details: &proto.CategoryDetails{
-			CreatedAt: ts.Format(msg.RFC3339Milli),
-			CreatedBy: user,
+			Creation: &proto.DetailsCreation{
+				CreatedAt: ts.Format(msg.RFC3339Milli),
+				CreatedBy: user,
+			},
 		},
 	})
 	mr.OK()

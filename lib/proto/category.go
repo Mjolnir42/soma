@@ -14,9 +14,26 @@ type Category struct {
 	Details *CategoryDetails `json:"details,omitempty"`
 }
 
+func (c *Category) Clone() Category {
+	clone := Category{
+		Name: c.Name,
+	}
+	if c.Details != nil {
+		clone.Details = c.Details.Clone()
+	}
+	return clone
+}
+
 type CategoryDetails struct {
-	CreatedAt string `json:"createdAt,omitempty"`
-	CreatedBy string `json:"createdBy,omitempty"`
+	Creation *DetailsCreation `json:"creation,omitempty"`
+}
+
+func (c *CategoryDetails) Clone() *CategoryDetails {
+	clone := &CategoryDetails{}
+	if c.Creation != nil {
+		clone.Creation = c.Creation.Clone()
+	}
+	return clone
 }
 
 func NewCategoryRequest() Request {
