@@ -13,8 +13,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -424,14 +424,14 @@ func (teg *Group) actionPropertyDelete(a Action) {
 func (teg *Group) actionProperty(a Action) {
 	a.Type = teg.Type
 	a.Group = teg.export()
-	a.Property.RepositoryId = teg.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Property.BucketId = teg.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Property.RepositoryID = teg.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Property.BucketID = teg.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 
 	switch a.Property.Type {
 	case "custom":
-		a.Property.Custom.RepositoryId = a.Property.RepositoryId
+		a.Property.Custom.RepositoryID = a.Property.RepositoryID
 	case "service":
-		a.Property.Service.TeamId = teg.Team.String()
+		a.Property.Service.TeamID = teg.Team.String()
 	}
 
 	teg.Action <- &a

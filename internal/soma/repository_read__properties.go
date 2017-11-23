@@ -43,12 +43,12 @@ func (r *RepositoryRead) oncallProperties(repo *proto.Repository) error {
 		*repo.Properties = append(*repo.Properties,
 			proto.Property{
 				Type:             `oncall`,
-				RepositoryId:     repo.Id,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				RepositoryID:     repo.Id,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Oncall: &proto.PropertyOncall{
-					Id:   oncallID,
+					ID:   oncallID,
 					Name: oncallName,
 				},
 			},
@@ -88,9 +88,9 @@ func (r *RepositoryRead) serviceProperties(repo *proto.Repository) error {
 		*repo.Properties = append(*repo.Properties,
 			proto.Property{
 				Type:             `service`,
-				RepositoryId:     repo.Id,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				RepositoryID:     repo.Id,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Service: &proto.PropertyService{
 					Name: serviceName,
@@ -133,9 +133,9 @@ func (r *RepositoryRead) systemProperties(repo *proto.Repository) error {
 		*repo.Properties = append(*repo.Properties,
 			proto.Property{
 				Type:             `system`,
-				RepositoryId:     repo.Id,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				RepositoryID:     repo.Id,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				System: &proto.PropertySystem{
 					Name:  systemProp,
@@ -180,12 +180,12 @@ func (r *RepositoryRead) customProperties(repo *proto.Repository) error {
 		*repo.Properties = append(*repo.Properties,
 			proto.Property{
 				Type:             `custom`,
-				RepositoryId:     repo.Id,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				RepositoryID:     repo.Id,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Custom: &proto.PropertyCustom{
-					Id:    customID,
+					ID:    customID,
 					Name:  customProp,
 					Value: value,
 				},

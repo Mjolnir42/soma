@@ -13,8 +13,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -390,14 +390,14 @@ func (tec *Cluster) actionPropertyDelete(a Action) {
 func (tec *Cluster) actionProperty(a Action) {
 	a.Type = tec.Type
 	a.Cluster = tec.export()
-	a.Property.RepositoryId = tec.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Property.BucketId = tec.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Property.RepositoryID = tec.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Property.BucketID = tec.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 
 	switch a.Property.Type {
 	case "custom":
-		a.Property.Custom.RepositoryId = a.Property.RepositoryId
+		a.Property.Custom.RepositoryID = a.Property.RepositoryID
 	case "service":
-		a.Property.Service.TeamId = tec.Team.String()
+		a.Property.Service.TeamID = tec.Team.String()
 	}
 
 	tec.Action <- &a

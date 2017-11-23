@@ -108,6 +108,8 @@ func (r *CheckConfigurationRead) process(q *msg.Request) {
 		r.list(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
+	case msg.ActionSearch:
+		// XXX BUG x.search(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -125,7 +127,7 @@ func (r *CheckConfigurationRead) list(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = r.stmtList.Query(
-		q.CheckConfig.RepositoryId,
+		q.CheckConfig.RepositoryID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -149,9 +151,9 @@ func (r *CheckConfigurationRead) list(q *msg.Request, mr *msg.Result) {
 		}
 		mr.CheckConfig = append(mr.CheckConfig,
 			proto.CheckConfig{
-				Id:           configID,
-				RepositoryId: repoID,
-				BucketId:     bucketID,
+				ID:           configID,
+				RepositoryID: repoID,
+				BucketID:     bucketID,
 				Name:         configName,
 			},
 		)
@@ -178,7 +180,7 @@ func (r *CheckConfigurationRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.CheckConfig.Id,
+		q.CheckConfig.ID,
 	).Scan(
 		&configID,
 		&repoID,
@@ -205,19 +207,19 @@ func (r *CheckConfigurationRead) show(q *msg.Request, mr *msg.Result) {
 	}
 
 	checkConfig = proto.CheckConfig{
-		Id:           configID,
+		ID:           configID,
 		Name:         configName,
 		Interval:     uint64(interval),
-		RepositoryId: repoID,
-		BucketId:     bucketID,
-		CapabilityId: capabilityID,
-		ObjectId:     objectID,
+		RepositoryID: repoID,
+		BucketID:     bucketID,
+		CapabilityID: capabilityID,
+		ObjectID:     objectID,
 		ObjectType:   objectType,
 		IsActive:     isActive,
 		IsEnabled:    isEnabled,
 		Inheritance:  hasInheritance,
 		ChildrenOnly: isChildrenOnly,
-		ExternalId:   externalID,
+		ExternalID:   externalID,
 	}
 
 	// retrieve check configuration thresholds
@@ -252,7 +254,7 @@ func (r *CheckConfigurationRead) thresholds(cnf *proto.CheckConfig) error {
 	)
 
 	if rows, err = r.stmtShowThreshold.Query(
-		cnf.Id,
+		cnf.ID,
 	); err != nil {
 		return err
 	}
@@ -360,7 +362,7 @@ func (r *CheckConfigurationRead) constraintCustom(cnf *proto.CheckConfig) error 
 	)
 
 	if rows, err = r.stmtShowConstraintCustom.Query(
-		cnf.Id,
+		cnf.ID,
 	); err != nil {
 		return err
 	}
@@ -380,8 +382,8 @@ func (r *CheckConfigurationRead) constraintCustom(cnf *proto.CheckConfig) error 
 		constraint := proto.CheckConfigConstraint{
 			ConstraintType: `custom`,
 			Custom: &proto.PropertyCustom{
-				Id:           propertyID,
-				RepositoryId: repoID,
+				ID:           propertyID,
+				RepositoryID: repoID,
 				Name:         property,
 				Value:        value,
 			},
@@ -404,7 +406,7 @@ func (r *CheckConfigurationRead) constraintSystem(cnf *proto.CheckConfig) error 
 	)
 
 	if rows, err = r.stmtShowConstraintSystem.Query(
-		cnf.Id,
+		cnf.ID,
 	); err != nil {
 		return err
 	}
@@ -444,7 +446,7 @@ func (r *CheckConfigurationRead) constraintNative(cnf *proto.CheckConfig) error 
 	)
 
 	if rows, err = r.stmtShowConstraintNative.Query(
-		cnf.Id,
+		cnf.ID,
 	); err != nil {
 		return err
 	}
@@ -482,7 +484,7 @@ func (r *CheckConfigurationRead) constraintService(cnf *proto.CheckConfig) error
 	)
 
 	if rows, err = r.stmtShowConstraintService.Query(
-		cnf.Id,
+		cnf.ID,
 	); err != nil {
 		return err
 	}
@@ -501,7 +503,7 @@ func (r *CheckConfigurationRead) constraintService(cnf *proto.CheckConfig) error
 			ConstraintType: `service`,
 			Service: &proto.PropertyService{
 				Name:   svcName,
-				TeamId: teamID,
+				TeamID: teamID,
 			},
 		}
 		cnf.Constraints = append(cnf.Constraints, constraint)
@@ -522,7 +524,7 @@ func (r *CheckConfigurationRead) constraintAttribute(cnf *proto.CheckConfig) err
 	)
 
 	if rows, err = r.stmtShowConstraintAttribute.Query(
-		cnf.Id,
+		cnf.ID,
 	); err != nil {
 		return err
 	}
@@ -559,7 +561,7 @@ func (r *CheckConfigurationRead) constraintOncall(cnf *proto.CheckConfig) error 
 	)
 
 	if rows, err = r.stmtShowConstraintOncall.Query(
-		cnf.Id,
+		cnf.ID,
 	); err != nil {
 		return err
 	}
@@ -578,7 +580,7 @@ func (r *CheckConfigurationRead) constraintOncall(cnf *proto.CheckConfig) error 
 		constraint := proto.CheckConfigConstraint{
 			ConstraintType: `oncall`,
 			Oncall: &proto.PropertyOncall{
-				Id:     oncallID,
+				ID:     oncallID,
 				Name:   oncallName,
 				Number: oncallNumber,
 			},
@@ -599,7 +601,7 @@ func (r *CheckConfigurationRead) instances(cnf *proto.CheckConfig) error {
 	)
 
 	if rows, err = r.stmtShowInstanceInfo.Query(
-		cnf.Id,
+		cnf.ID,
 	); err != nil {
 		return err
 	}
@@ -619,8 +621,8 @@ func (r *CheckConfigurationRead) instances(cnf *proto.CheckConfig) error {
 		}
 
 		instance := proto.CheckInstanceInfo{
-			Id:            instanceID,
-			ObjectId:      objectID,
+			ID:            instanceID,
+			ObjectID:      objectID,
 			ObjectType:    objectType,
 			CurrentStatus: currentStatus,
 			NextStatus:    nextStatus,

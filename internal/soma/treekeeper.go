@@ -524,7 +524,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 	if strings.HasPrefix(q.Action, `remove_check_from_`) {
 		if _, err = tx.Exec(
 			stmt.TxMarkCheckConfigDeleted,
-			q.CheckConfig.Id,
+			q.CheckConfig.ID,
 		); err != nil {
 			goto bailout
 		}

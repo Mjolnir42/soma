@@ -60,7 +60,7 @@ func (tk *TreeKeeper) convProperty(task string, q *msg.Request) (
 func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 	switch pp.Type {
 	case `custom`:
-		customID, _ := uuid.FromString(pp.Custom.Id)
+		customID, _ := uuid.FromString(pp.Custom.ID)
 		switch task {
 		case `add`:
 			return &tree.PropertyCustom{
@@ -73,7 +73,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Value:        pp.Custom.Value,
 			}
 		case `rm`:
-			srcUUID, _ := uuid.FromString(pp.SourceInstanceId)
+			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertyCustom{
 				SourceId: srcUUID,
 				CustomId: customID,
@@ -83,7 +83,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 			}
 		}
 	case `oncall`:
-		oncallID, _ := uuid.FromString(pp.Oncall.Id)
+		oncallID, _ := uuid.FromString(pp.Oncall.ID)
 		switch task {
 		case `add`:
 			return &tree.PropertyOncall{
@@ -96,7 +96,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Number:       pp.Oncall.Number,
 			}
 		case `rm`:
-			srcUUID, _ := uuid.FromString(pp.SourceInstanceId)
+			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertyOncall{
 				SourceId: srcUUID,
 				OncallId: oncallID,
@@ -117,7 +117,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Attributes:   pp.Service.Attributes,
 			}
 		case `rm`:
-			srcUUID, _ := uuid.FromString(pp.SourceInstanceId)
+			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertyService{
 				SourceId: srcUUID,
 				View:     pp.View,
@@ -136,7 +136,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Value:        pp.System.Value,
 			}
 		case `rm`:
-			srcUUID, _ := uuid.FromString(pp.SourceInstanceId)
+			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertySystem{
 				SourceId: srcUUID,
 				View:     pp.View,

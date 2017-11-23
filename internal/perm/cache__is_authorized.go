@@ -157,7 +157,7 @@ permloop:
 			case `monitoringsystem`, `capability`:
 				objID = q.Monitoring.Id
 			case `property_service_team`:
-				objID = q.Property.Service.TeamId
+				objID = q.Property.Service.TeamID
 			case `node`:
 				objID = q.Node.TeamID
 			case `repository`, `instance`, `node-config`,

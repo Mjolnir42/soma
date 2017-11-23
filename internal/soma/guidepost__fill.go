@@ -40,7 +40,7 @@ func (g *GuidePost) fillReqData(q *msg.Request) (bool, error) {
 
 // generate CheckConfigId
 func (g *GuidePost) fillCheckConfigID(q *msg.Request) (bool, error) {
-	q.CheckConfig.Id = uuid.NewV4().String()
+	q.CheckConfig.ID = uuid.NewV4().String()
 	return false, nil
 }
 
@@ -89,19 +89,19 @@ func (g *GuidePost) fillServiceAttributes(q *msg.Request) (bool, error) {
 	switch q.Section {
 	case msg.SectionRepository:
 		svName = (*q.Repository.Properties)[0].Service.Name
-		svTeam = (*q.Repository.Properties)[0].Service.TeamId
+		svTeam = (*q.Repository.Properties)[0].Service.TeamID
 	case msg.SectionBucket:
 		svName = (*q.Bucket.Properties)[0].Service.Name
-		svTeam = (*q.Bucket.Properties)[0].Service.TeamId
+		svTeam = (*q.Bucket.Properties)[0].Service.TeamID
 	case msg.SectionGroup:
 		svName = (*q.Group.Properties)[0].Service.Name
-		svTeam = (*q.Group.Properties)[0].Service.TeamId
+		svTeam = (*q.Group.Properties)[0].Service.TeamID
 	case msg.SectionCluster:
 		svName = (*q.Cluster.Properties)[0].Service.Name
-		svTeam = (*q.Cluster.Properties)[0].Service.TeamId
+		svTeam = (*q.Cluster.Properties)[0].Service.TeamID
 	case msg.SectionNode:
 		svName = (*q.Node.Properties)[0].Service.Name
-		svTeam = (*q.Node.Properties)[0].Service.TeamId
+		svTeam = (*q.Node.Properties)[0].Service.TeamID
 	}
 
 	// ignore error since it would have been caught by GuidePost
@@ -165,8 +165,8 @@ func (g *GuidePost) fillCheckDeleteInfo(q *msg.Request) (bool, error) {
 	var err error
 
 	if err = g.stmtCheckDetailsForDelete.QueryRow(
-		q.CheckConfig.Id,
-		q.CheckConfig.RepositoryId,
+		q.CheckConfig.ID,
+		q.CheckConfig.RepositoryID,
 	).Scan(
 		&delObjID,
 		&delObjTyp,
@@ -175,13 +175,13 @@ func (g *GuidePost) fillCheckDeleteInfo(q *msg.Request) (bool, error) {
 		if err == sql.ErrNoRows {
 			return true, fmt.Errorf(
 				"Failed to find source check for config %s",
-				q.CheckConfig.Id)
+				q.CheckConfig.ID)
 		}
 		return false, err
 	}
-	q.CheckConfig.ObjectId = delObjID
+	q.CheckConfig.ObjectID = delObjID
 	q.CheckConfig.ObjectType = delObjTyp
-	q.CheckConfig.ExternalId = delSrcChkID
+	q.CheckConfig.ExternalID = delSrcChkID
 	q.Action = fmt.Sprintf("remove_check_from_%s", delObjTyp)
 	return false, nil
 }
@@ -244,19 +244,19 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 	switch q.Section {
 	case msg.SectionRepository:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Repository.Properties)[0].SourceInstanceId)
+			(*q.Repository.Properties)[0].SourceInstanceID)
 	case msg.SectionBucket:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Bucket.Properties)[0].SourceInstanceId)
+			(*q.Bucket.Properties)[0].SourceInstanceID)
 	case msg.SectionGroup:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Group.Properties)[0].SourceInstanceId)
+			(*q.Group.Properties)[0].SourceInstanceID)
 	case msg.SectionCluster:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Cluster.Properties)[0].SourceInstanceId)
+			(*q.Cluster.Properties)[0].SourceInstanceID)
 	case msg.SectionNode:
 		row = g.conn.QueryRow(queryStmt,
-			(*q.Node.Properties)[0].SourceInstanceId)
+			(*q.Node.Properties)[0].SourceInstanceID)
 	}
 	switch {
 	case strings.HasPrefix(q.Action, `delete_system_`):
@@ -275,7 +275,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 		if err == sql.ErrNoRows {
 			return true, fmt.Errorf(
 				"Failed to find source property for %s",
-				(*q.Repository.Properties)[0].SourceInstanceId)
+				(*q.Repository.Properties)[0].SourceInstanceID)
 		}
 		return false, err
 	}
@@ -295,7 +295,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 		}
 	case strings.HasPrefix(q.Action, `delete_custom_`):
 		pCst = &proto.PropertyCustom{
-			Id:    cstID,
+			ID:    cstID,
 			Name:  cstProp,
 			Value: value,
 		}
@@ -306,7 +306,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 	case strings.HasPrefix(q.Action, `delete_oncall_`):
 		num := strconv.Itoa(oncNumber)
 		pOnc = &proto.PropertyOncall{
-			Id:     oncID,
+			ID:     oncID,
 			Name:   oncName,
 			Number: num,
 		}

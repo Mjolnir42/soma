@@ -1083,7 +1083,7 @@ func checkConfigIdByName(check, repo string) (string, string, error) {
 			check, (*res.CheckConfigs)[0].Name)
 		goto abort
 	}
-	return (*res.CheckConfigs)[0].Id, repo, nil
+	return (*res.CheckConfigs)[0].ID, repo, nil
 
 abort:
 	return ``, ``, fmt.Errorf("CheckConfigId lookup failed: %s",
@@ -1132,7 +1132,7 @@ func propertyIdByName(pType, pName, refId string) (string, error) {
 	switch pType {
 	case `custom`:
 		// custom properties are per-repository
-		req.Filter.Property.RepositoryId = refId
+		req.Filter.Property.RepositoryID = refId
 		path = fmt.Sprintf("/filter/property/custom/%s/", refId)
 	case `service`:
 		path = fmt.Sprintf("/filter/property/service/team/%s/",
@@ -1160,16 +1160,16 @@ func propertyIdByName(pType, pName, refId string) (string, error) {
 				pName, (*res.Properties)[0].Custom.Name)
 			goto abort
 		}
-		if refId != (*res.Properties)[0].Custom.RepositoryId {
+		if refId != (*res.Properties)[0].Custom.RepositoryID {
 			err = fmt.Errorf("RepositoryId mismatch: %s vs %s",
-				refId, (*res.Properties)[0].Custom.RepositoryId)
+				refId, (*res.Properties)[0].Custom.RepositoryID)
 			goto abort
 		}
-		return (*res.Properties)[0].Custom.Id, nil
+		return (*res.Properties)[0].Custom.ID, nil
 	case `service`:
-		if refId != (*res.Properties)[0].Service.TeamId {
+		if refId != (*res.Properties)[0].Service.TeamID {
 			err = fmt.Errorf("TeamId mismatch: %s vs %s",
-				refId, (*res.Properties)[0].Service.TeamId)
+				refId, (*res.Properties)[0].Service.TeamID)
 			goto abort
 		}
 		fallthrough

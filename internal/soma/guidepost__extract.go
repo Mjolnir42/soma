@@ -123,7 +123,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		`add_check_to_cluster`,
 		`add_check_to_node`,
 		`remove_check`:
-		return q.CheckConfig.RepositoryId, ``
+		return q.CheckConfig.RepositoryID, ``
 	case
 		`assign_node`,
 		`add_system_property_to_node`,

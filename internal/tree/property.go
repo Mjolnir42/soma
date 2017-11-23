@@ -9,8 +9,8 @@
 package tree
 
 import (
-	"github.com/mjolnir42/soma/lib/proto"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -192,8 +192,8 @@ func (p PropertyCustom) Clone() Property {
 func (p *PropertyCustom) MakeAction() Action {
 	return Action{
 		Property: proto.Property{
-			InstanceId:       p.GetID(),
-			SourceInstanceId: p.GetSourceInstance(),
+			InstanceID:       p.GetID(),
+			SourceInstanceID: p.GetSourceInstance(),
 			SourceType:       p.GetSourceType(),
 			IsInherited:      p.GetIsInherited(),
 			InheritedFrom:    p.GetSource(),
@@ -202,7 +202,7 @@ func (p *PropertyCustom) MakeAction() Action {
 			ChildrenOnly:     p.isChildrenOnly(),
 			View:             p.GetView(),
 			Custom: &proto.PropertyCustom{
-				Id:    p.CustomId.String(),
+				ID:    p.CustomId.String(),
 				Name:  p.Key,
 				Value: p.Value,
 			},
@@ -342,8 +342,8 @@ func (p PropertyService) Clone() Property {
 func (p *PropertyService) MakeAction() Action {
 	a := Action{
 		Property: proto.Property{
-			InstanceId:       p.GetID(),
-			SourceInstanceId: p.GetSourceInstance(),
+			InstanceID:       p.GetID(),
+			SourceInstanceID: p.GetSourceInstance(),
 			SourceType:       p.GetSourceType(),
 			IsInherited:      p.GetIsInherited(),
 			InheritedFrom:    p.GetSource(),
@@ -490,8 +490,8 @@ func (p PropertySystem) Clone() Property {
 func (p *PropertySystem) MakeAction() Action {
 	return Action{
 		Property: proto.Property{
-			InstanceId:       p.GetID(),
-			SourceInstanceId: p.GetSourceInstance(),
+			InstanceID:       p.GetID(),
+			SourceInstanceID: p.GetSourceInstance(),
 			SourceType:       p.GetSourceType(),
 			IsInherited:      p.GetIsInherited(),
 			InheritedFrom:    p.GetSource(),
@@ -640,8 +640,8 @@ func (p PropertyOncall) Clone() Property {
 func (p *PropertyOncall) MakeAction() Action {
 	return Action{
 		Property: proto.Property{
-			InstanceId:       p.GetID(),
-			SourceInstanceId: p.GetSourceInstance(),
+			InstanceID:       p.GetID(),
+			SourceInstanceID: p.GetSourceInstance(),
 			SourceType:       p.GetSourceType(),
 			IsInherited:      p.GetIsInherited(),
 			InheritedFrom:    p.GetSource(),
@@ -650,7 +650,7 @@ func (p *PropertyOncall) MakeAction() Action {
 			ChildrenOnly:     p.isChildrenOnly(),
 			View:             p.GetView(),
 			Oncall: &proto.PropertyOncall{
-				Id:     p.OncallId.String(),
+				ID:     p.OncallId.String(),
 				Name:   p.Name,
 				Number: p.Number,
 			},

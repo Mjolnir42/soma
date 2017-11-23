@@ -146,19 +146,19 @@ func exportCheckConfig(prepStmt *sql.Stmt, queryID string) (
 	}
 
 	checkConfig := proto.CheckConfig{
-		Id:           checkConfigID,
+		ID:           checkConfigID,
 		Name:         checkConfigName,
 		Interval:     uint64(interval),
-		RepositoryId: repositoryID,
-		BucketId:     bucketID,
-		CapabilityId: capabilityID,
-		ObjectId:     objectID,
+		RepositoryID: repositoryID,
+		BucketID:     bucketID,
+		CapabilityID: capabilityID,
+		ObjectID:     objectID,
 		ObjectType:   objectType,
 		IsActive:     isActive,
 		IsEnabled:    isEnabled,
 		Inheritance:  hasInheritance,
 		ChildrenOnly: isChildrenOnly,
-		ExternalId:   externalID,
+		ExternalID:   externalID,
 	}
 	return &checkConfig, nil
 }
@@ -294,8 +294,8 @@ func exportCheckConfigCustomConstraints(prepStmt *sql.Stmt,
 		cstr := proto.CheckConfigConstraint{
 			ConstraintType: `custom`,
 			Custom: &proto.PropertyCustom{
-				Id:           propertyID,
-				RepositoryId: repositoryID,
+				ID:           propertyID,
+				RepositoryID: repositoryID,
 				Name:         name,
 				Value:        value,
 			},
@@ -417,7 +417,7 @@ func exportCheckConfigServiceConstraints(prepStmt *sql.Stmt,
 			ConstraintType: `service`,
 			Service: &proto.PropertyService{
 				Name:   name,
-				TeamId: teamID,
+				TeamID: teamID,
 			},
 		}
 		constraints = append(constraints, cstr)
@@ -497,7 +497,7 @@ func exportCheckConfigOncallConstraints(prepStmt *sql.Stmt,
 		cstr := proto.CheckConfigConstraint{
 			ConstraintType: `oncall`,
 			Oncall: &proto.PropertyOncall{
-				Id:     oncallID,
+				ID:     oncallID,
 				Name:   name,
 				Number: number,
 			},
@@ -539,8 +539,8 @@ func exportCheckInstancesForConfig(prepStmt *sql.Stmt,
 			return nil, err
 		}
 		info := proto.CheckInstanceInfo{
-			Id:            instanceID,
-			ObjectId:      objectID,
+			ID:            instanceID,
+			ObjectID:      objectID,
 			ObjectType:    objectType,
 			CurrentStatus: currentStatus,
 			NextStatus:    nextStatus,
@@ -582,8 +582,8 @@ func exportCheckInstancesForObject(prepStmt *sql.Stmt,
 			return nil, err
 		}
 		info := proto.CheckInstanceInfo{
-			Id:            instanceID,
-			ObjectId:      resObjectID,
+			ID:            instanceID,
+			ObjectID:      resObjectID,
 			ObjectType:    objectType,
 			CurrentStatus: currentStatus,
 			NextStatus:    nextStatus,

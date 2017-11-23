@@ -43,12 +43,12 @@ func (r *ClusterRead) oncallProperties(cluster *proto.Cluster) error {
 		*cluster.Properties = append(*cluster.Properties,
 			proto.Property{
 				Type:             `oncall`,
-				BucketId:         cluster.BucketId,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				BucketID:         cluster.BucketId,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Oncall: &proto.PropertyOncall{
-					Id:   oncallID,
+					ID:   oncallID,
 					Name: oncallName,
 				},
 			},
@@ -88,9 +88,9 @@ func (r *ClusterRead) serviceProperties(cluster *proto.Cluster) error {
 		*cluster.Properties = append(*cluster.Properties,
 			proto.Property{
 				Type:             `service`,
-				BucketId:         cluster.BucketId,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				BucketID:         cluster.BucketId,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Service: &proto.PropertyService{
 					Name: serviceName,
@@ -133,9 +133,9 @@ func (r *ClusterRead) systemProperties(cluster *proto.Cluster) error {
 		*cluster.Properties = append(*cluster.Properties,
 			proto.Property{
 				Type:             `system`,
-				BucketId:         cluster.BucketId,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				BucketID:         cluster.BucketId,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				System: &proto.PropertySystem{
 					Name:  systemProp,
@@ -180,12 +180,12 @@ func (r *ClusterRead) customProperties(cluster *proto.Cluster) error {
 		*cluster.Properties = append(*cluster.Properties,
 			proto.Property{
 				Type:             `custom`,
-				BucketId:         cluster.BucketId,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				BucketID:         cluster.BucketId,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Custom: &proto.PropertyCustom{
-					Id:    customID,
+					ID:    customID,
 					Name:  customProp,
 					Value: value,
 				},

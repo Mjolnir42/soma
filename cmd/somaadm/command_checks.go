@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerChecks(app cli.App) *cli.App {
@@ -78,31 +78,31 @@ func cmdCheckAdd(c *cli.Context) error {
 	if err = adm.ValidateRuneCount(c.Args().First(), 256); err != nil {
 		return err
 	}
-	if req.CheckConfig.CapabilityId, err = adm.LookupCapabilityId(
+	if req.CheckConfig.CapabilityID, err = adm.LookupCapabilityId(
 		opts[`with`][0]); err != nil {
 		return err
 	}
 	req.CheckConfig.ObjectType = opts[`on/type`][0]
 	req.CheckConfig.Name = c.Args().First()
-	req.CheckConfig.BucketId, err = adm.LookupBucketId(opts[`in`][0])
+	req.CheckConfig.BucketID, err = adm.LookupBucketId(opts[`in`][0])
 	if err != nil {
 		return err
 	}
-	if req.CheckConfig.RepositoryId, err = adm.LookupRepoByBucket(
-		req.CheckConfig.BucketId); err != nil {
+	if req.CheckConfig.RepositoryID, err = adm.LookupRepoByBucket(
+		req.CheckConfig.BucketID); err != nil {
 		return err
 	}
-	if req.CheckConfig.ObjectId, err = adm.LookupCheckObjectId(
+	if req.CheckConfig.ObjectID, err = adm.LookupCheckObjectId(
 		opts[`on/type`][0],
 		opts[`on/object`][0],
-		req.CheckConfig.BucketId,
+		req.CheckConfig.BucketID,
 	); err != nil {
 		return err
 	}
 
 	// clear bucketid if check is on a repository
 	if req.CheckConfig.ObjectType == `repository` {
-		req.CheckConfig.BucketId = ``
+		req.CheckConfig.BucketID = ``
 	}
 
 	// optional argument: inheritance
@@ -132,11 +132,11 @@ func cmdCheckAdd(c *cli.Context) error {
 		if err = adm.ValidateRuneCount(ex[0], 64); err != nil {
 			return err
 		}
-		req.CheckConfig.ExternalId = ex[0]
+		req.CheckConfig.ExternalID = ex[0]
 	}
 
 	if teamId, err = adm.LookupTeamByRepo(
-		req.CheckConfig.RepositoryId); err != nil {
+		req.CheckConfig.RepositoryID); err != nil {
 		return err
 	}
 
@@ -147,14 +147,14 @@ func cmdCheckAdd(c *cli.Context) error {
 	}
 
 	if req.CheckConfig.Constraints, err = adm.ValidateCheckConstraints(
-		req.CheckConfig.RepositoryId,
+		req.CheckConfig.RepositoryID,
 		teamId,
 		constraints,
 	); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/checks/%s/", req.CheckConfig.RepositoryId)
+	path := fmt.Sprintf("/checks/%s/", req.CheckConfig.RepositoryID)
 	return adm.Perform(`postbody`, path, `command`, req, nil)
 }
 

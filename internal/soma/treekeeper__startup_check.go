@@ -149,14 +149,14 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		}
 		// save CheckConfig
 		victim = proto.CheckConfig{
-			Id:           configID,
-			RepositoryId: tk.meta.repoID,
-			CapabilityId: capabilityID,
-			ObjectId:     objID,
+			ID:           configID,
+			RepositoryID: tk.meta.repoID,
+			CapabilityID: capabilityID,
+			ObjectID:     objID,
 			ObjectType:   objType,
 		}
 		if nullBucketID.Valid {
-			victim.BucketId = nullBucketID.String
+			victim.BucketID = nullBucketID.String
 		}
 		cfgMap[checkID] = victim
 	}
@@ -167,7 +167,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 	// iterate over the loaded checks and continue assembly with values
 	// from the stored checkconfiguration
 	for checkID = range cfgMap {
-		if err = stMap[`LoadConfig`].QueryRow(cfgMap[checkID].Id, tk.meta.repoID).Scan(
+		if err = stMap[`LoadConfig`].QueryRow(cfgMap[checkID].ID, tk.meta.repoID).Scan(
 			&nullBucketID,
 			&cfgName,
 			&cfgObjID,
@@ -192,14 +192,14 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		victim.IsEnabled = isEnabled
 		victim.Inheritance = hasInheritance
 		victim.ChildrenOnly = isChildrenOnly
-		victim.ExternalId = externalID
+		victim.ExternalID = externalID
 		cfgMap[checkID] = victim
 	}
 
 	// iterate over the loaded checks and continue assembly with values
 	// from the stored thresholds
 	for checkID = range cfgMap {
-		if thrRows, err = stMap[`LoadThreshold`].Query(cfgMap[checkID].Id); err != nil {
+		if thrRows, err = stMap[`LoadThreshold`].Query(cfgMap[checkID].ID); err != nil {
 			// sql.ErrNoRows is fatal here since a check without
 			// thresholds is rather useless
 			goto fail
@@ -252,17 +252,17 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		for _, cstrType = range []string{`custom`, `native`, `oncall`, `attribute`, `service`, `system`} {
 			switch cstrType {
 			case `custom`:
-				cstrRows, err = stMap[`LoadCustomCstr`].Query(cfgMap[checkID].Id)
+				cstrRows, err = stMap[`LoadCustomCstr`].Query(cfgMap[checkID].ID)
 			case `native`:
-				cstrRows, err = stMap[`LoadNativeCstr`].Query(cfgMap[checkID].Id)
+				cstrRows, err = stMap[`LoadNativeCstr`].Query(cfgMap[checkID].ID)
 			case `oncall`:
-				cstrRows, err = stMap[`LoadOncallCstr`].Query(cfgMap[checkID].Id)
+				cstrRows, err = stMap[`LoadOncallCstr`].Query(cfgMap[checkID].ID)
 			case `attribute`:
-				cstrRows, err = stMap[`LoadAttributeCstr`].Query(cfgMap[checkID].Id)
+				cstrRows, err = stMap[`LoadAttributeCstr`].Query(cfgMap[checkID].ID)
 			case `service`:
-				cstrRows, err = stMap[`LoadServiceCstr`].Query(cfgMap[checkID].Id)
+				cstrRows, err = stMap[`LoadServiceCstr`].Query(cfgMap[checkID].ID)
 			case `system`:
-				cstrRows, err = stMap[`LoadSystemCstr`].Query(cfgMap[checkID].Id)
+				cstrRows, err = stMap[`LoadSystemCstr`].Query(cfgMap[checkID].ID)
 			}
 			if err != nil {
 				goto fail
@@ -281,9 +281,9 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 						proto.CheckConfigConstraint{
 							ConstraintType: cstrType,
 							Custom: &proto.PropertyCustom{
-								Id:           value1,
+								ID:           value1,
 								Name:         value2,
-								RepositoryId: tk.meta.repoID,
+								RepositoryID: tk.meta.repoID,
 								Value:        value3,
 							},
 						},
@@ -303,7 +303,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 						proto.CheckConfigConstraint{
 							ConstraintType: cstrType,
 							Oncall: &proto.PropertyOncall{
-								Id:     value1,
+								ID:     value1,
 								Name:   value2,
 								Number: value3,
 							},
@@ -325,7 +325,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 							ConstraintType: cstrType,
 							Service: &proto.PropertyService{
 								Name:   value2,
-								TeamId: value1,
+								TeamID: value1,
 							},
 						},
 					)
@@ -356,8 +356,8 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 	// required to populate groups in the correct order.
 	for checkID = range cfgMap {
 		victim = cfgMap[checkID]
-		if ckOrder[victim.ObjectId] == nil {
-			ckOrder[victim.ObjectId] = map[string]tree.Check{}
+		if ckOrder[victim.ObjectID] == nil {
+			ckOrder[victim.ObjectID] = map[string]tree.Check{}
 		}
 		if ckTree, err = tk.convertCheck(&victim); err != nil {
 			goto fail
@@ -365,7 +365,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		// add source check as well so it gets recreated with the
 		// correct UUID
 		ckItem = tree.CheckItem{ObjectType: victim.ObjectType}
-		ckItem.ObjectId, _ = uuid.FromString(victim.ObjectId)
+		ckItem.ObjectId, _ = uuid.FromString(victim.ObjectID)
 		ckItem.ItemId, _ = uuid.FromString(checkID)
 		ckTree.Items = []tree.CheckItem{ckItem}
 		tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, SrcCheckId=%s, CheckId=%s",
@@ -408,7 +408,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		if err = itRows.Err(); err != nil {
 			goto fail
 		}
-		ckOrder[victim.ObjectId][checkID] = *ckTree
+		ckOrder[victim.ObjectID][checkID] = *ckTree
 	}
 
 	// apply all tree.Check object to the tree, special case
@@ -428,7 +428,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 				for ck := range ckOrder[objKey] {
 					tk.tree.Find(tree.FindRequest{
 						ElementType: cfgMap[ck].ObjectType,
-						ElementId:   cfgMap[ck].ObjectId,
+						ElementId:   cfgMap[ck].ObjectID,
 					}, true).SetCheck(ckOrder[objKey][ck])
 					tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s",
 						tk.meta.repoName,
@@ -465,7 +465,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 					for ck := range ckOrder[objKey] {
 						tk.tree.Find(tree.FindRequest{
 							ElementType: cfgMap[ck].ObjectType,
-							ElementId:   cfgMap[ck].ObjectId,
+							ElementId:   cfgMap[ck].ObjectID,
 						}, true).SetCheck(ckOrder[objKey][ck])
 						tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s",
 							tk.meta.repoName,
@@ -506,7 +506,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 				for ck := range ckOrder[objKey] {
 					tk.tree.Find(tree.FindRequest{
 						ElementType: cfgMap[ck].ObjectType,
-						ElementId:   cfgMap[ck].ObjectId,
+						ElementId:   cfgMap[ck].ObjectID,
 					}, true).SetCheck(ckOrder[objKey][ck])
 					tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s",
 						tk.meta.repoName,
@@ -541,7 +541,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 			for ck := range ckOrder[objKey] {
 				tk.tree.Find(tree.FindRequest{
 					ElementType: cfgMap[ck].ObjectType,
-					ElementId:   cfgMap[ck].ObjectId,
+					ElementId:   cfgMap[ck].ObjectID,
 				}, true).SetCheck(ckOrder[objKey][ck])
 				tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s",
 					tk.meta.repoName,
@@ -721,29 +721,29 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 		conf := proto.CheckConfig{}
 		conf.Thresholds = []proto.CheckConfigThreshold{}
 		conf.Constraints = []proto.CheckConfigConstraint{}
-		conf.RepositoryId = tk.meta.repoID
+		conf.RepositoryID = tk.meta.repoID
 		conf.ObjectType = typ
 		if err = configRows.Scan(
-			&conf.Id,
+			&conf.ID,
 			&nullBucketID,
 			&conf.Name,
-			&conf.ObjectId,
+			&conf.ObjectID,
 			&conf.Inheritance,
 			&conf.ChildrenOnly,
-			&conf.CapabilityId,
+			&conf.CapabilityID,
 			&conf.Interval,
 			&conf.IsEnabled,
-			&conf.ExternalId,
+			&conf.ExternalID,
 		); err != nil {
 			goto fail
 		}
 		if nullBucketID.Valid {
-			conf.BucketId = nullBucketID.String
+			conf.BucketID = nullBucketID.String
 		}
-		tk.startLog.Printf("TK[%s]: rebuild processing check configuration %s", tk.meta.repoName, conf.Id)
+		tk.startLog.Printf("TK[%s]: rebuild processing check configuration %s", tk.meta.repoName, conf.ID)
 		// 2. assemble proto.CheckConfig object:
 		//    + thresholds
-		if threshRows, err = stMap[`LoadThreshold`].Query(conf.Id); err != nil {
+		if threshRows, err = stMap[`LoadThreshold`].Query(conf.ID); err != nil {
 			goto fail
 		}
 
@@ -784,17 +784,17 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 		for _, cstrType = range []string{`custom`, `native`, `oncall`, `attribute`, `service`, `system`} {
 			switch cstrType {
 			case `custom`:
-				cstrRows, err = stMap[`LoadCustomCstr`].Query(conf.Id)
+				cstrRows, err = stMap[`LoadCustomCstr`].Query(conf.ID)
 			case `native`:
-				cstrRows, err = stMap[`LoadNativeCstr`].Query(conf.Id)
+				cstrRows, err = stMap[`LoadNativeCstr`].Query(conf.ID)
 			case `oncall`:
-				cstrRows, err = stMap[`LoadOncallCstr`].Query(conf.Id)
+				cstrRows, err = stMap[`LoadOncallCstr`].Query(conf.ID)
 			case `attribute`:
-				cstrRows, err = stMap[`LoadAttributeCstr`].Query(conf.Id)
+				cstrRows, err = stMap[`LoadAttributeCstr`].Query(conf.ID)
 			case `service`:
-				cstrRows, err = stMap[`LoadServiceCstr`].Query(conf.Id)
+				cstrRows, err = stMap[`LoadServiceCstr`].Query(conf.ID)
 			case `system`:
-				cstrRows, err = stMap[`LoadSystemCstr`].Query(conf.Id)
+				cstrRows, err = stMap[`LoadSystemCstr`].Query(conf.ID)
 			}
 			if err != nil {
 				goto fail
@@ -811,9 +811,9 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 						proto.CheckConfigConstraint{
 							ConstraintType: cstrType,
 							Custom: &proto.PropertyCustom{
-								Id:           value1,
+								ID:           value1,
 								Name:         value2,
-								RepositoryId: tk.meta.repoID,
+								RepositoryID: tk.meta.repoID,
 								Value:        value3,
 							},
 						},
@@ -833,7 +833,7 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 						proto.CheckConfigConstraint{
 							ConstraintType: cstrType,
 							Oncall: &proto.PropertyOncall{
-								Id:     value1,
+								ID:     value1,
 								Name:   value2,
 								Number: value3,
 							},
@@ -855,7 +855,7 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 							ConstraintType: cstrType,
 							Service: &proto.PropertyService{
 								Name:   value2,
-								TeamId: value1,
+								TeamID: value1,
 							},
 						},
 					)
@@ -880,7 +880,7 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 			// 4. apply config
 			tk.tree.Find(tree.FindRequest{
 				ElementType: conf.ObjectType,
-				ElementId:   conf.ObjectId,
+				ElementId:   conf.ObjectID,
 			}, true).SetCheck(*treeCheck)
 		} else {
 			tk.startLog.Printf("Rebuild error during check conversion: %s", err)

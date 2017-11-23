@@ -304,27 +304,27 @@ func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (bool, error) {
 	var bid string
 	switch q.CheckConfig.ObjectType {
 	case `repository`:
-		if q.CheckConfig.RepositoryId !=
-			q.CheckConfig.ObjectId {
+		if q.CheckConfig.RepositoryID !=
+			q.CheckConfig.ObjectID {
 			return false, fmt.Errorf("Conflicting repository ids: %s, %s",
-				q.CheckConfig.RepositoryId,
-				q.CheckConfig.ObjectId,
+				q.CheckConfig.RepositoryID,
+				q.CheckConfig.ObjectID,
 			)
 		}
 		return false, nil
 	case `bucket`:
-		bid = q.CheckConfig.ObjectId
+		bid = q.CheckConfig.ObjectID
 	case `group`:
 		err = g.stmtBucketForGroupID.QueryRow(
-			q.CheckConfig.ObjectId,
+			q.CheckConfig.ObjectID,
 		).Scan(&bid)
 	case `cluster`:
 		err = g.stmtBucketForClusterID.QueryRow(
-			q.CheckConfig.ObjectId,
+			q.CheckConfig.ObjectID,
 		).Scan(&bid)
 	case `node`:
 		err = g.stmtBucketForNodeID.QueryRow(
-			q.CheckConfig.ObjectId,
+			q.CheckConfig.ObjectID,
 		).Scan(&bid)
 	default:
 		return false, fmt.Errorf("Unknown object type: %s",
@@ -337,14 +337,14 @@ func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (bool, error) {
 		}
 		return false, err
 	}
-	if bid != q.CheckConfig.BucketId {
+	if bid != q.CheckConfig.BucketID {
 		return false, fmt.Errorf("Object is in bucket %s, not %s",
-			bid, q.CheckConfig.BucketId,
+			bid, q.CheckConfig.BucketID,
 		)
 	}
 	return g.validateBucketInRepository(
-		q.CheckConfig.RepositoryId,
-		q.CheckConfig.BucketId,
+		q.CheckConfig.RepositoryID,
+		q.CheckConfig.BucketID,
 	)
 }
 
@@ -380,14 +380,14 @@ func (g *GuidePost) validateCheckThresholds(q *msg.Request) (bool, error) {
 	)
 
 	if err = g.stmtCapabilityThresholds.QueryRow(
-		q.CheckConfig.CapabilityId,
+		q.CheckConfig.CapabilityID,
 	).Scan(
 		&thrLimit,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			return true, fmt.Errorf(
 				"Capability %s not found",
-				q.CheckConfig.CapabilityId)
+				q.CheckConfig.CapabilityID)
 		}
 		return false, err
 	}

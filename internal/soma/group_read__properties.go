@@ -43,12 +43,12 @@ func (r *GroupRead) oncallProperties(group *proto.Group) error {
 		*group.Properties = append(*group.Properties,
 			proto.Property{
 				Type:             `oncall`,
-				BucketId:         group.BucketId,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				BucketID:         group.BucketId,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Oncall: &proto.PropertyOncall{
-					Id:   oncallID,
+					ID:   oncallID,
 					Name: oncallName,
 				},
 			},
@@ -88,9 +88,9 @@ func (r *GroupRead) serviceProperties(group *proto.Group) error {
 		*group.Properties = append(*group.Properties,
 			proto.Property{
 				Type:             `service`,
-				BucketId:         group.BucketId,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				BucketID:         group.BucketId,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Service: &proto.PropertyService{
 					Name: serviceName,
@@ -133,9 +133,9 @@ func (r *GroupRead) systemProperties(group *proto.Group) error {
 		*group.Properties = append(*group.Properties,
 			proto.Property{
 				Type:             `system`,
-				BucketId:         group.BucketId,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				BucketID:         group.BucketId,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				System: &proto.PropertySystem{
 					Name:  systemProp,
@@ -180,12 +180,12 @@ func (r *GroupRead) customProperties(group *proto.Group) error {
 		*group.Properties = append(*group.Properties,
 			proto.Property{
 				Type:             `custom`,
-				BucketId:         group.BucketId,
-				InstanceId:       instanceID,
-				SourceInstanceId: sourceInstanceID,
+				BucketID:         group.BucketId,
+				InstanceID:       instanceID,
+				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Custom: &proto.PropertyCustom{
-					Id:    customID,
+					ID:    customID,
 					Name:  customProp,
 					Value: value,
 				},

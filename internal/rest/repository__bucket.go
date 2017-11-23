@@ -206,8 +206,8 @@ func (x *Rest) BucketPropertyDestroy(w http.ResponseWriter, r *http.Request,
 		Properties: &[]proto.Property{
 			proto.Property{
 				Type:             params.ByName(`type`),
-				BucketId:         params.ByName(`bucket`),
-				SourceInstanceId: params.ByName(`source`),
+				BucketID:         params.ByName(`bucket`),
+				SourceInstanceID: params.ByName(`source`),
 			},
 		},
 	}

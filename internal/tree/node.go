@@ -298,14 +298,14 @@ func (ten *Node) actionPropertyDelete(a Action) {
 func (ten *Node) actionProperty(a Action) {
 	a.Type = ten.Type
 	a.Node = ten.export()
-	a.Property.RepositoryId = ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Property.BucketId = ten.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Property.RepositoryID = ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Property.BucketID = ten.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 
 	switch a.Property.Type {
 	case "custom":
-		a.Property.Custom.RepositoryId = a.Property.RepositoryId
+		a.Property.Custom.RepositoryID = a.Property.RepositoryID
 	case "service":
-		a.Property.Service.TeamId = ten.Team.String()
+		a.Property.Service.TeamID = ten.Team.String()
 	}
 
 	ten.Action <- &a

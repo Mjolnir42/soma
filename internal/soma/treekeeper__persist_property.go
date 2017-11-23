@@ -32,9 +32,9 @@ func (tk *TreeKeeper) txProperty(a *tree.Action,
 func (tk *TreeKeeper) txPropertyNew(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	if _, err := stm[`PropertyInstanceCreate`].Exec(
-		a.Property.InstanceId,
-		a.Property.RepositoryId,
-		a.Property.SourceInstanceId,
+		a.Property.InstanceID,
+		a.Property.RepositoryID,
+		a.Property.SourceInstanceID,
 		a.Property.SourceType,
 		a.Property.InheritedFrom,
 	); err != nil {
@@ -64,7 +64,7 @@ func (tk *TreeKeeper) txPropertyNewCustom(a *tree.Action,
 	switch a.Type {
 	case `repository`:
 		statement = stm[`RepositoryPropertyCustomCreate`]
-		id = a.Property.Custom.RepositoryId
+		id = a.Property.Custom.RepositoryID
 	case `bucket`:
 		statement = stm[`BucketPropertyCustomCreate`]
 		id = a.Bucket.ID
@@ -79,11 +79,11 @@ func (tk *TreeKeeper) txPropertyNewCustom(a *tree.Action,
 		id = a.Node.ID
 	}
 	_, err = statement.Exec(
-		a.Property.InstanceId,
-		a.Property.SourceInstanceId,
+		a.Property.InstanceID,
+		a.Property.SourceInstanceID,
 		id,
 		a.Property.View,
-		a.Property.Custom.Id,
+		a.Property.Custom.ID,
 		a.Property.Inheritance,
 		a.Property.ChildrenOnly,
 		a.Property.Custom.Value,
@@ -116,13 +116,13 @@ func (tk *TreeKeeper) txPropertyNewSystem(a *tree.Action,
 		id = a.Node.ID
 	}
 	_, err = statement.Exec(
-		a.Property.InstanceId,
-		a.Property.SourceInstanceId,
+		a.Property.InstanceID,
+		a.Property.SourceInstanceID,
 		id,
 		a.Property.View,
 		a.Property.System.Name,
 		a.Property.SourceType,
-		a.Property.RepositoryId,
+		a.Property.RepositoryID,
 		a.Property.Inheritance,
 		a.Property.ChildrenOnly,
 		a.Property.System.Value,
@@ -156,13 +156,13 @@ func (tk *TreeKeeper) txPropertyNewService(a *tree.Action,
 		id = a.Node.ID
 	}
 	_, err = statement.Exec(
-		a.Property.InstanceId,
-		a.Property.SourceInstanceId,
+		a.Property.InstanceID,
+		a.Property.SourceInstanceID,
 		id,
 		a.Property.View,
 		a.Property.Service.Name,
-		a.Property.Service.TeamId,
-		a.Property.RepositoryId,
+		a.Property.Service.TeamID,
+		a.Property.RepositoryID,
 		a.Property.Inheritance,
 		a.Property.ChildrenOnly,
 	)
@@ -194,12 +194,12 @@ func (tk *TreeKeeper) txPropertyNewOncall(a *tree.Action,
 		id = a.Node.ID
 	}
 	_, err = statement.Exec(
-		a.Property.InstanceId,
-		a.Property.SourceInstanceId,
+		a.Property.InstanceID,
+		a.Property.SourceInstanceID,
 		id,
 		a.Property.View,
-		a.Property.Oncall.Id,
-		a.Property.RepositoryId,
+		a.Property.Oncall.ID,
+		a.Property.RepositoryID,
 		a.Property.Inheritance,
 		a.Property.ChildrenOnly,
 	)
@@ -211,7 +211,7 @@ func (tk *TreeKeeper) txPropertyNewOncall(a *tree.Action,
 func (tk *TreeKeeper) txPropertyDelete(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	if _, err := stm[`PropertyInstanceDelete`].Exec(
-		a.Property.InstanceId,
+		a.Property.InstanceID,
 	); err != nil {
 		return err
 	}
@@ -272,7 +272,7 @@ func (tk *TreeKeeper) txPropertyDelete(a *tree.Action,
 		}
 	}
 	_, err := statement.Exec(
-		a.Property.InstanceId,
+		a.Property.InstanceID,
 	)
 	return err
 }

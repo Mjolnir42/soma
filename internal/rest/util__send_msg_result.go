@@ -73,6 +73,10 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		result = proto.NewCategoryResult()
 		*result.Categories = append(*result.Categories, r.Category...)
 
+	case msg.SectionCheckConfig:
+		result = proto.NewCheckConfigResult()
+		*result.CheckConfigs = append(*result.CheckConfigs, r.CheckConfig...)
+
 	// XXX below are legacy definitions
 	case `kex`:
 		k = r.Super.Kex

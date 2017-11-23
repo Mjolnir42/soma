@@ -191,29 +191,29 @@ func findPropSrcID(pType, pName, view string, props []proto.Property,
 		}
 
 		// inherited property
-		if p.InstanceId != p.SourceInstanceId {
+		if p.InstanceID != p.SourceInstanceID {
 			continue
 		}
 
 		switch pType {
 		case `system`:
 			if p.System.Name == pName {
-				*id = p.SourceInstanceId
+				*id = p.SourceInstanceID
 				return nil
 			}
 		case `oncall`:
 			if p.Oncall.Name == pName {
-				*id = p.SourceInstanceId
+				*id = p.SourceInstanceID
 				return nil
 			}
 		case `custom`:
 			if p.Custom.Name == pName {
-				*id = p.SourceInstanceId
+				*id = p.SourceInstanceID
 				return nil
 			}
 		case `service`:
 			if p.Service.Name == pName {
-				*id = p.SourceInstanceId
+				*id = p.SourceInstanceID
 				return nil
 			}
 		}

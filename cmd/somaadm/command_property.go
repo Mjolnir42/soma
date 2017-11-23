@@ -186,7 +186,7 @@ func cmdPropertyCustomCreate(c *cli.Context) error {
 
 	req.Property.Custom = &proto.PropertyCustom{}
 	req.Property.Custom.Name = c.Args().First()
-	req.Property.Custom.RepositoryId = repoId
+	req.Property.Custom.RepositoryID = repoId
 
 	path := fmt.Sprintf("/property/custom/%s/", repoId)
 	return adm.Perform(`postbody`, path, `command`, req, c)
@@ -301,7 +301,7 @@ func cmdPropertyServiceCreate(c *cli.Context) error {
 		[]proto.ServiceAttribute, 0, 16)
 	if c.Command.Name == "service" {
 		req.Property.Type = `service`
-		req.Property.Service.TeamId = teamId
+		req.Property.Service.TeamID = teamId
 	} else {
 		req.Property.Type = `template`
 	}
@@ -771,7 +771,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		// attributes are discarded by the server
 		prop.Service = &proto.PropertyService{
 			Name:       c.Args().First(),
-			TeamId:     teamId,
+			TeamID:     teamId,
 			Attributes: []proto.ServiceAttribute{},
 		}
 	case `oncall`:
@@ -780,7 +780,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 			return err
 		}
 		prop.Oncall = &proto.PropertyOncall{
-			Id: oncallId,
+			ID: oncallId,
 		}
 		prop.Oncall.Name, prop.Oncall.Number, err = adm.LookupOncallDetails(
 			oncallId,
@@ -796,9 +796,9 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		}
 
 		prop.Custom = &proto.PropertyCustom{
-			Id:           customId,
+			ID:           customId,
 			Name:         c.Args().First(),
-			RepositoryId: repoId,
+			RepositoryID: repoId,
 			Value:        opts[`value`][0],
 		}
 	}

@@ -139,7 +139,7 @@ func (r *PropertyRead) listCustom(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = r.stmtListCustom.Query(
-		q.Property.Custom.RepositoryId,
+		q.Property.Custom.RepositoryID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -154,8 +154,8 @@ func (r *PropertyRead) listCustom(q *msg.Request, mr *msg.Result) {
 		mr.Property = append(mr.Property, proto.Property{
 			Type: q.Property.Type,
 			Custom: &proto.PropertyCustom{
-				Id:           id,
-				RepositoryId: repository,
+				ID:           id,
+				RepositoryID: repository,
 				Name:         property,
 			},
 		})
@@ -209,7 +209,7 @@ func (r *PropertyRead) listService(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = r.stmtListService.Query(
-		q.Property.Service.TeamId,
+		q.Property.Service.TeamID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -225,7 +225,7 @@ func (r *PropertyRead) listService(q *msg.Request, mr *msg.Result) {
 			Type: q.Property.Type,
 			Service: &proto.PropertyService{
 				Name:   property,
-				TeamId: team,
+				TeamID: team,
 			},
 		})
 	}
@@ -328,8 +328,8 @@ func (r *PropertyRead) showCustom(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShowCustom.QueryRow(
-		q.Property.Custom.Id,
-		q.Property.Custom.RepositoryId,
+		q.Property.Custom.ID,
+		q.Property.Custom.RepositoryID,
 	).Scan(
 		&id,
 		&repository,
@@ -344,8 +344,8 @@ func (r *PropertyRead) showCustom(q *msg.Request, mr *msg.Result) {
 	mr.Property = append(mr.Property, proto.Property{
 		Type: q.Property.Type,
 		Custom: &proto.PropertyCustom{
-			Id:           id,
-			RepositoryId: repository,
+			ID:           id,
+			RepositoryID: repository,
 			Name:         property,
 		},
 	})
@@ -390,7 +390,7 @@ func (r *PropertyRead) showService(q *msg.Request, mr *msg.Result) {
 
 	if rows, err = r.stmtShowService.Query(
 		q.Property.Service.Name,
-		q.Property.Service.TeamId,
+		q.Property.Service.TeamID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -410,7 +410,7 @@ func (r *PropertyRead) showService(q *msg.Request, mr *msg.Result) {
 		}
 
 		service.Name = property
-		service.TeamId = team
+		service.TeamID = team
 		service.Attributes = append(service.Attributes,
 			proto.ServiceAttribute{
 				Name:  attribute,

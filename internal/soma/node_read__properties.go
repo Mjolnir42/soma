@@ -42,13 +42,13 @@ func (r *NodeRead) oncallProperties(node *proto.Node) error {
 		}
 		*node.Properties = append(*node.Properties, proto.Property{
 			Type:             `oncall`,
-			RepositoryId:     node.Config.RepositoryID,
-			BucketId:         node.Config.BucketID,
-			InstanceId:       instanceID,
-			SourceInstanceId: sourceInstanceID,
+			RepositoryID:     node.Config.RepositoryID,
+			BucketID:         node.Config.BucketID,
+			InstanceID:       instanceID,
+			SourceInstanceID: sourceInstanceID,
 			View:             view,
 			Oncall: &proto.PropertyOncall{
-				Id:   oncallID,
+				ID:   oncallID,
 				Name: oncallName,
 			},
 		})
@@ -84,10 +84,10 @@ func (r *NodeRead) serviceProperties(node *proto.Node) error {
 		}
 		*node.Properties = append(*node.Properties, proto.Property{
 			Type:             `service`,
-			RepositoryId:     node.Config.RepositoryID,
-			BucketId:         node.Config.BucketID,
-			InstanceId:       instanceID,
-			SourceInstanceId: sourceInstanceID,
+			RepositoryID:     node.Config.RepositoryID,
+			BucketID:         node.Config.BucketID,
+			InstanceID:       instanceID,
+			SourceInstanceID: sourceInstanceID,
 			View:             view,
 			Service: &proto.PropertyService{
 				Name: serviceName,
@@ -126,10 +126,10 @@ func (r *NodeRead) systemProperties(node *proto.Node) error {
 		}
 		*node.Properties = append(*node.Properties, proto.Property{
 			Type:             `system`,
-			RepositoryId:     node.Config.RepositoryID,
-			BucketId:         node.Config.BucketID,
-			InstanceId:       instanceID,
-			SourceInstanceId: sourceInstanceID,
+			RepositoryID:     node.Config.RepositoryID,
+			BucketID:         node.Config.BucketID,
+			InstanceID:       instanceID,
+			SourceInstanceID: sourceInstanceID,
 			View:             view,
 			System: &proto.PropertySystem{
 				Name:  systemProp,
@@ -170,13 +170,13 @@ func (r *NodeRead) customProperties(node *proto.Node) error {
 		}
 		*node.Properties = append(*node.Properties, proto.Property{
 			Type:             `custom`,
-			RepositoryId:     node.Config.RepositoryID,
-			BucketId:         node.Config.BucketID,
-			InstanceId:       instanceID,
-			SourceInstanceId: sourceInstanceID,
+			RepositoryID:     node.Config.RepositoryID,
+			BucketID:         node.Config.BucketID,
+			InstanceID:       instanceID,
+			SourceInstanceID: sourceInstanceID,
 			View:             view,
 			Custom: &proto.PropertyCustom{
-				Id:    customID,
+				ID:    customID,
 				Name:  customProp,
 				Value: value,
 			},

@@ -13,8 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/codegangsta/cli"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // ParseVariadicArguments parses split up argument lists of
@@ -463,7 +463,7 @@ func parseConstraintChain(result proto.CheckConfigConstraint,
 		result.Oncall = &proto.PropertyOncall{}
 		switch args[1] {
 		case `id`:
-			result.Oncall.Id = args[2]
+			result.Oncall.ID = args[2]
 		case `name`:
 			result.Oncall.Name = args[2]
 		default:

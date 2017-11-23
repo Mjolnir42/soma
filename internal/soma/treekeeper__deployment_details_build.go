@@ -79,11 +79,11 @@ deploymentbuilder:
 
 		//
 		detail.CheckConfig = &proto.CheckConfig{
-			Id:           detail.Check.CheckConfigId,
-			RepositoryId: detail.Check.RepositoryId,
-			BucketId:     detail.Check.BucketId,
-			CapabilityId: detail.Check.CapabilityId,
-			ObjectId:     objID,
+			ID:           detail.Check.CheckConfigId,
+			RepositoryID: detail.Check.RepositoryId,
+			BucketID:     detail.Check.BucketId,
+			CapabilityID: detail.Check.CapabilityId,
+			ObjectID:     objID,
 			ObjectType:   objType,
 			Inheritance:  detail.Check.Inheritance,
 			ChildrenOnly: detail.Check.ChildrenOnly,
@@ -93,16 +93,16 @@ deploymentbuilder:
 			&detail.CheckConfig.Interval,
 			&detail.CheckConfig.IsActive,
 			&detail.CheckConfig.IsEnabled,
-			&detail.CheckConfig.ExternalId,
+			&detail.CheckConfig.ExternalID,
 		)
 
 		//
 		detail.CheckConfig.Thresholds = []proto.CheckConfigThreshold{}
-		thresh, err = tk.stmtThreshold.Query(detail.CheckConfig.Id)
+		thresh, err = tk.stmtThreshold.Query(detail.CheckConfig.ID)
 		if err != nil {
 			// a check config must have 1+ thresholds
 			tk.treeLog.Println(`DANGER WILL ROBINSON!`,
-				`Failed to get thresholds for:`, detail.CheckConfig.Id)
+				`Failed to get thresholds for:`, detail.CheckConfig.ID)
 			continue deploymentbuilder
 		}
 		defer thresh.Close()
@@ -228,7 +228,7 @@ deploymentbuilder:
 					detail.View,
 				).Scan(
 					&detail.Service.Name,
-					&detail.Service.TeamId,
+					&detail.Service.TeamID,
 				)
 				if err == sql.ErrNoRows {
 					detail.Service = nil
@@ -279,7 +279,7 @@ deploymentbuilder:
 			for gCustProps.Next() {
 				prop := proto.PropertyCustom{}
 				err = gCustProps.Scan(
-					&prop.Id,
+					&prop.ID,
 					&prop.Name,
 					&prop.Value,
 				)
@@ -327,7 +327,7 @@ deploymentbuilder:
 					detail.View,
 				).Scan(
 					&detail.Service.Name,
-					&detail.Service.TeamId,
+					&detail.Service.TeamID,
 				)
 				if err != nil {
 					detail.Service = nil
@@ -375,7 +375,7 @@ deploymentbuilder:
 			for cCustProps.Next() {
 				prop := proto.PropertyCustom{}
 				cCustProps.Scan(
-					&prop.Id,
+					&prop.ID,
 					&prop.Name,
 					&prop.Value,
 				)
@@ -431,7 +431,7 @@ deploymentbuilder:
 					detail.View,
 				).Scan(
 					&detail.Service.Name,
-					&detail.Service.TeamId,
+					&detail.Service.TeamID,
 				)
 				if err != nil {
 					detail.Service = nil
@@ -476,7 +476,7 @@ deploymentbuilder:
 			for nCustProps.Next() {
 				prop := proto.PropertyCustom{}
 				nCustProps.Scan(
-					&prop.Id,
+					&prop.ID,
 					&prop.Name,
 					&prop.Value,
 				)

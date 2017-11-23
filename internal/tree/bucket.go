@@ -338,13 +338,13 @@ func (teb *Bucket) actionProperty(a Action) {
 	a.Type = teb.Type
 	a.Bucket = teb.export()
 
-	a.Property.RepositoryId = teb.Repository.String()
-	a.Property.BucketId = teb.Id.String()
+	a.Property.RepositoryID = teb.Repository.String()
+	a.Property.BucketID = teb.Id.String()
 	switch a.Property.Type {
 	case `custom`:
-		a.Property.Custom.RepositoryId = a.Property.RepositoryId
+		a.Property.Custom.RepositoryID = a.Property.RepositoryID
 	case `service`:
-		a.Property.Service.TeamId = teb.Team.String()
+		a.Property.Service.TeamID = teb.Team.String()
 	}
 
 	teb.Action <- &a

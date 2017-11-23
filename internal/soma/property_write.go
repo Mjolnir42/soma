@@ -178,10 +178,10 @@ func (w *PropertyWrite) addCustom(q *msg.Request, mr *msg.Result) {
 		err error
 	)
 
-	q.Property.Custom.Id = uuid.NewV4().String()
+	q.Property.Custom.ID = uuid.NewV4().String()
 	if res, err = w.stmtAddCustom.Exec(
-		q.Property.Custom.Id,
-		q.Property.Custom.RepositoryId,
+		q.Property.Custom.ID,
+		q.Property.Custom.RepositoryID,
 		q.Property.Custom.Name,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -209,7 +209,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 	switch q.Property.Type {
 	case `service`:
 		if res, err = tx.Stmt(w.stmtAddService).Exec(
-			q.Property.Service.TeamId,
+			q.Property.Service.TeamID,
 			q.Property.Service.Name,
 		); err != nil {
 			mr.ServerError(err, q.Section)
@@ -234,7 +234,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 		switch q.Property.Type {
 		case `service`:
 			if res, err = tx.Stmt(w.stmtAddServiceAttr).Exec(
-				q.Property.Service.TeamId,
+				q.Property.Service.TeamID,
 				q.Property.Service.Name,
 				attr.Name,
 				attr.Value,
@@ -325,8 +325,8 @@ func (w *PropertyWrite) removeCustom(q *msg.Request, mr *msg.Result) {
 		err error
 	)
 	if res, err = w.stmtRemoveCustom.Exec(
-		q.Property.Custom.RepositoryId,
-		q.Property.Custom.Id,
+		q.Property.Custom.RepositoryID,
+		q.Property.Custom.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -352,7 +352,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 	switch q.Property.Type {
 	case `service`:
 		if res, err = tx.Stmt(w.stmtRemoveServiceAttr).Exec(
-			q.Property.Service.TeamId,
+			q.Property.Service.TeamID,
 			q.Property.Service.Name,
 		); err != nil {
 			mr.ServerError(err, q.Section)
@@ -361,7 +361,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 		}
 	case `template`:
 		if res, err = tx.Stmt(w.stmtRemoveTemplateAttr).Exec(
-			q.Property.Service.TeamId,
+			q.Property.Service.TeamID,
 			q.Property.Service.Name,
 		); err != nil {
 			mr.ServerError(err, q.Section)
@@ -375,7 +375,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 	switch q.Property.Type {
 	case `service`:
 		if res, err = tx.Stmt(w.stmtRemoveService).Exec(
-			q.Property.Service.TeamId,
+			q.Property.Service.TeamID,
 			q.Property.Service.Name,
 		); err != nil {
 			mr.ServerError(err, q.Section)

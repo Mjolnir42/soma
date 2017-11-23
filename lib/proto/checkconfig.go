@@ -10,22 +10,52 @@
 package proto
 
 type CheckConfig struct {
-	Id           string                  `json:"id,omitempty"`
+	ID           string                  `json:"ID,omitempty"`
 	Name         string                  `json:"name,omitempty"`
 	Interval     uint64                  `json:"interval,omitempty"`
-	RepositoryId string                  `json:"repositoryId,omitempty"`
-	BucketId     string                  `json:"bucketId,omitempty"`
-	CapabilityId string                  `json:"capabilityId,omitempty"`
-	ObjectId     string                  `json:"objectId,omitempty"`
+	RepositoryID string                  `json:"repositoryID,omitempty"`
+	BucketID     string                  `json:"bucketID,omitempty"`
+	CapabilityID string                  `json:"capabilityID,omitempty"`
+	ObjectID     string                  `json:"objectID,omitempty"`
 	ObjectType   string                  `json:"objectType,omitempty"`
 	IsActive     bool                    `json:"isActive,omitempty"`
 	IsEnabled    bool                    `json:"isEnabled,omitempty"`
 	Inheritance  bool                    `json:"inheritance,omitempty"`
 	ChildrenOnly bool                    `json:"childrenOnly,omitempty"`
-	ExternalId   string                  `json:"externalId,omitempty"`
+	ExternalID   string                  `json:"externalID,omitempty"`
 	Constraints  []CheckConfigConstraint `json:"constraints,omitempty"`
 	Thresholds   []CheckConfigThreshold  `json:"thresholds,omitempty"`
 	Details      *CheckConfigDetails     `json:"details,omitempty"`
+}
+
+func (c *CheckConfig) Clone() CheckConfig {
+	clone := CheckConfig{
+		ID:           c.ID,
+		Name:         c.Name,
+		Interval:     c.Interval,
+		RepositoryID: c.RepositoryID,
+		BucketID:     c.BucketID,
+		CapabilityID: c.CapabilityID,
+		ObjectID:     c.ObjectID,
+		ObjectType:   c.ObjectType,
+		IsActive:     c.IsActive,
+		IsEnabled:    c.IsEnabled,
+		Inheritance:  c.Inheritance,
+		ChildrenOnly: c.ChildrenOnly,
+		ExternalID:   c.ExternalID,
+	}
+	clone.Constraints = make([]CheckConfigConstraint, len(c.Constraints))
+	for i := range c.Constraints {
+		clone.Constraints[i] = c.Constraints[i].Clone()
+	}
+	clone.Thresholds = make([]CheckConfigThreshold, len(c.Thresholds))
+	for i := range c.Thresholds {
+		clone.Thresholds[i] = c.Thresholds[i].Clone()
+	}
+	if c.Details != nil {
+		clone.Details = c.Details.Clone()
+	}
+	return clone
 }
 
 type CheckConfigConstraint struct {
@@ -36,6 +66,31 @@ type CheckConfigConstraint struct {
 	System         *PropertySystem   `json:"system,omitempty"`
 	Service        *PropertyService  `json:"service,omitempty"`
 	Attribute      *ServiceAttribute `json:"attribute,omitempty"`
+}
+
+func (c *CheckConfigConstraint) Clone() CheckConfigConstraint {
+	clone := CheckConfigConstraint{
+		ConstraintType: c.ConstraintType,
+	}
+	if c.Native != nil {
+		clone.Native = c.Native.Clone()
+	}
+	if c.Oncall != nil {
+		clone.Oncall = c.Oncall.Clone()
+	}
+	if c.Custom != nil {
+		clone.Custom = c.Custom.Clone()
+	}
+	if c.System != nil {
+		clone.System = c.System.Clone()
+	}
+	if c.Service != nil {
+		clone.Service = c.Service.Clone()
+	}
+	if c.Attribute != nil {
+		*clone.Attribute = c.Attribute.Clone()
+	}
+	return clone
 }
 
 func (c *CheckConfigConstraint) DeepCompare(a *CheckConfigConstraint) bool {
@@ -89,6 +144,14 @@ type CheckConfigThreshold struct {
 	Value     int64
 }
 
+func (c *CheckConfigThreshold) Clone() CheckConfigThreshold {
+	return CheckConfigThreshold{
+		Predicate: c.Predicate,
+		Level:     c.Level,
+		Value:     c.Value,
+	}
+}
+
 func (c *CheckConfigThreshold) DeepCompareSlice(a []CheckConfigThreshold) bool {
 	if a == nil {
 		return false
@@ -110,35 +173,56 @@ func (c *CheckConfigThreshold) DeepCompare(a *CheckConfigThreshold) bool {
 }
 
 type CheckConfigDetails struct {
-	CreatedAt string              `json:"createdAt,omitempty"`
-	CreatedBy string              `json:"createdBy,omitempty"`
+	Creation  *DetailsCreation    `json:"creation,omitempty"`
 	Instances []CheckInstanceInfo `json:"instances,omitempty"`
 }
 
+func (c *CheckConfigDetails) Clone() *CheckConfigDetails {
+	clone := &CheckConfigDetails{}
+	if c.Creation != nil {
+		clone.Creation = c.Creation.Clone()
+	}
+	clone.Instances = make([]CheckInstanceInfo, len(c.Instances))
+	for i := range c.Instances {
+		clone.Instances[i] = c.Instances[i].Clone()
+	}
+	return clone
+}
+
 type CheckConfigFilter struct {
-	Id           string `json:"id,omitempty"`
+	ID           string `json:"ID,omitempty"`
 	Name         string `json:"name,omitempty"`
-	CapabilityId string `json:"capabilityId,omitempty"`
+	CapabilityID string `json:"capabilityID,omitempty"`
 }
 
 type CheckInstanceInfo struct {
-	Id            string `json:"id,omitempty"`
-	ObjectId      string `json:"objectId,omitempty"`
+	ID            string `json:"ID,omitempty"`
+	ObjectID      string `json:"objectID,omitempty"`
 	ObjectType    string `json:"objectType,omitempty"`
 	CurrentStatus string `json:"currentStatus,omitempty"`
 	NextStatus    string `json:"nextStatus,omitempty"`
+}
+
+func (c *CheckInstanceInfo) Clone() CheckInstanceInfo {
+	return CheckInstanceInfo{
+		ID:            c.ID,
+		ObjectID:      c.ObjectID,
+		ObjectType:    c.ObjectType,
+		CurrentStatus: c.CurrentStatus,
+		NextStatus:    c.NextStatus,
+	}
 }
 
 func (c *CheckConfig) DeepCompare(a *CheckConfig) bool {
 	if a == nil {
 		return false
 	}
-	if c.Id != a.Id || c.Name != a.Name || c.Interval != a.Interval ||
-		c.RepositoryId != a.RepositoryId || c.BucketId != a.BucketId ||
-		c.CapabilityId != a.CapabilityId || c.ObjectId != a.ObjectId ||
+	if c.ID != a.ID || c.Name != a.Name || c.Interval != a.Interval ||
+		c.RepositoryID != a.RepositoryID || c.BucketID != a.BucketID ||
+		c.CapabilityID != a.CapabilityID || c.ObjectID != a.ObjectID ||
 		c.ObjectType != a.ObjectType || c.IsActive != a.IsActive ||
 		c.IsEnabled != a.IsEnabled || c.Inheritance != a.Inheritance ||
-		c.ChildrenOnly != a.ChildrenOnly || c.ExternalId != a.ExternalId {
+		c.ChildrenOnly != a.ChildrenOnly || c.ExternalID != a.ExternalID {
 		return false
 	}
 threshloop:

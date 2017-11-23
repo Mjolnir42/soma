@@ -24,28 +24,28 @@ func (tk *TreeKeeper) txCheckConfig(conf proto.CheckConfig,
 		nullBucket sql.NullString
 		err        error
 	)
-	if conf.BucketId != "" {
+	if conf.BucketID != "" {
 		nullBucket = sql.NullString{
-			String: conf.BucketId,
+			String: conf.BucketID,
 			Valid:  true,
 		}
 	} else {
 		nullBucket = sql.NullString{String: "", Valid: false}
 	}
 	if _, err = stm[`CreateCheckConfigurationBase`].Exec(
-		conf.Id,
+		conf.ID,
 		conf.Name,
 		int64(conf.Interval),
-		conf.RepositoryId,
+		conf.RepositoryID,
 		nullBucket,
-		conf.CapabilityId,
-		conf.ObjectId,
+		conf.CapabilityID,
+		conf.ObjectID,
 		conf.ObjectType,
 		conf.IsActive,
 		conf.IsEnabled,
 		conf.Inheritance,
 		conf.ChildrenOnly,
-		conf.ExternalId,
+		conf.ExternalID,
 	); err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func (tk *TreeKeeper) txCheckConfig(conf proto.CheckConfig,
 threshloop:
 	for _, thr := range conf.Thresholds {
 		if _, err = stm[`CreateCheckConfigurationThreshold`].Exec(
-			conf.Id,
+			conf.ID,
 			thr.Predicate.Symbol,
 			strconv.FormatInt(thr.Value, 10),
 			thr.Level.Name,
@@ -70,7 +70,7 @@ constrloop:
 		switch constr.ConstraintType {
 		case "native":
 			if _, err = stm[`CreateCheckConfigurationConstraintNative`].Exec(
-				conf.Id,
+				conf.ID,
 				constr.Native.Name,
 				constr.Native.Value,
 			); err != nil {
@@ -78,37 +78,37 @@ constrloop:
 			}
 		case "oncall":
 			if _, err = stm[`CreateCheckConfigurationConstraintOncall`].Exec(
-				conf.Id,
-				constr.Oncall.Id,
+				conf.ID,
+				constr.Oncall.ID,
 			); err != nil {
 				break constrloop
 			}
 		case "custom":
 			if _, err = stm[`CreateCheckConfigurationConstraintCustom`].Exec(
-				conf.Id,
-				constr.Custom.Id,
-				constr.Custom.RepositoryId,
+				conf.ID,
+				constr.Custom.ID,
+				constr.Custom.RepositoryID,
 				constr.Custom.Value,
 			); err != nil {
 				break constrloop
 			}
 		case "system":
 			if _, err = stm[`CreateCheckConfigurationConstraintSystem`].Exec(
-				conf.Id,
+				conf.ID,
 				constr.System.Name,
 				constr.System.Value,
 			); err != nil {
 				break constrloop
 			}
 		case "service":
-			if constr.Service.TeamId != tk.meta.teamID {
+			if constr.Service.TeamID != tk.meta.teamID {
 				err = fmt.Errorf(
 					"Service constraint has mismatched TeamID values: %s/%s",
-					tk.meta.teamID, constr.Service.TeamId)
+					tk.meta.teamID, constr.Service.TeamID)
 				break constrloop
 			}
 			if _, err = stm[`CreateCheckConfigurationConstraintService`].Exec(
-				conf.Id,
+				conf.ID,
 				tk.meta.teamID,
 				constr.Service.Name,
 			); err != nil {
@@ -116,7 +116,7 @@ constrloop:
 			}
 		case "attribute":
 			if _, err = stm[`CreateCheckConfigurationConstraintAttribute`].Exec(
-				conf.Id,
+				conf.ID,
 				constr.Attribute.Name,
 				constr.Attribute.Value,
 			); err != nil {

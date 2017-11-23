@@ -316,13 +316,13 @@ func ValidateCheckConstraints(repoId, teamId string,
 			oncall := proto.PropertyOncall{}
 			var err error
 			if prop.Oncall.Name != `` {
-				if oncall.Id, err = LookupOncallID(
+				if oncall.ID, err = LookupOncallID(
 					prop.Oncall.Name); err != nil {
 					return nil, err
 				}
-			} else if prop.Oncall.Id != `` {
-				if oncall.Id, err = LookupOncallID(
-					prop.Oncall.Id); err != nil {
+			} else if prop.Oncall.ID != `` {
+				if oncall.ID, err = LookupOncallID(
+					prop.Oncall.ID); err != nil {
 					return nil, err
 				}
 			} else {
@@ -341,7 +341,7 @@ func ValidateCheckConstraints(repoId, teamId string,
 				prop.Service.Name, teamId); err != nil {
 				return nil, err
 			}
-			service.TeamId = teamId
+			service.TeamID = teamId
 			valid = append(valid, proto.CheckConfigConstraint{
 				ConstraintType: prop.ConstraintType,
 				Service:        &service,
@@ -350,11 +350,11 @@ func ValidateCheckConstraints(repoId, teamId string,
 		case `custom`:
 			custom := proto.PropertyCustom{}
 			var err error
-			if custom.Id, err = LookupCustomPropertyId(
+			if custom.ID, err = LookupCustomPropertyId(
 				prop.Custom.Name, repoId); err != nil {
 				return nil, err
 			}
-			custom.RepositoryId = repoId
+			custom.RepositoryID = repoId
 			custom.Value = prop.Custom.Value
 			valid = append(valid, proto.CheckConfigConstraint{
 				ConstraintType: prop.ConstraintType,

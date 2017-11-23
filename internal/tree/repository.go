@@ -13,8 +13,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -334,14 +334,14 @@ func (ter *Repository) actionPropertyDelete(a Action) {
 func (ter *Repository) actionProperty(a Action) {
 	a.Type = ter.Type
 	a.Repository = ter.export()
-	a.Property.RepositoryId = ter.Id.String()
-	a.Property.BucketId = ""
+	a.Property.RepositoryID = ter.Id.String()
+	a.Property.BucketID = ``
 
 	switch a.Property.Type {
 	case "custom":
-		a.Property.Custom.RepositoryId = a.Property.RepositoryId
+		a.Property.Custom.RepositoryID = a.Property.RepositoryID
 	case "service":
-		a.Property.Service.TeamId = ter.Team.String()
+		a.Property.Service.TeamID = ter.Team.String()
 	}
 
 	ter.Action <- &a

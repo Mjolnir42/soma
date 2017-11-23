@@ -20,7 +20,7 @@ func (tk *TreeKeeper) addCheck(config *proto.CheckConfig) error {
 	if chk, err = tk.convertCheck(config); err == nil {
 		tk.tree.Find(tree.FindRequest{
 			ElementType: config.ObjectType,
-			ElementId:   config.ObjectId,
+			ElementId:   config.ObjectID,
 		}, true).SetCheck(*chk)
 		return nil
 	}
@@ -33,7 +33,7 @@ func (tk *TreeKeeper) rmCheck(config *proto.CheckConfig) error {
 	if chk, err = tk.convertCheckForDelete(config); err == nil {
 		tk.tree.Find(tree.FindRequest{
 			ElementType: config.ObjectType,
-			ElementId:   config.ObjectId,
+			ElementId:   config.ObjectID,
 		}, true).DeleteCheck(*chk)
 		return nil
 	}
@@ -49,9 +49,9 @@ func (tk *TreeKeeper) convertCheck(conf *proto.CheckConfig) (*tree.Check, error)
 		ChildrenOnly:  conf.ChildrenOnly,
 		Interval:      conf.Interval,
 	}
-	treechk.CapabilityId, _ = uuid.FromString(conf.CapabilityId)
-	treechk.ConfigId, _ = uuid.FromString(conf.Id)
-	if err := tk.stmtGetView.QueryRow(conf.CapabilityId).Scan(&treechk.View); err != nil {
+	treechk.CapabilityId, _ = uuid.FromString(conf.CapabilityID)
+	treechk.ConfigId, _ = uuid.FromString(conf.ID)
+	if err := tk.stmtGetView.QueryRow(conf.CapabilityID).Scan(&treechk.View); err != nil {
 		return &tree.Check{}, err
 	}
 
@@ -76,9 +76,9 @@ func (tk *TreeKeeper) convertCheck(conf *proto.CheckConfig) (*tree.Check, error)
 			ncon.Value = constr.Native.Value
 		case "oncall":
 			ncon.Key = "OncallId"
-			ncon.Value = constr.Oncall.Id
+			ncon.Value = constr.Oncall.ID
 		case "custom":
-			ncon.Key = constr.Custom.Id
+			ncon.Key = constr.Custom.ID
 			ncon.Value = constr.Custom.Value
 		case "system":
 			ncon.Key = constr.System.Name
@@ -101,10 +101,10 @@ func (tk *TreeKeeper) convertCheckForDelete(conf *proto.CheckConfig) (*tree.Chec
 		Id:            uuid.Nil,
 		InheritedFrom: uuid.Nil,
 	}
-	if treechk.SourceId, err = uuid.FromString(conf.ExternalId); err != nil {
+	if treechk.SourceId, err = uuid.FromString(conf.ExternalID); err != nil {
 		return nil, err
 	}
-	if treechk.ConfigId, err = uuid.FromString(conf.Id); err != nil {
+	if treechk.ConfigId, err = uuid.FromString(conf.ID); err != nil {
 		return nil, err
 	}
 	return treechk, nil

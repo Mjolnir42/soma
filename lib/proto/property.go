@@ -11,14 +11,14 @@ package proto
 
 type Property struct {
 	Type             string           `json:"type"`
-	RepositoryId     string           `json:"repositoryId,omitempty"`
-	BucketId         string           `json:"bucketId,omitempty"`
-	InstanceId       string           `json:"instanceId,omitempty"`
+	RepositoryID     string           `json:"repositoryID,omitempty"`
+	BucketID         string           `json:"bucketID,omitempty"`
+	InstanceID       string           `json:"instanceID,omitempty"`
 	View             string           `json:"view,omitempty"`
 	Inheritance      bool             `json:"inheritance,omitempty"`
 	ChildrenOnly     bool             `json:"childrenOnly,omitempty"`
 	IsInherited      bool             `json:"isInherited,omitempty"`
-	SourceInstanceId string           `json:"sourceInstanceId,omitempty"`
+	SourceInstanceID string           `json:"sourceInstanceID,omitempty"`
 	SourceType       string           `json:"sourceType,omitempty"`
 	InheritedFrom    string           `json:"inheritedFrom,omitempty"`
 	Custom           *PropertyCustom  `json:"custom,omitempty"`
@@ -29,25 +29,77 @@ type Property struct {
 	Details          *PropertyDetails `json:"details,omitempty"`
 }
 
+func (p *Property) Clone() Property {
+	clone := Property{
+		Type:             p.Type,
+		RepositoryID:     p.RepositoryID,
+		BucketID:         p.BucketID,
+		InstanceID:       p.InstanceID,
+		View:             p.View,
+		Inheritance:      p.Inheritance,
+		ChildrenOnly:     p.ChildrenOnly,
+		IsInherited:      p.IsInherited,
+		SourceInstanceID: p.SourceInstanceID,
+		SourceType:       p.SourceType,
+		InheritedFrom:    p.InheritedFrom,
+	}
+	if p.Custom != nil {
+		clone.Custom = p.Custom.Clone()
+	}
+	if p.System != nil {
+		clone.System = p.System.Clone()
+	}
+	if p.Service != nil {
+		clone.Service = p.Service.Clone()
+	}
+	if p.Native != nil {
+		clone.Native = p.Native.Clone()
+	}
+	if p.Oncall != nil {
+		clone.Oncall = p.Oncall.Clone()
+	}
+	if p.Details != nil {
+		clone.Details = p.Details.Clone()
+	}
+	return clone
+}
+
 type PropertyFilter struct {
 	Name         string `json:"name,omitempty"`
 	Type         string `json:"type,omitempty"`
-	RepositoryId string `json:"repositoryId,omitempty"`
+	RepositoryID string `json:"repositoryID,omitempty"`
 }
 
 type PropertyDetails struct {
-	DetailsCreation
+	Creation *DetailsCreation `json:"creation,omitempty"`
+}
+
+func (t *PropertyDetails) Clone() *PropertyDetails {
+	clone := &PropertyDetails{}
+	if t.Creation != nil {
+		clone.Creation = t.Creation.Clone()
+	}
+	return clone
 }
 
 type PropertyCustom struct {
-	Id           string `json:"id,omitempty"`
+	ID           string `json:"ID,omitempty"`
 	Name         string `json:"name,omitempty"`
-	RepositoryId string `json:"repositoryId,omitempty"`
+	RepositoryID string `json:"repositoryID,omitempty"`
 	Value        string `json:"value,omitempty"`
 }
 
+func (t *PropertyCustom) Clone() *PropertyCustom {
+	return &PropertyCustom{
+		ID:           t.ID,
+		Name:         t.Name,
+		RepositoryID: t.RepositoryID,
+		Value:        t.Value,
+	}
+}
+
 func (t *PropertyCustom) DeepCompare(a *PropertyCustom) bool {
-	if t.Id != a.Id || t.Name != a.Name || t.RepositoryId != a.RepositoryId || t.Value != a.Value {
+	if t.ID != a.ID || t.Name != a.Name || t.RepositoryID != a.RepositoryID || t.Value != a.Value {
 		return false
 	}
 	return true
@@ -68,6 +120,13 @@ func (t *PropertyCustom) DeepCompareSlice(a *[]PropertyCustom) bool {
 type PropertySystem struct {
 	Name  string `json:"name,omitempty"`
 	Value string `json:"value,omitempty"`
+}
+
+func (t *PropertySystem) Clone() *PropertySystem {
+	return &PropertySystem{
+		Name:  t.Name,
+		Value: t.Value,
+	}
 }
 
 func (t *PropertySystem) DeepCompare(a *PropertySystem) bool {
@@ -91,12 +150,24 @@ func (t *PropertySystem) DeepCompareSlice(a *[]PropertySystem) bool {
 
 type PropertyService struct {
 	Name       string             `json:"name,omitempty"`
-	TeamId     string             `json:"teamId,omitempty"`
+	TeamID     string             `json:"teamID,omitempty"`
 	Attributes []ServiceAttribute `json:"attributes"`
 }
 
+func (t *PropertyService) Clone() *PropertyService {
+	clone := &PropertyService{
+		Name:   t.Name,
+		TeamID: t.TeamID,
+	}
+	clone.Attributes = make([]ServiceAttribute, len(t.Attributes))
+	for i := range t.Attributes {
+		clone.Attributes[i] = t.Attributes[i].Clone()
+	}
+	return clone
+}
+
 func (t *PropertyService) DeepCompare(a *PropertyService) bool {
-	if t.Name != a.Name || t.TeamId != a.TeamId {
+	if t.Name != a.Name || t.TeamID != a.TeamID {
 		return false
 	}
 attrloop:
@@ -121,6 +192,13 @@ type PropertyNative struct {
 	Value string `json:"value,omitempty"`
 }
 
+func (t *PropertyNative) Clone() *PropertyNative {
+	return &PropertyNative{
+		Name:  t.Name,
+		Value: t.Value,
+	}
+}
+
 func (t *PropertyNative) DeepCompare(a *PropertyNative) bool {
 	if t.Name != a.Name || t.Value != a.Value {
 		return false
@@ -129,13 +207,21 @@ func (t *PropertyNative) DeepCompare(a *PropertyNative) bool {
 }
 
 type PropertyOncall struct {
-	Id     string `json:"id,omitempty"`
+	ID     string `json:"ID,omitempty"`
 	Name   string `json:"name,omitempty"`
 	Number string `json:"number,omitempty"`
 }
 
+func (t *PropertyOncall) Clone() *PropertyOncall {
+	return &PropertyOncall{
+		ID:     t.ID,
+		Name:   t.Name,
+		Number: t.Number,
+	}
+}
+
 func (t *PropertyOncall) DeepCompare(a *PropertyOncall) bool {
-	if t.Id != a.Id || t.Name != a.Name || t.Number != a.Number {
+	if t.ID != a.ID || t.Name != a.Name || t.Number != a.Number {
 		return false
 	}
 	return true
@@ -144,6 +230,13 @@ func (t *PropertyOncall) DeepCompare(a *PropertyOncall) bool {
 type ServiceAttribute struct {
 	Name  string `json:"name,omitempty"`
 	Value string `json:"value,omitempty"`
+}
+
+func (t *ServiceAttribute) Clone() ServiceAttribute {
+	return ServiceAttribute{
+		Name:  t.Name,
+		Value: t.Value,
+	}
 }
 
 func (t *ServiceAttribute) DeepCompare(a *ServiceAttribute) bool {
