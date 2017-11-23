@@ -230,8 +230,6 @@ func main() {
 
 	router.GET(`/buckets/:bucket/instances/`, Check(BasicAuth(InstanceList)))
 	router.GET(`/buckets/:bucket/tree/:tree`, Check(BasicAuth(OutputTree)))
-	router.GET(`/capability/:capability`, Check(BasicAuth(CapabilityShow)))
-	router.GET(`/capability/`, Check(BasicAuth(CapabilityList)))
 	router.GET(`/category/:category/permissions/:permission`, Check(BasicAuth(PermissionShow)))
 	router.GET(`/category/:category/permissions/`, Check(BasicAuth(PermissionList)))
 	router.GET(`/category/:category`, Check(BasicAuth(CategoryShow)))
@@ -318,7 +316,6 @@ func main() {
 	router.GET(`/views/:view`, Check(BasicAuth(ViewShow)))
 	router.GET(`/views/`, Check(BasicAuth(ViewList)))
 	router.GET(`/workflow/summary`, Check(BasicAuth(WorkflowSummary)))
-	router.POST(`/filter/capability/`, Check(BasicAuth(CapabilityList)))
 	router.POST(`/filter/checks/:repository/`, Check(BasicAuth(CheckConfigurationList)))
 	router.POST(`/filter/clusters/`, Check(BasicAuth(ClusterList)))
 	router.POST(`/filter/grant/`, Check(BasicAuth(RightSearch)))
@@ -344,7 +341,6 @@ func main() {
 	if !SomaCfg.ReadOnly {
 
 		if !SomaCfg.Observer {
-			router.DELETE(`/capability/:capability`, Check(BasicAuth(CapabilityRemove)))
 			router.DELETE(`/category/:category/permissions/:permission/grant/:grant`, Check(BasicAuth(RightRevoke)))
 			router.DELETE(`/category/:category/permissions/:permission`, Check(BasicAuth(PermissionRemove)))
 			router.DELETE(`/category/:category`, Check(BasicAuth(CategoryRemove)))
@@ -386,7 +382,6 @@ func main() {
 			router.PATCH(`/views/:view`, Check(BasicAuth(ViewRename)))
 			router.PATCH(`/workflow/instanceconfig/:instanceconfig`, Check(BasicAuth(WorkflowSet)))
 			router.PATCH(`/workflow/retry`, Check(BasicAuth(WorkflowRetry)))
-			router.POST(`/capability/`, Check(BasicAuth(CapabilityAdd)))
 			router.POST(`/category/:category/permissions/:permission/grant/`, Check(BasicAuth(RightGrant)))
 			router.POST(`/category/:category/permissions/`, Check(BasicAuth(PermissionAdd)))
 			router.POST(`/category/`, Check(BasicAuth(CategoryAdd)))

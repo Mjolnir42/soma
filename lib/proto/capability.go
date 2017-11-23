@@ -10,9 +10,9 @@
 package proto
 
 type Capability struct {
-	Id           string                  `json:"id,omitempty"`
+	ID           string                  `json:"ID,omitempty"`
 	Name         string                  `json:"name,omitempty"`
-	MonitoringId string                  `json:"monitoringId,omitempty"`
+	MonitoringID string                  `json:"monitoringID,omitempty"`
 	Metric       string                  `json:"metric,omitempty"`
 	View         string                  `json:"view,omitempty"`
 	Thresholds   uint64                  `json:"thresholds,omitempty"`
@@ -21,8 +21,23 @@ type Capability struct {
 	Details      *CapabilityDetails      `json:"details,omitempty"`
 }
 
+func (c *Capability) Clone() Capability {
+	clone := Capability{
+		ID:           c.ID,
+		Name:         c.Name,
+		MonitoringID: c.MonitoringID,
+		Metric:       c.Metric,
+		View:         c.View,
+		Thresholds:   c.Thresholds,
+		Details:      c.Details.Clone(),
+	}
+	// XXX Demux
+	// XXX Constraints
+	return clone
+}
+
 type CapabilityFilter struct {
-	MonitoringId   string `json:"monitoringId,omitempty"`
+	MonitoringID   string `json:"monitoringID,omitempty"`
 	MonitoringName string `json:"monitoringName,omitempty"`
 	Metric         string `json:"metric,omitempty"`
 	View           string `json:"view,omitempty"`
@@ -35,17 +50,23 @@ type CapabilityConstraint struct {
 }
 
 type CapabilityDetails struct {
-	DetailsCreation
+	Creation *DetailsCreation
+}
+
+func (c *CapabilityDetails) Clone() *CapabilityDetails {
+	return &CapabilityDetails{
+		Creation: c.Creation.Clone(),
+	}
 }
 
 func (c *Capability) DeepCompare(a *Capability) bool {
-	if c.Id != a.Id {
+	if c.ID != a.ID {
 		return false
 	}
 	if c.Name != a.Name {
 		return false
 	}
-	if c.MonitoringId != a.MonitoringId {
+	if c.MonitoringID != a.MonitoringID {
 		return false
 	}
 	if c.Metric != a.Metric {

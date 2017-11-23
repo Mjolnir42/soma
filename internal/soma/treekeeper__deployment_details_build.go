@@ -133,14 +133,14 @@ deploymentbuilder:
 
 		//
 		detail.Capability = &proto.Capability{
-			Id: detail.Check.CapabilityId,
+			ID: detail.Check.CapabilityId,
 		}
 		detail.Monitoring = &proto.Monitoring{}
 		detail.Metric = &proto.Metric{}
 		detail.Unit = &proto.Unit{}
-		tk.stmtCapMonMetric.QueryRow(detail.Capability.Id).Scan(
+		tk.stmtCapMonMetric.QueryRow(detail.Capability.ID).Scan(
 			&detail.Capability.Metric,
-			&detail.Capability.MonitoringId,
+			&detail.Capability.MonitoringID,
 			&detail.Capability.View,
 			&detail.Capability.Thresholds,
 			&detail.Monitoring.Name,
@@ -159,7 +159,7 @@ deploymentbuilder:
 		}
 		detail.Unit.Unit = detail.Metric.Unit
 		detail.Metric.Path = detail.Capability.Metric
-		detail.Monitoring.Id = detail.Capability.MonitoringId
+		detail.Monitoring.Id = detail.Capability.MonitoringID
 		detail.Capability.Name = fmt.Sprintf("%s.%s.%s",
 			detail.Monitoring.Name,
 			detail.Capability.View,

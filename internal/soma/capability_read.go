@@ -88,6 +88,8 @@ func (r *CapabilityRead) process(q *msg.Request) {
 		r.list(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
+	case msg.ActionSearch:
+		// XXX BUG r.search(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -120,8 +122,8 @@ func (r *CapabilityRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Capability = append(mr.Capability, proto.Capability{
-			Id:           id,
-			MonitoringId: monitoring,
+			ID:           id,
+			MonitoringID: monitoring,
 			Metric:       metric,
 			View:         view,
 			Name: fmt.Sprintf("%s.%s.%s", monName, view,
@@ -144,7 +146,7 @@ func (r *CapabilityRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Capability.Id,
+		q.Capability.ID,
 	).Scan(
 		&id,
 		&monitoring,
@@ -161,8 +163,8 @@ func (r *CapabilityRead) show(q *msg.Request, mr *msg.Result) {
 	}
 
 	mr.Capability = append(mr.Capability, proto.Capability{
-		Id:           id,
-		MonitoringId: monitoring,
+		ID:           id,
+		MonitoringID: monitoring,
 		Metric:       metric,
 		View:         view,
 		Thresholds:   uint64(thresholds),

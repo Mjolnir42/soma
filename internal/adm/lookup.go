@@ -1033,14 +1033,14 @@ func capabilityIdByName(cap string) (string, error) {
 		err = fmt.Errorf(`Capability split failed, name invalid`)
 		goto abort
 	}
-	if req.Filter.Capability.MonitoringId, err = LookupMonitoringId(
+	if req.Filter.Capability.MonitoringID, err = LookupMonitoringId(
 		split[0]); err != nil {
 		goto abort
 	}
 	req.Filter.Capability.View = split[1]
 	req.Filter.Capability.Metric = split[2]
 
-	if res, err = fetchFilter(req, `/filter/capability/`); err != nil {
+	if res, err = fetchFilter(req, `/search/capability/`); err != nil {
 		goto abort
 	}
 
@@ -1054,7 +1054,7 @@ func capabilityIdByName(cap string) (string, error) {
 			cap, (*res.Capabilities)[0].Name)
 		goto abort
 	}
-	return (*res.Capabilities)[0].Id, nil
+	return (*res.Capabilities)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("CapabilityId lookup failed: %s",

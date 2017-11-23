@@ -109,13 +109,13 @@ func (w *CapabilityWrite) add(q *msg.Request, mr *msg.Result) {
 
 	// input validation: MonitoringID
 	if w.stmtVerifyMonitoring.QueryRow(
-		q.Capability.MonitoringId,
+		q.Capability.MonitoringID,
 	).Scan(
 		&inputVal,
 	); err == sql.ErrNoRows {
 		mr.NotFound(fmt.Errorf(
 			"Monitoring system with ID %s is not registered",
-			q.Capability.MonitoringId),
+			q.Capability.MonitoringID),
 			q.Section,
 		)
 		return
@@ -156,10 +156,10 @@ func (w *CapabilityWrite) add(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	q.Capability.Id = uuid.NewV4().String()
+	q.Capability.ID = uuid.NewV4().String()
 	if res, err = w.stmtAdd.Exec(
-		q.Capability.Id,
-		q.Capability.MonitoringId,
+		q.Capability.ID,
+		q.Capability.MonitoringID,
 		q.Capability.Metric,
 		q.Capability.View,
 		q.Capability.Thresholds,
@@ -180,7 +180,7 @@ func (w *CapabilityWrite) remove(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRemove.Exec(
-		q.Capability.Id,
+		q.Capability.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

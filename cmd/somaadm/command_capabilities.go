@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerCapability(app cli.App) *cli.App {
@@ -76,7 +76,7 @@ func cmdCapabilityDeclare(c *cli.Context) error {
 		},
 	}
 	var err error
-	if req.Capability.MonitoringId, err = adm.LookupMonitoringId(
+	if req.Capability.MonitoringID, err = adm.LookupMonitoringId(
 		c.Args().First()); err != nil {
 		return err
 	}
