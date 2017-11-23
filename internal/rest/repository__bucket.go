@@ -48,6 +48,12 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	if cReq.Filter.Bucket.Name == `` && cReq.Filter.Bucket.ID == `` {
+		dispatchBadRequest(&w,
+			fmt.Errorf(`BucketSearch request without condition`))
+		return
+	}
+
 	request := newRequest(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionList
@@ -57,21 +63,18 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	// XXX BUG replace this with a BucketSearch endpoint
 	handler := x.handlerMap.Get(`bucket_r`)
 	handler.Intake() <- request
 	result := <-request.Reply
 
-	if (cReq.Filter.Bucket.Name != "") || (cReq.Filter.Bucket.ID != "") {
-		filtered := []proto.Bucket{}
-		for _, i := range result.Bucket {
-			if (i.Name == cReq.Filter.Bucket.Name) || (i.ID == cReq.Filter.Bucket.ID) {
-				filtered = append(filtered, i)
-			}
+	// XXX BUG filter in SQL statement
+	filtered := []proto.Bucket{}
+	for _, i := range result.Bucket {
+		if (i.Name == cReq.Filter.Bucket.Name) || (i.ID == cReq.Filter.Bucket.ID) {
+			filtered = append(filtered, i)
 		}
-		result.Bucket = filtered
 	}
-
+	result.Bucket = filtered
 	sendMsgResult(&w, &result)
 }
 

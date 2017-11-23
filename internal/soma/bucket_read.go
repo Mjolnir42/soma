@@ -96,6 +96,8 @@ func (r *BucketRead) process(q *msg.Request) {
 		r.list(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
+	case msg.ActionSearch:
+		// XXX BUG r.search(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}

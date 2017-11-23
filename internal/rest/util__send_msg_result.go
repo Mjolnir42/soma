@@ -61,6 +61,10 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		result = proto.NewAttributeResult()
 		*result.Attributes = append(*result.Attributes, r.Attribute...)
 
+	case msg.SectionBucket:
+		result = proto.NewBucketResult()
+		*result.Buckets = append(*result.Buckets, r.Bucket...)
+
 	case msg.SectionCapability:
 		result = proto.NewCapabilityResult()
 		*result.Capabilities = append(*result.Capabilities, r.Capability...)
