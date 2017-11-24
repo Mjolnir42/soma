@@ -77,6 +77,10 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		result = proto.NewCheckConfigResult()
 		*result.CheckConfigs = append(*result.CheckConfigs, r.CheckConfig...)
 
+	case msg.SectionCluster:
+		result = proto.NewClusterResult()
+		*result.Clusters = append(*result.Clusters, r.Cluster...)
+
 	// XXX below are legacy definitions
 	case `kex`:
 		k = r.Super.Kex

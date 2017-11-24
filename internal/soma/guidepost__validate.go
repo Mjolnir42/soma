@@ -123,12 +123,12 @@ func (g *GuidePost) validateObjectMatch(q *msg.Request) (bool, error) {
 	switch q.Action {
 	case `add_node_to_cluster`:
 		nodeID = (*q.Cluster.Members)[0].ID
-		clusterID = q.Cluster.Id
+		clusterID = q.Cluster.ID
 	case `add_node_to_group`:
 		nodeID = (*q.Group.MemberNodes)[0].ID
 		groupID = q.Group.Id
 	case `add_cluster_to_group`:
-		clusterID = (*q.Group.MemberClusters)[0].Id
+		clusterID = (*q.Group.MemberClusters)[0].ID
 		groupID = q.Group.Id
 	case `add_group_to_group`:
 		childGroupID = (*q.Group.MemberGroups)[0].Id
@@ -231,7 +231,7 @@ func (g *GuidePost) validateCorrectBucket(q *msg.Request) (bool, error) {
 		)
 	case `cluster`:
 		err = g.stmtBucketForClusterID.QueryRow(
-			q.Cluster.Id,
+			q.Cluster.ID,
 		).Scan(
 			&bid,
 		)
@@ -257,7 +257,7 @@ func (g *GuidePost) validateCorrectBucket(q *msg.Request) (bool, error) {
 				bid)
 		}
 	case `cluster`:
-		if bid != q.Cluster.BucketId {
+		if bid != q.Cluster.BucketID {
 			return false, fmt.Errorf("Cluster in different bucket %s",
 				bid)
 		}

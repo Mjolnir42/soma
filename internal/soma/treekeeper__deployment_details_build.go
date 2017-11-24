@@ -295,24 +295,24 @@ deploymentbuilder:
 		case "cluster":
 			// fetch the cluster object
 			detail.Cluster = &proto.Cluster{
-				Id: objID,
+				ID: objID,
 			}
 			tk.stmtCluster.QueryRow(objID).Scan(
 				&detail.Cluster.Name,
-				&detail.Cluster.BucketId,
+				&detail.Cluster.BucketID,
 				&detail.Cluster.ObjectState,
-				&detail.Cluster.TeamId,
+				&detail.Cluster.TeamID,
 				&detail.Bucket,
 				&detail.Environment,
 				&detail.Repository,
 			)
 			// fetch team information
 			detail.Team = &proto.Team{
-				Id: detail.Cluster.TeamId,
+				Id: detail.Cluster.TeamID,
 			}
 			// fetch oncall information if the property is set,
 			// otherwise cleanup detail.Oncall
-			err = tk.stmtClusterOncall.QueryRow(detail.Cluster.Id, detail.View).Scan(
+			err = tk.stmtClusterOncall.QueryRow(detail.Cluster.ID, detail.View).Scan(
 				&detail.Oncall.Id,
 				&detail.Oncall.Name,
 				&detail.Oncall.Number,
@@ -346,7 +346,7 @@ deploymentbuilder:
 			}
 			// fetch system properties
 			detail.Properties = &[]proto.PropertySystem{}
-			cSysProps, _ = tk.stmtClusterSysProp.Query(detail.Cluster.Id, detail.View)
+			cSysProps, _ = tk.stmtClusterSysProp.Query(detail.Cluster.ID, detail.View)
 			defer cSysProps.Close()
 
 			for cSysProps.Next() {
@@ -369,7 +369,7 @@ deploymentbuilder:
 			}
 			// fetch custom properties
 			detail.CustomProperties = &[]proto.PropertyCustom{}
-			cCustProps, _ = tk.stmtClusterCustProp.Query(detail.Cluster.Id, detail.View)
+			cCustProps, _ = tk.stmtClusterCustProp.Query(detail.Cluster.ID, detail.View)
 			defer cCustProps.Close()
 
 			for cCustProps.Next() {

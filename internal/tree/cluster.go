@@ -323,11 +323,11 @@ func (tec *Cluster) ClearLoadInfo() {
 func (tec *Cluster) export() proto.Cluster {
 	bucket := tec.Parent.(Bucketeer).GetBucket()
 	return proto.Cluster{
-		Id:          tec.Id.String(),
+		ID:          tec.Id.String(),
 		Name:        tec.Name,
-		BucketId:    bucket.(Builder).GetID(),
+		BucketID:    bucket.(Builder).GetID(),
 		ObjectState: tec.State,
-		TeamId:      tec.Team.String(),
+		TeamID:      tec.Team.String(),
 	}
 }
 

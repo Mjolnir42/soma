@@ -72,8 +72,8 @@ func (c *Cache) performCategoryRemove(q *msg.Request) {
 func (c *Cache) performClusterCreate(q *msg.Request) {
 	c.lock.Lock()
 	c.object.addCluster(
-		q.Cluster.BucketId,
-		q.Cluster.Id,
+		q.Cluster.BucketID,
+		q.Cluster.ID,
 	)
 	c.lock.Unlock()
 }
@@ -82,12 +82,12 @@ func (c *Cache) performClusterCreate(q *msg.Request) {
 func (c *Cache) performClusterDestroy(q *msg.Request) {
 	c.lock.Lock()
 	// revoke all grants on the object to be deleted
-	grantIDs := c.grantRepository.getObjectGrantID(q.Cluster.Id)
+	grantIDs := c.grantRepository.getObjectGrantID(q.Cluster.ID)
 	for _, grantID := range grantIDs {
 		c.grantRepository.revoke(grantID)
 	}
 	// remove object
-	c.object.rmCluster(q.Cluster.Id)
+	c.object.rmCluster(q.Cluster.ID)
 	c.lock.Unlock()
 }
 

@@ -295,7 +295,7 @@ func (r *GroupRead) memberList(q *msg.Request, mr *msg.Result) {
 		}
 		*group.MemberClusters = append(*group.MemberClusters,
 			proto.Cluster{
-				Id:   memberClusterID,
+				ID:   memberClusterID,
 				Name: memberClusterName,
 			})
 	}

@@ -115,7 +115,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		`delete_custom_property_from_cluster`,
 		`delete_oncall_property_from_cluster`,
 		`delete_service_property_from_cluster`:
-		return ``, q.Cluster.BucketId
+		return ``, q.Cluster.BucketID
 	case
 		`add_check_to_repository`,
 		`add_check_to_bucket`,

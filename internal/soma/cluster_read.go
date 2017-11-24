@@ -98,6 +98,8 @@ func (r *ClusterRead) process(q *msg.Request) {
 		r.list(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
+	case msg.ActionSearch:
+		//XXX TODO r.search(q, &result)
 	case msg.ActionMemberList:
 		r.memberList(q, &result)
 	default:
@@ -130,9 +132,9 @@ func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Cluster = append(mr.Cluster, proto.Cluster{
-			Id:       clusterID,
+			ID:       clusterID,
 			Name:     clusterName,
-			BucketId: bucketID,
+			BucketID: bucketID,
 		})
 	}
 	if err = rows.Err(); err != nil {
@@ -154,7 +156,7 @@ func (r *ClusterRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Cluster.Id,
+		q.Cluster.ID,
 	).Scan(
 		&clusterID,
 		&bucketID,
@@ -168,11 +170,11 @@ func (r *ClusterRead) show(q *msg.Request, mr *msg.Result) {
 		goto fail
 	}
 	cluster = proto.Cluster{
-		Id:          clusterID,
+		ID:          clusterID,
 		Name:        clusterName,
-		BucketId:    bucketID,
+		BucketID:    bucketID,
 		ObjectState: clusterState,
-		TeamId:      teamID,
+		TeamID:      teamID,
 	}
 
 	// add properties
@@ -201,7 +203,7 @@ func (r *ClusterRead) show(q *msg.Request, mr *msg.Result) {
 	}
 	if checkConfigs, err = exportCheckConfigObjectTX(
 		tx,
-		q.Cluster.Id,
+		q.Cluster.ID,
 	); err != nil {
 		tx.Rollback()
 		goto fail
@@ -229,14 +231,14 @@ func (r *ClusterRead) memberList(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = r.stmtMemberList.Query(
-		q.Cluster.Id,
+		q.Cluster.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
 
 	cluster := proto.Cluster{}
-	cluster.Id = q.Cluster.Id
+	cluster.ID = q.Cluster.ID
 	cluster.Members = &[]proto.Node{}
 
 	for rows.Next() {

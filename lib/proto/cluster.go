@@ -10,33 +10,58 @@
 package proto
 
 type Cluster struct {
-	Id          string      `json:"id,omitempty"`
+	ID          string      `json:"ID,omitempty"`
 	Name        string      `json:"name,omitempty"`
-	BucketId    string      `json:"bucketId,omitempty"`
+	BucketID    string      `json:"bucketID,omitempty"`
 	ObjectState string      `json:"objectState,omitempty"`
-	TeamId      string      `json:"teamId,omitempty"`
+	TeamID      string      `json:"teamID,omitempty"`
 	Members     *[]Node     `json:"members,omitempty"`
 	Details     *Details    `json:"details,omitempty"`
 	Properties  *[]Property `json:"properties,omitempty"`
 }
 
-type ClusterFilter struct {
-	Name     string `json:"name,omitempty"`
-	BucketId string `json:"bucketid,omitempty"`
-	TeamId   string `json:"teamId,omitempty"`
+func (c *Cluster) Clone() Cluster {
+	clone := Cluster{
+		ID:          c.ID,
+		Name:        c.Name,
+		BucketID:    c.BucketID,
+		ObjectState: c.ObjectState,
+		TeamID:      c.TeamID,
+	}
+	if c.Details != nil {
+		clone.Details = c.Details.Clone()
+	}
+	if c.Members != nil {
+		*clone.Members = make([]Node, len(*c.Members))
+		for i := range *c.Members {
+			(*clone.Members)[i] = (*c.Members)[i].Clone()
+		}
+	}
+	if c.Properties != nil {
+		*clone.Properties = make([]Property, len(*c.Properties))
+		for i := range *c.Properties {
+			(*clone.Properties)[i] = (*c.Properties)[i].Clone()
+		}
+	}
+	return clone
 }
 
-//
+type ClusterFilter struct {
+	Name     string `json:"name,omitempty"`
+	BucketID string `json:"bucketID,omitempty"`
+	TeamID   string `json:"teamID,omitempty"`
+}
+
 func (c *Cluster) DeepCompare(a *Cluster) bool {
 	if a == nil {
 		return false
 	}
 
-	if c.Id != a.Id ||
+	if c.ID != a.ID ||
 		c.Name != a.Name ||
-		c.BucketId != a.BucketId ||
+		c.BucketID != a.BucketID ||
 		c.ObjectState != a.ObjectState ||
-		c.TeamId != a.TeamId {
+		c.TeamID != a.TeamID {
 		return false
 	}
 

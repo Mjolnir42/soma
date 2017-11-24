@@ -155,7 +155,7 @@ func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 	case `group`:
 		id = a.Group.Id
 	case `cluster`:
-		id = a.Cluster.Id
+		id = a.Cluster.ID
 	case `node`:
 		id = a.Node.ID
 	}

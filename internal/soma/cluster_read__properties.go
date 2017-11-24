@@ -24,7 +24,7 @@ func (r *ClusterRead) oncallProperties(cluster *proto.Cluster) error {
 	)
 
 	if rows, err = r.stmtPropOncall.Query(
-		cluster.Id,
+		cluster.ID,
 	); err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (r *ClusterRead) oncallProperties(cluster *proto.Cluster) error {
 		*cluster.Properties = append(*cluster.Properties,
 			proto.Property{
 				Type:             `oncall`,
-				BucketID:         cluster.BucketId,
+				BucketID:         cluster.BucketID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -70,7 +70,7 @@ func (r *ClusterRead) serviceProperties(cluster *proto.Cluster) error {
 	)
 
 	if rows, err = r.stmtPropService.Query(
-		cluster.Id,
+		cluster.ID,
 	); err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func (r *ClusterRead) serviceProperties(cluster *proto.Cluster) error {
 		*cluster.Properties = append(*cluster.Properties,
 			proto.Property{
 				Type:             `service`,
-				BucketID:         cluster.BucketId,
+				BucketID:         cluster.BucketID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -114,7 +114,7 @@ func (r *ClusterRead) systemProperties(cluster *proto.Cluster) error {
 	)
 
 	if rows, err = r.stmtPropSystem.Query(
-		cluster.Id,
+		cluster.ID,
 	); err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (r *ClusterRead) systemProperties(cluster *proto.Cluster) error {
 		*cluster.Properties = append(*cluster.Properties,
 			proto.Property{
 				Type:             `system`,
-				BucketID:         cluster.BucketId,
+				BucketID:         cluster.BucketID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -160,7 +160,7 @@ func (r *ClusterRead) customProperties(cluster *proto.Cluster) error {
 	)
 
 	if rows, err = r.stmtPropCustom.Query(
-		cluster.Id,
+		cluster.ID,
 	); err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func (r *ClusterRead) customProperties(cluster *proto.Cluster) error {
 		*cluster.Properties = append(*cluster.Properties,
 			proto.Property{
 				Type:             `custom`,
-				BucketID:         cluster.BucketId,
+				BucketID:         cluster.BucketID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,

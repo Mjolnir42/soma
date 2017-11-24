@@ -81,22 +81,22 @@ func (tk *TreeKeeper) treeCluster(q *msg.Request) {
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `bucket`,
-			ParentId:   q.Cluster.BucketId,
+			ParentId:   q.Cluster.BucketID,
 		})
 	case `delete_cluster`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `cluster`,
-			ElementId:   q.Cluster.Id,
+			ElementId:   q.Cluster.ID,
 		}, true).(tree.BucketAttacher).Destroy()
 	case `reset_cluster_to_bucket`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `cluster`,
-			ElementId:   q.Cluster.Id,
+			ElementId:   q.Cluster.ID,
 		}, true).(tree.BucketAttacher).Detach()
 	case `add_cluster_to_group`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `cluster`,
-			ElementId:   (*q.Group.MemberClusters)[0].Id,
+			ElementId:   (*q.Group.MemberClusters)[0].ID,
 		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `group`,
@@ -147,7 +147,7 @@ func (tk *TreeKeeper) treeNode(q *msg.Request) {
 		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `cluster`,
-			ParentId:   q.Cluster.Id,
+			ParentId:   q.Cluster.ID,
 		})
 	}
 }

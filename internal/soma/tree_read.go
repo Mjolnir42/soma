@@ -419,11 +419,11 @@ func (r *TreeRead) cluster(id string, depth int) (*proto.Cluster, error) {
 	}
 
 	cluster := proto.Cluster{
-		Id:          id,
+		ID:          id,
 		Name:        name,
-		BucketId:    bucketID,
+		BucketID:    bucketID,
 		ObjectState: state,
-		TeamId:      teamID,
+		TeamID:      teamID,
 		Details: &proto.Details{
 			CreatedBy: createdBy,
 			CreatedAt: createdAt.UTC().Format(time.RFC3339),

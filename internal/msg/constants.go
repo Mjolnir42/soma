@@ -125,9 +125,9 @@ const (
 	ActionInsertNullID    = `insert-null`
 	ActionList            = `list`
 	ActionMap             = `map`
-	ActionMemberAdd       = `member-add`
+	ActionMemberAssign    = `member-assign`
 	ActionMemberList      = `member-list`
-	ActionMemberRemove    = `member-remove`
+	ActionMemberUnassign  = `member-unassign`
 	ActionPropertyCreate  = `property-create`
 	ActionPropertyDestroy = `property-destroy`
 	ActionPurge           = `purge`

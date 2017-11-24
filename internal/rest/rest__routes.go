@@ -25,6 +25,9 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/category/`, x.Verify(x.CategoryList))
 	router.GET(`/checkconfig/:repositoryID/:checkID`, x.Verify(x.CheckConfigShow))
 	router.GET(`/checkconfig/:repositoryID/`, x.Verify(x.CheckConfigList))
+	router.GET(`/cluster/:clusterID/members/`, x.Verify(x.ClusterMemberList))
+	router.GET(`/cluster/:clusterID`, x.Verify(x.ClusterShow))
+	router.GET(`/cluster/`, x.Verify(x.ClusterList))
 	router.GET(`/sections/:section/actions/:action`, x.Verify(x.ActionShow))
 	router.GET(`/sections/:section/actions/`, x.Verify(x.ActionList))
 	router.GET(`/sync/node/`, x.Verify(x.NodeMgmtSync))
@@ -33,6 +36,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(`/search/bucket/`, x.Verify(x.BucketSearch))
 	router.POST(`/search/capability/`, x.Verify(x.CapabilitySearch))
 	router.POST(`/search/checkconfig/:repositoryID/`, x.Verify(x.CheckConfigSearch))
+	router.POST(`/search/cluster/`, x.Verify(x.ClusterSearch))
 
 	if !x.conf.ReadOnly {
 		if !x.conf.Observer {
@@ -42,6 +46,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(`/capability/:capabilityID`, x.Verify(x.CapabilityRemove))
 			router.DELETE(`/category/:category`, x.Verify(x.CategoryRemove))
 			router.DELETE(`/checkconfig/:repositoryID/:checkID`, x.Verify(x.CheckConfigDestroy))
+			router.DELETE(`/cluster/:clusterID/property/:propertyType/:sourceID`, x.Verify(x.ClusterPropertyDestroy))
 			router.DELETE(`/node/:nodeID`, x.Verify(x.NodeMgmtRemove))
 			router.DELETE(`/sections/:section/actions/:action`, x.Verify(x.ActionRemove))
 			router.DELETE(`/tokens/global`, x.Verify(x.SupervisorTokenInvalidateGlobal))
@@ -54,6 +59,9 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.POST(`/capability/`, x.Verify(x.CapabilityAdd))
 			router.POST(`/category/`, x.Verify(x.CategoryAdd))
 			router.POST(`/checkconfig/:repositoryID/`, x.Verify(x.CheckConfigCreate))
+			router.POST(`/cluster/:clusterID/members/`, x.Verify(x.ClusterMemberAssign))
+			router.POST(`/cluster/:clusterID/property/:propertyType/`, x.Verify(x.ClusterPropertyCreate))
+			router.POST(`/cluster/`, x.Verify(x.ClusterCreate))
 			router.POST(`/kex/`, x.CheckShutdown(x.SupervisorKex))
 			router.POST(`/node/`, x.Verify(x.NodeMgmtAdd))
 			router.POST(`/sections/:section/actions/`, x.Verify(x.ActionAdd))
