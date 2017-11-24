@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"net/http"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -1185,6 +1187,22 @@ type outputTree struct {
 	appLog       *log.Logger
 	reqLog       *log.Logger
 	errLog       *log.Logger
+}
+
+func Check(h httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		h(w, r, ps)
+	}
+}
+
+func BasicAuth(h httprouter.Handle) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		h(w, r, ps)
+	}
+}
+
+func fixIsAuthorized(req *msg.Authorization) bool {
+	return false
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

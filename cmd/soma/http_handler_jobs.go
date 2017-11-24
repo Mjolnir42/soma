@@ -5,7 +5,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -14,7 +13,7 @@ func JobDelay(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `job`,
@@ -40,7 +39,7 @@ func JobList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `job`,
@@ -68,7 +67,7 @@ func JobListAll(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `runtime`,
@@ -96,7 +95,7 @@ func JobShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `job`,
@@ -106,7 +105,7 @@ func JobShow(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	withDetails := super.IsAuthorized(&msg.Authorization{
+	withDetails := fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `job`,
@@ -133,7 +132,7 @@ func JobSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `job`,
@@ -143,7 +142,7 @@ func JobSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	withDetails := super.IsAuthorized(&msg.Authorization{
+	withDetails := fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `job`,

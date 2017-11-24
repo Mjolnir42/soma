@@ -10,10 +10,10 @@ import (
 	"runtime/debug"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/auth"
 	"github.com/mjolnir42/soma/lib/proto"
-	log "github.com/Sirupsen/logrus"
 )
 
 func PanicCatcher(w http.ResponseWriter) {

@@ -8,7 +8,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -27,7 +26,7 @@ func PropertyList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    section,
@@ -49,10 +48,10 @@ func PropertyList(w http.ResponseWriter, r *http.Request,
 		req.prType = prType
 	case "custom":
 		req.prType = prType
-		req.Custom.RepositoryId = params.ByName("repository")
+		req.Custom.RepositoryID = params.ByName("repository")
 	case "service":
 		req.prType = prType
-		req.Service.TeamId = params.ByName("team")
+		req.Service.TeamID = params.ByName("team")
 	case "template":
 		req.prType = prType
 	default:
@@ -71,11 +70,11 @@ func PropertyList(w http.ResponseWriter, r *http.Request,
 
 	_ = DecodeJsonBody(r, &cReq)
 	if (cReq.Filter.Property.Type == "custom") && (cReq.Filter.Property.Name != "") &&
-		(cReq.Filter.Property.RepositoryId != "") {
+		(cReq.Filter.Property.RepositoryID != "") {
 		filtered := []somaPropertyResult{}
 		for _, i := range result.Properties {
 			if (i.Custom.Name == cReq.Filter.Property.Name) &&
-				(i.Custom.RepositoryId == cReq.Filter.Property.RepositoryId) {
+				(i.Custom.RepositoryID == cReq.Filter.Property.RepositoryID) {
 				filtered = append(filtered, i)
 			}
 		}
@@ -94,7 +93,7 @@ func PropertyList(w http.ResponseWriter, r *http.Request,
 		filtered := []somaPropertyResult{}
 		for _, i := range result.Properties {
 			if (i.Service.Name == cReq.Filter.Property.Name) &&
-				(i.Service.TeamId == params.ByName("team")) {
+				(i.Service.TeamID == params.ByName("team")) {
 				filtered = append(filtered, i)
 			}
 		}
@@ -129,7 +128,7 @@ func PropertyShow(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    section,
@@ -153,12 +152,12 @@ func PropertyShow(w http.ResponseWriter, r *http.Request,
 		req.System.Name = params.ByName("system")
 	case "custom":
 		req.prType = prType
-		req.Custom.Id = params.ByName("custom")
-		req.Custom.RepositoryId = params.ByName("repository")
+		req.Custom.ID = params.ByName("custom")
+		req.Custom.RepositoryID = params.ByName("repository")
 	case "service":
 		req.prType = prType
 		req.Service.Name = params.ByName("service")
-		req.Service.TeamId = params.ByName("team")
+		req.Service.TeamID = params.ByName("team")
 	case "template":
 		req.prType = prType
 		req.Service.Name = params.ByName("service")
@@ -187,7 +186,7 @@ func PropertyAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    section,
@@ -216,21 +215,21 @@ func PropertyAdd(w http.ResponseWriter, r *http.Request,
 		req.prType = prType
 		req.System = *cReq.Property.System
 	case "custom":
-		if params.ByName("repository") != cReq.Property.Custom.RepositoryId {
+		if params.ByName("repository") != cReq.Property.Custom.RepositoryID {
 			DispatchBadRequest(&w, errors.New("Body and URL repositories do not match"))
 			return
 		}
 		req.prType = prType
 		req.Custom = *cReq.Property.Custom
-		req.Custom.RepositoryId = params.ByName("repository")
+		req.Custom.RepositoryID = params.ByName("repository")
 	case "service":
-		if params.ByName("team") != cReq.Property.Service.TeamId {
+		if params.ByName("team") != cReq.Property.Service.TeamID {
 			DispatchBadRequest(&w, errors.New("Body and URL teams do not match"))
 			return
 		}
 		req.prType = prType
 		req.Service = *cReq.Property.Service
-		req.Service.TeamId = params.ByName("team")
+		req.Service.TeamID = params.ByName("team")
 	case "template":
 		req.prType = prType
 		req.Service = *cReq.Property.Service
@@ -259,7 +258,7 @@ func PropertyRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    section,
@@ -283,12 +282,12 @@ func PropertyRemove(w http.ResponseWriter, r *http.Request,
 		req.System.Name = params.ByName("system")
 	case "custom":
 		req.prType = prType
-		req.Custom.Id = params.ByName("custom")
-		req.Custom.RepositoryId = params.ByName("repository")
+		req.Custom.ID = params.ByName("custom")
+		req.Custom.RepositoryID = params.ByName("repository")
 	case "service":
 		req.prType = prType
 		req.Service.Name = params.ByName("service")
-		req.Service.TeamId = params.ByName("team")
+		req.Service.TeamID = params.ByName("team")
 	case "template":
 		req.prType = prType
 		req.Service.Name = params.ByName("service")
@@ -325,17 +324,17 @@ func SendPropertyReply(w *http.ResponseWriter, r *somaResult) {
 		case "custom":
 			*result.Properties = append(*result.Properties, proto.Property{Type: "custom",
 				Custom: &proto.PropertyCustom{
-					Id:           i.Custom.Id,
+					ID:           i.Custom.ID,
 					Name:         i.Custom.Name,
 					Value:        i.Custom.Value,
-					RepositoryId: i.Custom.RepositoryId,
+					RepositoryID: i.Custom.RepositoryID,
 				}})
 		case "service":
 			prop := proto.Property{
 				Type: "service",
 				Service: &proto.PropertyService{
 					Name:       i.Service.Name,
-					TeamId:     i.Service.TeamId,
+					TeamID:     i.Service.TeamID,
 					Attributes: []proto.ServiceAttribute{},
 				}}
 			for _, a := range i.Service.Attributes {

@@ -7,7 +7,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -16,7 +15,7 @@ func ServerList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `server`,
@@ -42,7 +41,7 @@ func ServerSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `server`,
@@ -68,7 +67,7 @@ func ServerShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `server`,
@@ -84,7 +83,7 @@ func ServerShow(w http.ResponseWriter, r *http.Request,
 		action: "show",
 		reply:  returnChannel,
 		Server: proto.Server{
-			Id: params.ByName("server"),
+			ID: params.ByName("server"),
 		},
 	}
 	result := <-returnChannel
@@ -96,7 +95,7 @@ func ServerSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `server`,
@@ -119,10 +118,10 @@ func ServerSearch(w http.ResponseWriter, r *http.Request,
 			Name: cReq.Filter.Server.Name,
 		}}
 	}
-	if cReq.Filter.Server.AssetId != 0 {
+	if cReq.Filter.Server.AssetID != 0 {
 		ssr.action = "search/asset"
 		ssr.Filter = proto.Filter{Server: &proto.ServerFilter{
-			AssetId: cReq.Filter.Server.AssetId,
+			AssetID: cReq.Filter.Server.AssetID,
 		}}
 	}
 
@@ -137,7 +136,7 @@ func ServerAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `server`,
@@ -160,7 +159,7 @@ func ServerAdd(w http.ResponseWriter, r *http.Request,
 		action: "add",
 		reply:  returnChannel,
 		Server: proto.Server{
-			AssetId:    cReq.Server.AssetId,
+			AssetID:    cReq.Server.AssetID,
 			Datacenter: cReq.Server.Datacenter,
 			Location:   cReq.Server.Location,
 			Name:       cReq.Server.Name,
@@ -187,7 +186,7 @@ func ServerRemove(w http.ResponseWriter, r *http.Request,
 		action = `purge`
 	}
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `server`,
@@ -203,7 +202,7 @@ func ServerRemove(w http.ResponseWriter, r *http.Request,
 		action: action,
 		reply:  returnChannel,
 		Server: proto.Server{
-			Id: params.ByName("server"),
+			ID: params.ByName("server"),
 		},
 	}
 	result := <-returnChannel
@@ -215,7 +214,7 @@ func ServerUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `server`,
@@ -232,7 +231,7 @@ func ServerUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Server.Id != params.ByName(`server`) {
+	if cReq.Server.ID != params.ByName(`server`) {
 		DispatchBadRequest(&w, errors.New(`Mismatching server UUIDs`))
 		return
 	}
@@ -243,8 +242,8 @@ func ServerUpdate(w http.ResponseWriter, r *http.Request,
 		action: "update",
 		reply:  returnChannel,
 		Server: proto.Server{
-			Id:         cReq.Server.Id,
-			AssetId:    cReq.Server.AssetId,
+			ID:         cReq.Server.ID,
+			AssetID:    cReq.Server.AssetID,
 			Datacenter: cReq.Server.Datacenter,
 			Location:   cReq.Server.Location,
 			Name:       cReq.Server.Name,
@@ -261,7 +260,7 @@ func ServerAddNull(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `server`,
@@ -278,7 +277,7 @@ func ServerAddNull(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Server.Id != "00000000-0000-0000-0000-000000000000" ||
+	if cReq.Server.ID != "00000000-0000-0000-0000-000000000000" ||
 		params.ByName("server") != "null" {
 		DispatchBadRequest(&w, errors.New("not null server"))
 		return

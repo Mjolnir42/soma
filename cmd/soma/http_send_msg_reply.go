@@ -13,10 +13,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/auth"
 	"github.com/mjolnir42/soma/lib/proto"
-	log "github.com/Sirupsen/logrus"
 )
 
 // SendMsgResult is the output function for all requests that did not

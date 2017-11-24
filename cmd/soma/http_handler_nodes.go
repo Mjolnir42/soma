@@ -7,7 +7,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -16,7 +15,7 @@ func NodeList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `node`,
@@ -60,7 +59,7 @@ func NodeShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `node`,
@@ -77,7 +76,7 @@ func NodeShow(w http.ResponseWriter, r *http.Request,
 		action: "show",
 		reply:  returnChannel,
 		Node: proto.Node{
-			Id: params.ByName("node"),
+			ID: params.ByName("node"),
 		},
 	}
 	result := <-returnChannel
@@ -89,7 +88,7 @@ func NodeShowConfig(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `node`,
@@ -106,7 +105,7 @@ func NodeShowConfig(w http.ResponseWriter, r *http.Request,
 		action: "get_config",
 		reply:  returnChannel,
 		Node: proto.Node{
-			Id: params.ByName("node"),
+			ID: params.ByName("node"),
 		},
 	}
 	result := <-returnChannel
@@ -125,7 +124,7 @@ func NodeAssign(w http.ResponseWriter, r *http.Request,
 	}
 
 	// check if the user is allowed to assign nodes from this team
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `node`,
@@ -137,14 +136,14 @@ func NodeAssign(w http.ResponseWriter, r *http.Request,
 	}
 
 	// check if the user is allowed to assign nodes to the target repo
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:     params.ByName(`AuthenticatedUser`),
 		RemoteAddr:   extractAddress(r.RemoteAddr),
 		Section:      `node-config`,
 		Action:       `assign`,
 		NodeID:       params.ByName(`node`),
-		RepositoryID: cReq.Node.Config.RepositoryId,
-		BucketID:     cReq.Node.Config.BucketId,
+		RepositoryID: cReq.Node.Config.RepositoryID,
+		BucketID:     cReq.Node.Config.BucketID,
 	}) {
 		DispatchForbidden(&w, nil)
 		return
@@ -177,11 +176,11 @@ func NodeAddProperty(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	switch {
-	case params.ByName("node") != cReq.Node.Id:
+	case params.ByName("node") != cReq.Node.ID:
 		DispatchBadRequest(&w,
 			fmt.Errorf("Mismatched node ids: %s, %s",
 				params.ByName("node"),
-				cReq.Node.Id))
+				cReq.Node.ID))
 		return
 	case len(*cReq.Node.Properties) != 1:
 		DispatchBadRequest(&w,
@@ -200,7 +199,7 @@ func NodeAddProperty(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `node`,
@@ -238,11 +237,11 @@ func NodeRemoveProperty(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	switch {
-	case params.ByName(`node`) != cReq.Node.Id:
+	case params.ByName(`node`) != cReq.Node.ID:
 		DispatchBadRequest(&w,
 			fmt.Errorf("Mismatched node ids: %s, %s",
 				params.ByName(`node`),
-				cReq.Node.Id))
+				cReq.Node.ID))
 		return
 	case cReq.Node.Config == nil:
 		DispatchBadRequest(&w,
@@ -250,38 +249,38 @@ func NodeRemoveProperty(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	// outside switch: _after_ nil test
-	if cReq.Node.Config.RepositoryId == `` ||
-		cReq.Node.Config.BucketId == `` {
+	if cReq.Node.Config.RepositoryID == `` ||
+		cReq.Node.Config.BucketID == `` {
 		DispatchBadRequest(&w,
 			fmt.Errorf(`Node configuration data incomplete`))
 		return
 	}
 
-	if !super.IsAuthorized(&msg.Authorization{
+	if !fixIsAuthorized(&msg.Authorization{
 		AuthUser:     params.ByName(`AuthenticatedUser`),
 		RemoteAddr:   extractAddress(r.RemoteAddr),
 		Section:      `node`,
 		Action:       `remove_property`,
 		NodeID:       params.ByName(`node`),
-		RepositoryID: cReq.Node.Config.RepositoryId,
-		BucketID:     cReq.Node.Config.BucketId,
+		RepositoryID: cReq.Node.Config.RepositoryID,
+		BucketID:     cReq.Node.Config.BucketID,
 	}) {
 		DispatchForbidden(&w, nil)
 		return
 	}
 
 	node := proto.Node{
-		Id: params.ByName(`node`),
+		ID: params.ByName(`node`),
 		Config: &proto.NodeConfig{
-			RepositoryId: cReq.Node.Config.RepositoryId,
-			BucketId:     cReq.Node.Config.BucketId,
+			RepositoryID: cReq.Node.Config.RepositoryID,
+			BucketID:     cReq.Node.Config.BucketID,
 		},
 		Properties: &[]proto.Property{
 			proto.Property{
 				Type:             params.ByName(`type`),
-				RepositoryId:     cReq.Node.Config.RepositoryId,
-				BucketId:         cReq.Node.Config.BucketId,
-				SourceInstanceId: params.ByName(`source`),
+				RepositoryID:     cReq.Node.Config.RepositoryID,
+				BucketID:         cReq.Node.Config.BucketID,
+				SourceInstanceID: params.ByName(`source`),
 			},
 		},
 	}

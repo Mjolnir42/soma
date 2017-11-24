@@ -12,8 +12,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mjolnir42/soma/internal/msg"
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/msg"
 )
 
 func logrotate(sigChan chan os.Signal) {

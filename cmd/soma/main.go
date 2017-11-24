@@ -14,6 +14,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/asaskevich/govalidator"
 	"github.com/client9/reopen"
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/rest"
 	"github.com/mjolnir42/soma/internal/soma"
@@ -225,6 +226,9 @@ func main() {
 	app.Start()
 
 	rst = rest.New(super.IsAuthorized, &hm, &SomaCfg)
+
+	//XXX compilefix
+	router := httprouter.New()
 
 	router.HEAD(`/`, Check(Ping))
 
