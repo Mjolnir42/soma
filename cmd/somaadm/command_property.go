@@ -812,8 +812,8 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		req.Node.Properties = &[]proto.Property{prop}
 	case `cluster`:
 		req = proto.NewClusterRequest()
-		req.Cluster.Id = objectId
-		req.Cluster.BucketId = bucketId
+		req.Cluster.ID = objectId
+		req.Cluster.BucketID = bucketId
 		req.Cluster.Properties = &[]proto.Property{prop}
 	case `group`:
 		req = proto.NewGroupRequest()

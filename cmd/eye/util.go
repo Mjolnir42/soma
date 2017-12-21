@@ -34,8 +34,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/asaskevich/govalidator"
+	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/satori/go.uuid"
 )
 
@@ -53,12 +53,12 @@ func Itemize(details *proto.Deployment) (string, *ConfigurationItem, error) {
 		fqdn, dns_zone string
 		err            error
 	)
-	lookupID := CalculateLookupId(details.Node.AssetId, details.Metric.Path)
+	lookupID := CalculateLookupId(details.Node.AssetID, details.Metric.Path)
 
 	item := &ConfigurationItem{
 		Metric:   details.Metric.Path,
 		Interval: details.CheckConfig.Interval,
-		HostId:   strconv.FormatUint(details.Node.AssetId, 10),
+		HostId:   strconv.FormatUint(details.Node.AssetID, 10),
 		Metadata: ConfigurationMetaData{
 			Monitoring: details.Monitoring.Name,
 			Team:       details.Team.Name,
@@ -83,7 +83,7 @@ func Itemize(details *proto.Deployment) (string, *ConfigurationItem, error) {
 		}
 		item.Metric = fmt.Sprintf("%s:%s", item.Metric, mpt)
 		// recalculate lookupID
-		lookupID = CalculateLookupId(details.Node.AssetId, item.Metric)
+		lookupID = CalculateLookupId(details.Node.AssetID, item.Metric)
 	}
 
 	// set oncall duty if available

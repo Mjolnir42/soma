@@ -426,7 +426,7 @@ func cmdGroupMemberAddCluster(c *cli.Context) error {
 		return err
 	}
 
-	cluster.Id = mClusterId
+	cluster.ID = mClusterId
 	req.Group = &proto.Group{}
 	req.Group.Id = groupId
 	req.Group.BucketId = bucketId

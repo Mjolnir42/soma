@@ -169,7 +169,7 @@ func cmdClusterCreate(c *cli.Context) error {
 	var req proto.Request
 	req.Cluster = &proto.Cluster{}
 	req.Cluster.Name = c.Args().First()
-	req.Cluster.BucketId = bucketId
+	req.Cluster.BucketID = bucketId
 
 	if err := adm.ValidateRuneCountRange(
 		req.Cluster.Name, 4, 256); err != nil {
@@ -344,8 +344,8 @@ func cmdClusterMemberAdd(c *cli.Context) error {
 		Config: &conf,
 	}
 	req.Cluster = &proto.Cluster{
-		Id:       clusterId,
-		BucketId: bucketId,
+		ID:       clusterId,
+		BucketID: bucketId,
 	}
 	*req.Cluster.Members = append(*req.Cluster.Members, node)
 
@@ -489,8 +489,8 @@ func cmdClusterPropertyDelete(c *cli.Context, pType string) error {
 	}
 
 	req := proto.NewClusterRequest()
-	req.Cluster.Id = clusterId
-	req.Cluster.BucketId = bucketId
+	req.Cluster.ID = clusterId
+	req.Cluster.BucketID = bucketId
 
 	path := fmt.Sprintf("/clusters/%s/property/%s/%s",
 		clusterId, pType, sourceId)

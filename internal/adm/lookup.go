@@ -709,7 +709,7 @@ abort:
 func clusterIdByName(cluster, bucketId string) (string, error) {
 	req := proto.NewClusterFilter()
 	req.Filter.Cluster.Name = cluster
-	req.Filter.Cluster.BucketId = bucketId
+	req.Filter.Cluster.BucketID = bucketId
 
 	res, err := fetchFilter(req, `/filter/clusters/`)
 	if err != nil {
@@ -725,7 +725,7 @@ func clusterIdByName(cluster, bucketId string) (string, error) {
 		err = fmt.Errorf("Name mismatch: %s vs %s",
 			cluster, (*res.Clusters)[0].Name)
 	}
-	return (*res.Clusters)[0].Id, nil
+	return (*res.Clusters)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("ClusterId lookup failed: %s",
