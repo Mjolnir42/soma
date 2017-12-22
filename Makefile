@@ -32,9 +32,11 @@ check: vet ineffassign misspell
 check-full: vet ineffassign misspell lint coroner
 
 build:
+	@echo "Building ...."
 	@go build ./...
 
 vet:
+	@echo "Running 'go vet' ...."
 	@go vet ./cmd/eye/
 	@go vet ./cmd/soma/
 	@go vet ./cmd/somaadm/
@@ -43,12 +45,17 @@ vet:
 	@go vet ./lib/proto/
 	@go vet ./internal/adm/
 	@go vet ./internal/cmpl/
+	@go vet ./internal/config/
 	@go vet ./internal/db/
 	@go vet ./internal/help/
 	@go vet ./internal/msg/
 	@go vet ./internal/perm/
+	@go vet ./internal/rest/
+	@go vet ./internal/soma/
 	@go vet ./internal/stmt/
+	@go vet ./internal/super/
 	@go vet ./internal/tree/
+	@echo "Running 'go vet -shadow' ...."
 	@go tool vet -shadow ./cmd/eye/
 	@go tool vet -shadow ./cmd/soma/
 	@go tool vet -shadow ./cmd/somaadm/
@@ -57,28 +64,36 @@ vet:
 	@go tool vet -shadow ./lib/proto/
 	@go tool vet -shadow ./internal/adm/
 	@go tool vet -shadow ./internal/cmpl/
+	@go tool vet -shadow ./internal/config/
 	@go tool vet -shadow ./internal/db/
 	@go tool vet -shadow ./internal/help/
 	@go tool vet -shadow ./internal/msg/
 	@go tool vet -shadow ./internal/perm/
+	@go tool vet -shadow ./internal/rest/
+	@go tool vet -shadow ./internal/soma/
 	@go tool vet -shadow ./internal/stmt/
+	@go tool vet -shadow ./internal/super/
 	@go tool vet -shadow ./internal/tree/
 
 ineffassign:
+	@echo "Running 'ineffassign' ...."
 	@ineffassign ./cmd
 	@ineffassign ./lib
 	@ineffassign ./internal
 
 misspell:
+	@echo "Running 'misspell' ...."
 	@misspell ./cmd
 	@misspell ./lib
 	@misspell ./internal
 	@misspell ./docs
 
 coroner:
+	@echo "Running 'codecoroner' ...."
 	@codecoroner funcs ./cmd/... ./lib/... ./internal/...
 
 lint:
+	@echo "Running 'golint' ...."
 	@golint ./cmd/... | grep -v 'should have comment or be unexported'
 	@golint ./internal/... | grep -v 'should have comment or be unexported'
 	@golint ./lib/... | grep -v 'should have comment or be unexported'
