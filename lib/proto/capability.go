@@ -29,7 +29,9 @@ func (c *Capability) Clone() Capability {
 		Metric:       c.Metric,
 		View:         c.View,
 		Thresholds:   c.Thresholds,
-		Details:      c.Details.Clone(),
+	}
+	if c.Details != nil {
+		clone.Details = c.Details.Clone()
 	}
 	// XXX Demux
 	// XXX Constraints
@@ -50,13 +52,15 @@ type CapabilityConstraint struct {
 }
 
 type CapabilityDetails struct {
-	Creation *DetailsCreation
+	Creation *DetailsCreation `json:"creation,omitempty"`
 }
 
 func (c *CapabilityDetails) Clone() *CapabilityDetails {
-	return &CapabilityDetails{
-		Creation: c.Creation.Clone(),
+	clone := &CapabilityDetails{}
+	if c.Creation != nil {
+		clone.Creation = c.Creation.Clone()
 	}
+	return clone
 }
 
 func (c *Capability) DeepCompare(a *Capability) bool {
