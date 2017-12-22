@@ -82,9 +82,9 @@ func (w *DatacenterWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionCreate:
+	case msg.ActionAdd:
 		w.add(q, &result)
-	case msg.ActionDelete:
+	case msg.ActionRemove:
 		w.remove(q, &result)
 	case msg.ActionRename:
 		w.rename(q, &result)
@@ -102,7 +102,7 @@ func (w *DatacenterWrite) add(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtAdd.Exec(
-		q.Datacenter.Locode,
+		q.Datacenter.LoCode,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -120,7 +120,7 @@ func (w *DatacenterWrite) remove(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRemove.Exec(
-		q.Datacenter.Locode,
+		q.Datacenter.LoCode,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -138,8 +138,8 @@ func (w *DatacenterWrite) rename(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRename.Exec(
-		q.Update.Datacenter.Locode,
-		q.Datacenter.Locode,
+		q.Update.Datacenter.LoCode,
+		q.Datacenter.LoCode,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerDatacenters(app cli.App) *cli.App {
@@ -61,9 +61,9 @@ func cmdDatacentersAdd(c *cli.Context) error {
 	}
 
 	req := proto.NewDatacenterRequest()
-	req.Datacenter.Locode = c.Args().First()
+	req.Datacenter.LoCode = c.Args().First()
 
-	return adm.Perform(`postbody`, `/datacenters/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/datacenter/`, `command`, req, c)
 }
 
 func cmdDatacentersRemove(c *cli.Context) error {
@@ -71,7 +71,7 @@ func cmdDatacentersRemove(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/datacenters/%s", c.Args().First())
+	path := fmt.Sprintf("/datacenter/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -85,9 +85,9 @@ func cmdDatacentersRename(c *cli.Context) error {
 	}
 
 	req := proto.NewDatacenterRequest()
-	req.Datacenter.Locode = opts[`to`][0]
+	req.Datacenter.LoCode = opts[`to`][0]
 
-	path := fmt.Sprintf("/datacenters/%s", c.Args().First())
+	path := fmt.Sprintf("/datacenter/%s", c.Args().First())
 	return adm.Perform(`put`, path, `command`, nil, c)
 }
 
@@ -96,7 +96,7 @@ func cmdDatacentersList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/datacenters/`, `list`, nil, c)
+	return adm.Perform(`get`, `/datacenter/`, `list`, nil, c)
 }
 
 func cmdDatacentersSync(c *cli.Context) error {
@@ -104,7 +104,7 @@ func cmdDatacentersSync(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/sync/datacenters/`, `list`, nil, c)
+	return adm.Perform(`get`, `/sync/datacenter/`, `list`, nil, c)
 }
 
 func cmdDatacentersShow(c *cli.Context) error {
@@ -112,7 +112,7 @@ func cmdDatacentersShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/datacenters/%s", c.Args().First())
+	path := fmt.Sprintf("/datacenter/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

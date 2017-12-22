@@ -113,7 +113,7 @@ func (r *DatacenterRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Datacenter = append(mr.Datacenter, proto.Datacenter{
-			Locode: datacenter,
+			LoCode: datacenter,
 		})
 	}
 	if err = rows.Err(); err != nil {
@@ -131,7 +131,7 @@ func (r *DatacenterRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Datacenter.Locode,
+		q.Datacenter.LoCode,
 	).Scan(
 		&datacenter,
 	); err == sql.ErrNoRows {
@@ -143,7 +143,7 @@ func (r *DatacenterRead) show(q *msg.Request, mr *msg.Result) {
 	}
 
 	mr.Datacenter = append(mr.Datacenter, proto.Datacenter{
-		Locode: datacenter,
+		LoCode: datacenter,
 	})
 	mr.OK()
 }
