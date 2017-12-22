@@ -33,7 +33,6 @@ func TestTreeKeeperRunPreparedStmt(t *testing.T) {
 	if tk.start_job == nil {
 		t.Errorf("stmt was expected preparing statement")
 	}
-	err = nil
 	tk.get_view, err = tk.conn.Prepare(tkStmtGetViewFromCapability)
 	if err != nil {
 		t.Errorf("Error '%s' preparing statement", err)
