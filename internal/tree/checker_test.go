@@ -28,28 +28,28 @@ func TestCheckGetter(t *testing.T) {
 	check := testSpawnCheck(false, false, true)
 
 	if _, err := uuid.FromString(check.GetSourceCheckId()); err != nil {
-		t.Errorf(`Received error`, err)
+		t.Error(`Received error`, err)
 	}
 
 	if _, err := uuid.FromString(check.GetCheckConfigId()); err != nil {
-		t.Errorf(`Received error`, err)
+		t.Error(`Received error`, err)
 	}
 
 	if sourceType := check.GetSourceType(); sourceType == "" {
-		t.Errorf(`Received empty Check.SourceType`)
+		t.Error(`Received empty Check.SourceType`)
 	}
 
 	if _, err := uuid.FromString(check.GetCapabilityId()); err != nil {
-		t.Errorf(`Received error`, err)
+		t.Error(`Received error`, err)
 	}
 
 	if view := check.GetView(); view == "" {
-		t.Errorf(`Received empty Check.View`)
+		t.Error(`Received empty Check.View`)
 	} else {
 		switch view {
 		case `internal`, `external`, `local`, `any`:
 		default:
-			t.Errorf(`Received unknown View`)
+			t.Error(`Received unknown View`)
 		}
 	}
 
@@ -77,13 +77,13 @@ func TestCheckInherited(t *testing.T) {
 	var err error
 
 	if id, err = uuid.FromString(check.GetCheckId()); err != nil {
-		t.Errorf(`Received error`, err)
+		t.Error(`Received error`, err)
 	}
 	if idFrom, err = uuid.FromString(check.GetInheritedFrom()); err != nil {
-		t.Errorf(`Received error`, err)
+		t.Error(`Received error`, err)
 	}
 	if uuid.Equal(id, idFrom) {
-		t.Errorf(`Equal id/sourceId for inherited check`)
+		t.Error(`Equal id/sourceId for inherited check`)
 	}
 }
 
@@ -98,13 +98,13 @@ func TestCheckNotInherited(t *testing.T) {
 	var err error
 
 	if id, err = uuid.FromString(check.GetCheckId()); err != nil {
-		t.Errorf(`Received error`, err)
+		t.Error(`Received error`, err)
 	}
 	if idFrom, err = uuid.FromString(check.GetInheritedFrom()); err != nil {
-		t.Errorf(`Received error`, err)
+		t.Error(`Received error`, err)
 	}
 	if !uuid.Equal(id, idFrom) {
-		t.Errorf(`Unequal id/sourceId for non-inherited check`)
+		t.Error(`Unequal id/sourceId for non-inherited check`)
 	}
 }
 
