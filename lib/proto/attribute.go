@@ -16,7 +16,7 @@ type Attribute struct {
 }
 
 type AttributeDetails struct {
-	DetailsCreation
+	Creation *DetailsCreation `json:"creation,omitempty"`
 }
 
 func NewAttributeRequest() Request {
