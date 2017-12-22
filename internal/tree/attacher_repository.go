@@ -42,7 +42,7 @@ func (ter *Repository) Destroy() {
 	// TODO delete all inherited checks + check instances
 
 	wg := new(sync.WaitGroup)
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		wg.Add(1)
 		go func(c string) {
 			defer wg.Done()
@@ -57,11 +57,11 @@ func (ter *Repository) Destroy() {
 
 	ter.Parent.Unlink(UnlinkRequest{
 		ParentType: ter.Parent.(Builder).GetType(),
-		ParentId:   ter.Parent.(Builder).GetID(),
+		ParentID:   ter.Parent.(Builder).GetID(),
 		ParentName: ter.Parent.(Builder).GetName(),
 		ChildType:  ter.GetType(),
 		ChildName:  ter.GetName(),
-		ChildId:    ter.GetID(),
+		ChildID:    ter.GetID(),
 	},
 	)
 
@@ -76,7 +76,7 @@ func (ter *Repository) Detach() {
 func (ter *Repository) attachToRoot(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  "repository",
 		Repository: ter,

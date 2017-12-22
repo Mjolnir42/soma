@@ -36,7 +36,7 @@ type BucketReceiver interface {
 	BucketUnlinker
 
 	receiveBucket(r ReceiveRequest)
-	resyncProperty(srcId, pType, childId string)
+	resyncProperty(srcID, pType, childID string)
 }
 
 type BucketUnlinker interface {
@@ -64,7 +64,7 @@ type GroupReceiver interface {
 	GroupUnlinker
 
 	receiveGroup(r ReceiveRequest)
-	resyncProperty(srcId, pType, childId string)
+	resyncProperty(srcID, pType, childID string)
 }
 
 type GroupUnlinker interface {
@@ -79,7 +79,7 @@ type ClusterReceiver interface {
 	ClusterUnlinker
 
 	receiveCluster(r ReceiveRequest)
-	resyncProperty(srcId, pType, childId string)
+	resyncProperty(srcID, pType, childID string)
 }
 
 type ClusterUnlinker interface {
@@ -94,7 +94,7 @@ type NodeReceiver interface {
 	NodeUnlinker
 
 	receiveNode(r ReceiveRequest)
-	resyncProperty(srcId, pType, childId string)
+	resyncProperty(srcID, pType, childID string)
 }
 
 type NodeUnlinker interface {
@@ -106,7 +106,7 @@ type NodeUnlinker interface {
 //
 type ReceiveRequest struct {
 	ParentType string
-	ParentId   string
+	ParentID   string
 	ParentName string
 	ChildType  string
 	Repository *Repository
@@ -119,11 +119,11 @@ type ReceiveRequest struct {
 
 type UnlinkRequest struct {
 	ParentType string
-	ParentId   string
+	ParentID   string
 	ParentName string
 	ChildType  string
 	ChildName  string
-	ChildId    string
+	ChildID    string
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

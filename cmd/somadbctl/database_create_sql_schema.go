@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func createSqlSchema(printOnly bool, verbose bool) {
+func createSQLSchema(printOnly bool, verbose bool) {
 	idx := 0
 	// map for storing the SQL statements by name
 	queryMap := make(map[string]string)

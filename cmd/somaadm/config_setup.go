@@ -55,7 +55,7 @@ func configSetup(c *cli.Context) error {
 			case "timeout":
 				Cfg.Timeout = uint(c.GlobalInt(params[p]))
 			case "host":
-				Cfg.Api = c.GlobalString(params[p])
+				Cfg.API = c.GlobalString(params[p])
 			case "dbdir":
 				Cfg.BoltDB.Path = c.GlobalString(params[p])
 			case "logdir":
@@ -94,7 +94,7 @@ func configSetup(c *cli.Context) error {
 	Cfg.Run.TimeoutBoltDB = time.Duration(Cfg.BoltDB.Timeout) * time.Second
 	Cfg.Run.TimeoutResty = time.Duration(Cfg.Timeout) * time.Second
 
-	Cfg.Run.SomaAPI, err = url.Parse(Cfg.Api)
+	Cfg.Run.SomaAPI, err = url.Parse(Cfg.API)
 	if err != nil {
 		return fmt.Errorf(
 			"Failed to parse SOMA API address: %s\n", err.Error())
@@ -103,7 +103,7 @@ func configSetup(c *cli.Context) error {
 	if Cfg.Run.SomaAPI.Scheme == `https` {
 		if Cfg.Cert == "" {
 			return fmt.Errorf(
-				"HTTPS API endpoint requires configured CA file.")
+				`HTTPS API endpoint requires configured CA file`)
 		}
 		Cfg.Run.CertPath = path.Join(home, ".soma", "adm", Cfg.Cert)
 	}

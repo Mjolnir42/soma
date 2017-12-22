@@ -74,16 +74,16 @@ func (g *GuidePost) Run() {
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
 		stmt.JobSave:               g.stmtJobSave,
-		stmt.RepoByBucketId:        g.stmtRepoForBucketID,
+		stmt.RepoByBucketID:        g.stmtRepoForBucketID,
 		stmt.NodeDetails:           g.stmtNodeDetails,
-		stmt.RepoNameById:          g.stmtRepoNameByID,
+		stmt.RepoNameByID:          g.stmtRepoNameByID,
 		stmt.ServiceLookup:         g.stmtServiceLookup,
 		stmt.ServiceAttributes:     g.stmtServiceAttributes,
 		stmt.CapabilityThresholds:  g.stmtCapabilityThresholds,
 		stmt.CheckDetailsForDelete: g.stmtCheckDetailsForDelete,
-		stmt.NodeBucketId:          g.stmtBucketForNodeID,
-		stmt.ClusterBucketId:       g.stmtBucketForClusterID,
-		stmt.GroupBucketId:         g.stmtBucketForGroupID,
+		stmt.NodeBucketID:          g.stmtBucketForNodeID,
+		stmt.ClusterBucketID:       g.stmtBucketForClusterID,
+		stmt.GroupBucketID:         g.stmtBucketForGroupID,
 	} {
 		if prepStmt, err = g.conn.Prepare(statement); err != nil {
 			g.errLog.Fatal(`guidepost`, err, stmt.Name(statement))
@@ -182,7 +182,7 @@ func (g *GuidePost) process(q *msg.Request) {
 	}
 
 	handler.Input <- *q
-	result.JobId = q.JobID.String()
+	result.JobID = q.JobID.String()
 
 	switch q.Section {
 	case msg.SectionRepository:
@@ -228,7 +228,7 @@ func (g *GuidePost) sysprocess(q *msg.Request) {
 
 	switch q.System.Request {
 	case msg.ActionRepoStop:
-		repoID = q.System.RepositoryId
+		repoID = q.System.RepositoryID
 	default:
 		result.UnknownRequest(q)
 		goto exit

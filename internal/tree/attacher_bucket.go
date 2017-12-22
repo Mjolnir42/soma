@@ -27,8 +27,8 @@ func (teb *Bucket) Attach(a AttachRequest) {
 		panic(`Bucket.Attach`)
 	}
 
-	teb.Parent.(Propertier).syncProperty(teb.Id.String())
-	teb.Parent.(Checker).syncCheck(teb.Id.String())
+	teb.Parent.(Propertier).syncProperty(teb.ID.String())
+	teb.Parent.(Checker).syncCheck(teb.ID.String())
 }
 
 func (teb *Bucket) Destroy() {
@@ -41,7 +41,7 @@ func (teb *Bucket) Destroy() {
 	// TODO delete all inherited checks + check instances
 
 	wg := new(sync.WaitGroup)
-	for child, _ := range teb.Children {
+	for child := range teb.Children {
 		wg.Add(1)
 		go func(c string) {
 			defer wg.Done()
@@ -52,11 +52,11 @@ func (teb *Bucket) Destroy() {
 
 	teb.Parent.Unlink(UnlinkRequest{
 		ParentType: teb.Parent.(Builder).GetType(),
-		ParentId:   teb.Parent.(Builder).GetID(),
+		ParentID:   teb.Parent.(Builder).GetID(),
 		ParentName: teb.Parent.(Builder).GetName(),
 		ChildType:  teb.GetType(),
 		ChildName:  teb.GetName(),
-		ChildId:    teb.GetID(),
+		ChildID:    teb.GetID(),
 	},
 	)
 
@@ -81,7 +81,7 @@ func (teb *Bucket) setFault(f *Fault) {
 func (teb *Bucket) updateParentRecursive(p Receiver) {
 	teb.setParent(p)
 	var wg sync.WaitGroup
-	for child, _ := range teb.Children {
+	for child := range teb.Children {
 		wg.Add(1)
 		c := child
 		go func(str Receiver) {
@@ -95,7 +95,7 @@ func (teb *Bucket) updateParentRecursive(p Receiver) {
 func (teb *Bucket) updateFaultRecursive(f *Fault) {
 	teb.setFault(f)
 	var wg sync.WaitGroup
-	for child, _ := range teb.Children {
+	for child := range teb.Children {
 		wg.Add(1)
 		c := child
 		go func(ptr *Fault) {
@@ -126,7 +126,7 @@ func (teb *Bucket) setBucketParent(p BucketReceiver) {
 func (teb *Bucket) attachToRepository(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  teb.Type,
 		Bucket:     teb,

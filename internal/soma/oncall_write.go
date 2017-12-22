@@ -104,9 +104,9 @@ func (w *OncallWrite) add(q *msg.Request, mr *msg.Result) {
 		err error
 	)
 
-	q.Oncall.Id = uuid.NewV4().String()
+	q.Oncall.ID = uuid.NewV4().String()
 	if res, err = w.stmtAdd.Exec(
-		q.Oncall.Id,
+		q.Oncall.ID,
 		q.Oncall.Name,
 		q.Oncall.Number,
 	); err != nil {
@@ -126,7 +126,7 @@ func (w *OncallWrite) remove(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRemove.Exec(
-		q.Oncall.Id,
+		q.Oncall.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -166,7 +166,7 @@ func (w *OncallWrite) update(q *msg.Request, mr *msg.Result) {
 	if res, err = w.stmtUpdate.Exec(
 		name,
 		number,
-		q.Oncall.Id,
+		q.Oncall.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

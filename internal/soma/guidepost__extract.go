@@ -76,7 +76,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		`delete_custom_property_from_repository`,
 		`delete_oncall_property_from_repository`,
 		`delete_service_property_from_repository`:
-		return q.Repository.Id, ``
+		return q.Repository.ID, ``
 	case
 		`create_bucket`:
 		return q.Bucket.RepositoryID, ``
@@ -103,7 +103,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		`delete_custom_property_from_group`,
 		`delete_oncall_property_from_group`,
 		`delete_service_property_from_group`:
-		return ``, q.Group.BucketId
+		return ``, q.Group.BucketID
 	case
 		`add_node_to_cluster`,
 		`create_cluster`,

@@ -25,7 +25,7 @@ func (teg *Group) Unlink(u UnlinkRequest) {
 		return
 	}
 loop:
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		if teg.Children[child].(Builder).GetType() == "node" {
 			continue loop
 		}
@@ -39,17 +39,17 @@ func (teg *Group) unlinkGroup(u UnlinkRequest) {
 	if unlinkRequestCheck(u, teg) {
 		switch u.ChildType {
 		case "group":
-			if _, ok := teg.Children[u.ChildId]; ok {
-				if u.ChildName == teg.Children[u.ChildId].GetName() {
+			if _, ok := teg.Children[u.ChildID]; ok {
+				if u.ChildName == teg.Children[u.ChildID].GetName() {
 					a := Action{
 						ChildType:  "group",
-						ChildGroup: teg.Children[u.ChildId].(*Group).export(),
+						ChildGroup: teg.Children[u.ChildID].(*Group).export(),
 					}
 
-					teg.Children[u.ChildId].clearParent()
-					delete(teg.Children, u.ChildId)
+					teg.Children[u.ChildID].clearParent()
+					delete(teg.Children, u.ChildID)
 					for i, grp := range teg.ordChildrenGrp {
-						if grp == u.ChildId {
+						if grp == u.ChildID {
 							delete(teg.ordChildrenGrp, i)
 						}
 					}
@@ -71,17 +71,17 @@ func (teg *Group) unlinkCluster(u UnlinkRequest) {
 	if unlinkRequestCheck(u, teg) {
 		switch u.ChildType {
 		case "cluster":
-			if _, ok := teg.Children[u.ChildId]; ok {
-				if u.ChildName == teg.Children[u.ChildId].GetName() {
+			if _, ok := teg.Children[u.ChildID]; ok {
+				if u.ChildName == teg.Children[u.ChildID].GetName() {
 					a := Action{
 						ChildType:    "cluster",
-						ChildCluster: teg.Children[u.ChildId].(*Cluster).export(),
+						ChildCluster: teg.Children[u.ChildID].(*Cluster).export(),
 					}
 
-					teg.Children[u.ChildId].clearParent()
-					delete(teg.Children, u.ChildId)
+					teg.Children[u.ChildID].clearParent()
+					delete(teg.Children, u.ChildID)
 					for i, clr := range teg.ordChildrenClr {
-						if clr == u.ChildId {
+						if clr == u.ChildID {
 							delete(teg.ordChildrenClr, i)
 						}
 					}
@@ -103,17 +103,17 @@ func (teg *Group) unlinkNode(u UnlinkRequest) {
 	if unlinkRequestCheck(u, teg) {
 		switch u.ChildType {
 		case "node":
-			if _, ok := teg.Children[u.ChildId]; ok {
-				if u.ChildName == teg.Children[u.ChildId].GetName() {
+			if _, ok := teg.Children[u.ChildID]; ok {
+				if u.ChildName == teg.Children[u.ChildID].GetName() {
 					a := Action{
 						ChildType: "node",
-						ChildNode: teg.Children[u.ChildId].(*Node).export(),
+						ChildNode: teg.Children[u.ChildID].(*Node).export(),
 					}
 
-					teg.Children[u.ChildId].clearParent()
-					delete(teg.Children, u.ChildId)
+					teg.Children[u.ChildID].clearParent()
+					delete(teg.Children, u.ChildID)
 					for i, nod := range teg.ordChildrenNod {
-						if nod == u.ChildId {
+						if nod == u.ChildID {
 							delete(teg.ordChildrenNod, i)
 						}
 					}

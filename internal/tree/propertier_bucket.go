@@ -31,10 +31,10 @@ func (teb *Bucket) SetProperty(p Property) {
 		case `custom`:
 			cstUUID, _ := uuid.FromString(prop.GetKey())
 			teb.deletePropertyInherited(&PropertyCustom{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
-				CustomId:  cstUUID,
+				CustomID:  cstUUID,
 				Key:       prop.(*PropertyCustom).GetKeyField(),
 				Value:     prop.(*PropertyCustom).GetValueField(),
 			})
@@ -42,14 +42,14 @@ func (teb *Bucket) SetProperty(p Property) {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			teb.deletePropertyInherited(&PropertyService{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
 				Service:   prop.GetKey(),
 			})
 		case `system`:
 			teb.deletePropertyInherited(&PropertySystem{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
 				Key:       prop.GetKey(),
@@ -58,30 +58,30 @@ func (teb *Bucket) SetProperty(p Property) {
 		case `oncall`:
 			oncUUID, _ := uuid.FromString(prop.GetKey())
 			teb.deletePropertyInherited(&PropertyOncall{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
-				OncallId:  oncUUID,
+				OncallID:  oncUUID,
 				Name:      prop.(*PropertyOncall).GetName(),
 				Number:    prop.(*PropertyOncall).GetNumber(),
 			})
 		}
 	}
-	p.SetId(p.GetInstanceId(teb.Type, teb.Id, teb.log))
+	p.SetID(p.GetInstanceID(teb.Type, teb.ID, teb.log))
 	if p.Equal(uuid.Nil) {
-		p.SetId(uuid.NewV4())
+		p.SetID(uuid.NewV4())
 	}
 	// this property is the source instance
-	p.SetInheritedFrom(teb.Id)
+	p.SetInheritedFrom(teb.ID)
 	p.SetInherited(false)
 	p.SetSourceType(teb.Type)
 	if i, e := uuid.FromString(p.GetID()); e == nil {
-		p.SetSourceId(i)
+		p.SetSourceID(i)
 	}
 	// send a scrubbed copy down
 	f := p.Clone()
 	f.SetInherited(true)
-	f.SetId(uuid.UUID{})
+	f.SetID(uuid.UUID{})
 	if f.hasInheritance() {
 		teb.setPropertyOnChildren(f)
 	}
@@ -93,9 +93,9 @@ func (teb *Bucket) SetProperty(p Property) {
 
 func (teb *Bucket) setPropertyInherited(p Property) {
 	f := p.Clone()
-	f.SetId(f.GetInstanceId(teb.Type, teb.Id, teb.log))
+	f.SetID(f.GetInstanceID(teb.Type, teb.ID, teb.log))
 	if f.Equal(uuid.Nil) {
-		f.SetId(uuid.NewV4())
+		f.SetID(uuid.NewV4())
 	}
 	f.clearInstances()
 
@@ -118,14 +118,14 @@ func (teb *Bucket) setPropertyInherited(p Property) {
 		return
 	}
 	teb.addProperty(f)
-	p.SetId(uuid.UUID{})
+	p.SetID(uuid.UUID{})
 	teb.setPropertyOnChildren(p)
 	teb.actionPropertyNew(f.MakeAction())
 }
 
 func (teb *Bucket) setPropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range teb.Children {
+	for child := range teb.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -163,7 +163,7 @@ func (teb *Bucket) UpdateProperty(p Property) {
 	}
 
 	// keep a copy for ourselves, no shared pointers
-	p.SetInheritedFrom(teb.Id)
+	p.SetInheritedFrom(teb.ID)
 	p.SetSourceType(teb.Type)
 	p.SetInherited(true)
 	f := p.Clone()
@@ -188,7 +188,7 @@ func (teb *Bucket) updatePropertyInherited(p Property) {
 
 func (teb *Bucket) updatePropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range teb.Children {
+	for child := range teb.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -199,7 +199,7 @@ func (teb *Bucket) updatePropertyOnChildren(p Property) {
 }
 
 func (teb *Bucket) switchProperty(p Property) bool {
-	uid := teb.findIdForSource(
+	uid := teb.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
@@ -216,8 +216,8 @@ func (teb *Bucket) switchProperty(p Property) bool {
 			Action: `bucket.switchProperty property not found`}
 		return false
 	}
-	updId, _ := uuid.FromString(uid)
-	p.SetId(updId)
+	updID, _ := uuid.FromString(uid)
+	p.SetID(updID)
 	curr := teb.getCurrentProperty(p)
 	if curr == nil {
 		return false
@@ -233,10 +233,10 @@ func (teb *Bucket) switchProperty(p Property) bool {
 		case `custom`:
 			cstUUID, _ := uuid.FromString(curr.GetKey())
 			teb.deletePropertyOnChildren(&PropertyCustom{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
-				CustomId:    cstUUID,
+				CustomID:    cstUUID,
 				Key:         curr.(*PropertyCustom).GetKeyField(),
 				Value:       curr.(*PropertyCustom).GetValueField(),
 				Inheritance: true,
@@ -245,7 +245,7 @@ func (teb *Bucket) switchProperty(p Property) bool {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			teb.deletePropertyOnChildren(&PropertyService{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
 				Service:     curr.GetKey(),
@@ -253,7 +253,7 @@ func (teb *Bucket) switchProperty(p Property) bool {
 			})
 		case `system`:
 			teb.deletePropertyOnChildren(&PropertySystem{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
 				Key:         curr.GetKey(),
@@ -263,10 +263,10 @@ func (teb *Bucket) switchProperty(p Property) bool {
 		case `oncall`:
 			oncUUID, _ := uuid.FromString(curr.GetKey())
 			teb.deletePropertyOnChildren(&PropertyOncall{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
-				OncallId:    oncUUID,
+				OncallID:    oncUUID,
 				Name:        curr.(*PropertyOncall).GetName(),
 				Number:      curr.(*PropertyOncall).GetNumber(),
 				Inheritance: true,
@@ -313,11 +313,11 @@ func (teb *Bucket) DeleteProperty(p Property) {
 
 	var flow Property
 	resync := false
-	delId := teb.findIdForSource(
+	delID := teb.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
-	if delId != `` {
+	if delID != `` {
 		// this is a delete for a locally set property. It might be a
 		// delete for an overwrite property, in which case we need to
 		// ask the parent to sync it to us again.
@@ -329,13 +329,13 @@ func (teb *Bucket) DeleteProperty(p Property) {
 		var delProp Property
 		switch p.GetType() {
 		case `custom`:
-			delProp = teb.PropertyCustom[delId]
+			delProp = teb.PropertyCustom[delID]
 		case `system`:
-			delProp = teb.PropertySystem[delId]
+			delProp = teb.PropertySystem[delID]
 		case `service`:
-			delProp = teb.PropertyService[delId]
+			delProp = teb.PropertyService[delID]
 		case `oncall`:
-			delProp = teb.PropertyOncall[delId]
+			delProp = teb.PropertyOncall[delID]
 		}
 		resync, _, flow = teb.Parent.(Propertier).checkDuplicate(
 			delProp,
@@ -354,7 +354,7 @@ func (teb *Bucket) DeleteProperty(p Property) {
 		teb.Parent.(Propertier).resyncProperty(
 			flow.GetSourceInstance(),
 			p.GetType(),
-			teb.Id.String(),
+			teb.ID.String(),
 		)
 	}
 }
@@ -367,7 +367,7 @@ func (teb *Bucket) deletePropertyInherited(p Property) {
 
 func (teb *Bucket) deletePropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range teb.Children {
+	for child := range teb.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -432,11 +432,11 @@ func (teb *Bucket) deletePropertyAllLocal() {
 }
 
 func (teb *Bucket) rmProperty(p Property) bool {
-	delId := teb.findIdForSource(
+	delID := teb.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
-	if delId == `` {
+	if delID == `` {
 		// we do not have the property for which we received a delete
 		if dupe, deleteOK, _ := teb.checkDuplicate(p); dupe && !deleteOK {
 			// the delete is duplicate to a property for which we
@@ -455,28 +455,28 @@ func (teb *Bucket) rmProperty(p Property) bool {
 	switch p.GetType() {
 	case `custom`:
 		teb.actionPropertyDelete(
-			teb.PropertyCustom[delId].MakeAction(),
+			teb.PropertyCustom[delID].MakeAction(),
 		)
-		hasInheritance = teb.PropertyCustom[delId].hasInheritance()
-		delete(teb.PropertyCustom, delId)
+		hasInheritance = teb.PropertyCustom[delID].hasInheritance()
+		delete(teb.PropertyCustom, delID)
 	case `service`:
 		teb.actionPropertyDelete(
-			teb.PropertyService[delId].MakeAction(),
+			teb.PropertyService[delID].MakeAction(),
 		)
-		hasInheritance = teb.PropertyService[delId].hasInheritance()
-		delete(teb.PropertyService, delId)
+		hasInheritance = teb.PropertyService[delID].hasInheritance()
+		delete(teb.PropertyService, delID)
 	case `system`:
 		teb.actionPropertyDelete(
-			teb.PropertySystem[delId].MakeAction(),
+			teb.PropertySystem[delID].MakeAction(),
 		)
-		hasInheritance = teb.PropertySystem[delId].hasInheritance()
-		delete(teb.PropertySystem, delId)
+		hasInheritance = teb.PropertySystem[delID].hasInheritance()
+		delete(teb.PropertySystem, delID)
 	case `oncall`:
 		teb.actionPropertyDelete(
-			teb.PropertyOncall[delId].MakeAction(),
+			teb.PropertyOncall[delID].MakeAction(),
 		)
-		hasInheritance = teb.PropertyOncall[delId].hasInheritance()
-		delete(teb.PropertyOncall, delId)
+		hasInheritance = teb.PropertyOncall[delID].hasInheritance()
+		delete(teb.PropertyOncall, delID)
 	default:
 		teb.Fault.Error <- &Error{Action: `bucket.rmProperty unknown type`}
 		return false
@@ -519,31 +519,31 @@ bailout:
 }
 
 //
-func (teb *Bucket) findIdForSource(source, prop string) string {
+func (teb *Bucket) findIDForSource(source, prop string) string {
 	switch prop {
 	case `custom`:
-		for id, _ := range teb.PropertyCustom {
+		for id := range teb.PropertyCustom {
 			if teb.PropertyCustom[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `system`:
-		for id, _ := range teb.PropertySystem {
+		for id := range teb.PropertySystem {
 			if teb.PropertySystem[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `service`:
-		for id, _ := range teb.PropertyService {
+		for id := range teb.PropertyService {
 			if teb.PropertyService[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `oncall`:
-		for id, _ := range teb.PropertyOncall {
+		for id := range teb.PropertyOncall {
 			if teb.PropertyOncall[id].GetSourceInstance() != source {
 				continue
 			}
@@ -554,99 +554,99 @@ func (teb *Bucket) findIdForSource(source, prop string) string {
 }
 
 //
-func (teb *Bucket) resyncProperty(srcId, pType, childId string) {
-	pId := teb.findIdForSource(srcId, pType)
-	if pId == `` {
+func (teb *Bucket) resyncProperty(srcID, pType, childID string) {
+	pID := teb.findIDForSource(srcID, pType)
+	if pID == `` {
 		return
 	}
 
 	var f Property
 	switch pType {
 	case `custom`:
-		f = teb.PropertyCustom[pId].(*PropertyCustom).Clone()
+		f = teb.PropertyCustom[pID].(*PropertyCustom).Clone()
 	case `oncall`:
-		f = teb.PropertyOncall[pId].(*PropertyOncall).Clone()
+		f = teb.PropertyOncall[pID].(*PropertyOncall).Clone()
 	case `service`:
-		f = teb.PropertyService[pId].(*PropertyService).Clone()
+		f = teb.PropertyService[pID].(*PropertyService).Clone()
 	case `system`:
-		f = teb.PropertySystem[pId].(*PropertySystem).Clone()
+		f = teb.PropertySystem[pID].(*PropertySystem).Clone()
 	}
 	if !f.hasInheritance() {
 		return
 	}
 	f.SetInherited(true)
-	f.SetId(uuid.UUID{})
+	f.SetID(uuid.UUID{})
 	f.clearInstances()
-	teb.Children[childId].setPropertyInherited(f)
+	teb.Children[childID].setPropertyInherited(f)
 }
 
-// when a child attaches, it calls self.Parent.syncProperty(self.Id)
+// when a child attaches, it calls self.Parent.syncProperty(self.ID)
 // to get get all properties of that part of the tree
-func (teb *Bucket) syncProperty(childId string) {
+func (teb *Bucket) syncProperty(childID string) {
 customloop:
-	for prop, _ := range teb.PropertyCustom {
+	for prop := range teb.PropertyCustom {
 		if !teb.PropertyCustom[prop].hasInheritance() {
 			continue customloop
 		}
 		f := teb.PropertyCustom[prop].(*PropertyCustom).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		teb.Children[childId].setPropertyInherited(f)
+		teb.Children[childID].setPropertyInherited(f)
 	}
 oncallloop:
-	for prop, _ := range teb.PropertyOncall {
+	for prop := range teb.PropertyOncall {
 		if !teb.PropertyOncall[prop].hasInheritance() {
 			continue oncallloop
 		}
 		f := teb.PropertyOncall[prop].(*PropertyOncall).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		teb.Children[childId].setPropertyInherited(f)
+		teb.Children[childID].setPropertyInherited(f)
 	}
 serviceloop:
-	for prop, _ := range teb.PropertyService {
+	for prop := range teb.PropertyService {
 		if !teb.PropertyService[prop].hasInheritance() {
 			continue serviceloop
 		}
 		f := teb.PropertyService[prop].(*PropertyService).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		teb.Children[childId].setPropertyInherited(f)
+		teb.Children[childID].setPropertyInherited(f)
 	}
 systemloop:
-	for prop, _ := range teb.PropertySystem {
+	for prop := range teb.PropertySystem {
 		if !teb.PropertySystem[prop].hasInheritance() {
 			continue systemloop
 		}
 		f := teb.PropertySystem[prop].(*PropertySystem).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		teb.Children[childId].setPropertyInherited(f)
+		teb.Children[childID].setPropertyInherited(f)
 	}
 }
 
 // function to be used by a child to check if the parent has a
 // specific Property
-func (teb *Bucket) checkProperty(propType string, propId string) bool {
+func (teb *Bucket) checkProperty(propType string, propID string) bool {
 	switch propType {
 	case "custom":
-		if _, ok := teb.PropertyCustom[propId]; ok {
+		if _, ok := teb.PropertyCustom[propID]; ok {
 			return true
 		}
 	case "service":
-		if _, ok := teb.PropertyService[propId]; ok {
+		if _, ok := teb.PropertyService[propID]; ok {
 			return true
 		}
 	case "system":
-		if _, ok := teb.PropertySystem[propId]; ok {
+		if _, ok := teb.PropertySystem[propID]; ok {
 			return true
 		}
 	case "oncall":
-		if _, ok := teb.PropertyOncall[propId]; ok {
+		if _, ok := teb.PropertyOncall[propID]; ok {
 			return true
 		}
 	}

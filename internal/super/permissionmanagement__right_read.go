@@ -44,9 +44,9 @@ func (s *Supervisor) rightSearchGlobal(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = s.stmtSearchAuthorizationGlobal.QueryRow(
-		q.Grant.PermissionId,
+		q.Grant.PermissionID,
 		q.Grant.Category,
-		q.Grant.RecipientId,
+		q.Grant.RecipientID,
 		q.Grant.RecipientType,
 	).Scan(
 		&grantID,
@@ -60,10 +60,10 @@ func (s *Supervisor) rightSearchGlobal(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Grant = append(mr.Grant, proto.Grant{
-		Id:            grantID,
-		PermissionId:  q.Grant.PermissionId,
+		ID:            grantID,
+		PermissionID:  q.Grant.PermissionID,
 		Category:      q.Grant.Category,
-		RecipientId:   q.Grant.RecipientId,
+		RecipientID:   q.Grant.RecipientID,
 		RecipientType: q.Grant.RecipientType,
 	})
 	mr.OK()
@@ -89,12 +89,12 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
 		scope = s.stmtSearchAuthorizationMonitoring
 	}
 	if err = scope.QueryRow(
-		q.Grant.PermissionId,
+		q.Grant.PermissionID,
 		q.Grant.Category,
-		q.Grant.RecipientId,
+		q.Grant.RecipientID,
 		q.Grant.RecipientType,
 		q.Grant.ObjectType,
-		q.Grant.ObjectId,
+		q.Grant.ObjectID,
 	).Scan(
 		&grantID,
 	); err == sql.ErrNoRows {
@@ -107,13 +107,13 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Grant = append(mr.Grant, proto.Grant{
-		Id:            grantID,
-		PermissionId:  q.Grant.PermissionId,
+		ID:            grantID,
+		PermissionID:  q.Grant.PermissionID,
 		Category:      q.Grant.Category,
-		RecipientId:   q.Grant.RecipientId,
+		RecipientID:   q.Grant.RecipientID,
 		RecipientType: q.Grant.RecipientType,
 		ObjectType:    q.Grant.ObjectType,
-		ObjectId:      q.Grant.ObjectId,
+		ObjectID:      q.Grant.ObjectID,
 	})
 	mr.OK()
 	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)

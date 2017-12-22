@@ -15,11 +15,11 @@ func (tec *Cluster) updateCheckInstances() {
 
 	// object may have no checks, but there could be instances to mop up
 	if len(tec.Checks) == 0 && len(tec.Instances) == 0 {
-		tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, HasChecks=%t",
+		tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, HasChecks=%t",
 			repoName,
 			`UpdateCheckInstances`,
 			`cluster`,
-			tec.Id.String(),
+			tec.ID.String(),
 			false,
 		)
 		// found nothing to do, ensure update flag is unset again
@@ -43,7 +43,7 @@ func (tec *Cluster) updateCheckInstances() {
 	// scan over all current checkinstances if their check still exists.
 	// If not the check has been deleted and the spawned instances need
 	// a good deletion
-	for ck, _ := range tec.CheckInstances {
+	for ck := range tec.CheckInstances {
 		if _, ok := tec.Checks[ck]; ok {
 			// check still exists
 			continue
@@ -53,11 +53,11 @@ func (tec *Cluster) updateCheckInstances() {
 		inst := tec.CheckInstances[ck]
 		for _, i := range inst {
 			tec.actionCheckInstanceDelete(tec.Instances[i].MakeAction())
-			tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+			tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 				repoName,
 				`CleanupInstance`,
 				`cluster`,
-				tec.Id.String(),
+				tec.ID.String(),
 				ck,
 				i,
 			)
@@ -68,7 +68,7 @@ func (tec *Cluster) updateCheckInstances() {
 
 	// loop over all checks and test if there is a reason to disable
 	// its check instances. And with disable we mean delete.
-	for chk, _ := range tec.Checks {
+	for chk := range tec.Checks {
 		disableThis := false
 		// disable this check if the system property
 		// `disable_all_monitoring` is set for the view that the check
@@ -85,7 +85,7 @@ func (tec *Cluster) updateCheckInstances() {
 		// check_configuration that spawned this check
 		if _, hit, _ := tec.evalSystemProp(
 			`disable_check_configuration`,
-			tec.Checks[chk].ConfigId.String(),
+			tec.Checks[chk].ConfigID.String(),
 			tec.Checks[chk].View,
 		); hit {
 			disableThis = true
@@ -96,11 +96,11 @@ func (tec *Cluster) updateCheckInstances() {
 			if instanceArray, ok := tec.CheckInstances[chk]; ok {
 				for _, i := range instanceArray {
 					tec.actionCheckInstanceDelete(tec.Instances[i].MakeAction())
-					tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`RemoveDisabledInstance`,
 						`cluster`,
-						tec.Id.String(),
+						tec.ID.String(),
 						chk,
 						i,
 					)
@@ -113,7 +113,7 @@ func (tec *Cluster) updateCheckInstances() {
 
 	// process remaining checks
 checksloop:
-	for i, _ := range tec.Checks {
+	for i := range tec.Checks {
 		if tec.Checks[i].Inherited == false && tec.Checks[i].ChildrenOnly == true {
 			continue checksloop
 		}
@@ -133,7 +133,7 @@ checksloop:
 		// property
 		if _, hit, _ := tec.evalSystemProp(
 			`disable_check_configuration`,
-			tec.Checks[i].ConfigId.String(),
+			tec.Checks[i].ConfigID.String(),
 			tec.Checks[i].View,
 		); hit {
 			continue checksloop
@@ -150,7 +150,7 @@ checksloop:
 		nativeC := map[string]string{}                 // Property->Value
 		serviceC := map[string]string{}                // Id->Value
 		customC := map[string]string{}                 // Id->Value
-		attributeC := map[string]map[string][]string{} // svcId->attr->[ value, ... ]
+		attributeC := map[string]map[string][]string{} // svcID->attr->[ value, ... ]
 
 		newInstances := map[string]CheckInstance{}
 		newCheckInstances := []string{}
@@ -202,11 +202,11 @@ checksloop:
 			}
 		}
 		if hasBrokenConstraint {
-			tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+			tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 				repoName,
 				`ConstraintEvaluation`,
 				`cluster`,
-				tec.Id.String(),
+				tec.ID.String(),
 				i,
 				false,
 			)
@@ -220,7 +220,7 @@ checksloop:
 		 */
 		if hasServiceConstraint && hasAttributeConstraint {
 		svcattrloop:
-			for id, _ := range serviceC {
+			for id := range serviceC {
 				for _, attr := range attributes {
 					hit, bind := tec.evalAttributeOfService(id, view, attr.Key, attr.Value)
 					if hit {
@@ -243,10 +243,10 @@ checksloop:
 		} else if hasAttributeConstraint {
 			attrCount := len(attributes)
 			for _, attr := range attributes {
-				hit, svcIdMap := tec.evalAttributeProp(view, attr.Key, attr.Value)
+				hit, svcIDMap := tec.evalAttributeProp(view, attr.Key, attr.Value)
 				if hit {
-					for id, bind := range svcIdMap {
-						serviceC[id] = svcIdMap[id]
+					for id, bind := range svcIDMap {
+						serviceC[id] = svcIDMap[id]
 						if attributeC[id] == nil {
 							// attributeC[id] might still be a nil map
 							attributeC[id] = make(map[string][]string)
@@ -259,7 +259,7 @@ checksloop:
 			//
 			// if a check has two attribute constraints on the same
 			// attribute, then len(attributeC[id]) != len(attributes)
-			for id, _ := range attributeC {
+			for id := range attributeC {
 				if tec.countAttribC(attributeC[id]) != attrCount {
 					delete(serviceC, id)
 					delete(attributeC, id)
@@ -275,22 +275,22 @@ checksloop:
 			}
 		}
 		if hasBrokenConstraint {
-			tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+			tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 				repoName,
 				`ConstraintEvaluation`,
 				`cluster`,
-				tec.Id.String(),
+				tec.ID.String(),
 				i,
 				false,
 			)
 			continue checksloop
 		}
 		// check triggered, create instances
-		tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+		tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 			repoName,
 			`ConstraintEvaluation`,
 			`cluster`,
-			tec.Id.String(),
+			tec.ID.String(),
 			i,
 			true,
 		)
@@ -300,16 +300,16 @@ checksloop:
 		 */
 		if !hasServiceConstraint {
 			inst := CheckInstance{
-				InstanceId: uuid.UUID{},
-				CheckId: func(id string) uuid.UUID {
+				InstanceID: uuid.UUID{},
+				CheckID: func(id string) uuid.UUID {
 					f, _ := uuid.FromString(id)
 					return f
 				}(i),
-				ConfigId: func(id string) uuid.UUID {
-					f, _ := uuid.FromString(tec.Checks[id].ConfigId.String())
+				ConfigID: func(id string) uuid.UUID {
+					f, _ := uuid.FromString(tec.Checks[id].ConfigID.String())
 					return f
 				}(i),
-				InstanceConfigId:      uuid.NewV4(),
+				InstanceConfigID:      uuid.NewV4(),
 				ConstraintOncall:      oncallC,
 				ConstraintService:     serviceC,
 				ConstraintSystem:      systemC,
@@ -325,28 +325,28 @@ checksloop:
 
 			if startupLoad {
 			nosvcstartinstanceloop:
-				for ldInstId, ldInst := range tec.loadedInstances[i] {
+				for ldInstID, ldInst := range tec.loadedInstances[i] {
 					if ldInst.InstanceSvcCfgHash != "" {
 						continue nosvcstartinstanceloop
 					}
 					// check if an instance exists bound against the same
 					// constraints
 					if ldInst.ConstraintHash == inst.ConstraintHash &&
-						uuid.Equal(ldInst.ConfigId, inst.ConfigId) &&
+						uuid.Equal(ldInst.ConfigID, inst.ConfigID) &&
 						ldInst.ConstraintValHash == inst.ConstraintValHash {
 
 						// found a match
-						inst.InstanceId, _ = uuid.FromString(ldInstId)
-						inst.InstanceConfigId, _ = uuid.FromString(ldInst.InstanceConfigId.String())
+						inst.InstanceID, _ = uuid.FromString(ldInstID)
+						inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
 						inst.Version = ldInst.Version
-						delete(tec.loadedInstances[i], ldInstId)
-						tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+						delete(tec.loadedInstances[i], ldInstID)
+						tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 							repoName,
 							`ComputeInstance`,
 							`cluster`,
-							tec.Id.String(),
+							tec.ID.String(),
 							i,
-							ldInstId,
+							ldInstID,
 							false,
 						)
 						goto nosvcstartinstancematch
@@ -356,14 +356,14 @@ checksloop:
 				// that we could not match to any loaded instances
 				// -> something is wrong
 				tec.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
-					" ObjType=%s, ObjId=%s, CheckId=%s", `cluster`, tec.Id.String(), i, repoName)
+					" ObjType=%s, ObjId=%s, CheckID=%s", `cluster`, tec.ID.String(), i, repoName)
 				tec.Fault.Error <- &Error{Action: `Failed to match a computed instance to loaded data`}
 				return
 			nosvcstartinstancematch:
 			} else {
 			nosvcinstanceloop:
-				for _, exInstId := range tec.CheckInstances[i] {
-					exInst := tec.Instances[exInstId]
+				for _, exInstID := range tec.CheckInstances[i] {
+					exInst := tec.Instances[exInstID]
 					// ignore instances with service constraints
 					if exInst.InstanceSvcCfgHash != "" {
 						continue nosvcinstanceloop
@@ -371,29 +371,29 @@ checksloop:
 					// check if an instance exists bound against the same
 					// constraints
 					if exInst.ConstraintHash == inst.ConstraintHash {
-						inst.InstanceId, _ = uuid.FromString(exInst.InstanceId.String())
+						inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
 						inst.Version = exInst.Version + 1
 						break nosvcinstanceloop
 					}
 				}
-				if uuid.Equal(uuid.Nil, inst.InstanceId) {
+				if uuid.Equal(uuid.Nil, inst.InstanceID) {
 					// no match was found during nosvcinstanceloop, this
 					// is a new instance
 					inst.Version = 0
-					inst.InstanceId = uuid.NewV4()
+					inst.InstanceID = uuid.NewV4()
 				}
-				tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+				tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 					repoName,
 					`ComputeInstance`,
 					`cluster`,
-					tec.Id.String(),
+					tec.ID.String(),
 					i,
-					inst.InstanceId.String(),
+					inst.InstanceID.String(),
 					false,
 				)
 			}
-			newInstances[inst.InstanceId.String()] = inst
-			newCheckInstances = append(newCheckInstances, inst.InstanceId.String())
+			newInstances[inst.InstanceID.String()] = inst
+			newCheckInstances = append(newCheckInstances, inst.InstanceID.String())
 		}
 
 		/* if service constraints are in effect, then we generate
@@ -407,24 +407,24 @@ checksloop:
 		* permutations.
 		 */
 	serviceconstraintloop:
-		for svcId, _ := range serviceC {
+		for svcID := range serviceC {
 			if !hasServiceConstraint {
 				break serviceconstraintloop
 			}
 
-			svcCfg := tec.getServiceMap(svcId)
+			svcCfg := tec.getServiceMap(svcID)
 
 			// calculate how many instances this service spawns
 			combinations := 1
-			for attr, _ := range svcCfg {
+			for attr := range svcCfg {
 				combinations = combinations * len(svcCfg[attr])
 			}
 
 			// build all attribute combinations
 			results := make([]map[string]string, 0, combinations)
-			for attr, _ := range svcCfg {
+			for attr := range svcCfg {
 				if len(results) == 0 {
-					for i, _ := range svcCfg[attr] {
+					for i := range svcCfg[attr] {
 						res := map[string]string{}
 						res[attr] = svcCfg[attr][i]
 						results = append(results, res)
@@ -432,8 +432,8 @@ checksloop:
 					continue
 				}
 				ires := make([]map[string]string, 0, combinations)
-				for r, _ := range results {
-					for j, _ := range svcCfg[attr] {
+				for r := range results {
+					for j := range svcCfg[attr] {
 						res := map[string]string{}
 						for k, v := range results[r] {
 							res[k] = v
@@ -452,23 +452,23 @@ checksloop:
 					cfg[k] = v
 				}
 				inst := CheckInstance{
-					InstanceId: uuid.UUID{},
-					CheckId: func(id string) uuid.UUID {
+					InstanceID: uuid.UUID{},
+					CheckID: func(id string) uuid.UUID {
 						f, _ := uuid.FromString(id)
 						return f
 					}(i),
-					ConfigId: func(id string) uuid.UUID {
-						f, _ := uuid.FromString(tec.Checks[id].ConfigId.String())
+					ConfigID: func(id string) uuid.UUID {
+						f, _ := uuid.FromString(tec.Checks[id].ConfigID.String())
 						return f
 					}(i),
-					InstanceConfigId:      uuid.NewV4(),
+					InstanceConfigID:      uuid.NewV4(),
 					ConstraintOncall:      oncallC,
 					ConstraintService:     serviceC,
 					ConstraintSystem:      systemC,
 					ConstraintCustom:      customC,
 					ConstraintNative:      nativeC,
 					ConstraintAttribute:   attributeC,
-					InstanceService:       svcId,
+					InstanceService:       svcID,
 					InstanceServiceConfig: cfg,
 				}
 				inst.calcConstraintHash()
@@ -476,29 +476,29 @@ checksloop:
 				inst.calcInstanceSvcCfgHash()
 
 				if startupLoad {
-					for ldInstId, ldInst := range tec.loadedInstances[i] {
+					for ldInstID, ldInst := range tec.loadedInstances[i] {
 						// check for data from loaded instance
 						if ldInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash &&
 							ldInst.ConstraintHash == inst.ConstraintHash &&
 							ldInst.ConstraintValHash == inst.ConstraintValHash &&
 							ldInst.InstanceService == inst.InstanceService &&
-							uuid.Equal(ldInst.ConfigId, inst.ConfigId) {
+							uuid.Equal(ldInst.ConfigID, inst.ConfigID) {
 
 							// found a match
-							inst.InstanceId, _ = uuid.FromString(ldInstId)
-							inst.InstanceConfigId, _ = uuid.FromString(ldInst.InstanceConfigId.String())
+							inst.InstanceID, _ = uuid.FromString(ldInstID)
+							inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
 							inst.Version = ldInst.Version
 							// we can assume InstanceServiceConfig to
 							// be equal, since InstanceSvcCfgHash is
 							// equal
-							delete(tec.loadedInstances[i], ldInstId)
-							tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+							delete(tec.loadedInstances[i], ldInstID)
+							tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 								repoName,
 								`ComputeInstance`,
 								`cluster`,
-								tec.Id.String(),
+								tec.ID.String(),
 								i,
-								ldInstId,
+								ldInstID,
 								true,
 							)
 							goto startinstancematch
@@ -508,7 +508,7 @@ checksloop:
 					// instance that we could not match to any
 					// loaded instances -> something is wrong
 					tec.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
-						" ObjType=%s, ObjId=%s, CheckId=%s", `cluster`, tec.Id.String(), i, repoName)
+						" ObjType=%s, ObjId=%s, CheckID=%s", `cluster`, tec.ID.String(), i, repoName)
 					tec.Fault.Error <- &Error{Action: `Failed to match a computed instance to loaded data`}
 					return
 				startinstancematch:
@@ -516,34 +516,34 @@ checksloop:
 					// lookup existing instance ids for check in tec.CheckInstances
 					// to determine if this is an update
 				instanceloop:
-					for _, exInstId := range tec.CheckInstances[i] {
-						exInst := tec.Instances[exInstId]
+					for _, exInstID := range tec.CheckInstances[i] {
+						exInst := tec.Instances[exInstID]
 						// this existing instance is for the same service
 						// configuration -> this is an update
 						if exInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash {
-							inst.InstanceId, _ = uuid.FromString(exInst.InstanceId.String())
+							inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
 							inst.Version = exInst.Version + 1
 							break instanceloop
 						}
 					}
-					if uuid.Equal(uuid.Nil, inst.InstanceId) {
+					if uuid.Equal(uuid.Nil, inst.InstanceID) {
 						// no match was found during instanceloop, this is
 						// a new instance
 						inst.Version = 0
-						inst.InstanceId = uuid.NewV4()
+						inst.InstanceID = uuid.NewV4()
 					}
-					tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+					tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 						repoName,
 						`ComputeInstance`,
 						`cluster`,
-						tec.Id.String(),
+						tec.ID.String(),
 						i,
-						inst.InstanceId.String(),
+						inst.InstanceID.String(),
 						true,
 					)
 				}
-				newInstances[inst.InstanceId.String()] = inst
-				newCheckInstances = append(newCheckInstances, inst.InstanceId.String())
+				newInstances[inst.InstanceID.String()] = inst
+				newCheckInstances = append(newCheckInstances, inst.InstanceID.String())
 			}
 		} // LOOPEND: range serviceC
 
@@ -558,57 +558,57 @@ checksloop:
 		// all new check instances have been built, check which
 		// existing instances did not get an update and need to be
 		// deleted
-		for _, oldInstanceId := range tec.CheckInstances[i] {
-			if _, ok := newInstances[oldInstanceId]; !ok {
+		for _, oldInstanceID := range tec.CheckInstances[i] {
+			if _, ok := newInstances[oldInstanceID]; !ok {
 				// there is no new version for this instance id
-				tec.actionCheckInstanceDelete(tec.Instances[oldInstanceId].MakeAction())
-				tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+				tec.actionCheckInstanceDelete(tec.Instances[oldInstanceID].MakeAction())
+				tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 					repoName,
 					`DeleteInstance`,
 					`cluster`,
-					tec.Id.String(),
+					tec.ID.String(),
 					i,
-					oldInstanceId,
+					oldInstanceID,
 				)
-				delete(tec.Instances, oldInstanceId)
+				delete(tec.Instances, oldInstanceID)
 				continue
 			}
-			delete(tec.Instances, oldInstanceId)
-			tec.Instances[oldInstanceId] = newInstances[oldInstanceId]
-			tec.actionCheckInstanceUpdate(tec.Instances[oldInstanceId].MakeAction())
-			tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+			delete(tec.Instances, oldInstanceID)
+			tec.Instances[oldInstanceID] = newInstances[oldInstanceID]
+			tec.actionCheckInstanceUpdate(tec.Instances[oldInstanceID].MakeAction())
+			tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 				repoName,
 				`UpdateInstance`,
 				`cluster`,
-				tec.Id.String(),
+				tec.ID.String(),
 				i,
-				oldInstanceId,
+				oldInstanceID,
 			)
 		}
-		for _, newInstanceId := range newCheckInstances {
-			if _, ok := tec.Instances[newInstanceId]; !ok {
+		for _, newInstanceID := range newCheckInstances {
+			if _, ok := tec.Instances[newInstanceID]; !ok {
 				// this instance is new, not an update
-				tec.Instances[newInstanceId] = newInstances[newInstanceId]
+				tec.Instances[newInstanceID] = newInstances[newInstanceID]
 				// no need to send a create action during load; the
 				// action channel is drained anyway
 				if !startupLoad {
-					tec.actionCheckInstanceCreate(tec.Instances[newInstanceId].MakeAction())
-					tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					tec.actionCheckInstanceCreate(tec.Instances[newInstanceID].MakeAction())
+					tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`CreateInstance`,
 						`cluster`,
-						tec.Id.String(),
+						tec.ID.String(),
 						i,
-						newInstanceId,
+						newInstanceID,
 					)
 				} else {
-					tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`RecreateInstance`,
 						`cluster`,
-						tec.Id.String(),
+						tec.ID.String(),
 						i,
-						newInstanceId,
+						newInstanceID,
 					)
 				}
 			}
@@ -659,8 +659,8 @@ func (tec *Cluster) evalOncallProp(
 	prop string, val string, view string) (string, bool) {
 	for _, v := range tec.PropertyOncall {
 		t := v.(*PropertyOncall)
-		if "OncallId" == prop && t.Id.String() == val && (t.View == view || t.View == `any`) {
-			return t.Id.String(), true
+		if "OncallID" == prop && t.ID.String() == val && (t.View == view || t.View == `any`) {
+			return t.ID.String(), true
 		}
 	}
 	return "", false
@@ -682,15 +682,15 @@ func (tec *Cluster) evalServiceProp(
 	for _, v := range tec.PropertyService {
 		t := v.(*PropertyService)
 		if prop == "name" && (t.Service == val || val == `@defined`) && (t.View == view || t.View == `any`) {
-			return t.Id.String(), true, t.Service
+			return t.ID.String(), true, t.Service
 		}
 	}
 	return "", false, ""
 }
 
 func (tec *Cluster) evalAttributeOfService(
-	svcId string, view string, attribute string, value string) (bool, string) {
-	t := tec.PropertyService[svcId].(*PropertyService)
+	svcID string, view string, attribute string, value string) (bool, string) {
+	t := tec.PropertyService[svcID].(*PropertyService)
 	for _, a := range t.Attributes {
 		if a.Name == attribute && (t.View == view || t.View == `any`) && (a.Value == value || value == `@defined`) {
 			return true, a.Value
@@ -707,7 +707,7 @@ svcloop:
 		t := v.(*PropertyService)
 		for _, a := range t.Attributes {
 			if a.Name == attr && (a.Value == value || value == `@defined`) && (t.View == view || t.View == `any`) {
-				f[t.Id.String()] = a.Value
+				f[t.ID.String()] = a.Value
 				continue svcloop
 			}
 		}
@@ -718,9 +718,9 @@ svcloop:
 	return false, f
 }
 
-func (tec *Cluster) getServiceMap(serviceId string) map[string][]string {
+func (tec *Cluster) getServiceMap(serviceID string) map[string][]string {
 	svc := new(PropertyService)
-	svc = tec.PropertyService[serviceId].(*PropertyService)
+	svc = tec.PropertyService[serviceID].(*PropertyService)
 
 	res := map[string][]string{}
 	for _, v := range svc.Attributes {
@@ -730,8 +730,8 @@ func (tec *Cluster) getServiceMap(serviceId string) map[string][]string {
 }
 
 func (tec *Cluster) countAttribC(attributeC map[string][]string) int {
-	var count int = 0
-	for key, _ := range attributeC {
+	var count int
+	for key := range attributeC {
 		count = count + len(attributeC[key])
 	}
 	return count

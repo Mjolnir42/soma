@@ -44,7 +44,7 @@ func (d *DB) FinishJob(id uint64, job *proto.Job) error {
 	}
 	defer d.Close()
 
-	jid := job.Id
+	jid := job.ID
 	data, err := json.Marshal(job)
 	if err != nil {
 		return err

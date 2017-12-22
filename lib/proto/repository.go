@@ -10,9 +10,9 @@
 package proto
 
 type Repository struct {
-	Id         string      `json:"id,omitempty"`
+	ID         string      `json:"id,omitempty"`
 	Name       string      `json:"name,omitempty"`
-	TeamId     string      `json:"teamId,omitempty"`
+	TeamID     string      `json:"teamId,omitempty"`
 	IsDeleted  bool        `json:"isDeleted,omitempty"`
 	IsActive   bool        `json:"isActive,omitempty"`
 	Members    *[]Bucket   `json:"members,omitempty"`
@@ -22,7 +22,7 @@ type Repository struct {
 
 type RepositoryFilter struct {
 	Name      string `json:"name,omitempty"`
-	TeamId    string `json:"teamId,omitempty"`
+	TeamID    string `json:"teamId,omitempty"`
 	IsDeleted bool   `json:"isDeleted,omitempty"`
 	IsActive  bool   `json:"isActive,omitempty"`
 }

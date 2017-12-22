@@ -95,7 +95,7 @@ func MonitoringSearch(w http.ResponseWriter, r *http.Request,
 
 authorized:
 	cReq := proto.NewMonitoringFilter()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -149,7 +149,7 @@ func MonitoringShow(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Monitoring: proto.Monitoring{
-			Id: params.ByName(`monitoring`),
+			ID: params.ByName(`monitoring`),
 		},
 	}
 	result := <-returnChannel
@@ -172,7 +172,7 @@ func MonitoringAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewMonitoringRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -195,7 +195,7 @@ func MonitoringAdd(w http.ResponseWriter, r *http.Request,
 			Name:     cReq.Monitoring.Name,
 			Mode:     cReq.Monitoring.Mode,
 			Contact:  cReq.Monitoring.Contact,
-			TeamId:   cReq.Monitoring.TeamId,
+			TeamID:   cReq.Monitoring.TeamID,
 			Callback: cReq.Monitoring.Callback,
 		},
 	}
@@ -227,7 +227,7 @@ func MonitoringRemove(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Monitoring: proto.Monitoring{
-			Id: params.ByName(`monitoring`),
+			ID: params.ByName(`monitoring`),
 		},
 	}
 	result := <-returnChannel

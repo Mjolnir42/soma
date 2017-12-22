@@ -25,7 +25,7 @@ func (teg *Group) Receive(r ReceiveRequest) {
 		return
 	}
 loop:
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		if teg.Children[child].(Builder).GetType() == "node" {
 			continue loop
 		}

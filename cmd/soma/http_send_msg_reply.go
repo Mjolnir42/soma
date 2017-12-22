@@ -136,7 +136,7 @@ func SendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		result.OK()
 	case 202:
 		log.Printf(LogStrOK, r.Section, r.Action, r.Code, 202)
-		result.JobId = r.JobId
+		result.JobID = r.JobID
 		result.Accepted()
 	case 400:
 		log.Printf(LogStrOK, r.Section, r.Action, r.Code, 400)
@@ -181,7 +181,7 @@ buildJSON:
 	}
 
 dispatchJSON:
-	DispatchJsonReply(w, &bjson)
+	DispatchJSONReply(w, &bjson)
 	return
 }
 

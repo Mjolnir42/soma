@@ -49,7 +49,7 @@ JOIN   soma.buckets
   ON   node_bucket_assignment.bucket_id = buckets.bucket_id
 WHERE  nodes.node_id = $1;`
 
-	NodeBucketId = `
+	NodeBucketID = `
 SELECT snba.bucket_id
 FROM   soma.node_bucket_assignment snba
 WHERE  snba.node_id = $1;`
@@ -214,7 +214,7 @@ AND         node_deleted;`
 
 func init() {
 	m[NodeAdd] = `NodeAdd`
-	m[NodeBucketId] = `NodeBucketId`
+	m[NodeBucketID] = `NodeBucketID`
 	m[NodeCstProps] = `NodeCstProps`
 	m[NodeCustomPropertyForDelete] = `NodeCustomPropertyForDelete`
 	m[NodeDetails] = `NodeDetails`

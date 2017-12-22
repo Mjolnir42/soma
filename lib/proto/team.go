@@ -10,9 +10,9 @@
 package proto
 
 type Team struct {
-	Id       string       `json:"id,omitempty"`
+	ID       string       `json:"id,omitempty"`
 	Name     string       `json:"name,omitempty"`
-	LdapId   string       `json:"ldapId,omitempty"`
+	LdapID   string       `json:"ldapId,omitempty"`
 	IsSystem bool         `json:"isSystem,omitempty"`
 	Details  *TeamDetails `json:"details,omitempty"`
 }
@@ -23,12 +23,12 @@ type TeamDetails struct {
 
 type TeamFilter struct {
 	Name     string `json:"name,omitempty"`
-	LdapId   string `json:"ldapId,omitempty"`
+	LdapID   string `json:"ldapId,omitempty"`
 	IsSystem bool   `json:"isSystem,omitempty"`
 }
 
 func (p *Team) DeepCompare(a *Team) bool {
-	if p.Id != a.Id || p.Name != a.Name || p.LdapId != a.LdapId || p.IsSystem != a.IsSystem {
+	if p.ID != a.ID || p.Name != a.Name || p.LdapID != a.LdapID || p.IsSystem != a.IsSystem {
 		return false
 	}
 	return true

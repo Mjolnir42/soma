@@ -29,9 +29,9 @@ func newUserLookup() *userLookup {
 // add inserts a user into the cache
 func (m *userLookup) add(userID, userName, teamID string) {
 	u := &proto.User{
-		Id:       userID,
+		ID:       userID,
 		UserName: userName,
-		TeamId:   teamID,
+		TeamID:   teamID,
 	}
 	m.byName[userName] = u
 	m.byID[userID] = u
@@ -58,7 +58,7 @@ func (m *userLookup) rmByID(userID string) {
 	}
 
 	delete(m.byName, u.UserName)
-	delete(m.byID, u.Id)
+	delete(m.byID, u.ID)
 }
 
 // rmByName removes a user from the cache. The user is identified by
@@ -69,7 +69,7 @@ func (m *userLookup) rmByName(userName string) {
 		return
 	}
 
-	delete(m.byID, u.Id)
+	delete(m.byID, u.ID)
 	delete(m.byName, u.UserName)
 }
 

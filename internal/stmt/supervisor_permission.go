@@ -17,7 +17,6 @@ SELECT permission_id,
        permission_name
 FROM   soma.permissions;`
 
-
 	PermissionAdd = `
 INSERT INTO soma.permissions (
             permission_id,
@@ -53,7 +52,7 @@ WHERE  NOT EXISTS (
    FROM   soma.permission_grant_map
    WHERE  permission_id = $2::uuid);`
 
-	PermissionLookupGrantId = `
+	PermissionLookupGrantID = `
 SELECT permission_id
 FROM   soma.permission_grant_map
 WHERE  granted_permission_id = $1::uuid;`
@@ -173,7 +172,7 @@ func init() {
 	m[PermissionAdd] = `PermissionAdd`
 	m[PermissionLinkGrant] = `PermissionLinkGrant`
 	m[PermissionList] = `PermissionList`
-	m[PermissionLookupGrantId] = `PermissionLookupGrantId`
+	m[PermissionLookupGrantID] = `PermissionLookupGrantID`
 	m[PermissionMapEntry] = `PermissionMapEntry`
 	m[PermissionMappedActions] = `PermissionMappedActions`
 	m[PermissionMappedSections] = `PermissionMappedSections`

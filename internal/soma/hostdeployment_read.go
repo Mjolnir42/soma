@@ -106,7 +106,7 @@ func (r *HostDeploymentRead) get(q *msg.Request, mr *msg.Result) {
 
 	if idList, err = r.stmtInstancesForNode.Query(
 		q.Node.AssetID,
-		q.Monitoring.Id,
+		q.Monitoring.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -190,7 +190,7 @@ func (r *HostDeploymentRead) assemble(q *msg.Request, mr *msg.Result) {
 
 	if idList, err = r.stmtInstancesForNode.Query(
 		q.Node.AssetID,
-		q.Monitoring.Id,
+		q.Monitoring.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -275,7 +275,7 @@ assembleloop:
 			mr.HostDeployment = append(
 				mr.HostDeployment,
 				proto.HostDeployment{
-					CheckInstanceId: delID,
+					CheckInstanceID: delID,
 					DeleteInstance:  true,
 				},
 			)

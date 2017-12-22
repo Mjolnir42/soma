@@ -172,7 +172,7 @@ func (k *Kex) NextNonce() *[24]byte {
 		err   error
 	)
 
-	k.count += 1
+	k.count++
 	if ib, err = hex.DecodeString(k.InitializationVector); err != nil {
 		// hex decode failed
 		return nil

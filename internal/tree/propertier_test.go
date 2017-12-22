@@ -18,42 +18,42 @@ func TestSetProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
 
-	propUUID, _ := uuid.FromString(propId)
+	propUUID, _ := uuid.FromString(propID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// set property on repository
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -65,55 +65,55 @@ func TestSetProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	close(actionChan)
@@ -168,21 +168,21 @@ func TestSetProperty(t *testing.T) {
 		)
 	}
 
-	if _, ok := sTree.Child.PropertySystem[propId]; !ok {
+	if _, ok := sTree.Child.PropertySystem[propID]; !ok {
 		t.Error(
 			`Could not find property under requested id`,
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 1 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Expected bucket to have 1 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
-	for _, p := range sTree.Child.Children[buckId].(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != propId {
+	for _, p := range sTree.Child.Children[buckID].(*Bucket).PropertySystem {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -196,7 +196,7 @@ func TestSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -205,7 +205,7 @@ func TestSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -214,7 +214,7 @@ func TestSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -226,38 +226,38 @@ func TestUpdateProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
 
-	propUUID, _ := uuid.FromString(propId)
+	propUUID, _ := uuid.FromString(propID)
 
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -269,62 +269,62 @@ func TestUpdateProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).UpdateProperty(&PropertySystem{
-		SourceId:     propUUID,
+		SourceID:     propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -388,21 +388,21 @@ func TestUpdateProperty(t *testing.T) {
 		)
 	}
 
-	if _, ok := sTree.Child.PropertySystem[propId]; !ok {
+	if _, ok := sTree.Child.PropertySystem[propID]; !ok {
 		t.Error(
 			`Could not find property under requested id`,
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 1 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Expected bucket to have 1 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
-	for _, p := range sTree.Child.Children[buckId].(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != propId {
+	for _, p := range sTree.Child.Children[buckID].(*Bucket).PropertySystem {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -416,7 +416,7 @@ func TestUpdateProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -425,7 +425,7 @@ func TestUpdateProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -434,7 +434,7 @@ func TestUpdateProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -446,38 +446,38 @@ func TestDeleteProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
 
-	propUUID, _ := uuid.FromString(propId)
+	propUUID, _ := uuid.FromString(propID)
 
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -489,62 +489,62 @@ func TestDeleteProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).UpdateProperty(&PropertySystem{
-		SourceId:     propUUID,
+		SourceID:     propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -554,9 +554,9 @@ func TestDeleteProperty(t *testing.T) {
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).DeleteProperty(&PropertySystem{
-		SourceId: propUUID,
+		SourceID: propUUID,
 		View:     `testview`,
 		Key:      `testkey`,
 		Value:    `testvalue`,
@@ -624,16 +624,16 @@ func TestDeleteProperty(t *testing.T) {
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 0 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 0 {
 		t.Error(
 			`Expected bucket to have 0 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 0 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -642,7 +642,7 @@ func TestDeleteProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 0 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -651,7 +651,7 @@ func TestDeleteProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 0 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -663,38 +663,38 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
 
-	propUUID, _ := uuid.FromString(propId)
+	propUUID, _ := uuid.FromString(propID)
 
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  false,
@@ -706,62 +706,62 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).DeleteProperty(&PropertySystem{
-		SourceId: propUUID,
+		SourceID: propUUID,
 		View:     `testview`,
 		Key:      `testkey`,
 		Value:    `testvalue`,
@@ -816,16 +816,16 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 0 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 0 {
 		t.Error(
 			`Expected bucket to have 0 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 0 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -834,7 +834,7 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 0 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -843,7 +843,7 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 0 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -855,40 +855,40 @@ func TestOverwriteProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
-	overId := `90009000-9000-4000-9000-900090009000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
+	overID := `90009000-9000-4000-9000-900090009000`
 
-	propUUID, _ := uuid.FromString(propId)
-	overUUID, _ := uuid.FromString(overId)
+	propUUID, _ := uuid.FromString(propID)
+	overUUID, _ := uuid.FromString(overID)
 
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -900,62 +900,62 @@ func TestOverwriteProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).UpdateProperty(&PropertySystem{
-		SourceId:     propUUID,
+		SourceID:     propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -965,7 +965,7 @@ func TestOverwriteProperty(t *testing.T) {
 
 	sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           overUUID,
 		Inheritance:  true,
@@ -1038,21 +1038,21 @@ func TestOverwriteProperty(t *testing.T) {
 		)
 	}
 
-	if _, ok := sTree.Child.PropertySystem[propId]; !ok {
+	if _, ok := sTree.Child.PropertySystem[propID]; !ok {
 		t.Error(
 			`Could not find property under requested id`,
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 1 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Expected bucket to have 1 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
-	for _, p := range sTree.Child.Children[buckId].(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != propId {
+	for _, p := range sTree.Child.Children[buckID].(*Bucket).PropertySystem {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1066,7 +1066,7 @@ func TestOverwriteProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -1075,7 +1075,7 @@ func TestOverwriteProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -1084,7 +1084,7 @@ func TestOverwriteProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -1096,40 +1096,40 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
-	overId := `90009000-9000-4000-9000-900090009000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
+	overID := `90009000-9000-4000-9000-900090009000`
 
-	propUUID, _ := uuid.FromString(propId)
-	overUUID, _ := uuid.FromString(overId)
+	propUUID, _ := uuid.FromString(propID)
+	overUUID, _ := uuid.FromString(overID)
 
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -1141,63 +1141,63 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// node must have the property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1211,9 +1211,9 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).UpdateProperty(&PropertySystem{
-		SourceId:     propUUID,
+		SourceID:     propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1224,9 +1224,9 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 	// node must have the updated property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1240,7 +1240,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           overUUID,
 		Inheritance:  true,
@@ -1253,9 +1253,9 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 	// node must have the overwrite property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1269,9 +1269,9 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).UpdateProperty(&PropertySystem{
-		SourceId:     propUUID,
+		SourceID:     propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1344,22 +1344,22 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 		)
 	}
 
-	if _, ok := sTree.Child.PropertySystem[propId]; !ok {
+	if _, ok := sTree.Child.PropertySystem[propID]; !ok {
 		t.Error(
 			`Could not find property under requested id`,
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 1 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Expected bucket to have 1 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
 	// bucket must have the update after overwrite property
-	for _, p := range sTree.Child.Children[buckId].(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != propId {
+	for _, p := range sTree.Child.Children[buckID].(*Bucket).PropertySystem {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1373,7 +1373,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -1382,7 +1382,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -1391,7 +1391,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -1401,9 +1401,9 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 	// node must still have the overwrite property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1420,97 +1420,97 @@ func TestSetAboveSetProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
-	overId := `90009000-9000-4000-9000-900090009000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
+	overID := `90009000-9000-4000-9000-900090009000`
 
-	propUUID, _ := uuid.FromString(propId)
-	overUUID, _ := uuid.FromString(overId)
+	propUUID, _ := uuid.FromString(propID)
+	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// set property on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -1523,7 +1523,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 	// set property on bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           overUUID,
 		Inheritance:  true,
@@ -1587,7 +1587,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Bucket has wrong system property count`,
@@ -1596,7 +1596,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -1605,7 +1605,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -1614,7 +1614,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -1624,9 +1624,9 @@ func TestSetAboveSetProperty(t *testing.T) {
 	// bucket must have the above property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1641,9 +1641,9 @@ func TestSetAboveSetProperty(t *testing.T) {
 	// group must have the above property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1658,9 +1658,9 @@ func TestSetAboveSetProperty(t *testing.T) {
 	// cluster must have the lower property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1675,9 +1675,9 @@ func TestSetAboveSetProperty(t *testing.T) {
 	// node must have the lower property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1695,97 +1695,97 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
-	overId := `90009000-9000-4000-9000-900090009000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
+	overID := `90009000-9000-4000-9000-900090009000`
 
-	propUUID, _ := uuid.FromString(propId)
-	overUUID, _ := uuid.FromString(overId)
+	propUUID, _ := uuid.FromString(propID)
+	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// set property on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -1798,7 +1798,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 	// set property on bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           overUUID,
 		Inheritance:  true,
@@ -1811,9 +1811,9 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 	// delete property on bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).DeleteProperty(&PropertySystem{
-		SourceId: overUUID,
+		SourceID: overUUID,
 		View:     `testview`,
 		Key:      `testkey`,
 		Value:    `testABOVE`,
@@ -1875,7 +1875,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem) != 0 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -1884,7 +1884,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 0 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -1893,7 +1893,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -1902,7 +1902,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -1912,9 +1912,9 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 	// cluster must have the lower property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1929,9 +1929,9 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 	// node must have the lower property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -1949,92 +1949,92 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
 
-	propUUID, _ := uuid.FromString(propId)
+	propUUID, _ := uuid.FromString(propID)
 
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// set property with no inheritance
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  false,
@@ -2046,7 +2046,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 0 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -2056,9 +2056,9 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 	// update property with inheritance
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).UpdateProperty(&PropertySystem{
-		SourceId:     propUUID,
+		SourceID:     propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -2123,21 +2123,21 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 		)
 	}
 
-	if _, ok := sTree.Child.PropertySystem[propId]; !ok {
+	if _, ok := sTree.Child.PropertySystem[propID]; !ok {
 		t.Error(
 			`Could not find property under requested id`,
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 1 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Expected bucket to have 1 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
-	for _, p := range sTree.Child.Children[buckId].(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != propId {
+	for _, p := range sTree.Child.Children[buckID].(*Bucket).PropertySystem {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -2151,7 +2151,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -2160,7 +2160,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -2169,7 +2169,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -2181,92 +2181,92 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
 
-	propUUID, _ := uuid.FromString(propId)
+	propUUID, _ := uuid.FromString(propID)
 
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// set property with inheritance
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -2279,7 +2279,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 	// node must inherited property
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -2287,9 +2287,9 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 	}
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -2304,9 +2304,9 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 	// update property with no inheritance
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).UpdateProperty(&PropertySystem{
-		SourceId:     propUUID,
+		SourceID:     propUUID,
 		Inheritance:  false,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -2375,22 +2375,22 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 		)
 	}
 
-	if _, ok := sTree.Child.PropertySystem[propId]; !ok {
+	if _, ok := sTree.Child.PropertySystem[propID]; !ok {
 		t.Error(
 			`Could not find property under requested id`,
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 0 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 0 {
 		t.Error(
 			`Expected bucket to have 0 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 0 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -2399,7 +2399,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 0 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -2408,7 +2408,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 0 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -2420,97 +2420,97 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
-	overId := `90009000-9000-4000-9000-900090009000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
+	overID := `90009000-9000-4000-9000-900090009000`
 
-	propUUID, _ := uuid.FromString(propId)
-	overUUID, _ := uuid.FromString(overId)
+	propUUID, _ := uuid.FromString(propID)
+	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// set property on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -2523,7 +2523,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 	// set property on bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           overUUID,
 		Inheritance:  true,
@@ -2535,7 +2535,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 2 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -2545,7 +2545,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 	// delete locally set properties on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).deletePropertyAllLocal()
 
 	close(actionChan)
@@ -2606,7 +2606,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Bucket has wrong system property count`,
@@ -2615,7 +2615,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -2624,7 +2624,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -2633,7 +2633,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -2643,9 +2643,9 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 	// bucket must have the high property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyHIGH` {
@@ -2660,9 +2660,9 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 	// group must have the high property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyHIGH` {
@@ -2677,9 +2677,9 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 	// cluster must have the high property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyHIGH` {
@@ -2694,9 +2694,9 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 	// node must have the high property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyHIGH` {
@@ -2714,97 +2714,97 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
-	overId := `90009000-9000-4000-9000-900090009000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
+	overID := `90009000-9000-4000-9000-900090009000`
 
-	propUUID, _ := uuid.FromString(propId)
-	overUUID, _ := uuid.FromString(overId)
+	propUUID, _ := uuid.FromString(propID)
+	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// set property on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -2817,7 +2817,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 	// set property on bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           overUUID,
 		Inheritance:  true,
@@ -2829,7 +2829,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 2 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -2839,7 +2839,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 	// delete inherited properties on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).deletePropertyAllInherited()
 
 	close(actionChan)
@@ -2900,7 +2900,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Bucket has wrong system property count`,
@@ -2909,7 +2909,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -2918,7 +2918,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -2927,7 +2927,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -2937,9 +2937,9 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 	// bucket must have the high property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyHIGH` {
@@ -2954,9 +2954,9 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 	// group must have the high property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyHIGH` {
@@ -2971,9 +2971,9 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 	// cluster must have the low property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyLOW` {
@@ -2988,9 +2988,9 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 	// node must have the low property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != propId {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyLOW` {
@@ -3008,97 +3008,97 @@ func TestDeletePropertyAll(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
-	overId := `90009000-9000-4000-9000-900090009000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
+	overID := `90009000-9000-4000-9000-900090009000`
 
-	propUUID, _ := uuid.FromString(propId)
-	overUUID, _ := uuid.FromString(overId)
+	propUUID, _ := uuid.FromString(propID)
+	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// set property on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -3111,7 +3111,7 @@ func TestDeletePropertyAll(t *testing.T) {
 	// set property on bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           overUUID,
 		Inheritance:  true,
@@ -3123,7 +3123,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 2 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -3133,12 +3133,12 @@ func TestDeletePropertyAll(t *testing.T) {
 	// delete inherited properties on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).deletePropertyAllInherited()
 	// delete locally set properties on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).deletePropertyAllLocal()
 
 	close(actionChan)
@@ -3201,7 +3201,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Bucket has wrong system property count`,
@@ -3210,7 +3210,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -3219,7 +3219,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 0 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -3228,7 +3228,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 0 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -3238,9 +3238,9 @@ func TestDeletePropertyAll(t *testing.T) {
 	// bucket must have the high property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyHIGH` {
@@ -3255,9 +3255,9 @@ func TestDeletePropertyAll(t *testing.T) {
 	// group must have the high property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkeyHIGH` {
@@ -3274,97 +3274,97 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
-	overId := `90009000-9000-4000-9000-900090009000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
+	overID := `90009000-9000-4000-9000-900090009000`
 
-	propUUID, _ := uuid.FromString(propId)
-	overUUID, _ := uuid.FromString(overId)
+	propUUID, _ := uuid.FromString(propID)
+	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	// set property on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -3377,7 +3377,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 	// set property on bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           overUUID,
 		Inheritance:  true,
@@ -3390,9 +3390,9 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 	// delete property on cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(Propertier).DeleteProperty(&PropertySystem{
-		SourceId: propUUID,
+		SourceID: propUUID,
 		View:     `testview`,
 		Key:      `testkey`,
 		Value:    `testLOWER`,
@@ -3456,7 +3456,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Bucket has wrong system property count`,
@@ -3465,7 +3465,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -3474,7 +3474,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -3483,7 +3483,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -3493,9 +3493,9 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 	// cluster must have the above property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -3510,9 +3510,9 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 	// node must have the above property
 	for _, p := range sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem {
-		if p.GetSourceInstance() != overId {
+		if p.GetSourceInstance() != overID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -3530,41 +3530,41 @@ func TestCloneAfterProperty(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	grupId := `60006000-6000-4000-6000-600060006000`
-	cltrId := `70007000-7000-4000-7000-700070007000`
-	nodeId := `80008000-8000-4000-8000-800080008000`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	grupID := `60006000-6000-4000-6000-600060006000`
+	cltrID := `70007000-7000-4000-7000-700070007000`
+	nodeID := `80008000-8000-4000-8000-800080008000`
 
-	propUUID, _ := uuid.FromString(propId)
+	propUUID, _ := uuid.FromString(propID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// set property on repository
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -3576,55 +3576,55 @@ func TestCloneAfterProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupId,
+		Id:   grupID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrId,
+		Id:   cltrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grupId,
+		ParentID:   grupID,
 	})
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: `00000000-0000-0000-0000-000000000000`,
+		Team:     teamID,
+		ServerID: `00000000-0000-0000-0000-000000000000`,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   cltrId,
+		ParentID:   cltrID,
 	})
 
 	sTree.Begin()
@@ -3683,21 +3683,21 @@ func TestCloneAfterProperty(t *testing.T) {
 		)
 	}
 
-	if _, ok := sTree.Child.PropertySystem[propId]; !ok {
+	if _, ok := sTree.Child.PropertySystem[propID]; !ok {
 		t.Error(
 			`Could not find property under requested id`,
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 1 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Expected bucket to have 1 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
-	for _, p := range sTree.Child.Children[buckId].(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != propId {
+	for _, p := range sTree.Child.Children[buckID].(*Bucket).PropertySystem {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {
@@ -3711,7 +3711,7 @@ func TestCloneAfterProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grupId,
+		ElementID:   grupID,
 	}, true).(*Group).PropertySystem) != 1 {
 		t.Error(
 			`Group has wrong system property count`,
@@ -3720,7 +3720,7 @@ func TestCloneAfterProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   cltrId,
+		ElementID:   cltrID,
 	}, true).(*Cluster).PropertySystem) != 1 {
 		t.Error(
 			`Cluster has wrong system property count`,
@@ -3729,7 +3729,7 @@ func TestCloneAfterProperty(t *testing.T) {
 
 	if len(sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).PropertySystem) != 1 {
 		t.Error(
 			`Node has wrong system property count`,
@@ -3741,57 +3741,57 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 	actionChan := make(chan *Action, 1024)
 	errChan := make(chan *Error, 1024)
 
-	treeId := `10001000-1000-4000-1000-100010001000`
-	repoId := `20002000-2000-4000-2000-200020002000`
-	propId := `30003000-3000-4000-3000-300030003000`
-	teamId := `40004000-4000-4000-4000-400040004000`
-	buckId := `50005000-5000-4000-5000-500050005000`
-	dupeId := `99999999-9999-4999-9999-999999999999`
+	treeID := `10001000-1000-4000-1000-100010001000`
+	repoID := `20002000-2000-4000-2000-200020002000`
+	propID := `30003000-3000-4000-3000-300030003000`
+	teamID := `40004000-4000-4000-4000-400040004000`
+	buckID := `50005000-5000-4000-5000-500050005000`
+	dupeID := `99999999-9999-4999-9999-999999999999`
 
-	propUUID, _ := uuid.FromString(propId)
-	dupeUUID, _ := uuid.FromString(dupeId)
+	propUUID, _ := uuid.FromString(propID)
+	dupeUUID, _ := uuid.FromString(dupeID)
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     treeId,
+		Id:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `testrepo`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   treeId,
+		ParentID:   treeID,
 	})
 	sTree.SetError(errChan)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: "repository",
-		ParentId:   `repoId`,
+		ParentID:   `repoID`,
 		ParentName: `testrepo`,
 	})
 
 	// set property on bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           propUUID,
 		Inheritance:  true,
@@ -3804,7 +3804,7 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 	// set property on bucket, again
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
 		Id:           dupeUUID,
 		Inheritance:  true,
@@ -3865,15 +3865,15 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 		)
 	}
 
-	if len(sTree.Child.Children[buckId].(*Bucket).PropertySystem) != 1 {
+	if len(sTree.Child.Children[buckID].(*Bucket).PropertySystem) != 1 {
 		t.Error(
 			`Expected bucket to have 1 system property, found`,
-			len(sTree.Child.Children[buckId].(*Bucket).PropertySystem),
+			len(sTree.Child.Children[buckID].(*Bucket).PropertySystem),
 		)
 	}
 
-	for _, p := range sTree.Child.Children[buckId].(*Bucket).PropertySystem {
-		if p.GetSourceInstance() != propId {
+	for _, p := range sTree.Child.Children[buckID].(*Bucket).PropertySystem {
+		if p.GetSourceInstance() != propID {
 			t.Error(`Wrong source id`, p.GetSourceInstance())
 		}
 		if p.GetKey() != `testkey` {

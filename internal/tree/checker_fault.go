@@ -34,10 +34,10 @@ func (tef *Fault) deleteCheckOnChildren(c Check) {
 func (tef *Fault) rmCheck(c Check) {
 }
 
-func (tef *Fault) syncCheck(childId string) {
+func (tef *Fault) syncCheck(childID string) {
 }
 
-func (tef *Fault) checkCheck(checkId string) bool {
+func (tef *Fault) checkCheck(checkID string) bool {
 	return false
 }
 

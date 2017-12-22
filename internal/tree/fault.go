@@ -17,7 +17,7 @@ import (
 )
 
 type Fault struct {
-	Id     uuid.UUID
+	ID     uuid.UUID
 	Name   string
 	Type   string
 	State  string
@@ -31,7 +31,7 @@ type Fault struct {
 // NEW
 func newFault() *Fault {
 	tef := new(Fault)
-	tef.Id = uuid.NewV4()
+	tef.ID = uuid.NewV4()
 	tef.Type = "fault"
 	tef.Name = "McFaulty"
 	tef.Errors = make([]error, 0)
@@ -51,7 +51,7 @@ func (tef *Fault) getErrors() []error {
 //
 // Interface: Builder
 func (tef *Fault) GetID() string {
-	return tef.Id.String()
+	return tef.ID.String()
 }
 
 func (tef *Fault) GetName() string {
@@ -90,7 +90,7 @@ func (tef *Fault) setAction(c chan *Action) {
 		tef.Action <- &Action{
 			Action: "create",
 			Type:   "fault",
-			//Id:     tef.Id.String(),
+			//Id:     tef.ID.String(),
 			//Name:   tef.Name,
 		}
 	}

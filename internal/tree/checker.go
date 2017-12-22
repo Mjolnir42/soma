@@ -33,33 +33,33 @@ type Checker interface {
 	deleteCheckOnChildren(c Check)
 	rmCheck(c Check)
 
-	syncCheck(childId string)
-	checkCheck(checkId string) bool
+	syncCheck(childID string)
+	checkCheck(checkID string) bool
 }
 
 type CheckGetter interface {
-	GetCheckId() string
-	GetSourceCheckId() string
-	GetCheckConfigId() string
+	GetCheckID() string
+	GetSourceCheckID() string
+	GetCheckConfigID() string
 	GetSourceType() string
 	GetIsInherited() bool
 	GetInheritedFrom() string
 	GetInheritance() bool
 	GetChildrenOnly() bool
 	GetView() string
-	GetCapabilityId() string
+	GetCapabilityID() string
 	GetInterval() uint64
-	GetItemId(objType string, objId uuid.UUID) uuid.UUID
+	GetItemID(objType string, objID uuid.UUID) uuid.UUID
 }
 
 type Check struct {
-	Id            uuid.UUID
-	SourceId      uuid.UUID
+	ID            uuid.UUID
+	SourceID      uuid.UUID
 	SourceType    string
 	Inherited     bool
 	InheritedFrom uuid.UUID
-	CapabilityId  uuid.UUID
-	ConfigId      uuid.UUID
+	CapabilityID  uuid.UUID
+	ConfigID      uuid.UUID
 	Inheritance   bool
 	ChildrenOnly  bool
 	View          string
@@ -78,24 +78,24 @@ func (c *Check) Clone() Check {
 		View:         c.View,
 		Interval:     c.Interval,
 	}
-	ng.Id, _ = uuid.FromString(c.Id.String())
-	ng.SourceId, _ = uuid.FromString(c.SourceId.String())
+	ng.ID, _ = uuid.FromString(c.ID.String())
+	ng.SourceID, _ = uuid.FromString(c.SourceID.String())
 	ng.InheritedFrom, _ = uuid.FromString(c.InheritedFrom.String())
-	ng.CapabilityId, _ = uuid.FromString(c.CapabilityId.String())
-	ng.ConfigId, _ = uuid.FromString(c.ConfigId.String())
+	ng.CapabilityID, _ = uuid.FromString(c.CapabilityID.String())
+	ng.ConfigID, _ = uuid.FromString(c.ConfigID.String())
 
 	ng.Thresholds = make([]CheckThreshold, len(c.Thresholds))
-	for i, _ := range c.Thresholds {
+	for i := range c.Thresholds {
 		ng.Thresholds[i] = c.Thresholds[i].Clone()
 	}
 
 	ng.Constraints = make([]CheckConstraint, len(c.Constraints))
-	for i, _ := range c.Constraints {
+	for i := range c.Constraints {
 		ng.Constraints[i] = c.Constraints[i].Clone()
 	}
 
 	ng.Items = make([]CheckItem, len(c.Items))
-	for i, _ := range c.Items {
+	for i := range c.Items {
 		ng.Items[i] = c.Items[i].Clone()
 	}
 
@@ -103,18 +103,18 @@ func (c *Check) Clone() Check {
 }
 
 type CheckItem struct {
-	ObjectId   uuid.UUID
+	ObjectID   uuid.UUID
 	ObjectType string
-	ItemId     uuid.UUID
+	ItemID     uuid.UUID
 }
 
 func (ci *CheckItem) Clone() CheckItem {
-	oid, _ := uuid.FromString(ci.ObjectId.String())
-	iid, _ := uuid.FromString(ci.ItemId.String())
+	oid, _ := uuid.FromString(ci.ObjectID.String())
+	iid, _ := uuid.FromString(ci.ItemID.String())
 	return CheckItem{
-		ObjectId:   oid,
+		ObjectID:   oid,
 		ObjectType: ci.ObjectType,
-		ItemId:     iid,
+		ItemID:     iid,
 	}
 }
 
@@ -147,10 +147,10 @@ func (cc *CheckConstraint) Clone() CheckConstraint {
 }
 
 type CheckInstance struct {
-	InstanceId            uuid.UUID
-	CheckId               uuid.UUID
-	ConfigId              uuid.UUID
-	InstanceConfigId      uuid.UUID
+	InstanceID            uuid.UUID
+	CheckID               uuid.UUID
+	ConfigID              uuid.UUID
+	InstanceConfigID      uuid.UUID
 	Version               uint64
 	ConstraintHash        string
 	ConstraintValHash     string
@@ -159,34 +159,34 @@ type CheckInstance struct {
 	ConstraintSystem      map[string]string              // Id->value
 	ConstraintCustom      map[string]string              // Id->value
 	ConstraintNative      map[string]string              // prop->value
-	ConstraintAttribute   map[string]map[string][]string // svcId->attr->[ value, value, ... ]
+	ConstraintAttribute   map[string]map[string][]string // svcID->attr->[ value, value, ... ]
 	InstanceServiceConfig map[string]string              // attr->value
 	InstanceService       string
 	InstanceSvcCfgHash    string
 }
 
-func (c *Check) GetItemId(objType string, objId uuid.UUID) uuid.UUID {
-	if !uuid.Equal(c.Id, uuid.Nil) {
-		return c.Id
+func (c *Check) GetItemID(objType string, objID uuid.UUID) uuid.UUID {
+	if !uuid.Equal(c.ID, uuid.Nil) {
+		return c.ID
 	}
 	for _, item := range c.Items {
-		if objType == item.ObjectType && uuid.Equal(item.ObjectId, objId) {
-			return item.ItemId
+		if objType == item.ObjectType && uuid.Equal(item.ObjectID, objID) {
+			return item.ItemID
 		}
 	}
 	return uuid.Nil
 }
 
-func (c *Check) GetCheckId() string {
-	return c.Id.String()
+func (c *Check) GetCheckID() string {
+	return c.ID.String()
 }
 
-func (c *Check) GetSourceCheckId() string {
-	return c.SourceId.String()
+func (c *Check) GetSourceCheckID() string {
+	return c.SourceID.String()
 }
 
-func (c *Check) GetCheckConfigId() string {
-	return c.ConfigId.String()
+func (c *Check) GetCheckConfigID() string {
+	return c.ConfigID.String()
 }
 
 func (c *Check) GetSourceType() string {
@@ -213,8 +213,8 @@ func (c *Check) GetView() string {
 	return c.View
 }
 
-func (c *Check) GetCapabilityId() string {
-	return c.CapabilityId.String()
+func (c *Check) GetCapabilityID() string {
+	return c.CapabilityID.String()
 }
 
 func (c *Check) GetInterval() uint64 {
@@ -224,15 +224,15 @@ func (c *Check) GetInterval() uint64 {
 func (c *Check) MakeAction() Action {
 	return Action{
 		Check: proto.Check{
-			CheckId:       c.GetCheckId(),
-			SourceCheckId: c.GetSourceCheckId(),
-			CheckConfigId: c.GetCheckConfigId(),
+			CheckID:       c.GetCheckID(),
+			SourceCheckID: c.GetSourceCheckID(),
+			CheckConfigID: c.GetCheckConfigID(),
 			SourceType:    c.GetSourceType(),
 			IsInherited:   c.GetIsInherited(),
 			InheritedFrom: c.GetInheritedFrom(),
 			Inheritance:   c.GetInheritance(),
 			ChildrenOnly:  c.GetChildrenOnly(),
-			CapabilityId:  c.GetCapabilityId(),
+			CapabilityID:  c.GetCapabilityID(),
 		},
 	}
 }
@@ -246,10 +246,10 @@ func (tci *CheckInstance) Clone() CheckInstance {
 		InstanceSvcCfgHash: tci.InstanceSvcCfgHash,
 		InstanceService:    tci.InstanceService,
 	}
-	cl.InstanceConfigId, _ = uuid.FromString(tci.InstanceConfigId.String())
-	cl.InstanceId, _ = uuid.FromString(tci.InstanceId.String())
-	cl.CheckId, _ = uuid.FromString(tci.CheckId.String())
-	cl.ConfigId, _ = uuid.FromString(tci.ConfigId.String())
+	cl.InstanceConfigID, _ = uuid.FromString(tci.InstanceConfigID.String())
+	cl.InstanceID, _ = uuid.FromString(tci.InstanceID.String())
+	cl.CheckID, _ = uuid.FromString(tci.CheckID.String())
+	cl.ConfigID, _ = uuid.FromString(tci.ConfigID.String())
 	cl.ConstraintService = make(map[string]string)
 	for k, v := range tci.ConstraintService {
 		t := v
@@ -276,7 +276,7 @@ func (tci *CheckInstance) Clone() CheckInstance {
 		cl.InstanceServiceConfig[k] = t
 	}
 	cl.ConstraintAttribute = make(map[string]map[string][]string, 0)
-	for k, _ := range tci.ConstraintAttribute {
+	for k := range tci.ConstraintAttribute {
 		cl.ConstraintAttribute[k] = make(map[string][]string)
 		for k2, aVal := range tci.ConstraintAttribute[k] {
 			for _, val := range aVal {
@@ -294,7 +294,7 @@ func (tci *CheckInstance) calcConstraintHash() {
 	io.WriteString(h, tci.ConstraintOncall)
 
 	services := []string{}
-	for i, _ := range tci.ConstraintService {
+	for i := range tci.ConstraintService {
 		j := i
 		services = append(services, j)
 	}
@@ -304,7 +304,7 @@ func (tci *CheckInstance) calcConstraintHash() {
 	}
 
 	systems := []string{}
-	for i, _ := range tci.ConstraintSystem {
+	for i := range tci.ConstraintSystem {
 		j := i
 		systems = append(systems, j)
 	}
@@ -314,7 +314,7 @@ func (tci *CheckInstance) calcConstraintHash() {
 	}
 
 	customs := []string{}
-	for i, _ := range tci.ConstraintCustom {
+	for i := range tci.ConstraintCustom {
 		j := i
 		customs = append(customs, j)
 	}
@@ -324,7 +324,7 @@ func (tci *CheckInstance) calcConstraintHash() {
 	}
 
 	natives := []string{}
-	for i, _ := range tci.ConstraintNative {
+	for i := range tci.ConstraintNative {
 		j := i
 		natives = append(natives, j)
 	}
@@ -334,14 +334,14 @@ func (tci *CheckInstance) calcConstraintHash() {
 	}
 
 	attributes := []string{}
-	for i, _ := range tci.ConstraintAttribute {
+	for i := range tci.ConstraintAttribute {
 		j := i
 		attributes = append(attributes, j)
 	}
 	sort.Strings(attributes)
 	for _, i := range attributes {
 		svcattr := []string{}
-		for j, _ := range tci.ConstraintAttribute[i] {
+		for j := range tci.ConstraintAttribute[i] {
 			k := j
 			svcattr = append(svcattr, k)
 		}
@@ -359,7 +359,7 @@ func (tci *CheckInstance) calcConstraintValHash() {
 	io.WriteString(h, tci.ConstraintOncall)
 
 	services := []string{}
-	for i, _ := range tci.ConstraintService {
+	for i := range tci.ConstraintService {
 		j := i
 		services = append(services, j)
 	}
@@ -370,7 +370,7 @@ func (tci *CheckInstance) calcConstraintValHash() {
 	}
 
 	systems := []string{}
-	for i, _ := range tci.ConstraintSystem {
+	for i := range tci.ConstraintSystem {
 		j := i
 		systems = append(systems, j)
 	}
@@ -381,7 +381,7 @@ func (tci *CheckInstance) calcConstraintValHash() {
 	}
 
 	customs := []string{}
-	for i, _ := range tci.ConstraintCustom {
+	for i := range tci.ConstraintCustom {
 		j := i
 		customs = append(customs, j)
 	}
@@ -392,7 +392,7 @@ func (tci *CheckInstance) calcConstraintValHash() {
 	}
 
 	natives := []string{}
-	for i, _ := range tci.ConstraintNative {
+	for i := range tci.ConstraintNative {
 		j := i
 		natives = append(natives, j)
 	}
@@ -403,14 +403,14 @@ func (tci *CheckInstance) calcConstraintValHash() {
 	}
 
 	attributes := []string{}
-	for i, _ := range tci.ConstraintAttribute {
+	for i := range tci.ConstraintAttribute {
 		j := i
 		attributes = append(attributes, j)
 	}
 	sort.Strings(attributes)
 	for _, i := range attributes {
 		svcattr := []string{}
-		for j, _ := range tci.ConstraintAttribute[i] {
+		for j := range tci.ConstraintAttribute[i] {
 			k := j
 			svcattr = append(svcattr, k)
 		}
@@ -433,7 +433,7 @@ func (tci *CheckInstance) calcInstanceSvcCfgHash() {
 	h := sha512.New()
 
 	attributes := []string{}
-	for i, _ := range tci.InstanceServiceConfig {
+	for i := range tci.InstanceServiceConfig {
 		j := i
 		attributes = append(attributes, j)
 	}
@@ -445,23 +445,23 @@ func (tci *CheckInstance) calcInstanceSvcCfgHash() {
 	tci.InstanceSvcCfgHash = base64.URLEncoding.EncodeToString(h.Sum(nil))
 }
 
-func (ci CheckInstance) MakeAction() Action {
-	serviceCfg, err := json.Marshal(ci.InstanceServiceConfig)
+func (tci CheckInstance) MakeAction() Action {
+	serviceCfg, err := json.Marshal(tci.InstanceServiceConfig)
 	if err != nil {
 		serviceCfg = []byte{}
 	}
 
 	return Action{
 		CheckInstance: proto.CheckInstance{
-			InstanceId:            ci.InstanceId.String(),
-			CheckId:               ci.CheckId.String(),
-			ConfigId:              ci.ConfigId.String(),
-			InstanceConfigId:      ci.InstanceConfigId.String(),
-			Version:               ci.Version,
-			ConstraintHash:        ci.ConstraintHash,
-			ConstraintValHash:     ci.ConstraintValHash,
-			InstanceSvcCfgHash:    ci.InstanceSvcCfgHash,
-			InstanceService:       ci.InstanceService,
+			InstanceID:            tci.InstanceID.String(),
+			CheckID:               tci.CheckID.String(),
+			ConfigID:              tci.ConfigID.String(),
+			InstanceConfigID:      tci.InstanceConfigID.String(),
+			Version:               tci.Version,
+			ConstraintHash:        tci.ConstraintHash,
+			ConstraintValHash:     tci.ConstraintValHash,
+			InstanceSvcCfgHash:    tci.InstanceSvcCfgHash,
+			InstanceService:       tci.InstanceService,
 			InstanceServiceConfig: string(serviceCfg),
 		},
 	}

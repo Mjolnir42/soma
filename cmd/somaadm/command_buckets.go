@@ -168,7 +168,7 @@ func cmdBucketCreate(c *cli.Context) error {
 		return err
 	}
 
-	repoId, err := adm.LookupRepoId(opts[`repository`][0])
+	repoID, err := adm.LookupRepoID(opts[`repository`][0])
 	if err != nil {
 		return err
 	}
@@ -183,7 +183,7 @@ func cmdBucketCreate(c *cli.Context) error {
 	req := proto.Request{
 		Bucket: &proto.Bucket{
 			Name:         c.Args().First(),
-			RepositoryID: repoId,
+			RepositoryID: repoID,
 			Environment:  opts["environment"][0],
 		},
 	}
@@ -206,12 +206,12 @@ func cmdBucketDelete(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	buckId, err := adm.LookupBucketId(c.Args().First())
+	buckID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/bucket/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -225,7 +225,7 @@ func cmdBucketRestore(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	buckId, err := adm.LookupBucketId(c.Args().First())
+	buckID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -236,7 +236,7 @@ func cmdBucketRestore(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/bucket/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -250,7 +250,7 @@ func cmdBucketPurge(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	buckId, err := adm.LookupBucketId(c.Args().First())
+	buckID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -260,7 +260,7 @@ func cmdBucketPurge(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/bucket/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckID)
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 
@@ -274,7 +274,7 @@ func cmdBucketFreeze(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	buckId, err := adm.LookupBucketId(c.Args().First())
+	buckID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -285,7 +285,7 @@ func cmdBucketFreeze(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/bucket/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -299,7 +299,7 @@ func cmdBucketThaw(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	buckId, err := adm.LookupBucketId(c.Args().First())
+	buckID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -310,7 +310,7 @@ func cmdBucketThaw(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/bucket/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -325,7 +325,7 @@ func cmdBucketRename(c *cli.Context) error {
 	); err != nil {
 		return err
 	}
-	buckId, err := adm.LookupBucketId(c.Args().First())
+	buckID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -336,7 +336,7 @@ func cmdBucketRename(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/bucket/%s", buckId)
+	path := fmt.Sprintf("/bucket/%s", buckID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -352,12 +352,12 @@ func cmdBucketShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	bucketId, err := adm.LookupBucketId(c.Args().First())
+	bucketID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/bucket/%s", bucketId)
+	path := fmt.Sprintf("/bucket/%s", bucketID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -365,12 +365,12 @@ func cmdBucketInstance(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	bucketId, err := adm.LookupBucketId(c.Args().First())
+	bucketID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/bucket/%s/instances/", bucketId)
+	path := fmt.Sprintf("/bucket/%s/instances/", bucketID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
@@ -378,12 +378,12 @@ func cmdBucketTree(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	bucketId, err := adm.LookupBucketId(c.Args().First())
+	bucketID, err := adm.LookupBucketID(c.Args().First())
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/bucket/%s/tree/tree", bucketId)
+	path := fmt.Sprintf("/bucket/%s/tree/tree", bucketID)
 	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 
@@ -436,7 +436,7 @@ func cmdBucketPropertyDelete(c *cli.Context, pType string) error {
 	); err != nil {
 		return err
 	}
-	bucketId, err := adm.LookupBucketId(opts[`from`][0])
+	bucketID, err := adm.LookupBucketID(opts[`from`][0])
 	if err != nil {
 		return err
 	}
@@ -447,14 +447,14 @@ func cmdBucketPropertyDelete(c *cli.Context, pType string) error {
 			return err
 		}
 	}
-	var sourceId string
+	var sourceID string
 	if err := adm.FindBucketPropSrcID(pType, c.Args().First(),
-		opts[`view`][0], bucketId, &sourceId); err != nil {
+		opts[`view`][0], bucketID, &sourceID); err != nil {
 		return err
 	}
 
 	path := fmt.Sprintf("/bucket/%s/property/%s/%s",
-		bucketId, pType, sourceId)
+		bucketID, pType, sourceID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 

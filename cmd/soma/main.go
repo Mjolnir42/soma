@@ -31,7 +31,7 @@ var (
 	// config file runtime configuration
 	SomaCfg config.Config
 	// Orderly shutdown of the system has been called. GrimReaper is active
-	ShutdownInProgress bool = false
+	ShutdownInProgress = false
 	// lookup table of logfile handles for logrotate reopen
 	logFileMap = make(map[string]*reopen.FileWriter)
 	// Global metrics registry
@@ -43,7 +43,10 @@ var (
 const (
 	// Format string for millisecond precision RFC3339
 	rfc3339Milli string = "2006-01-02T15:04:05.000Z07:00"
-	// Logging format strings
+)
+
+// Logging format strings
+const (
 	LogStrReq = `Subsystem=%s, Request=%s, User=%s, Addr=%s`
 	LogStrSRq = `Section=%s, Action=%s, User=%s, Addr=%s`
 	LogStrArg = `Subsystem=%s, Request=%s, User=%s, Addr=%s, Arg=%s`

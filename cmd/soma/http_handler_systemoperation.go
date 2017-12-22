@@ -15,7 +15,7 @@ func SystemOperation(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.NewSystemOperationRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -27,18 +27,18 @@ func SystemOperation(w http.ResponseWriter, r *http.Request,
 	case `repository_stop`:
 		sys = &proto.SystemOperation{
 			Request:      cReq.SystemOperation.Request,
-			RepositoryId: cReq.SystemOperation.RepositoryId,
+			RepositoryID: cReq.SystemOperation.RepositoryID,
 		}
 	case `repository_rebuild`:
 		sys = &proto.SystemOperation{
 			Request:      cReq.SystemOperation.Request,
-			RepositoryId: cReq.SystemOperation.RepositoryId,
+			RepositoryID: cReq.SystemOperation.RepositoryID,
 			RebuildLevel: cReq.SystemOperation.RebuildLevel,
 		}
 	case `repository_restart`:
 		sys = &proto.SystemOperation{
 			Request:      cReq.SystemOperation.Request,
-			RepositoryId: cReq.SystemOperation.RepositoryId,
+			RepositoryID: cReq.SystemOperation.RepositoryID,
 		}
 	case `shutdown`:
 	default:

@@ -24,7 +24,7 @@ func (r *GroupRead) oncallProperties(group *proto.Group) error {
 	)
 
 	if rows, err = r.stmtPropOncall.Query(
-		group.Id,
+		group.ID,
 	); err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (r *GroupRead) oncallProperties(group *proto.Group) error {
 		*group.Properties = append(*group.Properties,
 			proto.Property{
 				Type:             `oncall`,
-				BucketID:         group.BucketId,
+				BucketID:         group.BucketID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -70,7 +70,7 @@ func (r *GroupRead) serviceProperties(group *proto.Group) error {
 	)
 
 	if rows, err = r.stmtPropService.Query(
-		group.Id,
+		group.ID,
 	); err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func (r *GroupRead) serviceProperties(group *proto.Group) error {
 		*group.Properties = append(*group.Properties,
 			proto.Property{
 				Type:             `service`,
-				BucketID:         group.BucketId,
+				BucketID:         group.BucketID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -114,7 +114,7 @@ func (r *GroupRead) systemProperties(group *proto.Group) error {
 	)
 
 	if rows, err = r.stmtPropSystem.Query(
-		group.Id,
+		group.ID,
 	); err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (r *GroupRead) systemProperties(group *proto.Group) error {
 		*group.Properties = append(*group.Properties,
 			proto.Property{
 				Type:             `system`,
-				BucketID:         group.BucketId,
+				BucketID:         group.BucketID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -160,7 +160,7 @@ func (r *GroupRead) customProperties(group *proto.Group) error {
 	)
 
 	if rows, err = r.stmtPropCustom.Query(
-		group.Id,
+		group.ID,
 	); err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func (r *GroupRead) customProperties(group *proto.Group) error {
 		*group.Properties = append(*group.Properties,
 			proto.Property{
 				Type:             `custom`,
-				BucketID:         group.BucketId,
+				BucketID:         group.BucketID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,

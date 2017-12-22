@@ -10,14 +10,14 @@
 package proto
 
 type Job struct {
-	Id           string      `json:"id,omitempty"`
+	ID           string      `json:"id,omitempty"`
 	Status       string      `json:"status,omitempty"`
 	Result       string      `json:"result,omitempty"`
 	Type         string      `json:"type,omitempty"`
 	Serial       int         `json:"serial,omitempty"`
-	RepositoryId string      `json:"repositoryId,omitempty"`
-	UserId       string      `json:"userId,omitempty"`
-	TeamId       string      `json:"teamId,omitempty"`
+	RepositoryID string      `json:"repositoryId,omitempty"`
+	UserID       string      `json:"userId,omitempty"`
+	TeamID       string      `json:"teamId,omitempty"`
 	TsQueued     string      `json:"queued,omitempty"`
 	TsStarted    string      `json:"started,omitempty"`
 	TsFinished   string      `json:"finished,omitempty"`
@@ -31,7 +31,7 @@ type JobFilter struct {
 	Status string   `json:"status,omitempty"`
 	Result string   `json:"result,omitempty"`
 	Since  string   `json:"since,omitempty"`
-	IdList []string `json:"idlist,omitempty"`
+	IDList []string `json:"idlist,omitempty"`
 }
 
 type JobDetails struct {

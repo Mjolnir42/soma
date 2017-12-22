@@ -16,7 +16,7 @@ func dbOpen() {
 		Cfg.Database.Pass,
 		Cfg.Database.Host,
 		Cfg.Database.Port,
-		Cfg.TlsMode,
+		Cfg.TLSMode,
 		Cfg.Timeout,
 	)
 

@@ -15,11 +15,11 @@ func (ten *Node) updateCheckInstances() {
 
 	// object may have no checks, but there could be instances to mop up
 	if len(ten.Checks) == 0 && len(ten.Instances) == 0 {
-		ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, HasChecks=%t",
+		ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, HasChecks=%t",
 			repoName,
 			`UpdateCheckInstances`,
 			`node`,
-			ten.Id.String(),
+			ten.ID.String(),
 			false,
 		)
 		// found nothing to do, ensure update flag is unset again
@@ -43,7 +43,7 @@ func (ten *Node) updateCheckInstances() {
 	// scan over all current checkinstances if their check still exists.
 	// If not the check has been deleted and the spawned instances need
 	// a good deletion
-	for ck, _ := range ten.CheckInstances {
+	for ck := range ten.CheckInstances {
 		if _, ok := ten.Checks[ck]; ok {
 			// check still exists
 			continue
@@ -53,11 +53,11 @@ func (ten *Node) updateCheckInstances() {
 		inst := ten.CheckInstances[ck]
 		for _, i := range inst {
 			ten.actionCheckInstanceDelete(ten.Instances[i].MakeAction())
-			ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+			ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 				repoName,
 				`CleanupInstance`,
 				`node`,
-				ten.Id.String(),
+				ten.ID.String(),
 				ck,
 				i,
 			)
@@ -68,7 +68,7 @@ func (ten *Node) updateCheckInstances() {
 
 	// loop over all checks and test if there is a reason to disable
 	// its check instances. And with disable we mean delete.
-	for chk, _ := range ten.Checks {
+	for chk := range ten.Checks {
 		disableThis := false
 		// disable this check if the system property
 		// `disable_all_monitoring` is set for the view that the check
@@ -85,7 +85,7 @@ func (ten *Node) updateCheckInstances() {
 		// check_configuration that spawned this check
 		if _, hit, _ := ten.evalSystemProp(
 			`disable_check_configuration`,
-			ten.Checks[chk].ConfigId.String(),
+			ten.Checks[chk].ConfigID.String(),
 			ten.Checks[chk].View,
 		); hit {
 			disableThis = true
@@ -96,11 +96,11 @@ func (ten *Node) updateCheckInstances() {
 			if instanceArray, ok := ten.CheckInstances[chk]; ok {
 				for _, i := range instanceArray {
 					ten.actionCheckInstanceDelete(ten.Instances[i].MakeAction())
-					ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`RemoveDisabledInstance`,
 						`node`,
-						ten.Id.String(),
+						ten.ID.String(),
 						chk,
 						i,
 					)
@@ -113,7 +113,7 @@ func (ten *Node) updateCheckInstances() {
 
 	// process remaining checks
 checksloop:
-	for i, _ := range ten.Checks {
+	for i := range ten.Checks {
 		if ten.Checks[i].Inherited == false && ten.Checks[i].ChildrenOnly == true {
 			continue checksloop
 		}
@@ -130,7 +130,7 @@ checksloop:
 		// property
 		if _, hit, _ := ten.evalSystemProp(
 			`disable_check_configuration`,
-			ten.Checks[i].ConfigId.String(),
+			ten.Checks[i].ConfigID.String(),
 			ten.Checks[i].View,
 		); hit {
 			continue checksloop
@@ -147,7 +147,7 @@ checksloop:
 		nativeC := map[string]string{}                 // Property->Value
 		serviceC := map[string]string{}                // Id->Value
 		customC := map[string]string{}                 // Id->Value
-		attributeC := map[string]map[string][]string{} // svcId->attr->[ value, ... ]
+		attributeC := map[string]map[string][]string{} // svcID->attr->[ value, ... ]
 
 		newInstances := map[string]CheckInstance{}
 		newCheckInstances := []string{}
@@ -199,11 +199,11 @@ checksloop:
 			}
 		}
 		if hasBrokenConstraint {
-			ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+			ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 				repoName,
 				`ConstraintEvaluation`,
 				`node`,
-				ten.Id.String(),
+				ten.ID.String(),
 				i,
 				false,
 			)
@@ -217,7 +217,7 @@ checksloop:
 		 */
 		if hasServiceConstraint && hasAttributeConstraint {
 		svcattrloop:
-			for id, _ := range serviceC {
+			for id := range serviceC {
 				for _, attr := range attributes {
 					hit, bind := ten.evalAttributeOfService(id, view, attr.Key, attr.Value)
 					if hit {
@@ -240,10 +240,10 @@ checksloop:
 		} else if hasAttributeConstraint {
 			attrCount := len(attributes)
 			for _, attr := range attributes {
-				hit, svcIdMap := ten.evalAttributeProp(view, attr.Key, attr.Value)
+				hit, svcIDMap := ten.evalAttributeProp(view, attr.Key, attr.Value)
 				if hit {
-					for id, bind := range svcIdMap {
-						serviceC[id] = svcIdMap[id]
+					for id, bind := range svcIDMap {
+						serviceC[id] = svcIDMap[id]
 						if attributeC[id] == nil {
 							// attributeC[id] might still be a nil map
 							attributeC[id] = make(map[string][]string)
@@ -256,7 +256,7 @@ checksloop:
 			//
 			// if a check has two attribute constraints on the same
 			// attribute, then len(attributeC[id]) != len(attributes)
-			for id, _ := range attributeC {
+			for id := range attributeC {
 				if ten.countAttribC(attributeC[id]) != attrCount {
 					delete(serviceC, id)
 					delete(attributeC, id)
@@ -272,22 +272,22 @@ checksloop:
 			}
 		}
 		if hasBrokenConstraint {
-			ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+			ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 				repoName,
 				`ConstraintEvaluation`,
 				`node`,
-				ten.Id.String(),
+				ten.ID.String(),
 				i,
 				false,
 			)
 			continue checksloop
 		}
 		// check triggered, create instances
-		ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+		ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 			repoName,
 			`ConstraintEvaluation`,
 			`node`,
-			ten.Id.String(),
+			ten.ID.String(),
 			i,
 			true,
 		)
@@ -297,16 +297,16 @@ checksloop:
 		 */
 		if !hasServiceConstraint {
 			inst := CheckInstance{
-				InstanceId: uuid.UUID{},
-				CheckId: func(id string) uuid.UUID {
+				InstanceID: uuid.UUID{},
+				CheckID: func(id string) uuid.UUID {
 					f, _ := uuid.FromString(id)
 					return f
 				}(i),
-				ConfigId: func(id string) uuid.UUID {
-					f, _ := uuid.FromString(ten.Checks[id].ConfigId.String())
+				ConfigID: func(id string) uuid.UUID {
+					f, _ := uuid.FromString(ten.Checks[id].ConfigID.String())
 					return f
 				}(i),
-				InstanceConfigId:      uuid.NewV4(),
+				InstanceConfigID:      uuid.NewV4(),
 				ConstraintOncall:      oncallC,
 				ConstraintService:     serviceC,
 				ConstraintSystem:      systemC,
@@ -322,28 +322,28 @@ checksloop:
 
 			if startupLoad {
 			nosvcstartinstanceloop:
-				for ldInstId, ldInst := range ten.loadedInstances[i] {
+				for ldInstID, ldInst := range ten.loadedInstances[i] {
 					if ldInst.InstanceSvcCfgHash != "" {
 						continue nosvcstartinstanceloop
 					}
 					// check if an instance exists bound against the same
 					// constraints
 					if ldInst.ConstraintHash == inst.ConstraintHash &&
-						uuid.Equal(ldInst.ConfigId, inst.ConfigId) &&
+						uuid.Equal(ldInst.ConfigID, inst.ConfigID) &&
 						ldInst.ConstraintValHash == inst.ConstraintValHash {
 
 						// found a match
-						inst.InstanceId, _ = uuid.FromString(ldInstId)
-						inst.InstanceConfigId, _ = uuid.FromString(ldInst.InstanceConfigId.String())
+						inst.InstanceID, _ = uuid.FromString(ldInstID)
+						inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
 						inst.Version = ldInst.Version
-						delete(ten.loadedInstances[i], ldInstId)
-						ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+						delete(ten.loadedInstances[i], ldInstID)
+						ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 							repoName,
 							`ComputeInstance`,
 							`node`,
-							ten.Id.String(),
+							ten.ID.String(),
 							i,
-							ldInstId,
+							ldInstID,
 							false,
 						)
 						goto nosvcstartinstancematch
@@ -353,14 +353,14 @@ checksloop:
 				// that we could not match to any loaded instances
 				// -> something is wrong
 				ten.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
-					" ObjType=%s, ObjId=%s, CheckId=%s", `node`, ten.Id.String(), i, repoName)
+					" ObjType=%s, ObjId=%s, CheckID=%s", `node`, ten.ID.String(), i, repoName)
 				ten.Fault.Error <- &Error{Action: `Failed to match a computed instance to loaded data`}
 				return
 			nosvcstartinstancematch:
 			} else {
 			nosvcinstanceloop:
-				for _, exInstId := range ten.CheckInstances[i] {
-					exInst := ten.Instances[exInstId]
+				for _, exInstID := range ten.CheckInstances[i] {
+					exInst := ten.Instances[exInstID]
 					// ignore instances with service constraints
 					if exInst.InstanceSvcCfgHash != "" {
 						continue nosvcinstanceloop
@@ -368,29 +368,29 @@ checksloop:
 					// check if an instance exists bound against the same
 					// constraints
 					if exInst.ConstraintHash == inst.ConstraintHash {
-						inst.InstanceId, _ = uuid.FromString(exInst.InstanceId.String())
+						inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
 						inst.Version = exInst.Version + 1
 						break nosvcinstanceloop
 					}
 				}
-				if uuid.Equal(uuid.Nil, inst.InstanceId) {
+				if uuid.Equal(uuid.Nil, inst.InstanceID) {
 					// no match was found during nosvcinstanceloop, this
 					// is a new instance
 					inst.Version = 0
-					inst.InstanceId = uuid.NewV4()
+					inst.InstanceID = uuid.NewV4()
 				}
-				ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+				ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 					repoName,
 					`ComputeInstance`,
 					`node`,
-					ten.Id.String(),
+					ten.ID.String(),
 					i,
-					inst.InstanceId.String(),
+					inst.InstanceID.String(),
 					false,
 				)
 			}
-			newInstances[inst.InstanceId.String()] = inst
-			newCheckInstances = append(newCheckInstances, inst.InstanceId.String())
+			newInstances[inst.InstanceID.String()] = inst
+			newCheckInstances = append(newCheckInstances, inst.InstanceID.String())
 		}
 
 		/* if service constraints are in effect, then we generate
@@ -404,24 +404,24 @@ checksloop:
 		* permutations.
 		 */
 	serviceconstraintloop:
-		for svcId, _ := range serviceC {
+		for svcID := range serviceC {
 			if !hasServiceConstraint {
 				break serviceconstraintloop
 			}
 
-			svcCfg := ten.getServiceMap(svcId)
+			svcCfg := ten.getServiceMap(svcID)
 
 			// calculate how many instances this service spawns
 			combinations := 1
-			for attr, _ := range svcCfg {
+			for attr := range svcCfg {
 				combinations = combinations * len(svcCfg[attr])
 			}
 
 			// build all attribute combinations
 			results := make([]map[string]string, 0, combinations)
-			for attr, _ := range svcCfg {
+			for attr := range svcCfg {
 				if len(results) == 0 {
-					for i, _ := range svcCfg[attr] {
+					for i := range svcCfg[attr] {
 						res := map[string]string{}
 						res[attr] = svcCfg[attr][i]
 						results = append(results, res)
@@ -429,8 +429,8 @@ checksloop:
 					continue
 				}
 				ires := make([]map[string]string, 0, combinations)
-				for r, _ := range results {
-					for j, _ := range svcCfg[attr] {
+				for r := range results {
+					for j := range svcCfg[attr] {
 						res := map[string]string{}
 						for k, v := range results[r] {
 							res[k] = v
@@ -449,23 +449,23 @@ checksloop:
 					cfg[k] = v
 				}
 				inst := CheckInstance{
-					InstanceId: uuid.UUID{},
-					CheckId: func(id string) uuid.UUID {
+					InstanceID: uuid.UUID{},
+					CheckID: func(id string) uuid.UUID {
 						f, _ := uuid.FromString(id)
 						return f
 					}(i),
-					ConfigId: func(id string) uuid.UUID {
-						f, _ := uuid.FromString(ten.Checks[id].ConfigId.String())
+					ConfigID: func(id string) uuid.UUID {
+						f, _ := uuid.FromString(ten.Checks[id].ConfigID.String())
 						return f
 					}(i),
-					InstanceConfigId:      uuid.NewV4(),
+					InstanceConfigID:      uuid.NewV4(),
 					ConstraintOncall:      oncallC,
 					ConstraintService:     serviceC,
 					ConstraintSystem:      systemC,
 					ConstraintCustom:      customC,
 					ConstraintNative:      nativeC,
 					ConstraintAttribute:   attributeC,
-					InstanceService:       svcId,
+					InstanceService:       svcID,
 					InstanceServiceConfig: cfg,
 				}
 				inst.calcConstraintHash()
@@ -473,29 +473,29 @@ checksloop:
 				inst.calcInstanceSvcCfgHash()
 
 				if startupLoad {
-					for ldInstId, ldInst := range ten.loadedInstances[i] {
+					for ldInstID, ldInst := range ten.loadedInstances[i] {
 						// check for data from loaded instance
 						if ldInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash &&
 							ldInst.ConstraintHash == inst.ConstraintHash &&
 							ldInst.ConstraintValHash == inst.ConstraintValHash &&
 							ldInst.InstanceService == inst.InstanceService &&
-							uuid.Equal(ldInst.ConfigId, inst.ConfigId) {
+							uuid.Equal(ldInst.ConfigID, inst.ConfigID) {
 
 							// found a match
-							inst.InstanceId, _ = uuid.FromString(ldInstId)
-							inst.InstanceConfigId, _ = uuid.FromString(ldInst.InstanceConfigId.String())
+							inst.InstanceID, _ = uuid.FromString(ldInstID)
+							inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
 							inst.Version = ldInst.Version
 							// we can assume InstanceServiceConfig to
 							// be equal, since InstanceSvcCfgHash is
 							// equal
-							delete(ten.loadedInstances[i], ldInstId)
-							ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+							delete(ten.loadedInstances[i], ldInstID)
+							ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 								repoName,
 								`ComputeInstance`,
 								`node`,
-								ten.Id.String(),
+								ten.ID.String(),
 								i,
-								ldInstId,
+								ldInstID,
 								true,
 							)
 							goto startinstancematch
@@ -505,7 +505,7 @@ checksloop:
 					// instance that we could not match to any
 					// loaded instances -> something is wrong
 					ten.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
-						" ObjType=%s, ObjId=%s, CheckId=%s", `node`, ten.Id.String(), i, repoName)
+						" ObjType=%s, ObjId=%s, CheckID=%s", `node`, ten.ID.String(), i, repoName)
 					ten.Fault.Error <- &Error{Action: `Failed to match a computed instance to loaded data`}
 					return
 				startinstancematch:
@@ -513,34 +513,34 @@ checksloop:
 					// lookup existing instance ids for check in ten.CheckInstances
 					// to determine if this is an update
 				instanceloop:
-					for _, exInstId := range ten.CheckInstances[i] {
-						exInst := ten.Instances[exInstId]
+					for _, exInstID := range ten.CheckInstances[i] {
+						exInst := ten.Instances[exInstID]
 						// this existing instance is for the same service
 						// configuration -> this is an update
 						if exInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash {
-							inst.InstanceId, _ = uuid.FromString(exInst.InstanceId.String())
+							inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
 							inst.Version = exInst.Version + 1
 							break instanceloop
 						}
 					}
-					if uuid.Equal(uuid.Nil, inst.InstanceId) {
+					if uuid.Equal(uuid.Nil, inst.InstanceID) {
 						// no match was found during instanceloop, this is
 						// a new instance
 						inst.Version = 0
-						inst.InstanceId = uuid.NewV4()
+						inst.InstanceID = uuid.NewV4()
 					}
-					ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+					ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 						repoName,
 						`ComputeInstance`,
 						`node`,
-						ten.Id.String(),
+						ten.ID.String(),
 						i,
-						inst.InstanceId.String(),
+						inst.InstanceID.String(),
 						true,
 					)
 				}
-				newInstances[inst.InstanceId.String()] = inst
-				newCheckInstances = append(newCheckInstances, inst.InstanceId.String())
+				newInstances[inst.InstanceID.String()] = inst
+				newCheckInstances = append(newCheckInstances, inst.InstanceID.String())
 			}
 		} // LOOPEND: range serviceC
 
@@ -555,57 +555,57 @@ checksloop:
 		// all new check instances have been built, check which
 		// existing instances did not get an update and need to be
 		// deleted
-		for _, oldInstanceId := range ten.CheckInstances[i] {
-			if _, ok := newInstances[oldInstanceId]; !ok {
+		for _, oldInstanceID := range ten.CheckInstances[i] {
+			if _, ok := newInstances[oldInstanceID]; !ok {
 				// there is no new version for this instance id
-				ten.actionCheckInstanceDelete(ten.Instances[oldInstanceId].MakeAction())
-				ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+				ten.actionCheckInstanceDelete(ten.Instances[oldInstanceID].MakeAction())
+				ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 					repoName,
 					`DeleteInstance`,
 					`node`,
-					ten.Id.String(),
+					ten.ID.String(),
 					i,
-					oldInstanceId,
+					oldInstanceID,
 				)
-				delete(ten.Instances, oldInstanceId)
+				delete(ten.Instances, oldInstanceID)
 				continue
 			}
-			delete(ten.Instances, oldInstanceId)
-			ten.Instances[oldInstanceId] = newInstances[oldInstanceId]
-			ten.actionCheckInstanceUpdate(ten.Instances[oldInstanceId].MakeAction())
-			ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+			delete(ten.Instances, oldInstanceID)
+			ten.Instances[oldInstanceID] = newInstances[oldInstanceID]
+			ten.actionCheckInstanceUpdate(ten.Instances[oldInstanceID].MakeAction())
+			ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 				repoName,
 				`UpdateInstance`,
 				`node`,
-				ten.Id.String(),
+				ten.ID.String(),
 				i,
-				oldInstanceId,
+				oldInstanceID,
 			)
 		}
-		for _, newInstanceId := range newCheckInstances {
-			if _, ok := ten.Instances[newInstanceId]; !ok {
+		for _, newInstanceID := range newCheckInstances {
+			if _, ok := ten.Instances[newInstanceID]; !ok {
 				// this instance is new, not an update
-				ten.Instances[newInstanceId] = newInstances[newInstanceId]
+				ten.Instances[newInstanceID] = newInstances[newInstanceID]
 				// no need to send a create action during load; the
 				// action channel is drained anyway
 				if !startupLoad {
-					ten.actionCheckInstanceCreate(ten.Instances[newInstanceId].MakeAction())
-					ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					ten.actionCheckInstanceCreate(ten.Instances[newInstanceID].MakeAction())
+					ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`CreateInstance`,
 						`node`,
-						ten.Id.String(),
+						ten.ID.String(),
 						i,
-						newInstanceId,
+						newInstanceID,
 					)
 				} else {
-					ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`RecreateInstance`,
 						`node`,
-						ten.Id.String(),
+						ten.ID.String(),
 						i,
-						newInstanceId,
+						newInstanceID,
 					)
 				}
 			}
@@ -654,8 +654,8 @@ func (ten *Node) evalSystemProp(prop string, val string, view string) (string, b
 func (ten *Node) evalOncallProp(prop string, val string, view string) (string, bool) {
 	for _, v := range ten.PropertyOncall {
 		t := v.(*PropertyOncall)
-		if "OncallId" == prop && t.Id.String() == val && (t.View == view || t.View == `any`) {
-			return t.Id.String(), true
+		if "OncallID" == prop && t.ID.String() == val && (t.View == view || t.View == `any`) {
+			return t.ID.String(), true
 		}
 	}
 	return "", false
@@ -675,14 +675,14 @@ func (ten *Node) evalServiceProp(prop string, val string, view string) (string, 
 	for _, v := range ten.PropertyService {
 		t := v.(*PropertyService)
 		if prop == "name" && (t.Service == val || val == `@defined`) && (t.View == view || t.View == `any`) {
-			return t.Id.String(), true, t.Service
+			return t.ID.String(), true, t.Service
 		}
 	}
 	return "", false, ""
 }
 
-func (ten *Node) evalAttributeOfService(svcId string, view string, attribute string, value string) (bool, string) {
-	t := ten.PropertyService[svcId].(*PropertyService)
+func (ten *Node) evalAttributeOfService(svcID string, view string, attribute string, value string) (bool, string) {
+	t := ten.PropertyService[svcID].(*PropertyService)
 	for _, a := range t.Attributes {
 		if a.Name == attribute && (t.View == view || t.View == `any`) && (a.Value == value || value == `@defined`) {
 			return true, a.Value
@@ -698,7 +698,7 @@ svcloop:
 		t := v.(*PropertyService)
 		for _, a := range t.Attributes {
 			if a.Name == attr && (a.Value == value || value == `@defined`) && (t.View == view || t.View == `any`) {
-				f[t.Id.String()] = a.Value
+				f[t.ID.String()] = a.Value
 				continue svcloop
 			}
 		}
@@ -709,9 +709,9 @@ svcloop:
 	return false, f
 }
 
-func (ten *Node) getServiceMap(serviceId string) map[string][]string {
+func (ten *Node) getServiceMap(serviceID string) map[string][]string {
 	svc := new(PropertyService)
-	svc = ten.PropertyService[serviceId].(*PropertyService)
+	svc = ten.PropertyService[serviceID].(*PropertyService)
 
 	res := map[string][]string{}
 	for _, v := range svc.Attributes {
@@ -721,8 +721,8 @@ func (ten *Node) getServiceMap(serviceId string) map[string][]string {
 }
 
 func (ten *Node) countAttribC(attributeC map[string][]string) int {
-	var count int = 0
-	for key, _ := range attributeC {
+	var count int
+	for key := range attributeC {
 		count = count + len(attributeC[key])
 	}
 	return count

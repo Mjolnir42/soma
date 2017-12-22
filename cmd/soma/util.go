@@ -25,7 +25,7 @@ func PanicCatcher(w http.ResponseWriter) {
 	}
 }
 
-func DecodeJsonBody(r *http.Request, s interface{}) error {
+func DecodeJSONBody(r *http.Request, s interface{}) error {
 	decoder := json.NewDecoder(r.Body)
 	var err error
 
@@ -38,7 +38,7 @@ func DecodeJsonBody(r *http.Request, s interface{}) error {
 		err = decoder.Decode(c)
 	default:
 		rt := reflect.TypeOf(s)
-		err = fmt.Errorf("DecodeJsonBody: Unhandled request type: %s", rt)
+		err = fmt.Errorf("DecodeJSONBody: Unhandled request type: %s", rt)
 	}
 	return err
 }
@@ -161,7 +161,7 @@ func DispatchNotImplemented(w *http.ResponseWriter, err error) {
 	http.Error(*w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
 }
 
-func DispatchJsonReply(w *http.ResponseWriter, b *[]byte) {
+func DispatchJSONReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Header().Set("Content-Type", "application/json")
 	(*w).WriteHeader(http.StatusOK)
 	(*w).Write(*b)
@@ -173,7 +173,7 @@ func DispatchOctetReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Write(*b)
 }
 
-func GetPropertyTypeFromUrl(u *url.URL) (string, error) {
+func GetPropertyTypeFromURL(u *url.URL) (string, error) {
 	// strip surrounding / and skip first path element `property|filter`
 	el := strings.Split(strings.Trim(u.Path, "/"), "/")[1:]
 	if el[0] == "property" {

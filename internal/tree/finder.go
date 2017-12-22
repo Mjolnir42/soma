@@ -13,7 +13,7 @@ type Finder interface {
 }
 
 type FindRequest struct {
-	ElementId   string
+	ElementID   string
 	ElementName string
 	ElementType string
 }

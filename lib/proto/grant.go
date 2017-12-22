@@ -10,23 +10,23 @@
 package proto
 
 type Grant struct {
-	Id            string           `json:"id"`
+	ID            string           `json:"id"`
 	RecipientType string           `json:"recipientType"`
-	RecipientId   string           `json:"recipientId"`
-	PermissionId  string           `json:"permissionId"`
+	RecipientID   string           `json:"recipientId"`
+	PermissionID  string           `json:"permissionId"`
 	Category      string           `json:"category"`
 	ObjectType    string           `json:"objectType"`
-	ObjectId      string           `json:"objectId"`
+	ObjectID      string           `json:"objectId"`
 	Details       *DetailsCreation `json:"details,omitempty"`
 }
 
 type GrantFilter struct {
 	RecipientType string `json:"recipientType"`
-	RecipientId   string `json:"recipientId"`
-	PermissionId  string `json:"permissionId"`
+	RecipientID   string `json:"recipientId"`
+	PermissionID  string `json:"permissionId"`
 	Category      string `json:"category"`
 	ObjectType    string `json:"objectType"`
-	ObjectId      string `json:"objectId"`
+	ObjectID      string `json:"objectId"`
 }
 
 func NewGrantRequest() Request {

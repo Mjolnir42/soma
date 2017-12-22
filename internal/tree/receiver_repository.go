@@ -21,7 +21,7 @@ func (ter *Repository) Receive(r ReceiveRequest) {
 		}
 		return
 	}
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		ter.Children[child].(Receiver).Receive(r)
 	}
 }

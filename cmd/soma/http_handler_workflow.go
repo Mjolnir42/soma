@@ -62,7 +62,7 @@ func WorkflowList(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewWorkflowFilter()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -104,11 +104,11 @@ func WorkflowRetry(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewWorkflowRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
-	if cReq.Workflow.InstanceId == `` {
+	if cReq.Workflow.InstanceID == `` {
 		DispatchBadRequest(&w, fmt.Errorf(
 			`No instanceID for retry specified`))
 		return
@@ -123,7 +123,7 @@ func WorkflowRetry(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Workflow: proto.Workflow{
-			InstanceId: cReq.Workflow.InstanceId,
+			InstanceID: cReq.Workflow.InstanceID,
 		},
 	}
 	result := <-returnChannel
@@ -146,7 +146,7 @@ func WorkflowSet(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewWorkflowRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -172,7 +172,7 @@ func WorkflowSet(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Workflow: proto.Workflow{
-			InstanceConfigId: params.ByName(`instanceconfig`),
+			InstanceConfigID: params.ByName(`instanceconfig`),
 			Status:           cReq.Workflow.Status,
 			NextStatus:       cReq.Workflow.NextStatus,
 		},

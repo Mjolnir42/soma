@@ -46,7 +46,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	}
 
 	// check if the subject has omnipotence
-	if c.checkOmnipotence(subjType, user.Id) {
+	if c.checkOmnipotence(subjType, user.ID) {
 		result.Super.Verdict = 200
 		goto dispatch
 	}
@@ -68,7 +68,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 
 	// check if the user has the correct system permission
 	if ok, invalid := c.checkSystem(category, subjType,
-		user.Id); invalid {
+		user.ID); invalid {
 		goto dispatch
 	} else if ok {
 		result.Super.Verdict = 200
@@ -88,7 +88,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 
 	// check if the user has one the permissions that map the
 	// requested action
-	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, subjType, user.Id,
+	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, subjType, user.ID,
 		category) {
 		result.Super.Verdict = 200
 		goto dispatch
@@ -102,7 +102,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	}
 
 	// check if the user's team has a specific grant for the action
-	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, `team`, user.TeamId,
+	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, `team`, user.TeamID,
 		category) {
 		result.Super.Verdict = 200
 	}
@@ -155,14 +155,14 @@ permloop:
 		} else {
 			switch q.Section {
 			case `monitoringsystem`, `capability`:
-				objID = q.Monitoring.Id
+				objID = q.Monitoring.ID
 			case `property_service_team`:
 				objID = q.Property.Service.TeamID
 			case `node`:
 				objID = q.Node.TeamID
 			case `repository`, `instance`, `node-config`,
 				`property_custom`:
-				objID = q.Repository.Id
+				objID = q.Repository.ID
 			case `bucket`, `clusters`, `checks`, `groups`:
 				objID = q.Bucket.ID
 			default:

@@ -121,7 +121,7 @@ func (r *UserRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.User = append(mr.User, proto.User{
-			Id:       userID,
+			ID:       userID,
 			UserName: userName,
 		})
 	}
@@ -144,7 +144,7 @@ func (r *UserRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.User.Id,
+		q.User.ID,
 	).Scan(
 		&userID,
 		&userName,
@@ -165,7 +165,7 @@ func (r *UserRead) show(q *msg.Request, mr *msg.Result) {
 	}
 
 	mr.User = append(mr.User, proto.User{
-		Id:             userID,
+		ID:             userID,
 		UserName:       userName,
 		FirstName:      firstName,
 		LastName:       lastName,
@@ -174,7 +174,7 @@ func (r *UserRead) show(q *msg.Request, mr *msg.Result) {
 		IsActive:       isActive,
 		IsSystem:       isSystem,
 		IsDeleted:      isDeleted,
-		TeamId:         team,
+		TeamID:         team,
 	})
 	mr.OK()
 }
@@ -213,14 +213,14 @@ func (r *UserRead) sync(q *msg.Request, mr *msg.Result) {
 		}
 
 		mr.User = append(mr.User, proto.User{
-			Id:             userID,
+			ID:             userID,
 			UserName:       userName,
 			FirstName:      firstName,
 			LastName:       lastName,
 			EmployeeNumber: strconv.Itoa(employeeNr),
 			MailAddress:    mailAddr,
 			IsDeleted:      isDeleted,
-			TeamId:         team,
+			TeamID:         team,
 		})
 	}
 	if err = rows.Err(); err != nil {

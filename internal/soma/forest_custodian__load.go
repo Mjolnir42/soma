@@ -55,9 +55,9 @@ treeloop:
 			repoName)
 		if err = f.loadSomaTree(&msg.Request{
 			Repository: proto.Repository{
-				Id:        repoID,
+				ID:        repoID,
 				Name:      repoName,
-				TeamId:    teamID,
+				TeamID:    teamID,
 				IsDeleted: isDeleted,
 				IsActive:  isActive,
 			},
@@ -80,23 +80,23 @@ func (f *ForestCustodian) loadSomaTree(q *msg.Request) error {
 	actionChan := make(chan *tree.Action, 1024000)
 	errChan := make(chan *tree.Error, 1024000)
 
-	sTree := tree.New(tree.TreeSpec{
-		Id:     uuid.NewV4().String(),
+	sTree := tree.New(tree.Spec{
+		ID:     uuid.NewV4().String(),
 		Name:   fmt.Sprintf("root_%s", q.Repository.Name),
 		Action: actionChan,
 		Log:    f.appLog,
 	})
 	sTree.SetError(errChan)
 	tree.NewRepository(tree.RepositorySpec{
-		Id:      q.Repository.Id,
+		ID:      q.Repository.ID,
 		Name:    q.Repository.Name,
-		Team:    q.Repository.TeamId,
+		Team:    q.Repository.TeamID,
 		Deleted: q.Repository.IsDeleted,
 		Active:  q.Repository.IsActive,
 	}).Attach(tree.AttachRequest{
 		Root:       sTree,
 		ParentType: "root",
-		ParentId:   sTree.GetID(),
+		ParentID:   sTree.GetID(),
 	})
 	// errors during tree loading are not a good sign
 	for i := len(errChan); i > 0; i-- {
@@ -124,7 +124,7 @@ func (f *ForestCustodian) loadSomaTree(q *msg.Request) error {
 		sTree,
 		errChan,
 		actionChan,
-		q.Repository.TeamId,
+		q.Repository.TeamID,
 	)
 }
 
@@ -174,7 +174,7 @@ func (f *ForestCustodian) spawnTreeKeeper(q *msg.Request, s *tree.Tree,
 	tK.status.isStopped = false
 	tK.status.requiresRebuild = q.Flag.Rebuild
 	tK.status.rebuildLevel = q.Flag.RebuildLevel
-	tK.meta.repoID = q.Repository.Id
+	tK.meta.repoID = q.Repository.ID
 	tK.meta.repoName = q.Repository.Name
 	tK.meta.teamID = team
 	tK.appLog = f.appLog

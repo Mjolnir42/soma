@@ -92,7 +92,7 @@ func RetrieveConfigurationItems(w http.ResponseWriter, r *http.Request, params h
 		return
 	}
 
-	dispatchJsonOK(&w, &jsonb)
+	dispatchJSONOK(&w, &jsonb)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

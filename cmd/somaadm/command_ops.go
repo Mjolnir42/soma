@@ -288,11 +288,11 @@ func cmdOpsRepoRebuild(c *cli.Context) error {
 func cmdOpsRepo(c *cli.Context, req proto.Request) error {
 
 	// lookup requested repository
-	repoId, err := adm.LookupRepoId(c.Args().First())
+	repoID, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
-	req.SystemOperation.RepositoryId = repoId
+	req.SystemOperation.RepositoryID = repoID
 
 	return adm.Perform(`postbody`, `/system/`, `command`, req, c)
 }

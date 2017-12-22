@@ -25,7 +25,7 @@ func LookupOncallID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return oncallIdByName(s)
+	return oncallIDByName(s)
 }
 
 // LookupOncallDetails looks up the details for oncall duty s.
@@ -39,29 +39,29 @@ func LookupOncallDetails(s string) (string, string, error) {
 		oID = o
 	}
 
-	return oncallDetailsById(oID)
+	return oncallDetailsByID(oID)
 }
 
 // LookupOncallId looks up the UUID for a user on the server
 // with username s. Error is set if no such user was found
 // or an error occurred.
 // If s is already a UUID, then s is immediately returned.
-func LookupUserId(s string) (string, error) {
+func LookupUserID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return userIdByUserName(s)
+	return userIDByUserName(s)
 }
 
-// LookupTeamId looks up the UUID for a team on the server
+// LookupTeamID looks up the UUID for a team on the server
 // with teamname s. Error is set if no such team was found
 // or an error occurred.
 // If s is already a UUID, then s is immediately returned.
-func LookupTeamId(s string) (string, error) {
+func LookupTeamID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return teamIdByName(s)
+	return teamIDByName(s)
 }
 
 // LookupTeamByRepo looks up the UUID for the team that is the
@@ -69,19 +69,19 @@ func LookupTeamId(s string) (string, error) {
 // of the repository.
 func LookupTeamByRepo(s string) (string, error) {
 	var (
-		bId string
+		bID string
 		err error
 	)
 
 	if !IsUUID(s) {
-		if bId, err = LookupRepoId(s); err != nil {
+		if bID, err = LookupRepoID(s); err != nil {
 			return ``, err
 		}
 	} else {
-		bId = s
+		bID = s
 	}
 
-	return teamIdByRepoId(bId)
+	return teamIDByRepoID(bID)
 }
 
 // LookupTeamByBucket looks up the UUID for the team that is
@@ -89,19 +89,19 @@ func LookupTeamByRepo(s string) (string, error) {
 // UUID of the bucket.
 func LookupTeamByBucket(s string) (string, error) {
 	var (
-		bId string
+		bID string
 		err error
 	)
 
 	if !IsUUID(s) {
-		if bId, err = LookupBucketId(s); err != nil {
+		if bID, err = LookupBucketID(s); err != nil {
 			return ``, err
 		}
 	} else {
-		bId = s
+		bID = s
 	}
 
-	return teamIdByBucketId(bId)
+	return teamIDByBucketID(bID)
 }
 
 // LookupTeamByNode looks up the UUID for the team that is
@@ -109,273 +109,273 @@ func LookupTeamByBucket(s string) (string, error) {
 // UUID of the node.
 func LookupTeamByNode(s string) (string, error) {
 	var (
-		nId string
+		nID string
 		err error
 	)
 
 	if !IsUUID(s) {
-		if nId, err = LookupBucketId(s); err != nil {
+		if nID, err = LookupBucketID(s); err != nil {
 			return ``, err
 		}
 	} else {
-		nId = s
+		nID = s
 	}
 
-	return teamIdByNodeId(nId)
+	return teamIDByNodeID(nID)
 }
 
-// LookupRepoId looks up the UUID for a repository on the server
+// LookupRepoID looks up the UUID for a repository on the server
 // with reponame s. Error is set if no such repository was found
 // or an error occurred.
 // If s is already a UUID, then s is immediately returned.
-func LookupRepoId(s string) (string, error) {
+func LookupRepoID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return repoIdByName(s)
+	return repoIDByName(s)
 }
 
 // LookupRepoByBucket looks up the UUI for a repository by either
 // the UUID or name of a bucket in that repository.
 func LookupRepoByBucket(s string) (string, error) {
 	var (
-		bId string
+		bID string
 		err error
 	)
 
 	if !IsUUID(s) {
-		if bId, err = LookupBucketId(s); err != nil {
+		if bID, err = LookupBucketID(s); err != nil {
 			return ``, err
 		}
 	} else {
-		bId = s
+		bID = s
 	}
 
-	return repoIdByBucketId(bId)
+	return repoIDByBucketID(bID)
 }
 
-// LookupBucketId looks up the UUID for a bucket on the server
+// LookupBucketID looks up the UUID for a bucket on the server
 // with bucketname s. Error is set if no such bucket was found
 // or an error occurred.
 // If s is already a UUID, then s is immediately returned.
-func LookupBucketId(s string) (string, error) {
+func LookupBucketID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return bucketIdByName(s)
+	return bucketIDByName(s)
 }
 
-// LookupGroupId looks up the UUID for group group in bucket
+// LookupGroupID looks up the UUID for group group in bucket
 // bucket on the server.
 // If group is already a UUID, then group is immediately returned.
-func LookupGroupId(group, bucket string) (string, error) {
+func LookupGroupID(group, bucket string) (string, error) {
 	if IsUUID(group) {
 		return group, nil
 	}
 	var (
-		bId string
+		bID string
 		err error
 	)
 	if !IsUUID(bucket) {
-		if bId, err = LookupBucketId(bucket); err != nil {
+		if bID, err = LookupBucketID(bucket); err != nil {
 			return ``, err
 		}
 	} else {
-		bId = bucket
+		bID = bucket
 	}
 
-	return groupIdByName(group, bId)
+	return groupIDByName(group, bID)
 }
 
-// LookupClusterId looks up the UUID for cluster cluster in
+// LookupClusterID looks up the UUID for cluster cluster in
 // bucket bucket on the server.
 // If cluster is already a UUID, then cluster is immediately returned.
-func LookupClusterId(cluster, bucket string) (string, error) {
+func LookupClusterID(cluster, bucket string) (string, error) {
 	if IsUUID(cluster) {
 		return cluster, nil
 	}
 	var (
-		bId string
+		bID string
 		err error
 	)
 	if !IsUUID(bucket) {
-		if bId, err = LookupBucketId(bucket); err != nil {
+		if bID, err = LookupBucketID(bucket); err != nil {
 			return ``, err
 		}
 	} else {
-		bId = bucket
+		bID = bucket
 	}
 
-	return clusterIdByName(cluster, bId)
+	return clusterIDByName(cluster, bID)
 }
 
-// LookupServerId looks up the UUID for a server either in the
+// LookupServerID looks up the UUID for a server either in the
 // local cache or on the server. Error is set if no such server
 // was found or an error occurred.
 // If s is already a UUID, then s is immediately returned.
 // If s is a Uint64 number, then the serverlookup is by AssetID.
 // Otherwise s is the server name.
-func LookupServerId(s string) (string, error) {
+func LookupServerID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
 	if ok, num := isUint64(s); ok {
-		return serverIdByAsset(s, num)
+		return serverIDByAsset(s, num)
 	}
-	return serverIdByName(s)
+	return serverIDByName(s)
 }
 
-// LookupPermIdRef looks up the UUID for a permission from
+// LookupPermIDRef looks up the UUID for a permission from
 // the server. Error is set if no such permission was found or
 // an error occurred. The permission must be in category c.
 // If s is already a UUID, then is is immediately returned.
-func LookupPermIdRef(s, c string, id *string) error {
+func LookupPermIDRef(s, c string, id *string) error {
 	if IsUUID(s) {
 		*id = s
 		return nil
 	}
-	return permissionIdByName(s, c, id)
+	return permissionIDByName(s, c, id)
 }
 
-// LookupGrantIdRef looks up the UUID of a permission grant from
+// LookupGrantIDRef looks up the UUID of a permission grant from
 // the server and fills it into the provided id pointer.
 // Error is set if no such grant was found or an error occurred.
-func LookupGrantIdRef(rcptType, rcptId, permId, cat string,
+func LookupGrantIDRef(rcptType, rcptID, permID, cat string,
 	id *string) error {
-	return grantIdFromServer(rcptType, rcptId, permId, cat, id)
+	return grantIDFromServer(rcptType, rcptID, permID, cat, id)
 }
 
-// LookupMonitoringId looks up the UUID of the monitoring system
+// LookupMonitoringID looks up the UUID of the monitoring system
 // with the name s. Returns immediately if s is a UUID.
-func LookupMonitoringId(s string) (string, error) {
+func LookupMonitoringID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return monitoringIdByName(s)
+	return monitoringIDByName(s)
 }
 
-// LookupNodeId looks up the UUID of the repository the bucket
+// LookupNodeID looks up the UUID of the repository the bucket
 // given via string s is part of. If s is a UUID, it is used as
-// bucketId for the lookup.
-func LookupNodeId(s string) (string, error) {
+// bucketID for the lookup.
+func LookupNodeID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return nodeIdByName(s)
+	return nodeIDByName(s)
 }
 
-// LookupCapabilityId looks up the UUID of the capability with the
+// LookupCapabilityID looks up the UUID of the capability with the
 // name s. Returns immediately if s is a UUID.
-func LookupCapabilityId(s string) (string, error) {
+func LookupCapabilityID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return capabilityIdByName(s)
+	return capabilityIDByName(s)
 }
 
-// LookupSectionId looks up the UUID of the section with the name
+// LookupSectionID looks up the UUID of the section with the name
 // s. Returns immediately if s is a UUID.
-func LookupSectionId(s string) (string, error) {
+func LookupSectionID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return sectionIdByName(s)
+	return sectionIDByName(s)
 }
 
-// LookupActionId looks up the UUID of the action with the name
+// LookupActionID looks up the UUID of the action with the name
 // a in section s. Return immediately if a is a UUID.
-func LookupActionId(a, s string) (string, error) {
+func LookupActionID(a, s string) (string, error) {
 	if IsUUID(s) {
 		return a, nil
 	}
 	var sID string
 	var err error
-	if sID, err = LookupSectionId(s); err != nil {
+	if sID, err = LookupSectionID(s); err != nil {
 		return ``, err
 	}
-	return actionIdByName(a, sID)
+	return actionIDByName(a, sID)
 }
 
 // LookupNodeConfig looks up the node repo/bucket configuration
 // given the name or UUID s of the node.
 func LookupNodeConfig(s string) (*proto.NodeConfig, error) {
 	var (
-		nId string
+		nID string
 		err error
 	)
 
 	if !IsUUID(s) {
-		if nId, err = LookupNodeId(s); err != nil {
+		if nID, err = LookupNodeID(s); err != nil {
 			return nil, err
 		}
 	} else {
-		nId = s
+		nID = s
 	}
 
-	return nodeConfigById(nId)
+	return nodeConfigByID(nID)
 }
 
-// LookupCheckConfigId looks up the UUID of check configuration.
+// LookupCheckConfigID looks up the UUID of check configuration.
 // Lookup requires either the name and repository of the check,
 // or the id of a check instance that was created by this check
 // configuration.
 // When the lookup is performed via name and repository, if the
 // name is already a UUID it is returned immediately.
-func LookupCheckConfigId(name, repo, instance string) (string, string, error) {
+func LookupCheckConfigID(name, repo, instance string) (string, string, error) {
 	if name != `` && repo != `` {
 		if IsUUID(name) {
 			return name, ``, nil
 		}
 		var repoID, r string
 		var err error
-		if r, err = LookupRepoId(repo); err != nil {
+		if r, err = LookupRepoID(repo); err != nil {
 			return ``, ``, err
 		}
 		repoID = r
-		return checkConfigIdByName(name, repoID)
+		return checkConfigIDByName(name, repoID)
 	} else if instance != `` {
-		return checkConfigIdByInstance(instance)
+		return checkConfigIDByInstance(instance)
 	}
-	return ``, ``, fmt.Errorf(`Invalid argument combination for CheckConfigId`)
+	return ``, ``, fmt.Errorf(`Invalid argument combination for CheckConfigID`)
 }
 
-// LookupCustomPropertyId looks up the UUID of a custom property s
+// LookupCustomPropertyID looks up the UUID of a custom property s
 // in Repository repo. Returns immediately if s is a UUID.
-func LookupCustomPropertyId(s, repo string) (string, error) {
+func LookupCustomPropertyID(s, repo string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	var rId, r string
+	var rID, r string
 	var err error
-	if r, err = LookupRepoId(repo); err != nil {
+	if r, err = LookupRepoID(repo); err != nil {
 		return ``, err
 	}
-	rId = r
-	return propertyIdByName(`custom`, s, rId)
+	rID = r
+	return propertyIDByName(`custom`, s, rID)
 }
 
-// LookupServicePropertyId looks up the id of a service property s
+// LookupServicePropertyID looks up the id of a service property s
 // of team team.
-func LookupServicePropertyId(s, team string) (string, error) {
+func LookupServicePropertyID(s, team string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
 	var tID, t string
 	var err error
-	if t, err = LookupTeamId(team); err != nil {
+	if t, err = LookupTeamID(team); err != nil {
 		return ``, err
 	}
 	tID = t
-	return propertyIdByName(`service`, s, tID)
+	return propertyIDByName(`service`, s, tID)
 }
 
-// LookupTemplatePropertyId looks up the id of a service template
+// LookupTemplatePropertyID looks up the id of a service template
 // property
-func LookupTemplatePropertyId(s string) (string, error) {
+func LookupTemplatePropertyID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return propertyIdByName(`template`, s, `none`)
+	return propertyIDByName(`template`, s, `none`)
 }
 
 // LookupLevelName looks up the long name of a level s, where s
@@ -384,32 +384,32 @@ func LookupLevelName(s string) (string, error) {
 	return levelByName(s)
 }
 
-// LookupCheckObjectId looks up the UUID for whichever object a
+// LookupCheckObjectID looks up the UUID for whichever object a
 // check was defined on
-func LookupCheckObjectId(oType, oName, buck string) (string, error) {
+func LookupCheckObjectID(oType, oName, buck string) (string, error) {
 	switch oType {
 	case `repository`:
-		return LookupRepoId(oName)
+		return LookupRepoID(oName)
 
 	case `bucket`:
-		return LookupBucketId(oName)
+		return LookupBucketID(oName)
 
 	case `group`:
-		return LookupGroupId(oName, buck)
+		return LookupGroupID(oName, buck)
 
 	case `cluster`:
-		return LookupClusterId(oName, buck)
+		return LookupClusterID(oName, buck)
 
 	case `node`:
-		return LookupNodeId(oName)
+		return LookupNodeID(oName)
 	}
 
 	return ``, fmt.Errorf("Unknown object type: %s", oType)
 }
 
-// oncallIdByName implements the actual serverside lookup of the
+// oncallIDByName implements the actual serverside lookup of the
 // oncall duty UUID
-func oncallIdByName(oncall string) (string, error) {
+func oncallIDByName(oncall string) (string, error) {
 	req := proto.NewOncallFilter()
 	req.Filter.Oncall = &proto.OncallFilter{Name: oncall}
 
@@ -429,15 +429,15 @@ func oncallIdByName(oncall string) (string, error) {
 			oncall, (*res.Oncalls)[0].Name)
 		goto abort
 	}
-	return (*res.Oncalls)[0].Id, nil
+	return (*res.Oncalls)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("OncallId lookup failed: %s", err.Error())
 }
 
-// oncallDetailsById implements the actual serverside lookup of
+// oncallDetailsByID implements the actual serverside lookup of
 // the oncall duty details
-func oncallDetailsById(oncall string) (string, string, error) {
+func oncallDetailsByID(oncall string) (string, string, error) {
 	res, err := fetchObjList(fmt.Sprintf("/oncall/%s", oncall))
 	if err != nil {
 		goto abort
@@ -448,9 +448,9 @@ func oncallDetailsById(oncall string) (string, string, error) {
 		goto abort
 	}
 
-	if oncall != (*res.Oncalls)[0].Id {
+	if oncall != (*res.Oncalls)[0].ID {
 		err = fmt.Errorf("OncallId mismatch: %s vs %s",
-			oncall, (*res.Oncalls)[0].Id)
+			oncall, (*res.Oncalls)[0].ID)
 		goto abort
 	}
 	return (*res.Oncalls)[0].Name, (*res.Oncalls)[0].Number, nil
@@ -460,9 +460,9 @@ abort:
 		err.Error())
 }
 
-// userIdByUserName implements the actual serverside lookup of the
+// userIDByUserName implements the actual serverside lookup of the
 // user's UUID
-func userIdByUserName(user string) (string, error) {
+func userIDByUserName(user string) (string, error) {
 	req := proto.NewUserFilter()
 	req.Filter.User.UserName = user
 
@@ -482,15 +482,15 @@ func userIdByUserName(user string) (string, error) {
 			user, (*res.Users)[0].UserName)
 		goto abort
 	}
-	return (*res.Users)[0].Id, nil
+	return (*res.Users)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("UserId lookup failed: %s", err.Error())
+	return ``, fmt.Errorf("UserID lookup failed: %s", err.Error())
 }
 
-// teamIdByName implements the actual serverside lookup of the
+// teamIDByName implements the actual serverside lookup of the
 // team's UUID
-func teamIdByName(team string) (string, error) {
+func teamIDByName(team string) (string, error) {
 	req := proto.NewTeamFilter()
 	req.Filter.Team.Name = team
 
@@ -510,15 +510,15 @@ func teamIdByName(team string) (string, error) {
 			team, (*res.Teams)[0].Name)
 		goto abort
 	}
-	return (*res.Teams)[0].Id, nil
+	return (*res.Teams)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("TeamId lookup failed: %s", err.Error())
+	return ``, fmt.Errorf("TeamID lookup failed: %s", err.Error())
 }
 
-// teamIdByRepoId implements the actual serverside lookup of
-// a repository's TeamId
-func teamIdByRepoId(repo string) (string, error) {
+// teamIDByRepoID implements the actual serverside lookup of
+// a repository's TeamID
+func teamIDByRepoID(repo string) (string, error) {
 	res, err := fetchObjList(fmt.Sprintf("/repository/%s", repo))
 	if err != nil {
 		goto abort
@@ -530,21 +530,21 @@ func teamIdByRepoId(repo string) (string, error) {
 	}
 
 	// check the received record against the input
-	if repo != (*res.Repositories)[0].Id {
+	if repo != (*res.Repositories)[0].ID {
 		err = fmt.Errorf("RepositoryId mismatch: %s vs %s",
-			repo, (*res.Repositories)[0].Id)
+			repo, (*res.Repositories)[0].ID)
 		goto abort
 	}
-	return (*res.Repositories)[0].TeamId, nil
+	return (*res.Repositories)[0].TeamID, nil
 
 abort:
-	return ``, fmt.Errorf("TeamId lookup failed: %s",
+	return ``, fmt.Errorf("TeamID lookup failed: %s",
 		err.Error())
 }
 
-// teamIdByBucketId implements the actual serverside lookup of
-// a bucket's TeamId
-func teamIdByBucketId(bucket string) (string, error) {
+// teamIDByBucketID implements the actual serverside lookup of
+// a bucket's TeamID
+func teamIDByBucketID(bucket string) (string, error) {
 	res, err := fetchObjList(fmt.Sprintf("/bucket/%s", bucket))
 	if err != nil {
 		goto abort
@@ -557,20 +557,20 @@ func teamIdByBucketId(bucket string) (string, error) {
 
 	// check the received record against the input
 	if bucket != (*res.Buckets)[0].ID {
-		err = fmt.Errorf("BucketId mismatch: %s vs %s",
+		err = fmt.Errorf("BucketID mismatch: %s vs %s",
 			bucket, (*res.Buckets)[0].ID)
 		goto abort
 	}
 	return (*res.Buckets)[0].TeamID, nil
 
 abort:
-	return ``, fmt.Errorf("TeamId lookup failed: %s",
+	return ``, fmt.Errorf("TeamID lookup failed: %s",
 		err.Error())
 }
 
-// teamIdByNodeId implements the actual serverside lookup of a
-// node's TeamId
-func teamIdByNodeId(node string) (string, error) {
+// teamIDByNodeID implements the actual serverside lookup of a
+// node's TeamID
+func teamIDByNodeID(node string) (string, error) {
 	res, err := fetchObjList(fmt.Sprintf("/nodes/%s", node))
 	if err != nil {
 		goto abort
@@ -590,13 +590,13 @@ func teamIdByNodeId(node string) (string, error) {
 	return (*res.Nodes)[0].TeamID, nil
 
 abort:
-	return ``, fmt.Errorf("TeamId lookup failed: %s",
+	return ``, fmt.Errorf("TeamID lookup failed: %s",
 		err.Error())
 }
 
-// repoIdByName implements the actual serverside lookup of the
+// repoIDByName implements the actual serverside lookup of the
 // repo's UUID
-func repoIdByName(repo string) (string, error) {
+func repoIDByName(repo string) (string, error) {
 	req := proto.NewRepositoryFilter()
 	req.Filter.Repository.Name = repo
 
@@ -616,16 +616,16 @@ func repoIdByName(repo string) (string, error) {
 			repo, (*res.Repositories)[0].Name)
 		goto abort
 	}
-	return (*res.Repositories)[0].Id, nil
+	return (*res.Repositories)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("RepositoryId lookup failed: %s",
 		err.Error())
 }
 
-// repoIdByBucketId implements the actual serverside lookup of the
+// repoIDByBucketID implements the actual serverside lookup of the
 // repo's UUID
-func repoIdByBucketId(bucket string) (string, error) {
+func repoIDByBucketID(bucket string) (string, error) {
 	res, err := fetchObjList(fmt.Sprintf("/bucket/%s", bucket))
 	if err != nil {
 		goto abort
@@ -638,7 +638,7 @@ func repoIdByBucketId(bucket string) (string, error) {
 
 	// check the received record against the input
 	if bucket != (*res.Buckets)[0].ID {
-		err = fmt.Errorf("BucketId mismatch: %s vs %s",
+		err = fmt.Errorf("BucketID mismatch: %s vs %s",
 			bucket, (*res.Buckets)[0].ID)
 		goto abort
 	}
@@ -649,9 +649,9 @@ abort:
 		err.Error())
 }
 
-// bucketIdByName implements the actual serverside lookup of the
+// bucketIDByName implements the actual serverside lookup of the
 // bucket's UUID
-func bucketIdByName(bucket string) (string, error) {
+func bucketIDByName(bucket string) (string, error) {
 	req := proto.NewBucketFilter()
 	req.Filter.Bucket.Name = bucket
 
@@ -674,15 +674,15 @@ func bucketIdByName(bucket string) (string, error) {
 	return (*res.Buckets)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("BucketId lookup failed: %s",
+	return ``, fmt.Errorf("BucketID lookup failed: %s",
 		err.Error())
 }
 
 //
-func groupIdByName(group, bucketId string) (string, error) {
+func groupIDByName(group, bucketID string) (string, error) {
 	req := proto.NewGroupFilter()
 	req.Filter.Group.Name = group
-	req.Filter.Group.BucketId = bucketId
+	req.Filter.Group.BucketID = bucketID
 
 	res, err := fetchFilter(req, `/filter/groups/`)
 	if err != nil {
@@ -698,18 +698,18 @@ func groupIdByName(group, bucketId string) (string, error) {
 		err = fmt.Errorf("Name mismatch: %s vs %s",
 			group, (*res.Groups)[0].Name)
 	}
-	return (*res.Groups)[0].Id, nil
+	return (*res.Groups)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("GroupId lookup failed: %s",
+	return ``, fmt.Errorf("GroupID lookup failed: %s",
 		err.Error())
 }
 
 //
-func clusterIdByName(cluster, bucketId string) (string, error) {
+func clusterIDByName(cluster, bucketID string) (string, error) {
 	req := proto.NewClusterFilter()
 	req.Filter.Cluster.Name = cluster
-	req.Filter.Cluster.BucketID = bucketId
+	req.Filter.Cluster.BucketID = bucketID
 
 	res, err := fetchFilter(req, `/filter/clusters/`)
 	if err != nil {
@@ -728,13 +728,13 @@ func clusterIdByName(cluster, bucketId string) (string, error) {
 	return (*res.Clusters)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("ClusterId lookup failed: %s",
+	return ``, fmt.Errorf("ClusterID lookup failed: %s",
 		err.Error())
 }
 
-// serverIdByName implements the actual lookup of the server UUID
+// serverIDByName implements the actual lookup of the server UUID
 // by name
-func serverIdByName(s string) (string, error) {
+func serverIDByName(s string) (string, error) {
 	if m, err := cache.ServerByName(s); err == nil {
 		return m[`id`], nil
 	}
@@ -765,13 +765,13 @@ func serverIdByName(s string) (string, error) {
 	return (*res.Servers)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("ServerId lookup failed: %s",
+	return ``, fmt.Errorf("ServerID lookup failed: %s",
 		err.Error())
 }
 
-// serverIdByAsset implements the actual lookup of the server UUID
+// serverIDByAsset implements the actual lookup of the server UUID
 // by numeric AssetID
-func serverIdByAsset(s string, aid uint64) (string, error) {
+func serverIDByAsset(s string, aid uint64) (string, error) {
 	if m, err := cache.ServerByAsset(s); err == nil {
 		return m[`id`], nil
 	}
@@ -802,13 +802,13 @@ func serverIdByAsset(s string, aid uint64) (string, error) {
 	return (*res.Servers)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("ServerId lookup failed: %s",
+	return ``, fmt.Errorf("ServerID lookup failed: %s",
 		err.Error())
 }
 
-// permissionIdByName implements the actual lookup of the permission
+// permissionIDByName implements the actual lookup of the permission
 // UUID by name
-func permissionIdByName(perm, cat string, id *string) error {
+func permissionIDByName(perm, cat string, id *string) error {
 	req := proto.NewPermissionFilter()
 	req.Filter.Permission.Name = perm
 	req.Filter.Permission.Category = cat
@@ -828,21 +828,21 @@ func permissionIdByName(perm, cat string, id *string) error {
 			perm, (*res.Permissions)[0].Name)
 		goto abort
 	}
-	*id = (*res.Permissions)[0].Id
+	*id = (*res.Permissions)[0].ID
 	return nil
 
 abort:
-	return fmt.Errorf("PermissionId lookup failed: %s",
+	return fmt.Errorf("PermissionID lookup failed: %s",
 		err.Error())
 }
 
-// grantIdFromServer implements the actual lookup of the grant UUID
-func grantIdFromServer(rcptType, rcptId, permId, cat string,
+// grantIDFromServer implements the actual lookup of the grant UUID
+func grantIDFromServer(rcptType, rcptID, permID, cat string,
 	id *string) error {
 	req := proto.NewGrantFilter()
 	req.Filter.Grant.RecipientType = rcptType
-	req.Filter.Grant.RecipientId = rcptId
-	req.Filter.Grant.PermissionId = permId
+	req.Filter.Grant.RecipientID = rcptID
+	req.Filter.Grant.PermissionID = permID
 	req.Filter.Grant.Category = cat
 
 	res, err := fetchFilter(req, `/filter/grant/`)
@@ -855,21 +855,21 @@ func grantIdFromServer(rcptType, rcptId, permId, cat string,
 		goto abort
 	}
 
-	if permId != (*res.Grants)[0].PermissionId {
-		err = fmt.Errorf("PermissionId mismatch: %s vs %s",
-			permId, (*res.Grants)[0].PermissionId)
+	if permID != (*res.Grants)[0].PermissionID {
+		err = fmt.Errorf("PermissionID mismatch: %s vs %s",
+			permID, (*res.Grants)[0].PermissionID)
 		goto abort
 	}
-	*id = (*res.Grants)[0].Id
+	*id = (*res.Grants)[0].ID
 
 abort:
 	return fmt.Errorf("GrantId lookup failed: %s",
 		err.Error())
 }
 
-// monitoringIdByName implements the actual lookup of the monitoring
+// monitoringIDByName implements the actual lookup of the monitoring
 // system UUID
-func monitoringIdByName(monitoring string) (string, error) {
+func monitoringIDByName(monitoring string) (string, error) {
 	req := proto.NewMonitoringFilter()
 	req.Filter.Monitoring.Name = monitoring
 
@@ -888,15 +888,15 @@ func monitoringIdByName(monitoring string) (string, error) {
 			monitoring, (*res.Monitorings)[0].Name)
 		goto abort
 	}
-	return (*res.Monitorings)[0].Id, nil
+	return (*res.Monitorings)[0].ID, nil
 
 abort:
 	return ``, fmt.Errorf("MonitoringId lookup failed: %s",
 		err.Error())
 }
 
-// nodeIdByName implements the actual lookup of the node UUID
-func nodeIdByName(node string) (string, error) {
+// nodeIDByName implements the actual lookup of the node UUID
+func nodeIDByName(node string) (string, error) {
 	req := proto.NewNodeFilter()
 	req.Filter.Node.Name = node
 
@@ -922,9 +922,9 @@ abort:
 		err.Error())
 }
 
-// sectionIdByName implements the actual lookup of the section
+// sectionIDByName implements the actual lookup of the section
 // UUID from the server
-func sectionIdByName(section string) (string, error) {
+func sectionIDByName(section string) (string, error) {
 	req := proto.NewSectionFilter()
 	req.Filter.Section.Name = section
 
@@ -943,16 +943,16 @@ func sectionIdByName(section string) (string, error) {
 			section, (*res.Sections)[0].Name)
 		goto abort
 	}
-	return (*res.Sections)[0].Id, nil
+	return (*res.Sections)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("SectionId lookup failed: %s",
+	return ``, fmt.Errorf("SectionID lookup failed: %s",
 		err.Error())
 }
 
-// actionIdByName implements the actual lookup of the action
+// actionIDByName implements the actual lookup of the action
 // UUID from the server
-func actionIdByName(action, section string) (string, error) {
+func actionIDByName(action, section string) (string, error) {
 	req := proto.NewActionFilter()
 	req.Filter.Action.Name = action
 	req.Filter.Action.SectionID = section
@@ -975,13 +975,13 @@ func actionIdByName(action, section string) (string, error) {
 	return (*res.Actions)[0].ID, nil
 
 abort:
-	return ``, fmt.Errorf("ActionId lookup failed: %s",
+	return ``, fmt.Errorf("ActionID lookup failed: %s",
 		err.Error())
 }
 
-// nodeConfigById implements the actual lookup of the node's repo
+// nodeConfigByID implements the actual lookup of the node's repo
 // and bucket assignment information from the server
-func nodeConfigById(node string) (*proto.NodeConfig, error) {
+func nodeConfigByID(node string) (*proto.NodeConfig, error) {
 	path := fmt.Sprintf("/nodes/%s/config", node)
 	var (
 		err  error
@@ -1021,9 +1021,9 @@ abort:
 		err.Error())
 }
 
-// capabilityIdByName implements the actual lookup of the capability
+// capabilityIDByName implements the actual lookup of the capability
 // UUID from the server
-func capabilityIdByName(cap string) (string, error) {
+func capabilityIDByName(cap string) (string, error) {
 	var err error
 	var res *proto.Result
 	req := proto.NewCapabilityFilter()
@@ -1033,7 +1033,7 @@ func capabilityIdByName(cap string) (string, error) {
 		err = fmt.Errorf(`Capability split failed, name invalid`)
 		goto abort
 	}
-	if req.Filter.Capability.MonitoringID, err = LookupMonitoringId(
+	if req.Filter.Capability.MonitoringID, err = LookupMonitoringID(
 		split[0]); err != nil {
 		goto abort
 	}
@@ -1061,9 +1061,9 @@ abort:
 		err.Error())
 }
 
-// checkConfigIdByName implements the actual lookup of the check
+// checkConfigIDByName implements the actual lookup of the check
 // configuration's UUID from the server by check config name
-func checkConfigIdByName(check, repo string) (string, string, error) {
+func checkConfigIDByName(check, repo string) (string, string, error) {
 	req := proto.NewCheckConfigFilter()
 	req.Filter.CheckConfig.Name = check
 
@@ -1086,13 +1086,13 @@ func checkConfigIdByName(check, repo string) (string, string, error) {
 	return (*res.CheckConfigs)[0].ID, repo, nil
 
 abort:
-	return ``, ``, fmt.Errorf("CheckConfigId lookup failed: %s",
+	return ``, ``, fmt.Errorf("CheckConfigID lookup failed: %s",
 		err.Error())
 }
 
-// checkConfigIdByInstance implements the actual lookup of the check
+// checkConfigIDByInstance implements the actual lookup of the check
 // configuration's UUID from the server via an instance ID it created
-func checkConfigIdByInstance(instance string) (string, string, error) {
+func checkConfigIDByInstance(instance string) (string, string, error) {
 	res, err := fetchObjList(fmt.Sprintf("/instances/%s", instance))
 	if err != nil {
 		goto abort
@@ -1103,22 +1103,22 @@ func checkConfigIdByInstance(instance string) (string, string, error) {
 		goto abort
 	}
 
-	if instance != (*res.Instances)[0].Id {
+	if instance != (*res.Instances)[0].ID {
 		err = fmt.Errorf("Id mismatch: %s vs %s",
-			instance, (*res.Instances)[0].Id)
+			instance, (*res.Instances)[0].ID)
 		goto abort
 	}
-	return (*res.Instances)[0].ConfigId,
-		(*res.Instances)[0].RepositoryId, nil
+	return (*res.Instances)[0].ConfigID,
+		(*res.Instances)[0].RepositoryID, nil
 
 abort:
-	return ``, ``, fmt.Errorf("CheckConfigId lookup failed: %s",
+	return ``, ``, fmt.Errorf("CheckConfigID lookup failed: %s",
 		err.Error())
 }
 
-// propertyIdByName implements the actual lookup of property ids
+// propertyIDByName implements the actual lookup of property ids
 // from the server
-func propertyIdByName(pType, pName, refId string) (string, error) {
+func propertyIDByName(pType, pName, refID string) (string, error) {
 	req := proto.NewPropertyFilter()
 	req.Filter.Property.Type = pType
 	req.Filter.Property.Name = pName
@@ -1132,11 +1132,11 @@ func propertyIdByName(pType, pName, refId string) (string, error) {
 	switch pType {
 	case `custom`:
 		// custom properties are per-repository
-		req.Filter.Property.RepositoryID = refId
-		path = fmt.Sprintf("/filter/property/custom/%s/", refId)
+		req.Filter.Property.RepositoryID = refID
+		path = fmt.Sprintf("/filter/property/custom/%s/", refID)
 	case `service`:
 		path = fmt.Sprintf("/filter/property/service/team/%s/",
-			refId)
+			refID)
 	case `template`:
 		path = `/filter/property/service/global/`
 	default:
@@ -1160,16 +1160,16 @@ func propertyIdByName(pType, pName, refId string) (string, error) {
 				pName, (*res.Properties)[0].Custom.Name)
 			goto abort
 		}
-		if refId != (*res.Properties)[0].Custom.RepositoryID {
+		if refID != (*res.Properties)[0].Custom.RepositoryID {
 			err = fmt.Errorf("RepositoryId mismatch: %s vs %s",
-				refId, (*res.Properties)[0].Custom.RepositoryID)
+				refID, (*res.Properties)[0].Custom.RepositoryID)
 			goto abort
 		}
 		return (*res.Properties)[0].Custom.ID, nil
 	case `service`:
-		if refId != (*res.Properties)[0].Service.TeamID {
-			err = fmt.Errorf("TeamId mismatch: %s vs %s",
-				refId, (*res.Properties)[0].Service.TeamID)
+		if refID != (*res.Properties)[0].Service.TeamID {
+			err = fmt.Errorf("TeamID mismatch: %s vs %s",
+				refID, (*res.Properties)[0].Service.TeamID)
 			goto abort
 		}
 		fallthrough
@@ -1185,7 +1185,7 @@ func propertyIdByName(pType, pName, refId string) (string, error) {
 	}
 
 abort:
-	return ``, fmt.Errorf("PropertyId lookup failed: %s", err.Error())
+	return ``, fmt.Errorf("PropertyID lookup failed: %s", err.Error())
 }
 
 // levelByName implements the actual lookup of the level details
@@ -1218,7 +1218,7 @@ abort:
 		err.Error())
 }
 
-// fetchFilter is a helper used in the ...IdByFoo functions
+// fetchFilter is a helper used in the ...IDByFoo functions
 func fetchFilter(req proto.Request, path string) (*proto.Result, error) {
 	var (
 		err  error

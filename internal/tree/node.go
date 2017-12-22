@@ -18,11 +18,11 @@ import (
 )
 
 type Node struct {
-	Id              uuid.UUID
+	ID              uuid.UUID
 	Name            string
-	AssetId         uint64
+	AssetID         uint64
 	Team            uuid.UUID
-	ServerId        uuid.UUID
+	ServerID        uuid.UUID
 	State           string
 	Online          bool
 	Deleted         bool
@@ -43,11 +43,11 @@ type Node struct {
 }
 
 type NodeSpec struct {
-	Id       string
-	AssetId  uint64
+	ID       string
+	AssetID  uint64
 	Name     string
 	Team     string
-	ServerId string
+	ServerID string
 	Online   bool
 	Deleted  bool
 }
@@ -61,11 +61,11 @@ func NewNode(spec NodeSpec) *Node {
 	}
 
 	ten := new(Node)
-	ten.Id, _ = uuid.FromString(spec.Id)
+	ten.ID, _ = uuid.FromString(spec.ID)
 	ten.Name = spec.Name
-	ten.AssetId = spec.AssetId
+	ten.AssetID = spec.AssetID
 	ten.Team, _ = uuid.FromString(spec.Team)
-	ten.ServerId, _ = uuid.FromString(spec.ServerId)
+	ten.ServerID, _ = uuid.FromString(spec.ServerID)
 	ten.Online = spec.Online
 	ten.Deleted = spec.Deleted
 	ten.Type = "node"
@@ -92,10 +92,10 @@ func (ten Node) Clone() *Node {
 		Type:    ten.Type,
 		log:     ten.log,
 	}
-	cl.Id, _ = uuid.FromString(ten.Id.String())
-	cl.AssetId = ten.AssetId
+	cl.ID, _ = uuid.FromString(ten.ID.String())
+	cl.AssetID = ten.AssetID
 	cl.Team, _ = uuid.FromString(ten.Team.String())
-	cl.ServerId, _ = uuid.FromString(ten.ServerId.String())
+	cl.ServerID, _ = uuid.FromString(ten.ServerID.String())
 
 	pO := make(map[string]Property)
 	for k, prop := range ten.PropertyOncall {
@@ -135,7 +135,7 @@ func (ten Node) Clone() *Node {
 	cl.loadedInstances = make(map[string]map[string]CheckInstance)
 
 	ci := make(map[string][]string)
-	for k, _ := range ten.CheckInstances {
+	for k := range ten.CheckInstances {
 		for _, str := range ten.CheckInstances[k] {
 			t := str
 			ci[k] = append(ci[k], t)
@@ -161,7 +161,7 @@ func (ten Node) CloneCluster() ClusterAttacher {
 //
 // Interface:
 func (ten *Node) GetID() string {
-	return ten.Id.String()
+	return ten.ID.String()
 }
 
 func (ten *Node) GetName() string {
@@ -197,12 +197,12 @@ func (ten *Node) setActionDeep(c chan *Action) {
 	ten.setAction(c)
 }
 
-func (n *Node) setLog(newlog *log.Logger) {
-	n.log = newlog
+func (ten *Node) setLog(newlog *log.Logger) {
+	ten.log = newlog
 }
 
-func (n *Node) setLoggerDeep(newlog *log.Logger) {
-	n.setLog(newlog)
+func (ten *Node) setLoggerDeep(newlog *log.Logger) {
+	ten.setLog(newlog)
 }
 
 func (ten *Node) updateParentRecursive(p Receiver) {
@@ -229,11 +229,11 @@ func (ten *Node) updateFaultRecursive(f *Fault) {
 //
 //
 func (ten *Node) ComputeCheckInstances() {
-	ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s",
+	ten.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s",
 		ten.Parent.(Bucketeer).GetRepositoryName(),
 		`ComputeCheckInstances`,
 		`node`,
-		ten.Id.String(),
+		ten.ID.String(),
 	)
 	ten.updateCheckInstances()
 }
@@ -249,11 +249,11 @@ func (ten *Node) ClearLoadInfo() {
 func (ten *Node) export() proto.Node {
 	bucket := ten.Parent.(Bucketeer).GetBucket()
 	return proto.Node{
-		ID:        ten.Id.String(),
-		AssetID:   ten.AssetId,
+		ID:        ten.ID.String(),
+		AssetID:   ten.AssetID,
 		Name:      ten.Name,
 		TeamID:    ten.Team.String(),
-		ServerID:  ten.ServerId.String(),
+		ServerID:  ten.ServerID.String(),
 		State:     ten.State,
 		IsOnline:  ten.Online,
 		IsDeleted: ten.Deleted,
@@ -313,14 +313,14 @@ func (ten *Node) actionProperty(a Action) {
 
 //
 func (ten *Node) actionCheckNew(a Action) {
-	a.Check.RepositoryId = ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Check.BucketId = ten.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Check.RepositoryID = ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Check.BucketID = ten.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 	ten.actionDispatch("check_new", a)
 }
 
 func (ten *Node) actionCheckRemoved(a Action) {
-	a.Check.RepositoryId = ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Check.BucketId = ten.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Check.RepositoryID = ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Check.BucketID = ten.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 	ten.actionDispatch(`check_removed`, a)
 }
 

@@ -95,8 +95,8 @@ func (c *Cache) performClusterDestroy(q *msg.Request) {
 func (c *Cache) performGroupCreate(q *msg.Request) {
 	c.lock.Lock()
 	c.object.addGroup(
-		q.Group.BucketId,
-		q.Group.Id,
+		q.Group.BucketID,
+		q.Group.ID,
 	)
 	c.lock.Unlock()
 }
@@ -105,12 +105,12 @@ func (c *Cache) performGroupCreate(q *msg.Request) {
 func (c *Cache) performGroupDestroy(q *msg.Request) {
 	c.lock.Lock()
 	// revoke all grants on the object to be deleted
-	grantIDs := c.grantRepository.getObjectGrantID(q.Group.Id)
+	grantIDs := c.grantRepository.getObjectGrantID(q.Group.ID)
 	for _, grantID := range grantIDs {
 		c.grantRepository.revoke(grantID)
 	}
 	// remove object
-	c.object.rmGroup(q.Group.Id)
+	c.object.rmGroup(q.Group.ID)
 	c.lock.Unlock()
 }
 
@@ -141,7 +141,7 @@ func (c *Cache) performNodeUnassign(q *msg.Request) {
 func (c *Cache) performPermissionAdd(q *msg.Request) {
 	c.lock.Lock()
 	c.pmap.addPermission(
-		q.Permission.Id,
+		q.Permission.ID,
 		q.Permission.Name,
 		q.Permission.Category,
 	)
@@ -164,7 +164,7 @@ func (c *Cache) performPermissionMap(q *msg.Request) {
 // performPermissionRemove removes a permission from the cache
 func (c *Cache) performPermissionRemove(q *msg.Request) {
 	c.lock.Lock()
-	c.performPermissionRemoveTask(q.Permission.Id)
+	c.performPermissionRemoveTask(q.Permission.ID)
 	c.lock.Unlock()
 }
 
@@ -185,7 +185,7 @@ func (c *Cache) performPermissionUnmap(q *msg.Request) {
 // performRepositoryCreate adds a new repository to the object cache
 func (c *Cache) performRepositoryCreate(q *msg.Request) {
 	c.lock.Lock()
-	c.object.addRepository(q.Repository.Id)
+	c.object.addRepository(q.Repository.ID)
 	c.lock.Unlock()
 }
 
@@ -193,12 +193,12 @@ func (c *Cache) performRepositoryCreate(q *msg.Request) {
 func (c *Cache) performRepositoryDestroy(q *msg.Request) {
 	c.lock.Lock()
 	// revoke all grants on the object to be deleted
-	grantIDs := c.grantRepository.getObjectGrantID(q.Repository.Id)
+	grantIDs := c.grantRepository.getObjectGrantID(q.Repository.ID)
 	for _, grantID := range grantIDs {
 		c.grantRepository.revoke(grantID)
 	}
 	// remove object
-	c.object.rmRepository(q.Repository.Id)
+	c.object.rmRepository(q.Repository.ID)
 	c.lock.Unlock()
 }
 
@@ -238,7 +238,7 @@ func (c *Cache) performRightRevoke(q *msg.Request) {
 func (c *Cache) performSectionAdd(q *msg.Request) {
 	c.lock.Lock()
 	c.section.add(
-		q.SectionObj.Id,
+		q.SectionObj.ID,
 		q.SectionObj.Name,
 		q.SectionObj.Category,
 	)
@@ -249,7 +249,7 @@ func (c *Cache) performSectionAdd(q *msg.Request) {
 // actions and permission mappings
 func (c *Cache) performSectionRemove(q *msg.Request) {
 	c.lock.Lock()
-	c.performSectionRemoveTask(q.SectionObj.Id)
+	c.performSectionRemoveTask(q.SectionObj.ID)
 	c.lock.Unlock()
 }
 
@@ -257,7 +257,7 @@ func (c *Cache) performSectionRemove(q *msg.Request) {
 func (c *Cache) performTeamAdd(q *msg.Request) {
 	c.lock.Lock()
 	c.team.add(
-		q.Team.Id,
+		q.Team.ID,
 		q.Team.Name,
 	)
 	c.lock.Unlock()
@@ -267,27 +267,27 @@ func (c *Cache) performTeamAdd(q *msg.Request) {
 func (c *Cache) performTeamRemove(q *msg.Request) {
 	c.lock.Lock()
 	// revoke all global grants for the team
-	grantIDs := c.grantGlobal.getSubjectGrantID(`team`, q.Team.Id)
+	grantIDs := c.grantGlobal.getSubjectGrantID(`team`, q.Team.ID)
 	for _, grantID := range grantIDs {
 		c.grantGlobal.revoke(grantID)
 	}
 	// revoke all monitoring grants for the team
-	grantIDs = c.grantMonitoring.getSubjectGrantID(`team`, q.Team.Id)
+	grantIDs = c.grantMonitoring.getSubjectGrantID(`team`, q.Team.ID)
 	for _, grantID := range grantIDs {
 		c.grantMonitoring.revoke(grantID)
 	}
 	// revoke all repository grants for the team
-	grantIDs = c.grantRepository.getSubjectGrantID(`team`, q.Team.Id)
+	grantIDs = c.grantRepository.getSubjectGrantID(`team`, q.Team.ID)
 	for _, grantID := range grantIDs {
 		c.grantRepository.revoke(grantID)
 	}
 	// revoke all team grants for the team
-	grantIDs = c.grantTeam.getSubjectGrantID(`team`, q.Team.Id)
+	grantIDs = c.grantTeam.getSubjectGrantID(`team`, q.Team.ID)
 	for _, grantID := range grantIDs {
 		c.grantTeam.revoke(grantID)
 	}
 	// remove team
-	c.team.rmByID(q.Team.Id)
+	c.team.rmByID(q.Team.ID)
 	c.lock.Unlock()
 }
 
@@ -295,13 +295,13 @@ func (c *Cache) performTeamRemove(q *msg.Request) {
 func (c *Cache) performUserAdd(q *msg.Request) {
 	c.lock.Lock()
 	c.user.add(
-		q.User.Id,
+		q.User.ID,
 		q.User.UserName,
-		q.User.TeamId,
+		q.User.TeamID,
 	)
 	c.team.addMember(
-		q.User.TeamId,
-		q.User.Id,
+		q.User.TeamID,
+		q.User.ID,
 	)
 	c.lock.Unlock()
 }
@@ -309,34 +309,34 @@ func (c *Cache) performUserAdd(q *msg.Request) {
 // performUserRemove removes a user
 func (c *Cache) performUserRemove(q *msg.Request) {
 	c.lock.Lock()
-	u := c.user.getByID(q.User.Id)
+	u := c.user.getByID(q.User.ID)
 	if u == nil {
 		return
 	}
 	// revoke all global grants for the user
-	grantIDs := c.grantGlobal.getSubjectGrantID(`user`, u.Id)
+	grantIDs := c.grantGlobal.getSubjectGrantID(`user`, u.ID)
 	for _, grantID := range grantIDs {
 		c.grantGlobal.revoke(grantID)
 	}
 	// revoke all monitoring grants for the user
-	grantIDs = c.grantMonitoring.getSubjectGrantID(`user`, u.Id)
+	grantIDs = c.grantMonitoring.getSubjectGrantID(`user`, u.ID)
 	for _, grantID := range grantIDs {
 		c.grantMonitoring.revoke(grantID)
 	}
 	// revoke all repository grants for the user
-	grantIDs = c.grantRepository.getSubjectGrantID(`user`, u.Id)
+	grantIDs = c.grantRepository.getSubjectGrantID(`user`, u.ID)
 	for _, grantID := range grantIDs {
 		c.grantRepository.revoke(grantID)
 	}
 	// revoke all team grants for the user
-	grantIDs = c.grantTeam.getSubjectGrantID(`user`, u.Id)
+	grantIDs = c.grantTeam.getSubjectGrantID(`user`, u.ID)
 	for _, grantID := range grantIDs {
 		c.grantTeam.revoke(grantID)
 	}
 	// remove user from team
-	c.team.rmMember(u.TeamId, u.Id)
+	c.team.rmMember(u.TeamID, u.ID)
 	// remove user
-	c.user.rmByID(u.Id)
+	c.user.rmByID(u.ID)
 	c.lock.Unlock()
 }
 

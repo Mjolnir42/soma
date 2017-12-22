@@ -52,7 +52,7 @@ func registerInstances(app cli.App) *cli.App {
 func cmdInstanceCascade(c *cli.Context) error {
 	var (
 		err             error
-		checkId, repoId string
+		checkID, repoID string
 	)
 	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
@@ -61,12 +61,12 @@ func cmdInstanceCascade(c *cli.Context) error {
 		return fmt.Errorf("Argument is not a UUID: %s",
 			c.Args().First())
 	}
-	if checkId, repoId, err = adm.LookupCheckConfigId(
+	if checkID, repoID, err = adm.LookupCheckConfigID(
 		``, ``, c.Args().First()); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/checks/%s/%s", repoId, checkId)
+	path := fmt.Sprintf("/checks/%s/%s", repoID, checkID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 

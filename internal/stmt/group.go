@@ -60,7 +60,7 @@ JOIN   soma.groups sg
 ON     sgmn.group_id = sg.group_id
 WHERE  sgmn.group_id = $1::uuid;`
 
-	GroupBucketId = `
+	GroupBucketID = `
 SELECT sg.bucket_id
 FROM   soma.groups sg
 WHERE  sg.group_id = $1;`
@@ -148,7 +148,7 @@ WHERE  sgsp.source_instance_id = $1::uuid
 )
 
 func init() {
-	m[GroupBucketId] = `GroupBucketId`
+	m[GroupBucketID] = `GroupBucketID`
 	m[GroupCstProps] = `GroupCstProps`
 	m[GroupCustomPropertyForDelete] = `GroupCustomPropertyForDelete`
 	m[GroupList] = `GroupList`

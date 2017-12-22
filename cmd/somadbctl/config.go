@@ -12,7 +12,7 @@ import (
 type Config struct {
 	Environment string   `json:"environment"`
 	Timeout     string   `json:"timeout"`
-	TlsMode     string   `json:"tlsmode"`
+	TLSMode     string   `json:"tlsmode"`
 	Database    DbConfig `json:"database"`
 }
 
@@ -39,11 +39,11 @@ func (c *Config) populateFromFile(fname string) error {
 	}
 
 	// take detour via JSON to load UCL into struct
-	uclJson, err := json.Marshal(uclData)
+	uclJSON, err := json.Marshal(uclData)
 	if err != nil {
 		log.Fatal(err)
 	}
-	json.Unmarshal([]byte(uclJson), &c)
+	json.Unmarshal([]byte(uclJSON), &c)
 
 	return nil
 }

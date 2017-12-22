@@ -38,7 +38,7 @@ JOIN   soma.clusters sc
 ON     scm.cluster_id = sc.cluster_id
 WHERE  scm.cluster_id = $1::uuid;`
 
-	ClusterBucketId = `
+	ClusterBucketID = `
 SELECT sc.bucket_id
 FROM   soma.clusters sc
 WHERE  sc.cluster_id = $1;`
@@ -126,7 +126,7 @@ WHERE  scsp.source_instance_id = $1::uuid
 )
 
 func init() {
-	m[ClusterBucketId] = `ClusterBucketId`
+	m[ClusterBucketID] = `ClusterBucketID`
 	m[ClusterCstProps] = `ClusterCstProps`
 	m[ClusterCustomPropertyForDelete] = `ClusterCustomPropertyForDelete`
 	m[ClusterList] = `ClusterList`

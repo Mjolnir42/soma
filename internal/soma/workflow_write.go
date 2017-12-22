@@ -120,7 +120,7 @@ func (w *WorkflowWrite) retry(q *msg.Request, mr *msg.Result) {
 	}
 
 	if res, err = txMap[`retry`].Exec(
-		q.Workflow.InstanceId,
+		q.Workflow.InstanceID,
 	); err != nil {
 		tx.Rollback()
 		mr.ServerError(err, q.Section)
@@ -132,7 +132,7 @@ func (w *WorkflowWrite) retry(q *msg.Request, mr *msg.Result) {
 	}
 
 	if res, err = txMap[`update`].Exec(
-		q.Workflow.InstanceId,
+		q.Workflow.InstanceID,
 	); err != nil {
 		tx.Rollback()
 		mr.ServerError(err, q.Section)
@@ -160,7 +160,7 @@ func (w *WorkflowWrite) set(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 	if res, err = w.stmtSet.Exec(
-		q.Workflow.InstanceConfigId,
+		q.Workflow.InstanceConfigID,
 		q.Workflow.Status,
 		q.Workflow.NextStatus,
 	); err != nil {

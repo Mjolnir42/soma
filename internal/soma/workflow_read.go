@@ -145,11 +145,11 @@ func (r *WorkflowRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		instance := proto.Instance{
-			Id:               instanceID,
-			CheckId:          checkID,
-			RepositoryId:     repoID,
-			ConfigId:         configID,
-			InstanceConfigId: instanceConfigID,
+			ID:               instanceID,
+			CheckID:          checkID,
+			RepositoryID:     repoID,
+			ConfigID:         configID,
+			InstanceConfigID: instanceConfigID,
 			Version:          uint64(version),
 			CurrentStatus:    status,
 			IsInherited:      isInherited,

@@ -14,7 +14,7 @@ type somaResult struct {
 	NotFound        bool
 	NotImplemented  bool
 	Accepted        bool
-	JobId           string
+	JobID           string
 	JobType         string
 	Buckets         []somaBucketResult
 	Capabilities    []somaCapabilityResult
@@ -80,7 +80,7 @@ func (r *somaResult) Append(err error, res SomaAppender) {
 
 func (r *somaResult) MarkErrors(reply ErrorMarker) bool {
 	return reply.ErrorMark(r.RequestError, r.NotImplemented, r.NotFound,
-		ResultLength(r, reply), r.JobId, r.JobType)
+		ResultLength(r, reply), r.JobID, r.JobType)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

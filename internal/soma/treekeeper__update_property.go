@@ -19,7 +19,7 @@ func (tk *TreeKeeper) addProperty(q *msg.Request) {
 	prop, id := tk.convProperty(`add`, q)
 	tk.tree.Find(tree.FindRequest{
 		ElementType: q.Section,
-		ElementId:   id,
+		ElementID:   id,
 	}, true).(tree.Propertier).SetProperty(prop)
 }
 
@@ -27,7 +27,7 @@ func (tk *TreeKeeper) rmProperty(q *msg.Request) {
 	prop, id := tk.convProperty(`rm`, q)
 	tk.tree.Find(tree.FindRequest{
 		ElementType: q.Section,
-		ElementId:   id,
+		ElementID:   id,
 	}, true).(tree.Propertier).DeleteProperty(prop)
 }
 
@@ -45,13 +45,13 @@ func (tk *TreeKeeper) convProperty(task string, q *msg.Request) (
 		id = q.Cluster.ID
 		prop = tk.pTT(task, (*q.Cluster.Properties)[0])
 	case `group`:
-		id = q.Group.Id
+		id = q.Group.ID
 		prop = tk.pTT(task, (*q.Group.Properties)[0])
 	case `bucket`:
 		id = q.Bucket.ID
 		prop = tk.pTT(task, (*q.Bucket.Properties)[0])
 	case `repository`:
-		id = q.Repository.Id
+		id = q.Repository.ID
 		prop = tk.pTT(task, (*q.Repository.Properties)[0])
 	}
 	return prop, id
@@ -64,8 +64,8 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		switch task {
 		case `add`:
 			return &tree.PropertyCustom{
-				Id:           uuid.NewV4(),
-				CustomId:     customID,
+				ID:           uuid.NewV4(),
+				CustomID:     customID,
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
 				View:         pp.View,
@@ -75,8 +75,8 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		case `rm`:
 			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertyCustom{
-				SourceId: srcUUID,
-				CustomId: customID,
+				SourceID: srcUUID,
+				CustomID: customID,
 				View:     pp.View,
 				Key:      pp.Custom.Name,
 				Value:    pp.Custom.Value,
@@ -87,8 +87,8 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		switch task {
 		case `add`:
 			return &tree.PropertyOncall{
-				Id:           uuid.NewV4(),
-				OncallId:     oncallID,
+				ID:           uuid.NewV4(),
+				OncallID:     oncallID,
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
 				View:         pp.View,
@@ -98,8 +98,8 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		case `rm`:
 			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertyOncall{
-				SourceId: srcUUID,
-				OncallId: oncallID,
+				SourceID: srcUUID,
+				OncallID: oncallID,
 				View:     pp.View,
 				Name:     pp.Oncall.Name,
 				Number:   pp.Oncall.Number,
@@ -109,7 +109,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		switch task {
 		case `add`:
 			return &tree.PropertyService{
-				Id:           uuid.NewV4(),
+				ID:           uuid.NewV4(),
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
 				View:         pp.View,
@@ -119,7 +119,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		case `rm`:
 			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertyService{
-				SourceId: srcUUID,
+				SourceID: srcUUID,
 				View:     pp.View,
 				Service:  pp.Service.Name,
 			}
@@ -128,7 +128,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		switch task {
 		case `add`:
 			return &tree.PropertySystem{
-				Id:           uuid.NewV4(),
+				ID:           uuid.NewV4(),
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
 				View:         pp.View,
@@ -138,7 +138,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		case `rm`:
 			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertySystem{
-				SourceId: srcUUID,
+				SourceID: srcUUID,
 				View:     pp.View,
 				Key:      pp.System.Name,
 				Value:    pp.System.Value,

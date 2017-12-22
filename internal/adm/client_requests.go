@@ -124,8 +124,8 @@ func handleRequestOptions(resp *resty.Response, err error) (*resty.Response, err
 	}
 
 	if jobSave {
-		if result.StatusCode == 202 && result.JobId != "" {
-			cache.SaveJob(result.JobId, result.JobType)
+		if result.StatusCode == 202 && result.JobID != "" {
+			cache.SaveJob(result.JobID, result.JobType)
 		}
 	}
 
@@ -140,9 +140,9 @@ func asyncWait(result *proto.Result) {
 		return
 	}
 
-	if result.StatusCode == 202 && result.JobId != "" {
-		fmt.Fprintf(os.Stderr, "Waiting for job: %s\n", result.JobId)
-		_, err := PutReq(fmt.Sprintf("/jobs/id/%s", result.JobId))
+	if result.StatusCode == 202 && result.JobID != "" {
+		fmt.Fprintf(os.Stderr, "Waiting for job: %s\n", result.JobID)
+		_, err := PutReq(fmt.Sprintf("/jobs/id/%s", result.JobID))
 		if err != nil && err != io.EOF {
 			fmt.Fprintf(os.Stderr, "Wait error: %s\n", err.Error())
 		}

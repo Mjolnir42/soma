@@ -10,7 +10,7 @@
 package proto
 
 type Tree struct {
-	Id         string      `json:"id,omitempty"`
+	ID         string      `json:"id,omitempty"`
 	Type       string      `json:"type,omitempty"`
 	Repository *Repository `json:"repository,omitempty"`
 	Bucket     *Bucket     `json:"bucket,omitempty"`

@@ -13,13 +13,13 @@ type ConfigurationData struct {
 }
 
 type ConfigurationList struct {
-	ConfigurationItemIdList []string `json:"configuration_item_id_list"`
+	ConfigurationItemIDList []string `json:"configuration_item_id_list"`
 }
 
 type ConfigurationItem struct {
-	ConfigurationItemId uuid.UUID                `json:"configuration_item_id" valid:"-"`
+	ConfigurationItemID uuid.UUID                `json:"configuration_item_id" valid:"-"`
 	Metric              string                   `json:"metric" valid:"printableascii"`
-	HostId              string                   `json:"host_id" valid:"numeric"`
+	HostID              string                   `json:"host_id" valid:"numeric"`
 	Tags                []string                 `json:"tags,omitempty" valid:"-"`
 	Oncall              string                   `json:"oncall" valid:"-"`
 	Interval            uint64                   `json:"interval" valid:"-"`

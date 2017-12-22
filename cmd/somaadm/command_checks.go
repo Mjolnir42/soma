@@ -55,7 +55,7 @@ func registerChecks(app cli.App) *cli.App {
 func cmdCheckAdd(c *cli.Context) error {
 	var (
 		err    error
-		teamId string
+		teamID string
 	)
 	opts := make(map[string][]string)
 	constraints := []proto.CheckConfigConstraint{}
@@ -78,13 +78,13 @@ func cmdCheckAdd(c *cli.Context) error {
 	if err = adm.ValidateRuneCount(c.Args().First(), 256); err != nil {
 		return err
 	}
-	if req.CheckConfig.CapabilityID, err = adm.LookupCapabilityId(
+	if req.CheckConfig.CapabilityID, err = adm.LookupCapabilityID(
 		opts[`with`][0]); err != nil {
 		return err
 	}
 	req.CheckConfig.ObjectType = opts[`on/type`][0]
 	req.CheckConfig.Name = c.Args().First()
-	req.CheckConfig.BucketID, err = adm.LookupBucketId(opts[`in`][0])
+	req.CheckConfig.BucketID, err = adm.LookupBucketID(opts[`in`][0])
 	if err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func cmdCheckAdd(c *cli.Context) error {
 		req.CheckConfig.BucketID); err != nil {
 		return err
 	}
-	if req.CheckConfig.ObjectID, err = adm.LookupCheckObjectId(
+	if req.CheckConfig.ObjectID, err = adm.LookupCheckObjectID(
 		opts[`on/type`][0],
 		opts[`on/object`][0],
 		req.CheckConfig.BucketID,
@@ -135,7 +135,7 @@ func cmdCheckAdd(c *cli.Context) error {
 		req.CheckConfig.ExternalID = ex[0]
 	}
 
-	if teamId, err = adm.LookupTeamByRepo(
+	if teamID, err = adm.LookupTeamByRepo(
 		req.CheckConfig.RepositoryID); err != nil {
 		return err
 	}
@@ -148,7 +148,7 @@ func cmdCheckAdd(c *cli.Context) error {
 
 	if req.CheckConfig.Constraints, err = adm.ValidateCheckConstraints(
 		req.CheckConfig.RepositoryID,
-		teamId,
+		teamID,
 		constraints,
 	); err != nil {
 		return err
@@ -174,20 +174,20 @@ func cmdCheckDelete(c *cli.Context) error {
 	}
 	var (
 		err                       error
-		bucketId, repoId, checkId string
+		bucketID, repoID, checkID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts[`in`][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if repoId, err = adm.LookupRepoByBucket(bucketId); err != nil {
+	if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
-	if checkId, _, err = adm.LookupCheckConfigId(c.Args().First(),
-		repoId, ``); err != nil {
+	if checkID, _, err = adm.LookupCheckConfigID(c.Args().First(),
+		repoID, ``); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/checks/%s/%s", repoId, checkId)
+	path := fmt.Sprintf("/checks/%s/%s", repoID, checkID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -207,17 +207,17 @@ func cmdCheckList(c *cli.Context) error {
 	}
 	var (
 		err              error
-		bucketId, repoId string
+		bucketID, repoID string
 	)
-	bucketId, err = adm.LookupBucketId(opts[`in`][0])
+	bucketID, err = adm.LookupBucketID(opts[`in`][0])
 	if err != nil {
 		return err
 	}
-	if repoId, err = adm.LookupRepoByBucket(bucketId); err != nil {
+	if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/checks/%s/", repoId)
+	path := fmt.Sprintf("/checks/%s/", repoID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
@@ -236,20 +236,20 @@ func cmdCheckShow(c *cli.Context) error {
 	}
 	var (
 		err                       error
-		bucketId, repoId, checkId string
+		bucketID, repoID, checkID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts[`in`][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if repoId, err = adm.LookupRepoByBucket(bucketId); err != nil {
+	if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
-	if checkId, _, err = adm.LookupCheckConfigId(c.Args().First(),
-		repoId, ``); err != nil {
+	if checkID, _, err = adm.LookupCheckConfigID(c.Args().First(),
+		repoID, ``); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/checks/%s/%s", repoId, checkId)
+	path := fmt.Sprintf("/checks/%s/%s", repoID, checkID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

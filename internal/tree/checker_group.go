@@ -20,19 +20,19 @@ import (
 // Checker:> Add Check
 
 func (teg *Group) SetCheck(c Check) {
-	c.Id = c.GetItemId(teg.Type, teg.Id)
-	if uuid.Equal(c.Id, uuid.Nil) {
-		c.Id = uuid.NewV4()
+	c.ID = c.GetItemID(teg.Type, teg.ID)
+	if uuid.Equal(c.ID, uuid.Nil) {
+		c.ID = uuid.NewV4()
 	}
 	// this check is the source check
-	c.InheritedFrom = teg.Id
+	c.InheritedFrom = teg.ID
 	c.Inherited = false
-	c.SourceId, _ = uuid.FromString(c.Id.String())
+	c.SourceID, _ = uuid.FromString(c.ID.String())
 	c.SourceType = teg.Type
 	// send a scrubbed copy downward
 	f := c.Clone()
 	f.Inherited = true
-	f.Id = uuid.Nil
+	f.ID = uuid.Nil
 	teg.setCheckOnChildren(f)
 	// scrub checkitem startup information prior to storing
 	c.Items = nil
@@ -42,12 +42,12 @@ func (teg *Group) SetCheck(c Check) {
 func (teg *Group) setCheckInherited(c Check) {
 	// we keep a local copy, that way we know it is ours....
 	f := c.Clone()
-	f.Id = f.GetItemId(teg.Type, teg.Id)
-	if uuid.Equal(f.Id, uuid.Nil) {
-		f.Id = uuid.NewV4()
+	f.ID = f.GetItemID(teg.Type, teg.ID)
+	if uuid.Equal(f.ID, uuid.Nil) {
+		f.ID = uuid.NewV4()
 	}
 	// send original check downwards
-	c.Id = uuid.Nil
+	c.ID = uuid.Nil
 	teg.setCheckOnChildren(c)
 	f.Items = nil
 	teg.addCheck(f)
@@ -87,7 +87,7 @@ func (teg *Group) setCheckOnChildren(c Check) {
 
 func (teg *Group) addCheck(c Check) {
 	teg.hasUpdate = true
-	teg.Checks[c.Id.String()] = c
+	teg.Checks[c.ID.String()] = c
 	teg.actionCheckNew(c.MakeAction())
 }
 
@@ -136,8 +136,8 @@ func (teg *Group) deleteCheckOnChildren(c Check) {
 }
 
 func (teg *Group) rmCheck(c Check) {
-	for id, _ := range teg.Checks {
-		if uuid.Equal(teg.Checks[id].SourceId, c.SourceId) {
+	for id := range teg.Checks {
+		if uuid.Equal(teg.Checks[id].SourceID, c.SourceID) {
 			teg.hasUpdate = true
 			teg.actionCheckRemoved(teg.setupCheckAction(teg.Checks[id]))
 			delete(teg.Checks, id)
@@ -149,8 +149,8 @@ func (teg *Group) rmCheck(c Check) {
 //
 // Checker:> Meta
 
-func (teg *Group) syncCheck(childId string) {
-	for check, _ := range teg.Checks {
+func (teg *Group) syncCheck(childID string) {
+	for check := range teg.Checks {
 		if !teg.Checks[check].Inheritance {
 			continue
 		}
@@ -158,14 +158,14 @@ func (teg *Group) syncCheck(childId string) {
 		f := teg.Checks[check]
 		c := f.Clone()
 		c.Inherited = true
-		c.Id = uuid.Nil
+		c.ID = uuid.Nil
 		c.Items = nil
-		teg.Children[childId].(Checker).setCheckInherited(c)
+		teg.Children[childID].(Checker).setCheckInherited(c)
 	}
 }
 
-func (teg *Group) checkCheck(checkId string) bool {
-	if _, ok := teg.Checks[checkId]; ok {
+func (teg *Group) checkCheck(checkID string) bool {
+	if _, ok := teg.Checks[checkID]; ok {
 		return true
 	}
 	return false
@@ -173,12 +173,12 @@ func (teg *Group) checkCheck(checkId string) bool {
 
 //
 func (teg *Group) LoadInstance(i CheckInstance) {
-	ckId := i.CheckId.String()
-	ckInstId := i.InstanceId.String()
-	if teg.loadedInstances[ckId] == nil {
-		teg.loadedInstances[ckId] = map[string]CheckInstance{}
+	ckID := i.CheckID.String()
+	ckInstID := i.InstanceID.String()
+	if teg.loadedInstances[ckID] == nil {
+		teg.loadedInstances[ckID] = map[string]CheckInstance{}
 	}
-	teg.loadedInstances[ckId][ckInstId] = i
+	teg.loadedInstances[ckID][ckInstID] = i
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

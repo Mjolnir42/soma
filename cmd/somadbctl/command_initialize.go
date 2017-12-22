@@ -5,7 +5,7 @@ func commandInitialize(done chan<- bool, printOnly bool, verbose bool, version s
 		dbOpen()
 	}
 
-	createSqlSchema(printOnly, verbose)
+	createSQLSchema(printOnly, verbose)
 
 	createTablesMetaData(printOnly, verbose)
 

@@ -49,12 +49,12 @@ SET    lookup_id = $2::varchar,
        configuration = $3::jsonb
 WHERE  configuration_item_id = $1::uuid;`
 
-const stmtGetLookupIdForItem = `
+const stmtGetLookupIDForItem = `
 SELECT lookup_id
 FROM   eye.configuration_items
 WHERE  configuration_item_id = $1::uuid;`
 
-const stmtGetItemCountForLookupId = `
+const stmtGetItemCountForLookupID = `
 SELECT COUNT(1)::integer
 FROM   eye.configuration_items
 WHERE  lookup_id = $1::varchar;`
@@ -63,7 +63,7 @@ const stmtDeleteConfigurationItem = `
 DELETE FROM eye.configuration_items
 WHERE       configuration_item_id = $1::uuid;`
 
-const stmtDeleteLookupId = `
+const stmtDeleteLookupID = `
 DELETE FROM eye.configuration_lookup
 WHERE       lookup_id = $1::varchar;`
 

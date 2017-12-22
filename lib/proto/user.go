@@ -10,7 +10,7 @@
 package proto
 
 type User struct {
-	Id             string           `json:"id,omitempty"`
+	ID             string           `json:"id,omitempty"`
 	UserName       string           `json:"userName,omitempty"`
 	FirstName      string           `json:"firstName,omitempty"`
 	LastName       string           `json:"lastName,omitempty"`
@@ -19,7 +19,7 @@ type User struct {
 	IsActive       bool             `json:"isActive,omitempty"`
 	IsSystem       bool             `json:"isSystem,omitempty"`
 	IsDeleted      bool             `json:"isDeleted,omitempty"`
-	TeamId         string           `json:"teamId,omitempty"`
+	TeamID         string           `json:"teamId,omitempty"`
 	Details        *UserDetails     `json:"details,omitempty"`
 	Credentials    *UserCredentials `json:"credentials,omitempty"`
 }

@@ -114,7 +114,7 @@ func (r *OncallRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Oncall = append(mr.Oncall, proto.Oncall{
-			Id:   oncallID,
+			ID:   oncallID,
 			Name: oncallName,
 		})
 	}
@@ -134,7 +134,7 @@ func (r *OncallRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Oncall.Id,
+		q.Oncall.ID,
 	).Scan(
 		&oncallID,
 		&oncallName,
@@ -147,7 +147,7 @@ func (r *OncallRead) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Oncall = append(mr.Oncall, proto.Oncall{
-		Id:     oncallID,
+		ID:     oncallID,
 		Name:   oncallName,
 		Number: strconv.Itoa(oncallNumber),
 	})

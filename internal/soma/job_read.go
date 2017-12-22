@@ -65,7 +65,7 @@ func (r *JobRead) Run() {
 	for statement, prepStmt := range map[string]*sql.Stmt{
 		stmt.ListAllOutstandingJobs:    r.stmtListAllOutstanding,
 		stmt.ListScopedOutstandingJobs: r.stmtListScopedOutstanding,
-		stmt.JobResultForId:            r.stmtResultByID,
+		stmt.JobResultForID:            r.stmtResultByID,
 		stmt.JobResultsForList:         r.stmtResultByIDList,
 	} {
 		if prepStmt, err = r.conn.Prepare(statement); err != nil {
@@ -134,7 +134,7 @@ func (r *JobRead) list(q *msg.Request, mr *msg.Result) {
 		}
 		mr.Job = append(mr.Job,
 			proto.Job{
-				Id:   jobID,
+				ID:   jobID,
 				Type: jobType,
 			},
 		)
@@ -171,7 +171,7 @@ func (r *JobRead) all(q *msg.Request, mr *msg.Result) {
 		}
 		mr.Job = append(mr.Job,
 			proto.Job{
-				Id:   jobID,
+				ID:   jobID,
 				Type: jobType,
 			},
 		)
@@ -195,7 +195,7 @@ func (r *JobRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtResultByID.QueryRow(
-		q.Job.Id,
+		q.Job.ID,
 	).Scan(
 		&jobID,
 		&jobStatus,
@@ -218,14 +218,14 @@ func (r *JobRead) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	job := proto.Job{
-		Id:           jobID,
+		ID:           jobID,
 		Status:       jobStatus,
 		Result:       jobResult,
 		Type:         jobType,
 		Serial:       jobSerial,
-		RepositoryId: repositoryID,
-		UserId:       userID,
-		TeamId:       teamID,
+		RepositoryID: repositoryID,
+		UserID:       userID,
+		TeamID:       teamID,
 		Error:        jobError,
 	}
 	job.TsQueued = jobQueued.Format(msg.RFC3339Milli)
@@ -256,7 +256,7 @@ func (r *JobRead) search(q *msg.Request, mr *msg.Result) {
 		jobStarted, jobFinished                            pq.NullTime
 	)
 
-	idList = fmt.Sprintf("{%s}", strings.Join(q.Search.Job.IdList, `,`))
+	idList = fmt.Sprintf("{%s}", strings.Join(q.Search.Job.IDList, `,`))
 	if rows, err = r.stmtResultByIDList.Query(
 		idList,
 	); err != nil {
@@ -285,14 +285,14 @@ func (r *JobRead) search(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		job := proto.Job{
-			Id:           jobID,
+			ID:           jobID,
 			Status:       jobStatus,
 			Result:       jobResult,
 			Type:         jobType,
 			Serial:       jobSerial,
-			RepositoryId: repositoryID,
-			UserId:       userID,
-			TeamId:       teamID,
+			RepositoryID: repositoryID,
+			UserID:       userID,
+			TeamID:       teamID,
 			Error:        jobError,
 		}
 		job.TsQueued = jobQueued.Format(msg.RFC3339Milli)

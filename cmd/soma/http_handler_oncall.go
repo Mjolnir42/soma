@@ -38,7 +38,7 @@ func OncallList(w http.ResponseWriter, r *http.Request,
 		goto skip
 	}
 
-	_ = DecodeJsonBody(r, &cReq)
+	_ = DecodeJSONBody(r, &cReq)
 	if cReq.Filter.Oncall.Name != "" {
 		filtered := []somaOncallResult{}
 		for _, i := range result.Oncall {
@@ -75,7 +75,7 @@ func OncallShow(w http.ResponseWriter, r *http.Request,
 		action: "show",
 		reply:  returnChannel,
 		Oncall: proto.Oncall{
-			Id: params.ByName("oncall"),
+			ID: params.ByName("oncall"),
 		},
 	}
 	result := <-returnChannel
@@ -98,7 +98,7 @@ func OncallAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.Request{}
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -135,7 +135,7 @@ func OncallUpdate(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.Request{}
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -147,7 +147,7 @@ func OncallUpdate(w http.ResponseWriter, r *http.Request,
 		action: "update",
 		reply:  returnChannel,
 		Oncall: proto.Oncall{
-			Id:     params.ByName("oncall"),
+			ID:     params.ByName("oncall"),
 			Name:   cReq.Oncall.Name,
 			Number: cReq.Oncall.Number,
 		},
@@ -178,7 +178,7 @@ func OncallRemove(w http.ResponseWriter, r *http.Request,
 		action: "delete",
 		reply:  returnChannel,
 		Oncall: proto.Oncall{
-			Id: params.ByName("oncall"),
+			ID: params.ByName("oncall"),
 		},
 	}
 	result := <-returnChannel
@@ -204,7 +204,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

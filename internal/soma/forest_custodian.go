@@ -68,7 +68,7 @@ func (f *ForestCustodian) Run() {
 	for statement, prepStmt := range map[string]*sql.Stmt{
 		stmt.ForestAddRepository:          f.stmtAdd,
 		stmt.ForestLoadRepository:         f.stmtLoad,
-		stmt.ForestRepoNameById:           f.stmtRepoName,
+		stmt.ForestRepoNameByID:           f.stmtRepoName,
 		stmt.ForestRebuildDeleteChecks:    f.stmtRebuildCheck,
 		stmt.ForestRebuildDeleteInstances: f.stmtRebuildInstance,
 	} {
@@ -133,7 +133,7 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 	actionChan = make(chan *tree.Action, 1024000)
 	errChan = make(chan *tree.Error, 1024000)
 
-	if q.Repository.TeamId == `` {
+	if q.Repository.TeamID == `` {
 		mr.BadRequest(
 			fmt.Errorf("Team has not been set prior to spawning TreeKeeper for repo: %s", q.Repository.Name),
 			q.Section,
@@ -141,10 +141,10 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	q.Repository.Id = uuid.NewV4().String()
+	q.Repository.ID = uuid.NewV4().String()
 
-	sTree = tree.New(tree.TreeSpec{
-		Id:     uuid.NewV4().String(),
+	sTree = tree.New(tree.Spec{
+		ID:     uuid.NewV4().String(),
 		Name:   fmt.Sprintf("root_%s", q.Repository.Name),
 		Action: actionChan,
 		Log:    f.appLog,
@@ -152,15 +152,15 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 	sTree.SetError(errChan)
 
 	tree.NewRepository(tree.RepositorySpec{
-		Id:      q.Repository.Id,
+		ID:      q.Repository.ID,
 		Name:    q.Repository.Name,
-		Team:    q.Repository.TeamId,
+		Team:    q.Repository.TeamID,
 		Deleted: false,
 		Active:  q.Repository.IsActive,
 	}).Attach(tree.AttachRequest{
 		Root:       sTree,
 		ParentType: "root",
-		ParentId:   sTree.GetID(),
+		ParentID:   sTree.GetID(),
 	})
 
 	// there should not be anything on the error channel
@@ -180,11 +180,11 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 			}
 			if action.Type == msg.SectionRepository {
 				if res, err = f.stmtAdd.Exec(
-					action.Repository.Id,
+					action.Repository.ID,
 					action.Repository.Name,
 					action.Repository.IsActive,
 					false,
-					action.Repository.TeamId,
+					action.Repository.TeamID,
 					q.AuthUser,
 				); err != nil {
 					mr.ServerError(err, q.Section)
@@ -207,7 +207,7 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 
 	// start the handler routine
 	if err = f.spawnTreeKeeper(q, sTree, errChan,
-		actionChan, q.Repository.TeamId); err != nil {
+		actionChan, q.Repository.TeamID); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}

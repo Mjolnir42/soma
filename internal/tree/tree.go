@@ -14,7 +14,7 @@ import (
 )
 
 type Tree struct {
-	Id     uuid.UUID
+	ID     uuid.UUID
 	Name   string
 	Type   string
 	Child  *Repository
@@ -23,16 +23,16 @@ type Tree struct {
 	log    *log.Logger
 }
 
-type TreeSpec struct {
-	Id     string
+type Spec struct {
+	ID     string
 	Name   string
 	Action chan *Action
 	Log    *log.Logger
 }
 
-func New(spec TreeSpec) *Tree {
+func New(spec Spec) *Tree {
 	st := new(Tree)
-	st.Id, _ = uuid.FromString(spec.Id)
+	st.ID, _ = uuid.FromString(spec.ID)
 	st.Name = spec.Name
 	st.Action = spec.Action
 	st.Type = "root"
@@ -84,7 +84,7 @@ func (st *Tree) SwitchLogger(newlog *log.Logger) {
 //
 // Interface: Builder
 func (st *Tree) GetID() string {
-	return st.Id.String()
+	return st.ID.String()
 }
 
 func (st *Tree) GetName() string {
@@ -115,7 +115,7 @@ func (st *Tree) GetErrors() []error {
 func (st *Tree) Receive(r ReceiveRequest) {
 	switch {
 	case r.ParentType == "root" &&
-		r.ParentId == st.Id.String() &&
+		r.ParentID == st.ID.String() &&
 		r.ChildType == "repository":
 		st.receiveRepository(r)
 	default:
@@ -131,7 +131,7 @@ func (st *Tree) Receive(r ReceiveRequest) {
 func (st *Tree) Unlink(u UnlinkRequest) {
 	switch {
 	case u.ParentType == "root" &&
-		(u.ParentId == st.Id.String() ||
+		(u.ParentID == st.ID.String() ||
 			u.ParentName == st.Name) &&
 		u.ChildType == "repository" &&
 		u.ChildName == st.Child.GetName():
@@ -149,7 +149,7 @@ func (st *Tree) Unlink(u UnlinkRequest) {
 func (st *Tree) receiveRepository(r ReceiveRequest) {
 	switch {
 	case r.ParentType == "root" &&
-		r.ParentId == st.Id.String() &&
+		r.ParentID == st.ID.String() &&
 		r.ChildType == "repository":
 		st.Child = r.Repository
 		r.Repository.setParent(st)
@@ -164,7 +164,7 @@ func (st *Tree) receiveRepository(r ReceiveRequest) {
 func (st *Tree) unlinkRepository(u UnlinkRequest) {
 	switch {
 	case u.ParentType == "root" &&
-		u.ParentId == st.Id.String() &&
+		u.ParentID == st.ID.String() &&
 		u.ChildType == "repository" &&
 		u.ChildName == st.Child.GetName():
 		st.Child = nil
@@ -192,11 +192,11 @@ func (st *Tree) ComputeCheckInstances() {
 		panic(`Tree.ComputeCheckInstances: no repository registered`)
 	}
 
-	st.log.Printf("Tree[%s]: Action=%s, ObjectType=%s, ObjectId=%s",
+	st.log.Printf("Tree[%s]: Action=%s, ObjectType=%s, ObjectID=%s",
 		st.Name,
 		`ComputeCheckInstances`,
 		`tree`,
-		st.Id.String(),
+		st.ID.String(),
 	)
 	st.Child.ComputeCheckInstances()
 	return

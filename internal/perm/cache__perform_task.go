@@ -43,13 +43,13 @@ func (c *Cache) performCategoryRemoveTask(category string) {
 
 	// remove all permissions in this category
 	for _, perm := range permIDs {
-		c.performPermissionRemoveTask(perm.Id)
+		c.performPermissionRemoveTask(perm.ID)
 	}
 
 	// retrieve all sections and actions in this category
 	sectionIDs := c.section.getCategory(category)
 	for _, section := range sectionIDs {
-		c.performSectionRemoveTask(section.Id)
+		c.performSectionRemoveTask(section.ID)
 	}
 	// no category to remove as categories are tracked implicitly
 }
@@ -60,7 +60,7 @@ func (c *Cache) performPermissionMapAction(q *msg.Request) {
 		c.pmap.mapAction(
 			a.SectionID,
 			a.ID,
-			q.Permission.Id,
+			q.Permission.ID,
 		)
 	}
 }
@@ -69,8 +69,8 @@ func (c *Cache) performPermissionMapAction(q *msg.Request) {
 func (c *Cache) performPermissionMapSection(q *msg.Request) {
 	for _, s := range *q.Permission.Sections {
 		c.pmap.mapSection(
-			s.Id,
-			q.Permission.Id,
+			s.ID,
+			q.Permission.ID,
 		)
 	}
 }
@@ -115,7 +115,7 @@ func (c *Cache) performPermissionUnmapAction(q *msg.Request) {
 		c.pmap.unmapAction(
 			a.SectionID,
 			a.ID,
-			q.Permission.Id,
+			q.Permission.ID,
 		)
 	}
 }
@@ -124,8 +124,8 @@ func (c *Cache) performPermissionUnmapAction(q *msg.Request) {
 func (c *Cache) performPermissionUnmapSection(q *msg.Request) {
 	for _, s := range *q.Permission.Sections {
 		c.pmap.unmapSection(
-			s.Id,
-			q.Permission.Id,
+			s.ID,
+			q.Permission.ID,
 		)
 	}
 }
@@ -137,11 +137,11 @@ func (c *Cache) performRightGrantScopeMonitoring(q *msg.Request) {
 	case `monitoring`:
 		c.grantMonitoring.grant(
 			q.Grant.RecipientType,
-			q.Grant.RecipientId,
+			q.Grant.RecipientID,
 			q.Grant.Category,
-			q.Grant.ObjectId,
-			q.Grant.PermissionId,
-			q.Grant.Id,
+			q.Grant.ObjectID,
+			q.Grant.PermissionID,
+			q.Grant.ID,
 		)
 	}
 }
@@ -152,11 +152,11 @@ func (c *Cache) performRightGrantScopeRepository(q *msg.Request) {
 	case `repository`, `bucket`:
 		c.grantRepository.grant(
 			q.Grant.RecipientType,
-			q.Grant.RecipientId,
+			q.Grant.RecipientID,
 			q.Grant.Category,
-			q.Grant.ObjectId,
-			q.Grant.PermissionId,
-			q.Grant.Id,
+			q.Grant.ObjectID,
+			q.Grant.PermissionID,
+			q.Grant.ID,
 		)
 	}
 }
@@ -167,11 +167,11 @@ func (c *Cache) performRightGrantScopeTeam(q *msg.Request) {
 	case `team`:
 		c.grantTeam.grant(
 			q.Grant.RecipientType,
-			q.Grant.RecipientId,
+			q.Grant.RecipientID,
 			q.Grant.Category,
-			q.Grant.ObjectId,
-			q.Grant.PermissionId,
-			q.Grant.Id,
+			q.Grant.ObjectID,
+			q.Grant.PermissionID,
+			q.Grant.ID,
 		)
 	}
 }
@@ -180,31 +180,31 @@ func (c *Cache) performRightGrantScopeTeam(q *msg.Request) {
 func (c *Cache) performRightGrantUnscoped(q *msg.Request) {
 	c.grantGlobal.grant(
 		q.Grant.RecipientType,
-		q.Grant.RecipientId,
+		q.Grant.RecipientID,
 		q.Grant.Category,
-		q.Grant.PermissionId,
-		q.Grant.Id,
+		q.Grant.PermissionID,
+		q.Grant.ID,
 	)
 }
 
 // performRightRevokeScopeMonitoring revokes a monitoring-scoped grant
 func (c *Cache) performRightRevokeScopeMonitoring(q *msg.Request) {
-	c.grantMonitoring.revoke(q.Grant.Id)
+	c.grantMonitoring.revoke(q.Grant.ID)
 }
 
 // performRightRevokeScopeRepository revokes a repo-scoped grant
 func (c *Cache) performRightRevokeScopeRepository(q *msg.Request) {
-	c.grantRepository.revoke(q.Grant.Id)
+	c.grantRepository.revoke(q.Grant.ID)
 }
 
 // performRightRevokeScopeTeam revokes a team-scoped grant
 func (c *Cache) performRightRevokeScopeTeam(q *msg.Request) {
-	c.grantTeam.revoke(q.Grant.Id)
+	c.grantTeam.revoke(q.Grant.ID)
 }
 
 // performRightRevokeUnscoped revokes a global grant
 func (c *Cache) performRightRevokeUnscoped(q *msg.Request) {
-	c.grantGlobal.revoke(q.Grant.Id)
+	c.grantGlobal.revoke(q.Grant.ID)
 }
 
 // performSectionRemoveTask implements performSectionRemove without

@@ -91,7 +91,7 @@ func EnvironmentAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewEnvironmentRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -159,7 +159,7 @@ func EnvironmentRename(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewEnvironmentRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}

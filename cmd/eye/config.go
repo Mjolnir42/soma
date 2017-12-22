@@ -35,7 +35,7 @@ type DbConfig struct {
 	Port    string `json:"port" valid:"port"`
 	Pass    string `json:"password" valid:"-"`
 	Timeout string `json:"timeout" valid:"numeric"`
-	TlsMode string `json:"tlsmode" valid:"alpha"`
+	TLSMode string `json:"tlsmode" valid:"alpha"`
 }
 
 type SomaConfig struct {
@@ -47,25 +47,25 @@ type EyeDaemon struct {
 	url    *url.URL
 	Listen string `json:"listen" valid:"ip"`
 	Port   string `json:"port" valid:"port"`
-	Tls    bool   `json:"tls,string" valid:"-"`
+	TLS    bool   `json:"tls,string" valid:"-"`
 	Cert   string `json:"cert-file" valid:"optional"`
 	Key    string `json:"key-file" valid:"optional"`
 }
 
 type EyeRuntime struct {
-	conn          *sql.DB
-	check_item    *sql.Stmt
-	update_item   *sql.Stmt
-	check_lookup  *sql.Stmt
-	insert_lookup *sql.Stmt
-	insert_item   *sql.Stmt
-	delete_item   *sql.Stmt
-	delete_lookup *sql.Stmt
-	get_lookup    *sql.Stmt
-	item_count    *sql.Stmt
-	get_config    *sql.Stmt
-	get_items     *sql.Stmt
-	retrieve      *sql.Stmt
+	conn         *sql.DB
+	checkItem    *sql.Stmt
+	updateItem   *sql.Stmt
+	checkLookup  *sql.Stmt
+	insertLookup *sql.Stmt
+	insertItem   *sql.Stmt
+	deleteItem   *sql.Stmt
+	deleteLookup *sql.Stmt
+	getLookup    *sql.Stmt
+	itemCount    *sql.Stmt
+	getConfig    *sql.Stmt
+	getItems     *sql.Stmt
+	retrieve     *sql.Stmt
 }
 
 func (c *EyeConfig) readConfigFile(fname string) error {
@@ -85,11 +85,11 @@ func (c *EyeConfig) readConfigFile(fname string) error {
 	}
 
 	// take detour via JSON to load UCL into struct
-	uclJson, err := json.Marshal(uclData)
+	uclJSON, err := json.Marshal(uclData)
 	if err != nil {
 		log.Fatal(err)
 	}
-	json.Unmarshal([]byte(uclJson), &c)
+	json.Unmarshal([]byte(uclJSON), &c)
 
 	govalidator.SetFieldsRequiredByDefault(true)
 	if ok, err := govalidator.ValidateStruct(c); !ok {

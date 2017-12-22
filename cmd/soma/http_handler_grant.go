@@ -26,7 +26,7 @@ func RightSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	crq := proto.NewGrantFilter()
-	if err := DecodeJsonBody(r, &crq); err != nil {
+	if err := DecodeJSONBody(r, &crq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -41,11 +41,11 @@ func RightSearch(w http.ResponseWriter, r *http.Request,
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Grant: proto.Grant{
 			RecipientType: crq.Filter.Grant.RecipientType,
-			RecipientId:   crq.Filter.Grant.RecipientId,
-			PermissionId:  crq.Filter.Grant.PermissionId,
+			RecipientID:   crq.Filter.Grant.RecipientID,
+			PermissionID:  crq.Filter.Grant.PermissionID,
 			Category:      crq.Filter.Grant.Category,
 			ObjectType:    crq.Filter.Grant.ObjectType,
-			ObjectId:      crq.Filter.Grant.ObjectId,
+			ObjectID:      crq.Filter.Grant.ObjectID,
 		},
 	}
 
@@ -60,14 +60,14 @@ func RightGrant(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.Request{}
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
 
 	if cReq.Grant.Category != params.ByName(`category`) ||
-		cReq.Grant.PermissionId != params.ByName(`permission`) {
+		cReq.Grant.PermissionID != params.ByName(`permission`) {
 		DispatchBadRequest(&w,
 			fmt.Errorf(`Category/PermissionId mismatch`))
 		return
@@ -104,9 +104,9 @@ func RightRevoke(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	grant := proto.Grant{
-		Id:           params.ByName(`grant`),
+		ID:           params.ByName(`grant`),
 		Category:     params.ByName(`category`),
-		PermissionId: params.ByName(`permission`),
+		PermissionID: params.ByName(`permission`),
 	}
 
 	if !fixIsAuthorized(&msg.Authorization{

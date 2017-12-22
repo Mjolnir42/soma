@@ -175,7 +175,7 @@ func cmdPropertyCustomCreate(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	repoId, err := adm.LookupRepoId(opts[`repository`][0])
+	repoID, err := adm.LookupRepoID(opts[`repository`][0])
 	if err != nil {
 		return err
 	}
@@ -186,9 +186,9 @@ func cmdPropertyCustomCreate(c *cli.Context) error {
 
 	req.Property.Custom = &proto.PropertyCustom{}
 	req.Property.Custom.Name = c.Args().First()
-	req.Property.Custom.RepositoryID = repoId
+	req.Property.Custom.RepositoryID = repoID
 
-	path := fmt.Sprintf("/property/custom/%s/", repoId)
+	path := fmt.Sprintf("/property/custom/%s/", repoID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
@@ -279,10 +279,10 @@ func cmdPropertyServiceCreate(c *cli.Context) error {
 		return err
 	}
 	// team lookup only for service
-	var teamId string
+	var teamID string
 	if c.Command.Name == "service" {
 		var err error
-		teamId, err = adm.LookupTeamId(opts["team"][0])
+		teamID, err = adm.LookupTeamID(opts["team"][0])
 		if err != nil {
 			return err
 		}
@@ -301,14 +301,14 @@ func cmdPropertyServiceCreate(c *cli.Context) error {
 		[]proto.ServiceAttribute, 0, 16)
 	if c.Command.Name == "service" {
 		req.Property.Type = `service`
-		req.Property.Service.TeamID = teamId
+		req.Property.Service.TeamID = teamID
 	} else {
 		req.Property.Type = `template`
 	}
 
 	// fill attributes into request body
 attrConversionLoop:
-	for oName, _ := range opts {
+	for oName := range opts {
 		// the team that registers this service is not a service
 		// attribute
 		if c.Command.Name == `service` && oName == `team` {
@@ -335,7 +335,7 @@ attrConversionLoop:
 	var path string
 	switch c.Command.Name {
 	case `service`:
-		path = fmt.Sprintf("/property/service/team/%s/", teamId)
+		path = fmt.Sprintf("/property/service/team/%s/", teamID)
 	case `template`:
 		path = `/property/service/global/`
 	}
@@ -397,17 +397,17 @@ func cmdPropertyCustomDelete(c *cli.Context) error {
 		return err
 	}
 
-	repoId, err := adm.LookupRepoId(opts[`repository`][0])
+	repoID, err := adm.LookupRepoID(opts[`repository`][0])
 	if err != nil {
 		return err
 	}
 
-	propId, err := adm.LookupCustomPropertyId(
-		c.Args().First(), repoId)
+	propID, err := adm.LookupCustomPropertyID(
+		c.Args().First(), repoID)
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/property/custom/%s/%s", repoId, propId)
+	path := fmt.Sprintf("/property/custom/%s/%s", repoID, propID)
 
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
@@ -440,17 +440,17 @@ func cmdPropertyServiceDelete(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	teamId, err := adm.LookupTeamId(opts[`team`][0])
+	teamID, err := adm.LookupTeamID(opts[`team`][0])
 	if err != nil {
 		return err
 	}
-	propId, err := adm.LookupServicePropertyId(
-		c.Args().First(), teamId)
+	propID, err := adm.LookupServicePropertyID(
+		c.Args().First(), teamID)
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/property/service/team/%s/%s", teamId, propId)
+	path := fmt.Sprintf("/property/service/team/%s/%s", teamID, propID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -458,12 +458,12 @@ func cmdPropertyTemplateDelete(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	propId, err := adm.LookupTemplatePropertyId(c.Args().First())
+	propID, err := adm.LookupTemplatePropertyID(c.Args().First())
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/property/service/global/%s", propId)
+	path := fmt.Sprintf("/property/service/global/%s", propID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -479,16 +479,16 @@ func cmdPropertyCustomShow(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	repoId, err := adm.LookupRepoId(opts[`repository`][0])
+	repoID, err := adm.LookupRepoID(opts[`repository`][0])
 	if err != nil {
 		return err
 	}
-	propId, err := adm.LookupCustomPropertyId(c.Args().First(), repoId)
+	propID, err := adm.LookupCustomPropertyID(c.Args().First(), repoID)
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/property/custom/%s/%s", repoId,
-		propId)
+	path := fmt.Sprintf("/property/custom/%s/%s", repoID,
+		propID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -519,17 +519,17 @@ func cmdPropertyServiceShow(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	teamId, err := adm.LookupTeamId(opts[`team`][0])
+	teamID, err := adm.LookupTeamID(opts[`team`][0])
 	if err != nil {
 		return err
 	}
-	propId, err := adm.LookupServicePropertyId(
-		c.Args().First(), teamId)
+	propID, err := adm.LookupServicePropertyID(
+		c.Args().First(), teamID)
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/property/service/team/%s/%s", teamId, propId)
+	path := fmt.Sprintf("/property/service/team/%s/%s", teamID, propID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -537,12 +537,12 @@ func cmdPropertyTemplateShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	propId, err := adm.LookupTemplatePropertyId(
+	propID, err := adm.LookupTemplatePropertyID(
 		c.Args().First())
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/property/service/global/%s", propId)
+	path := fmt.Sprintf("/property/service/global/%s", propID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -558,12 +558,12 @@ func cmdPropertyCustomList(c *cli.Context) error {
 		adm.AllArguments(c)); err != nil {
 		return err
 	}
-	repoId, err := adm.LookupRepoId(opts[`repository`][0])
+	repoID, err := adm.LookupRepoID(opts[`repository`][0])
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/property/custom/%s/", repoId)
+	path := fmt.Sprintf("/property/custom/%s/", repoID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
@@ -593,12 +593,12 @@ func cmdPropertyServiceList(c *cli.Context) error {
 		adm.AllArguments(c)); err != nil {
 		return err
 	}
-	teamId, err := adm.LookupTeamId(opts[`team`][0])
+	teamID, err := adm.LookupTeamID(opts[`team`][0])
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/property/service/team/%s/", teamId)
+	path := fmt.Sprintf("/property/service/team/%s/", teamID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
@@ -669,7 +669,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	}
 
 	var (
-		objectId, object, repoId, bucketId string
+		objectID, object, repoID, bucketID string
 		config                             *proto.NodeConfig
 		req                                proto.Request
 		err                                error
@@ -677,53 +677,53 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	// id lookup
 	switch oType {
 	case `node`:
-		if objectId, err = adm.LookupNodeId(opts[`to`][0]); err != nil {
+		if objectID, err = adm.LookupNodeID(opts[`to`][0]); err != nil {
 			return err
 		}
-		if config, err = adm.LookupNodeConfig(objectId); err != nil {
+		if config, err = adm.LookupNodeConfig(objectID); err != nil {
 			return err
 		}
-		repoId = config.RepositoryID
-		bucketId = config.BucketID
+		repoID = config.RepositoryID
+		bucketID = config.BucketID
 	case `cluster`:
-		bucketId, err = adm.LookupBucketId(opts["in"][0])
+		bucketID, err = adm.LookupBucketID(opts["in"][0])
 		if err != nil {
 			return err
 		}
-		if objectId, err = adm.LookupClusterId(opts[`to`][0],
-			bucketId); err != nil {
+		if objectID, err = adm.LookupClusterID(opts[`to`][0],
+			bucketID); err != nil {
 			return err
 		}
-		if repoId, err = adm.LookupRepoByBucket(bucketId); err != nil {
+		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
 	case `group`:
-		bucketId, err = adm.LookupBucketId(opts["in"][0])
+		bucketID, err = adm.LookupBucketID(opts["in"][0])
 		if err != nil {
 			return err
 		}
-		if objectId, err = adm.LookupGroupId(opts[`to`][0],
-			bucketId); err != nil {
+		if objectID, err = adm.LookupGroupID(opts[`to`][0],
+			bucketID); err != nil {
 			return err
 		}
-		if repoId, err = adm.LookupRepoByBucket(bucketId); err != nil {
+		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
 	case `bucket`:
-		bucketId, err = adm.LookupBucketId(opts["to"][0])
+		bucketID, err = adm.LookupBucketID(opts["to"][0])
 		if err != nil {
 			return err
 		}
-		objectId = bucketId
-		if repoId, err = adm.LookupRepoByBucket(bucketId); err != nil {
+		objectID = bucketID
+		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
 	case `repository`:
-		repoId, err = adm.LookupRepoId(opts[`to`][0])
+		repoID, err = adm.LookupRepoID(opts[`to`][0])
 		if err != nil {
 			return err
 		}
-		objectId = repoId
+		objectID = repoID
 	}
 
 	// property assembly
@@ -755,15 +755,15 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 			Value: opts[`value`][0],
 		}
 	case `service`:
-		var teamId string
+		var teamID string
 		switch oType {
 		case `repository`:
-			if teamId, err = adm.LookupTeamByRepo(repoId); err != nil {
+			if teamID, err = adm.LookupTeamByRepo(repoID); err != nil {
 				return err
 			}
 		default:
-			if teamId, err = adm.LookupTeamByBucket(
-				bucketId); err != nil {
+			if teamID, err = adm.LookupTeamByBucket(
+				bucketID); err != nil {
 				return err
 			}
 		}
@@ -771,34 +771,34 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		// attributes are discarded by the server
 		prop.Service = &proto.PropertyService{
 			Name:       c.Args().First(),
-			TeamID:     teamId,
+			TeamID:     teamID,
 			Attributes: []proto.ServiceAttribute{},
 		}
 	case `oncall`:
-		oncallId, err := adm.LookupOncallID(c.Args().First())
+		oncallID, err := adm.LookupOncallID(c.Args().First())
 		if err != nil {
 			return err
 		}
 		prop.Oncall = &proto.PropertyOncall{
-			ID: oncallId,
+			ID: oncallID,
 		}
 		prop.Oncall.Name, prop.Oncall.Number, err = adm.LookupOncallDetails(
-			oncallId,
+			oncallID,
 		)
 		if err != nil {
 			return err
 		}
 	case `custom`:
-		customId, err := adm.LookupCustomPropertyId(
-			c.Args().First(), repoId)
+		customID, err := adm.LookupCustomPropertyID(
+			c.Args().First(), repoID)
 		if err != nil {
 			return err
 		}
 
 		prop.Custom = &proto.PropertyCustom{
-			ID:           customId,
+			ID:           customID,
 			Name:         c.Args().First(),
-			RepositoryID: repoId,
+			RepositoryID: repoID,
 			Value:        opts[`value`][0],
 		}
 	}
@@ -807,26 +807,26 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	switch oType {
 	case `node`:
 		req = proto.NewNodeRequest()
-		req.Node.ID = objectId
+		req.Node.ID = objectID
 		req.Node.Config = config
 		req.Node.Properties = &[]proto.Property{prop}
 	case `cluster`:
 		req = proto.NewClusterRequest()
-		req.Cluster.ID = objectId
-		req.Cluster.BucketID = bucketId
+		req.Cluster.ID = objectID
+		req.Cluster.BucketID = bucketID
 		req.Cluster.Properties = &[]proto.Property{prop}
 	case `group`:
 		req = proto.NewGroupRequest()
-		req.Group.Id = objectId
-		req.Group.BucketId = bucketId
+		req.Group.ID = objectID
+		req.Group.BucketID = bucketID
 		req.Group.Properties = &[]proto.Property{prop}
 	case `bucket`:
 		req = proto.NewBucketRequest()
-		req.Bucket.ID = objectId
+		req.Bucket.ID = objectID
 		req.Bucket.Properties = &[]proto.Property{prop}
 	case `repository`:
 		req = proto.NewRepositoryRequest()
-		req.Repository.Id = repoId
+		req.Repository.ID = repoID
 		req.Repository.Properties = &[]proto.Property{prop}
 	}
 
@@ -837,7 +837,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	default:
 		object = oType + `s`
 	}
-	path := fmt.Sprintf("/%s/%s/property/%s/", object, objectId, pType)
+	path := fmt.Sprintf("/%s/%s/property/%s/", object, objectID, pType)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 

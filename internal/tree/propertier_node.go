@@ -27,10 +27,10 @@ func (ten *Node) SetProperty(p Property) {
 		case `custom`:
 			cstUUID, _ := uuid.FromString(prop.GetKey())
 			ten.deletePropertyInherited(&PropertyCustom{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
-				CustomId:  cstUUID,
+				CustomID:  cstUUID,
 				Key:       prop.(*PropertyCustom).GetKeyField(),
 				Value:     prop.(*PropertyCustom).GetValueField(),
 			})
@@ -38,14 +38,14 @@ func (ten *Node) SetProperty(p Property) {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			ten.deletePropertyInherited(&PropertyService{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
 				Service:   prop.GetKey(),
 			})
 		case `system`:
 			ten.deletePropertyInherited(&PropertySystem{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
 				Key:       prop.GetKey(),
@@ -56,30 +56,30 @@ func (ten *Node) SetProperty(p Property) {
 			// match, we do not set it
 			oncUUID, _ := uuid.FromString(prop.GetKey())
 			ten.deletePropertyInherited(&PropertyOncall{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
-				OncallId:  oncUUID,
+				OncallID:  oncUUID,
 				Name:      prop.(*PropertyOncall).GetName(),
 				Number:    prop.(*PropertyOncall).GetNumber(),
 			})
 		}
 	}
-	p.SetId(p.GetInstanceId(ten.Type, ten.Id, ten.log))
+	p.SetID(p.GetInstanceID(ten.Type, ten.ID, ten.log))
 	if p.Equal(uuid.Nil) {
-		p.SetId(uuid.NewV4())
+		p.SetID(uuid.NewV4())
 	}
 	// this property is the source instance
-	p.SetInheritedFrom(ten.Id)
+	p.SetInheritedFrom(ten.ID)
 	p.SetInherited(false)
 	p.SetSourceType(ten.Type)
 	if i, e := uuid.FromString(p.GetID()); e == nil {
-		p.SetSourceId(i)
+		p.SetSourceID(i)
 	}
 	// send a scrubbed copy down
 	f := p.Clone()
 	f.SetInherited(true)
-	f.SetId(uuid.UUID{})
+	f.SetID(uuid.UUID{})
 	if f.hasInheritance() {
 		ten.setPropertyOnChildren(f)
 	}
@@ -91,9 +91,9 @@ func (ten *Node) SetProperty(p Property) {
 
 func (ten *Node) setPropertyInherited(p Property) {
 	f := p.Clone()
-	f.SetId(f.GetInstanceId(ten.Type, ten.Id, ten.log))
+	f.SetID(f.GetInstanceID(ten.Type, ten.ID, ten.log))
 	if f.Equal(uuid.Nil) {
-		f.SetId(uuid.NewV4())
+		f.SetID(uuid.NewV4())
 	}
 	f.clearInstances()
 
@@ -154,7 +154,7 @@ func (ten *Node) UpdateProperty(p Property) {
 	}
 
 	// keep a copy for ourselves, no shared pointers
-	p.SetInheritedFrom(ten.Id)
+	p.SetInheritedFrom(ten.ID)
 	p.SetSourceType(ten.Type)
 	p.SetInherited(true)
 	f := p.Clone()
@@ -182,7 +182,7 @@ func (ten *Node) updatePropertyOnChildren(p Property) {
 }
 
 func (ten *Node) switchProperty(p Property) bool {
-	uid := ten.findIdForSource(
+	uid := ten.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
@@ -199,8 +199,8 @@ func (ten *Node) switchProperty(p Property) bool {
 			Action: `node.switchProperty property not found`}
 		return false
 	}
-	updId, _ := uuid.FromString(uid)
-	p.SetId(updId)
+	updID, _ := uuid.FromString(uid)
+	p.SetID(updID)
 	ten.addProperty(p)
 	ten.actionPropertyUpdate(p.MakeAction())
 	// nodes have no children, we require no handling of changes in
@@ -227,11 +227,11 @@ func (ten *Node) DeleteProperty(p Property) {
 
 	var flow Property
 	resync := false
-	delId := ten.findIdForSource(
+	delID := ten.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
-	if delId != `` {
+	if delID != `` {
 		// this is a delete for a locally set property. It might be a
 		// delete for an overwrite property, in which case we need to
 		// ask the parent to sync it to us again.
@@ -243,13 +243,13 @@ func (ten *Node) DeleteProperty(p Property) {
 		var delProp Property
 		switch p.GetType() {
 		case `custom`:
-			delProp = ten.PropertyCustom[delId]
+			delProp = ten.PropertyCustom[delID]
 		case `system`:
-			delProp = ten.PropertySystem[delId]
+			delProp = ten.PropertySystem[delID]
 		case `service`:
-			delProp = ten.PropertyService[delId]
+			delProp = ten.PropertyService[delID]
 		case `oncall`:
-			delProp = ten.PropertyOncall[delId]
+			delProp = ten.PropertyOncall[delID]
 		}
 		resync, _, flow = ten.Parent.(Propertier).checkDuplicate(
 			delProp,
@@ -268,7 +268,7 @@ func (ten *Node) DeleteProperty(p Property) {
 		ten.Parent.(Propertier).resyncProperty(
 			flow.GetSourceInstance(),
 			p.GetType(),
-			ten.Id.String(),
+			ten.ID.String(),
 		)
 	}
 }
@@ -338,11 +338,11 @@ func (ten *Node) deletePropertyAllLocal() {
 }
 
 func (ten *Node) rmProperty(p Property) bool {
-	delId := ten.findIdForSource(
+	delID := ten.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
-	if delId == `` {
+	if delID == `` {
 		// we do not have the property for which we received a delete
 		if dupe, deleteOK, _ := ten.checkDuplicate(p); dupe && !deleteOK {
 			// the delete is duplicate to a property for which we
@@ -362,28 +362,28 @@ func (ten *Node) rmProperty(p Property) bool {
 	switch p.GetType() {
 	case `custom`:
 		ten.actionPropertyDelete(
-			ten.PropertyCustom[delId].MakeAction(),
+			ten.PropertyCustom[delID].MakeAction(),
 		)
-		hasInheritance = ten.PropertyCustom[delId].hasInheritance()
-		delete(ten.PropertyCustom, delId)
+		hasInheritance = ten.PropertyCustom[delID].hasInheritance()
+		delete(ten.PropertyCustom, delID)
 	case `service`:
 		ten.actionPropertyDelete(
-			ten.PropertyService[delId].MakeAction(),
+			ten.PropertyService[delID].MakeAction(),
 		)
-		hasInheritance = ten.PropertyService[delId].hasInheritance()
-		delete(ten.PropertyService, delId)
+		hasInheritance = ten.PropertyService[delID].hasInheritance()
+		delete(ten.PropertyService, delID)
 	case `system`:
 		ten.actionPropertyDelete(
-			ten.PropertySystem[delId].MakeAction(),
+			ten.PropertySystem[delID].MakeAction(),
 		)
-		hasInheritance = ten.PropertySystem[delId].hasInheritance()
-		delete(ten.PropertySystem, delId)
+		hasInheritance = ten.PropertySystem[delID].hasInheritance()
+		delete(ten.PropertySystem, delID)
 	case `oncall`:
 		ten.actionPropertyDelete(
-			ten.PropertyOncall[delId].MakeAction(),
+			ten.PropertyOncall[delID].MakeAction(),
 		)
-		hasInheritance = ten.PropertyOncall[delId].hasInheritance()
-		delete(ten.PropertyOncall, delId)
+		hasInheritance = ten.PropertyOncall[delID].hasInheritance()
+		delete(ten.PropertyOncall, delID)
 	default:
 		ten.hasUpdate = false
 		ten.Fault.Error <- &Error{Action: `node.rmProperty unknown type`}
@@ -426,31 +426,31 @@ bailout:
 	return false
 }
 
-func (ten *Node) findIdForSource(source, prop string) string {
+func (ten *Node) findIDForSource(source, prop string) string {
 	switch prop {
 	case `custom`:
-		for id, _ := range ten.PropertyCustom {
+		for id := range ten.PropertyCustom {
 			if ten.PropertyCustom[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `system`:
-		for id, _ := range ten.PropertySystem {
+		for id := range ten.PropertySystem {
 			if ten.PropertySystem[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `service`:
-		for id, _ := range ten.PropertyService {
+		for id := range ten.PropertyService {
 			if ten.PropertyService[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `oncall`:
-		for id, _ := range ten.PropertyOncall {
+		for id := range ten.PropertyOncall {
 			if ten.PropertyOncall[id].GetSourceInstance() != source {
 				continue
 			}
@@ -460,11 +460,11 @@ func (ten *Node) findIdForSource(source, prop string) string {
 	return ``
 }
 
-func (ten *Node) syncProperty(childId string) {
+func (ten *Node) syncProperty(childID string) {
 	// noop, satisfy interface
 }
 
-func (ten *Node) checkProperty(propType string, propId string) bool {
+func (ten *Node) checkProperty(propType string, propID string) bool {
 	// noop, satisfy interface
 	return false
 }
@@ -525,7 +525,7 @@ propswitch:
 	return dupe, deleteOK, prop
 }
 
-func (ten *Node) resyncProperty(srcId, pType, childId string) {
+func (ten *Node) resyncProperty(srcID, pType, childID string) {
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

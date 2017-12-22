@@ -74,7 +74,7 @@ func PermissionShow(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Permission: proto.Permission{
-			Id:       params.ByName(`permission`),
+			ID:       params.ByName(`permission`),
 			Category: params.ByName(`category`),
 		},
 	}
@@ -98,7 +98,7 @@ func PermissionSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewPermissionFilter()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -138,7 +138,7 @@ func PermissionAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewPermissionRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -210,7 +210,7 @@ func PermissionRemove(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Permission: proto.Permission{
-			Id:       params.ByName(`permission`),
+			ID:       params.ByName(`permission`),
 			Category: params.ByName(`category`),
 		},
 	}
@@ -234,7 +234,7 @@ func PermissionEdit(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewPermissionRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -244,7 +244,7 @@ func PermissionEdit(w http.ResponseWriter, r *http.Request,
 		DispatchBadRequest(&w, fmt.Errorf(`Category mismatch`))
 		return
 	}
-	if cReq.Permission.Id != params.ByName(`permission`) {
+	if cReq.Permission.ID != params.ByName(`permission`) {
 		DispatchBadRequest(&w, fmt.Errorf(`PermissionId mismatch`))
 		return
 	}
@@ -300,7 +300,7 @@ func PermissionEdit(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Permission: proto.Permission{
-			Id:       cReq.Permission.Id,
+			ID:       cReq.Permission.ID,
 			Name:     cReq.Permission.Name,
 			Category: cReq.Permission.Category,
 			Sections: cReq.Permission.Sections,

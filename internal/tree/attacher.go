@@ -81,7 +81,7 @@ type ClusterAttacher interface {
 type AttachRequest struct {
 	Root       Receiver
 	ParentType string
-	ParentId   string
+	ParentID   string
 	ParentName string
 }
 

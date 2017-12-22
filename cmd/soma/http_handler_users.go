@@ -40,7 +40,7 @@ func UserList(w http.ResponseWriter, r *http.Request,
 		goto skip
 	}
 
-	_ = DecodeJsonBody(r, &cReq)
+	_ = DecodeJSONBody(r, &cReq)
 	if cReq.Filter.User.UserName != "" {
 		filtered := []somaUserResult{}
 		for _, i := range result.Users {
@@ -76,7 +76,7 @@ func UserShow(w http.ResponseWriter, r *http.Request,
 		action: "show",
 		reply:  returnChannel,
 		User: proto.User{
-			Id: params.ByName("user"),
+			ID: params.ByName("user"),
 		},
 	}
 	result := <-returnChannel
@@ -124,7 +124,7 @@ func UserAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewUserRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -148,7 +148,7 @@ func UserAdd(w http.ResponseWriter, r *http.Request,
 			IsActive:       false,
 			IsSystem:       cReq.User.IsSystem,
 			IsDeleted:      false,
-			TeamId:         cReq.User.TeamId,
+			TeamID:         cReq.User.TeamID,
 		},
 	}
 	result := <-returnChannel
@@ -171,7 +171,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewUserRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -180,7 +180,7 @@ func UserUpdate(w http.ResponseWriter, r *http.Request,
 		DispatchBadRequest(&w, fmt.Errorf(`Invalid username containing : character`))
 		return
 	}
-	if params.ByName(`user`) != cReq.User.Id {
+	if params.ByName(`user`) != cReq.User.ID {
 		DispatchBadRequest(&w, fmt.Errorf(`Mismatching user UUIDs in body and URL`))
 		return
 	}
@@ -191,14 +191,14 @@ func UserUpdate(w http.ResponseWriter, r *http.Request,
 		action: "update",
 		reply:  returnChannel,
 		User: proto.User{
-			Id:             cReq.User.Id,
+			ID:             cReq.User.ID,
 			UserName:       cReq.User.UserName,
 			FirstName:      cReq.User.FirstName,
 			LastName:       cReq.User.LastName,
 			EmployeeNumber: cReq.User.EmployeeNumber,
 			MailAddress:    cReq.User.MailAddress,
 			IsDeleted:      cReq.User.IsDeleted,
-			TeamId:         cReq.User.TeamId,
+			TeamID:         cReq.User.TeamID,
 		},
 	}
 	result := <-returnChannel
@@ -211,7 +211,7 @@ func UserRemove(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.NewUserRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -236,7 +236,7 @@ func UserRemove(w http.ResponseWriter, r *http.Request,
 		action: action,
 		reply:  returnChannel,
 		User: proto.User{
-			Id: params.ByName("user"),
+			ID: params.ByName("user"),
 		},
 	}
 	result := <-returnChannel
@@ -262,7 +262,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

@@ -78,7 +78,7 @@ func MetricAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.Request{}
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -142,7 +142,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

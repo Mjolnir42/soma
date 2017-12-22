@@ -10,7 +10,7 @@
 package proto
 
 type Permission struct {
-	Id       string           `json:"id,omitempty"`
+	ID       string           `json:"id,omitempty"`
 	Name     string           `json:"name,omitempty"`
 	Category string           `json:"category,omitempty"`
 	Actions  *[]Action        `json:"actions,omitempty"`

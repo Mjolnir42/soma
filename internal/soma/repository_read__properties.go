@@ -24,7 +24,7 @@ func (r *RepositoryRead) oncallProperties(repo *proto.Repository) error {
 	)
 
 	if rows, err = r.stmtPropOncall.Query(
-		repo.Id,
+		repo.ID,
 	); err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (r *RepositoryRead) oncallProperties(repo *proto.Repository) error {
 		*repo.Properties = append(*repo.Properties,
 			proto.Property{
 				Type:             `oncall`,
-				RepositoryID:     repo.Id,
+				RepositoryID:     repo.ID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -70,7 +70,7 @@ func (r *RepositoryRead) serviceProperties(repo *proto.Repository) error {
 	)
 
 	if rows, err = r.stmtPropService.Query(
-		repo.Id,
+		repo.ID,
 	); err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func (r *RepositoryRead) serviceProperties(repo *proto.Repository) error {
 		*repo.Properties = append(*repo.Properties,
 			proto.Property{
 				Type:             `service`,
-				RepositoryID:     repo.Id,
+				RepositoryID:     repo.ID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -114,7 +114,7 @@ func (r *RepositoryRead) systemProperties(repo *proto.Repository) error {
 	)
 
 	if rows, err = r.stmtPropSystem.Query(
-		repo.Id,
+		repo.ID,
 	); err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (r *RepositoryRead) systemProperties(repo *proto.Repository) error {
 		*repo.Properties = append(*repo.Properties,
 			proto.Property{
 				Type:             `system`,
-				RepositoryID:     repo.Id,
+				RepositoryID:     repo.ID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
@@ -160,7 +160,7 @@ func (r *RepositoryRead) customProperties(repo *proto.Repository) error {
 	)
 
 	if rows, err = r.stmtPropCustom.Query(
-		repo.Id,
+		repo.ID,
 	); err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func (r *RepositoryRead) customProperties(repo *proto.Repository) error {
 		*repo.Properties = append(*repo.Properties,
 			proto.Property{
 				Type:             `custom`,
-				RepositoryID:     repo.Id,
+				RepositoryID:     repo.ID,
 				InstanceID:       instanceID,
 				SourceInstanceID: sourceInstanceID,
 				View:             view,

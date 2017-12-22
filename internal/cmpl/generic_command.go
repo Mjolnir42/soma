@@ -10,7 +10,7 @@ func In(c *cli.Context) {
 	Generic(c, []string{`in`})
 }
 
-func Direct_In(c *cli.Context) {
+func DirectIn(c *cli.Context) {
 	GenericDirect(c, []string{`in`})
 }
 
@@ -42,11 +42,11 @@ func To(c *cli.Context) {
 	Generic(c, []string{`to`})
 }
 
-func Triple_ToOn(c *cli.Context) {
+func TripleToOn(c *cli.Context) {
 	GenericTriple(c, []string{`to`, `on`})
 }
 
-func Triple_FromOn(c *cli.Context) {
+func TripleFromOn(c *cli.Context) {
 	GenericTriple(c, []string{`from`, `on`})
 }
 

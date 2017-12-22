@@ -25,8 +25,8 @@ func (ten *Node) Attach(a AttachRequest) {
 		panic(`Node.Attach`)
 	}
 
-	ten.Parent.(Propertier).syncProperty(ten.Id.String())
-	ten.Parent.(Checker).syncCheck(ten.Id.String())
+	ten.Parent.(Propertier).syncProperty(ten.ID.String())
+	ten.Parent.(Checker).syncCheck(ten.ID.String())
 }
 
 func (ten *Node) ReAttach(a AttachRequest) {
@@ -39,16 +39,16 @@ func (ten *Node) ReAttach(a AttachRequest) {
 	ten.Parent.Unlink(UnlinkRequest{
 		ParentType: ten.Parent.(Builder).GetType(),
 		ParentName: ten.Parent.(Builder).GetName(),
-		ParentId:   ten.Parent.(Builder).GetID(),
+		ParentID:   ten.Parent.(Builder).GetID(),
 		ChildType:  ten.GetType(),
 		ChildName:  ten.GetName(),
-		ChildId:    ten.GetID(),
+		ChildID:    ten.GetID(),
 	},
 	)
 
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  ten.GetType(),
 		Node:       ten,
@@ -59,8 +59,8 @@ func (ten *Node) ReAttach(a AttachRequest) {
 		panic(`Node.ReAttach: not reattached`)
 	}
 	ten.actionUpdate()
-	ten.Parent.(Propertier).syncProperty(ten.Id.String())
-	ten.Parent.(Checker).syncCheck(ten.Id.String())
+	ten.Parent.(Propertier).syncProperty(ten.ID.String())
+	ten.Parent.(Checker).syncCheck(ten.ID.String())
 }
 
 func (ten *Node) Destroy() {
@@ -76,11 +76,11 @@ func (ten *Node) Destroy() {
 
 	ten.Parent.Unlink(UnlinkRequest{
 		ParentType: ten.Parent.(Builder).GetType(),
-		ParentId:   ten.Parent.(Builder).GetID(),
+		ParentID:   ten.Parent.(Builder).GetID(),
 		ParentName: ten.Parent.(Builder).GetName(),
 		ChildType:  ten.GetType(),
 		ChildName:  ten.GetName(),
-		ChildId:    ten.GetID(),
+		ChildID:    ten.GetID(),
 	},
 	)
 
@@ -99,17 +99,17 @@ func (ten *Node) Detach() {
 
 	ten.Parent.Unlink(UnlinkRequest{
 		ParentType: ten.Parent.(Builder).GetType(),
-		ParentId:   ten.Parent.(Builder).GetID(),
+		ParentID:   ten.Parent.(Builder).GetID(),
 		ParentName: ten.Parent.(Builder).GetName(),
 		ChildType:  ten.GetType(),
 		ChildName:  ten.GetName(),
-		ChildId:    ten.GetID(),
+		ChildID:    ten.GetID(),
 	},
 	)
 
 	bucket.Receive(ReceiveRequest{
 		ParentType: bucket.(Builder).GetType(),
-		ParentId:   bucket.(Builder).GetID(),
+		ParentID:   bucket.(Builder).GetID(),
 		ParentName: bucket.(Builder).GetName(),
 		ChildType:  ten.Type,
 		Node:       ten,
@@ -117,7 +117,7 @@ func (ten *Node) Detach() {
 	)
 
 	ten.actionUpdate()
-	ten.Parent.(Propertier).syncProperty(ten.Id.String())
+	ten.Parent.(Propertier).syncProperty(ten.ID.String())
 }
 
 //
@@ -125,7 +125,7 @@ func (ten *Node) Detach() {
 func (ten *Node) attachToBucket(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  ten.Type,
 		Node:       ten,
@@ -143,7 +143,7 @@ func (ten *Node) attachToBucket(a AttachRequest) {
 func (ten *Node) attachToGroup(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  ten.Type,
 		Node:       ten,
@@ -161,7 +161,7 @@ func (ten *Node) attachToGroup(a AttachRequest) {
 func (ten *Node) attachToCluster(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  ten.Type,
 		Node:       ten,

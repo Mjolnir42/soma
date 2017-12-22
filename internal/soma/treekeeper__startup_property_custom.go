@@ -68,8 +68,8 @@ func (tk *TreeKeeper) startupCustomProperties(stMap map[string]*sql.Stmt) {
 				Key:          customProperty,
 				Value:        value,
 			}
-			prop.Id, _ = uuid.FromString(instanceID)
-			prop.CustomId, _ = uuid.FromString(customID)
+			prop.ID, _ = uuid.FromString(instanceID)
+			prop.CustomID, _ = uuid.FromString(customID)
 			prop.Instances = make([]tree.PropertyInstance, 0)
 
 			instanceRows, err = stMap[`LoadPropCustomInstance`].Query(
@@ -120,9 +120,9 @@ func (tk *TreeKeeper) startupCustomProperties(stMap map[string]*sql.Stmt) {
 				}
 
 				pi := tree.PropertyInstance{
-					ObjectId:   propObjectID,
+					ObjectID:   propObjectID,
 					ObjectType: inObjectType,
-					InstanceId: propInstanceID,
+					InstanceID: propInstanceID,
 				}
 				prop.Instances = append(prop.Instances, pi)
 			}
@@ -130,7 +130,7 @@ func (tk *TreeKeeper) startupCustomProperties(stMap map[string]*sql.Stmt) {
 			// lookup the object and set the prepared property
 			tk.tree.Find(tree.FindRequest{
 				ElementType: loopType,
-				ElementId:   objectID,
+				ElementID:   objectID,
 			}, true).SetProperty(&prop)
 
 			// throw away all generated actions, we do this for every

@@ -281,7 +281,7 @@ func ValidateNoSlash(s string) error {
 
 // ValidateCheckConstraints tests that all specified check constraints
 // resolve to a valid property or attribute.
-func ValidateCheckConstraints(repoId, teamId string,
+func ValidateCheckConstraints(repoID, teamID string,
 	constraints []proto.CheckConfigConstraint) (
 	[]proto.CheckConfigConstraint, error) {
 	valid := []proto.CheckConfigConstraint{}
@@ -337,11 +337,11 @@ func ValidateCheckConstraints(repoId, teamId string,
 		case `service`:
 			service := proto.PropertyService{}
 			var err error
-			if service.Name, err = LookupServicePropertyId(
-				prop.Service.Name, teamId); err != nil {
+			if service.Name, err = LookupServicePropertyID(
+				prop.Service.Name, teamID); err != nil {
 				return nil, err
 			}
-			service.TeamID = teamId
+			service.TeamID = teamID
 			valid = append(valid, proto.CheckConfigConstraint{
 				ConstraintType: prop.ConstraintType,
 				Service:        &service,
@@ -350,11 +350,11 @@ func ValidateCheckConstraints(repoId, teamId string,
 		case `custom`:
 			custom := proto.PropertyCustom{}
 			var err error
-			if custom.ID, err = LookupCustomPropertyId(
-				prop.Custom.Name, repoId); err != nil {
+			if custom.ID, err = LookupCustomPropertyID(
+				prop.Custom.Name, repoID); err != nil {
 				return nil, err
 			}
-			custom.RepositoryID = repoId
+			custom.RepositoryID = repoID
 			custom.Value = prop.Custom.Value
 			valid = append(valid, proto.CheckConfigConstraint{
 				ConstraintType: prop.ConstraintType,

@@ -25,7 +25,7 @@ import (
 )
 
 type NotifyMessage struct {
-	Uuid string `json:"uuid" valid:"uuidv4"`
+	UUID string `json:"uuid" valid:"uuidv4"`
 	Path string `json:"path" valid:"abspath"`
 }
 
@@ -57,7 +57,7 @@ func FetchConfigurationItems(w http.ResponseWriter, r *http.Request, _ httproute
 	}
 
 	soma, _ = url.Parse(Eye.Soma.url.String())
-	soma.Path = strings.Replace(fmt.Sprintf("%s/%s", msg.Path, msg.Uuid), `//`, `/`, -1)
+	soma.Path = strings.Replace(fmt.Sprintf("%s/%s", msg.Path, msg.UUID), `//`, `/`, -1)
 	client = resty.New().SetTimeout(500 * time.Millisecond)
 	log.Printf("Fetching deployment: %s\n", soma.String())
 	if resp, err = client.R().Get(soma.String()); err != nil || resp.StatusCode() > 299 {
@@ -66,35 +66,35 @@ func FetchConfigurationItems(w http.ResponseWriter, r *http.Request, _ httproute
 		}
 		log.Printf("Failed to fetch deployment from SOMA: %s\n", err.Error())
 		dispatchPrecondition(&w, err.Error())
-		Failed(msg.Uuid)
+		Failed(msg.UUID)
 		return
 	}
 	if err = json.Unmarshal(resp.Body(), &res); err != nil {
 		log.Printf("Error deserializing deployment: %s\n", err.Error())
 		dispatchUnprocessable(&w, err.Error())
-		Failed(msg.Uuid)
+		Failed(msg.UUID)
 		return
 	}
 	if res.StatusCode != 200 {
 		log.Printf("Error in fetched deployment, Statuscode %d\n", res.StatusCode)
 		dispatchGone(&w, err.Error())
-		Failed(msg.Uuid)
+		Failed(msg.UUID)
 		return
 	}
 	if len(*res.Deployments) != 1 {
 		log.Printf("Error, deployment contained wrong deployment count: %d\n", len(*res.Deployments))
 		dispatchPrecondition(&w, err.Error())
-		Failed(msg.Uuid)
+		Failed(msg.UUID)
 		return
 	}
 	if err = CheckUpdateOrInsertOrDelete(&(*res.Deployments)[0]); err != nil {
 		log.Printf("Error processing fetched deployment: %s\n", err.Error())
 		dispatchInternalServerError(&w, err.Error())
-		Failed(msg.Uuid)
+		Failed(msg.UUID)
 		return
 	}
 	dispatchNoContent(&w)
-	Success(msg.Uuid)
+	Success(msg.UUID)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

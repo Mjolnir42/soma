@@ -130,7 +130,7 @@ func (r *MonitoringRead) listAll(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
-			Id:   monitoringID,
+			ID:   monitoringID,
 			Name: monitoringName,
 		})
 	}
@@ -164,7 +164,7 @@ func (r *MonitoringRead) listScoped(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
-			Id:   monitoringID,
+			ID:   monitoringID,
 			Name: monitoringName,
 		})
 	}
@@ -185,7 +185,7 @@ func (r *MonitoringRead) show(q *msg.Request, mr *msg.Result) {
 		callback                 string
 	)
 	if err = r.stmtShow.QueryRow(
-		q.Monitoring.Id,
+		q.Monitoring.ID,
 	).Scan(
 		&monitoringID,
 		&name,
@@ -205,11 +205,11 @@ func (r *MonitoringRead) show(q *msg.Request, mr *msg.Result) {
 		callback = callbackNull.String
 	}
 	mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
-		Id:       monitoringID,
+		ID:       monitoringID,
 		Name:     name,
 		Mode:     mode,
 		Contact:  contact,
-		TeamId:   teamID,
+		TeamID:   teamID,
 		Callback: callback,
 	})
 	mr.OK()
@@ -236,7 +236,7 @@ func (r *MonitoringRead) searchAll(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
-		Id:   monitoringID,
+		ID:   monitoringID,
 		Name: monitoringName,
 	})
 	mr.OK()
@@ -265,7 +265,7 @@ func (r *MonitoringRead) searchScoped(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Monitoring = append(mr.Monitoring, proto.Monitoring{
-		Id:   monitoringID,
+		ID:   monitoringID,
 		Name: monitoringName,
 	})
 	mr.OK()

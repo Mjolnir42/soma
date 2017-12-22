@@ -121,7 +121,7 @@ func (r *TeamRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Team = append(mr.Team, proto.Team{
-			Id:   teamID,
+			ID:   teamID,
 			Name: teamName,
 		})
 	}
@@ -142,7 +142,7 @@ func (r *TeamRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Team.Id,
+		q.Team.ID,
 	).Scan(
 		&teamID,
 		&teamName,
@@ -156,9 +156,9 @@ func (r *TeamRead) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Team = append(mr.Team, proto.Team{
-		Id:       teamID,
+		ID:       teamID,
 		Name:     teamName,
-		LdapId:   strconv.Itoa(ldapID),
+		LdapID:   strconv.Itoa(ldapID),
 		IsSystem: systemFlag,
 	})
 	mr.OK()
@@ -191,9 +191,9 @@ func (r *TeamRead) sync(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Team = append(mr.Team, proto.Team{
-			Id:       teamID,
+			ID:       teamID,
 			Name:     teamName,
-			LdapId:   strconv.Itoa(ldapID),
+			LdapID:   strconv.Itoa(ldapID),
 			IsSystem: systemFlag,
 		})
 	}

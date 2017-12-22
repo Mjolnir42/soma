@@ -80,7 +80,7 @@ func ViewAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewViewRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -147,7 +147,7 @@ func ViewRename(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewViewRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -186,7 +186,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

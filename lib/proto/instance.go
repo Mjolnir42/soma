@@ -10,14 +10,14 @@
 package proto
 
 type Instance struct {
-	Id               string               `json:"id,omitempty"`
+	ID               string               `json:"id,omitempty"`
 	Version          uint64               `json:"version"`
-	CheckId          string               `json:"checkId,omitempty"`
-	ConfigId         string               `json:"configId,omitempty"`
-	InstanceConfigId string               `json:"instanceConfigId,omitempty"`
-	RepositoryId     string               `json:"repositoryId,omitempty"`
-	BucketId         string               `json:"bucketId,omitempty"`
-	ObjectId         string               `json:"objectId,omitempty"`
+	CheckID          string               `json:"checkId,omitempty"`
+	ConfigID         string               `json:"configId,omitempty"`
+	InstanceConfigID string               `json:"instanceConfigID,omitempty"`
+	RepositoryID     string               `json:"repositoryId,omitempty"`
+	BucketID         string               `json:"bucketId,omitempty"`
+	ObjectID         string               `json:"objectId,omitempty"`
 	ObjectType       string               `json:"objectType,omitempty"`
 	CurrentStatus    string               `json:"currentStatus,omitempty"`
 	NextStatus       string               `json:"nextStatus,omitempty"`

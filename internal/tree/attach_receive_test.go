@@ -18,19 +18,19 @@ func TestAttachRepository(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
 		Team:    uuid.NewV4().String(),
 		Deleted: false,
@@ -38,7 +38,7 @@ func TestAttachRepository(t *testing.T) {
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
@@ -58,45 +58,45 @@ func TestAttachBucket(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	close(actionC)
@@ -115,57 +115,57 @@ func TestAttachGroup(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	close(actionC)
@@ -184,69 +184,69 @@ func TestAttachGroupToGroup(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
-	grpId2 := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
+	grpID2 := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId2,
+		Id:   grpID2,
 		Name: `testgroup2`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	close(actionC)
@@ -265,57 +265,57 @@ func TestAttachCluster(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	clrId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	clrID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrId,
+		Id:   clrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	close(actionC)
@@ -334,62 +334,62 @@ func TestAttachNode(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	close(actionC)
@@ -408,75 +408,75 @@ func TestAttachNodeToGroup(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	grp := NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	})
 	grp.Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	close(actionC)
@@ -495,84 +495,84 @@ func TestMoveNodeToGroup(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move node to group
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	close(actionC)
@@ -594,79 +594,79 @@ func TestMoveClusterToGroup(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
-	clrId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
+	clrID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrId,
+		Id:   clrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move cluster to group
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clrId,
+		ElementID:   clrID,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	close(actionC)
@@ -688,79 +688,79 @@ func TestMoveGroupToGroup(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
 	grp2Id := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
 		Id:   grp2Id,
 		Name: `testgroup2`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move group to group
 	sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grp2Id,
+		ElementID:   grp2Id,
 	}, true).(*Group).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	close(actionC)
@@ -782,84 +782,84 @@ func TestMoveNodeToCluster(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	clrId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	clrID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrId,
+		Id:   clrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move node to cluster
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(*Node).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   clrId,
+		ParentID:   clrID,
 	})
 
 	close(actionC)
@@ -881,85 +881,85 @@ func TestDetachGroupToBucket(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
 	grp2Id := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
 		Id:   grp2Id,
 		Name: `testgroup2`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move group to group
 	sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grp2Id,
+		ElementID:   grp2Id,
 	}, true).(*Group).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	// detach group
 	sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grp2Id,
+		ElementID:   grp2Id,
 	}, true).(*Group).Detach()
 
 	close(actionC)
@@ -981,85 +981,85 @@ func TestDetachClusterToBucket(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
-	clrId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
+	clrID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrId,
+		Id:   clrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move cluster to group
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clrId,
+		ElementID:   clrID,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	// detach cluster
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clrId,
+		ElementID:   clrID,
 	}, true).(Attacher).Detach()
 
 	close(actionC)
@@ -1081,112 +1081,112 @@ func TestDetachNodeToBucket(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
-	clrId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
+	clrID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrId,
+		Id:   clrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move cluster to group
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clrId,
+		ElementID:   clrID,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	// move node to cluster
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(ClusterAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   clrId,
+		ParentID:   clrID,
 	})
 
 	// detach node
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(Attacher).Detach()
 
 	close(actionC)
@@ -1208,112 +1208,112 @@ func TestDestroyRepository(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
-	clrId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
+	clrID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrId,
+		Id:   clrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move cluster to group
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clrId,
+		ElementID:   clrID,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	// move node to cluster
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(ClusterAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   clrId,
+		ParentID:   clrID,
 	})
 
 	// destroy bucket
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
-		ElementId:   repoId,
+		ElementID:   repoID,
 	}, true).(Attacher).Destroy()
 
 	close(actionC)
@@ -1339,112 +1339,112 @@ func TestDestroyBucket(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
-	clrId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
+	clrID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrId,
+		Id:   clrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move cluster to group
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clrId,
+		ElementID:   clrID,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	// move node to cluster
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(ClusterAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   clrId,
+		ParentID:   clrID,
 	})
 
 	// destroy bucket
 	sTree.Find(FindRequest{
 		ElementType: `bucket`,
-		ElementId:   buckId,
+		ElementID:   buckID,
 	}, true).(Attacher).Destroy()
 
 	close(actionC)
@@ -1466,124 +1466,124 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	grpId := uuid.NewV4().String()
-	clrId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	grpID := uuid.NewV4().String()
+	clrID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpId,
+		Id:   grpID,
 		Name: `testgroup`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrId,
+		Id:   clrID,
 		Name: `testcluster`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	// move cluster to group
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clrId,
+		ElementID:   clrID,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grpId,
+		ParentID:   grpID,
 	})
 
 	// move node to cluster
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(ClusterAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   clrId,
+		ParentID:   clrID,
 	})
 
 	sTree.Begin()
 
-	if sTree.Snap.Id.String() != repoId {
+	if sTree.Snap.ID.String() != repoID {
 		t.Error(`Clone failure`)
 	}
-	if sTree.Snap.Children[buckId].(*Bucket).
-		Children[grpId].(*Group).
-		Children[clrId].(*Cluster).
-		Children[nodeId].(*Node).Name != `testnode` {
+	if sTree.Snap.Children[buckID].(*Bucket).
+		Children[grpID].(*Group).
+		Children[clrID].(*Cluster).
+		Children[nodeID].(*Node).Name != `testnode` {
 		t.Error(`Deep clone failure`)
 	}
 
 	// detach node
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true).(Attacher).Detach()
 
 	sTree.Rollback()
@@ -1604,10 +1604,10 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 
 	if sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clrId,
-	}, true).(*Cluster).Children[nodeId] != sTree.Find(FindRequest{
+		ElementID:   clrID,
+	}, true).(*Cluster).Children[nodeID] != sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nodeId,
+		ElementID:   nodeID,
 	}, true) {
 		t.Error(`Bad things`)
 	}

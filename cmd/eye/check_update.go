@@ -47,7 +47,7 @@ func CheckUpdateOrInsertOrDelete(details *proto.Deployment) error {
 	fmt.Println(lookupID)
 	fmt.Println(item)
 
-	err = Eye.run.check_item.QueryRow(item.ConfigurationItemId).Scan(&itemID)
+	err = Eye.run.checkItem.QueryRow(item.ConfigurationItemID).Scan(&itemID)
 	switch details.Task {
 	case "rollout":
 		if err == sql.ErrNoRows {
@@ -64,7 +64,7 @@ func CheckUpdateOrInsertOrDelete(details *proto.Deployment) error {
 		}
 	}
 
-	if item.ConfigurationItemId.String() != itemID {
+	if item.ConfigurationItemID.String() != itemID {
 		panic(`Database corrupted`)
 	}
 	switch details.Task {

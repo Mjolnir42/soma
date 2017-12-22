@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerTeams(app cli.App) *cli.App {
@@ -84,7 +84,7 @@ func cmdTeamAdd(c *cli.Context) error {
 
 	req := proto.NewTeamRequest()
 	req.Team.Name = c.Args().First()
-	req.Team.LdapId = opts["ldap"][0]
+	req.Team.LdapID = opts["ldap"][0]
 	if len(opts["system"]) > 0 {
 		if err := adm.ValidateBool(opts["system"][0],
 			&req.Team.IsSystem); err != nil {
@@ -106,13 +106,13 @@ func cmdTeamUpdate(c *cli.Context) error {
 		return err
 	}
 
-	teamid, err := adm.LookupTeamId(c.Args().First())
+	teamid, err := adm.LookupTeamID(c.Args().First())
 	if err != nil {
 		return err
 	}
 	req := proto.NewTeamRequest()
 	req.Team.Name = opts[`name`][0]
-	req.Team.LdapId = opts[`ldap`][0]
+	req.Team.LdapID = opts[`ldap`][0]
 	if len(opts[`system`]) > 0 {
 		if err := adm.ValidateBool(opts["system"][0],
 			&req.Team.IsSystem); err != nil {
@@ -128,7 +128,7 @@ func cmdTeamDel(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupTeamId(c.Args().First())
+	id, err := adm.LookupTeamID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -145,7 +145,7 @@ func cmdTeamRename(c *cli.Context) error {
 		return err
 	}
 
-	id, err := adm.LookupTeamId(c.Args().First())
+	id, err := adm.LookupTeamID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -182,7 +182,7 @@ func cmdTeamShow(c *cli.Context) error {
 		return err
 	}
 
-	id, err := adm.LookupTeamId(c.Args().First())
+	id, err := adm.LookupTeamID(c.Args().First())
 	if err != nil {
 		return err
 	}

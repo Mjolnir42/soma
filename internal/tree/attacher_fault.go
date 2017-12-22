@@ -29,11 +29,11 @@ func (tef *Fault) Destroy() {
 
 	tef.Parent.Unlink(UnlinkRequest{
 		ParentType: tef.Parent.(Builder).GetType(),
-		ParentId:   tef.Parent.(Builder).GetID(),
+		ParentID:   tef.Parent.(Builder).GetID(),
 		ParentName: tef.Parent.(Builder).GetName(),
 		ChildType:  tef.GetType(),
 		ChildName:  tef.GetName(),
-		ChildId:    tef.GetID(),
+		ChildID:    tef.GetID(),
 	},
 	)
 
@@ -53,7 +53,7 @@ func (tef *Fault) ReAttach(a AttachRequest) {
 func (tef *Fault) attachToRepository(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  tef.Type,
 		Fault:      tef,

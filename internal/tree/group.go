@@ -19,7 +19,7 @@ import (
 )
 
 type Group struct {
-	Id              uuid.UUID
+	ID              uuid.UUID
 	Name            string
 	State           string
 	Team            uuid.UUID
@@ -47,7 +47,7 @@ type Group struct {
 }
 
 type GroupSpec struct {
-	Id   string
+	ID   string
 	Name string
 	Team string
 }
@@ -61,7 +61,7 @@ func NewGroup(spec GroupSpec) *Group {
 	}
 
 	teg := new(Group)
-	teg.Id, _ = uuid.FromString(spec.Id)
+	teg.ID, _ = uuid.FromString(spec.ID)
 	teg.Name = spec.Name
 	teg.Team, _ = uuid.FromString(spec.Team)
 	teg.Type = "group"
@@ -96,7 +96,7 @@ func (teg Group) Clone() *Group {
 		ordNumChildNod: teg.ordNumChildNod,
 		log:            teg.log,
 	}
-	cl.Id, _ = uuid.FromString(teg.Id.String())
+	cl.ID, _ = uuid.FromString(teg.ID.String())
 
 	f := make(map[string]GroupAttacher, 0)
 	for k, child := range teg.Children {
@@ -142,7 +142,7 @@ func (teg Group) Clone() *Group {
 	cl.loadedInstances = make(map[string]map[string]CheckInstance)
 
 	ci := make(map[string][]string)
-	for k, _ := range teg.CheckInstances {
+	for k := range teg.CheckInstances {
 		for _, str := range teg.CheckInstances[k] {
 			t := str
 			ci[k] = append(ci[k], t)
@@ -182,7 +182,7 @@ func (teg Group) CloneGroup() GroupAttacher {
 //
 // Interface: Builder
 func (teg *Group) GetID() string {
-	return teg.Id.String()
+	return teg.ID.String()
 }
 
 func (teg *Group) GetName() string {
@@ -213,19 +213,19 @@ func (teg *Group) setAction(c chan *Action) {
 
 func (teg *Group) setActionDeep(c chan *Action) {
 	teg.setAction(c)
-	for ch, _ := range teg.Children {
+	for ch := range teg.Children {
 		teg.Children[ch].setActionDeep(c)
 	}
 }
 
-func (g *Group) setLog(newlog *log.Logger) {
-	g.log = newlog
+func (teg *Group) setLog(newlog *log.Logger) {
+	teg.log = newlog
 }
 
-func (g *Group) setLoggerDeep(newlog *log.Logger) {
-	g.setLog(newlog)
-	for ch, _ := range g.Children {
-		g.Children[ch].setLoggerDeep(newlog)
+func (teg *Group) setLoggerDeep(newlog *log.Logger) {
+	teg.setLog(newlog)
+	for ch := range teg.Children {
+		teg.Children[ch].setLoggerDeep(newlog)
 	}
 }
 
@@ -237,7 +237,7 @@ func (teg *Group) setGroupParent(p GroupReceiver) {
 func (teg *Group) updateParentRecursive(p Receiver) {
 	teg.setParent(p)
 	var wg sync.WaitGroup
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		c := child
 		go func(str Receiver) {
@@ -260,7 +260,7 @@ func (teg *Group) setFault(f *Fault) {
 func (teg *Group) updateFaultRecursive(f *Fault) {
 	teg.setFault(f)
 	var wg sync.WaitGroup
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		c := child
 		go func(ptr *Fault) {
@@ -299,14 +299,14 @@ func (teg *Group) GetEnvironment() string {
 //
 //
 func (teg *Group) ComputeCheckInstances() {
-	teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s",
+	teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s",
 		teg.GetRepositoryName(),
 		`ComputeCheckInstances`,
 		`group`,
-		teg.Id.String(),
+		teg.ID.String(),
 	)
 	/* var wg sync.WaitGroup
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		c := child
 		go func() {
@@ -340,7 +340,7 @@ func (teg *Group) ComputeCheckInstances() {
 //
 func (teg *Group) ClearLoadInfo() {
 	var wg sync.WaitGroup
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		c := child
 		go func() {
@@ -357,11 +357,11 @@ func (teg *Group) ClearLoadInfo() {
 func (teg *Group) export() proto.Group {
 	bucket := teg.Parent.(Bucketeer).GetBucket()
 	return proto.Group{
-		Id:          teg.Id.String(),
+		ID:          teg.ID.String(),
 		Name:        teg.Name,
-		BucketId:    bucket.(Builder).GetID(),
+		BucketID:    bucket.(Builder).GetID(),
 		ObjectState: teg.State,
-		TeamId:      teg.Team.String(),
+		TeamID:      teg.Team.String(),
 	}
 }
 
@@ -439,14 +439,14 @@ func (teg *Group) actionProperty(a Action) {
 
 //
 func (teg *Group) actionCheckNew(a Action) {
-	a.Check.RepositoryId = teg.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Check.BucketId = teg.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Check.RepositoryID = teg.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Check.BucketID = teg.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 	teg.actionDispatch("check_new", a)
 }
 
 func (teg *Group) actionCheckRemoved(a Action) {
-	a.Check.RepositoryId = teg.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Check.BucketId = teg.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Check.RepositoryID = teg.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Check.BucketID = teg.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 	teg.actionDispatch(`check_removed`, a)
 }
 

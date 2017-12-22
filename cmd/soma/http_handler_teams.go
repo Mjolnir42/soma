@@ -38,7 +38,7 @@ func TeamList(w http.ResponseWriter, r *http.Request,
 		goto skip
 	}
 
-	_ = DecodeJsonBody(r, &cReq)
+	_ = DecodeJSONBody(r, &cReq)
 	if cReq.Filter.Team.Name != "" {
 		filtered := []somaTeamResult{}
 		for _, i := range result.Teams {
@@ -75,7 +75,7 @@ func TeamShow(w http.ResponseWriter, r *http.Request,
 		action: "show",
 		reply:  returnChannel,
 		Team: proto.Team{
-			Id: params.ByName("team"),
+			ID: params.ByName("team"),
 		},
 	}
 	result := <-returnChannel
@@ -124,7 +124,7 @@ func TeamAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewTeamRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -137,7 +137,7 @@ func TeamAdd(w http.ResponseWriter, r *http.Request,
 		reply:  returnChannel,
 		Team: proto.Team{
 			Name:     cReq.Team.Name,
-			LdapId:   cReq.Team.LdapId,
+			LdapID:   cReq.Team.LdapID,
 			IsSystem: cReq.Team.IsSystem,
 		},
 	}
@@ -162,7 +162,7 @@ func TeamUpdate(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewTeamRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -174,9 +174,9 @@ func TeamUpdate(w http.ResponseWriter, r *http.Request,
 		action: `update`,
 		reply:  returnChannel,
 		Team: proto.Team{
-			Id:       params.ByName(`team`),
+			ID:       params.ByName(`team`),
 			Name:     cReq.Team.Name,
-			LdapId:   cReq.Team.LdapId,
+			LdapID:   cReq.Team.LdapID,
 			IsSystem: cReq.Team.IsSystem,
 		},
 	}
@@ -206,7 +206,7 @@ func TeamRemove(w http.ResponseWriter, r *http.Request,
 		action: "delete",
 		reply:  returnChannel,
 		Team: proto.Team{
-			Id: params.ByName("team"),
+			ID: params.ByName("team"),
 		},
 	}
 	result := <-returnChannel
@@ -232,7 +232,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

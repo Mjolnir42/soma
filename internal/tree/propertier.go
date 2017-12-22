@@ -28,11 +28,11 @@ type Propertier interface {
 	rmProperty(p Property) bool
 
 	verifySourceInstance(id, prop string) bool
-	findIdForSource(source, prop string) string
-	syncProperty(childId string)
-	checkProperty(propType, propId string) bool
+	findIDForSource(source, prop string) string
+	syncProperty(childID string)
+	checkProperty(propType, propID string) bool
 	checkDuplicate(p Property) (bool, bool, Property)
-	resyncProperty(srcId, pType, childId string)
+	resyncProperty(srcID, pType, childID string)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

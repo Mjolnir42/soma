@@ -49,7 +49,7 @@ func GetConfigurationItem(w http.ResponseWriter, r *http.Request, params httprou
 		return
 	}
 
-	if err = Eye.run.get_config.QueryRow(params.ByName("item")).Scan(&jConfig); err != nil {
+	if err = Eye.run.getConfig.QueryRow(params.ByName("item")).Scan(&jConfig); err != nil {
 		if err == sql.ErrNoRows {
 			dispatchNotFound(&w)
 		} else {
@@ -70,7 +70,7 @@ func GetConfigurationItem(w http.ResponseWriter, r *http.Request, params httprou
 		return
 	}
 
-	dispatchJsonOK(&w, &jsonb)
+	dispatchJSONOK(&w, &jsonb)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

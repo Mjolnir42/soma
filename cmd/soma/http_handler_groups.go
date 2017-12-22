@@ -40,12 +40,12 @@ func GroupList(w http.ResponseWriter, r *http.Request,
 		goto skip
 	}
 
-	_ = DecodeJsonBody(r, &cReq)
+	_ = DecodeJSONBody(r, &cReq)
 	if cReq.Filter.Group.Name != "" {
 		filtered := []somaGroupResult{}
 		for _, i := range result.Groups {
 			if i.Group.Name == cReq.Filter.Group.Name &&
-				i.Group.BucketId == cReq.Filter.Group.BucketId {
+				i.Group.BucketID == cReq.Filter.Group.BucketID {
 				filtered = append(filtered, i)
 			}
 		}
@@ -78,7 +78,7 @@ func GroupShow(w http.ResponseWriter, r *http.Request,
 		action: "show",
 		reply:  returnChannel,
 		Group: proto.Group{
-			Id: params.ByName("group"),
+			ID: params.ByName("group"),
 		},
 	}
 	result := <-returnChannel
@@ -107,7 +107,7 @@ func GroupListMember(w http.ResponseWriter, r *http.Request,
 		action: "member_list",
 		reply:  returnChannel,
 		Group: proto.Group{
-			Id: params.ByName("group"),
+			ID: params.ByName("group"),
 		},
 	}
 	result := <-returnChannel
@@ -120,7 +120,7 @@ func GroupCreate(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.Request{}
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -131,7 +131,7 @@ func GroupCreate(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `group`,
 		Action:     `create`,
-		GroupID:    cReq.Group.BucketId,
+		GroupID:    cReq.Group.BucketID,
 	}) {
 		DispatchForbidden(&w, nil)
 		return
@@ -165,7 +165,7 @@ func GroupAddMember(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.Request{}
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -176,8 +176,8 @@ func GroupAddMember(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		Section:    `group`,
 		Action:     `add_member`,
-		GroupID:    cReq.Group.Id,
-		BucketID:   cReq.Group.BucketId,
+		GroupID:    cReq.Group.ID,
+		BucketID:   cReq.Group.BucketID,
 	}) {
 		DispatchForbidden(&w, nil)
 		return
@@ -214,16 +214,16 @@ func GroupAddProperty(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.Request{}
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
 	switch {
-	case params.ByName("group") != cReq.Group.Id:
+	case params.ByName("group") != cReq.Group.ID:
 		DispatchBadRequest(&w,
 			fmt.Errorf("Mismatched group ids: %s, %s",
 				params.ByName("group"),
-				cReq.Group.Id))
+				cReq.Group.ID))
 		return
 	case len(*cReq.Group.Properties) != 1:
 		DispatchBadRequest(&w,
@@ -248,7 +248,7 @@ func GroupAddProperty(w http.ResponseWriter, r *http.Request,
 		Section:    `group`,
 		Action:     `add_property`,
 		GroupID:    params.ByName(`group`),
-		BucketID:   cReq.Group.BucketId,
+		BucketID:   cReq.Group.BucketID,
 	}) {
 		DispatchForbidden(&w, nil)
 		return
@@ -276,29 +276,29 @@ func GroupRemoveProperty(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.Request{}
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
 	switch {
-	case params.ByName(`group`) != cReq.Group.Id:
+	case params.ByName(`group`) != cReq.Group.ID:
 		DispatchBadRequest(&w,
 			fmt.Errorf("Mismatched group ids: %s, %s",
 				params.ByName(`group`),
-				cReq.Group.Id))
+				cReq.Group.ID))
 		return
-	case cReq.Group.BucketId == ``:
+	case cReq.Group.BucketID == ``:
 		DispatchBadRequest(&w,
 			fmt.Errorf(`Missing bucketId in group delete request`))
 		return
 	}
 
 	group := proto.Group{
-		Id: params.ByName(`group`),
+		ID: params.ByName(`group`),
 		Properties: &[]proto.Property{
 			proto.Property{
 				Type:             params.ByName(`type`),
-				BucketID:         cReq.Group.BucketId,
+				BucketID:         cReq.Group.BucketID,
 				SourceInstanceID: params.ByName(`source`),
 			},
 		},
@@ -310,7 +310,7 @@ func GroupRemoveProperty(w http.ResponseWriter, r *http.Request,
 		Section:    `group`,
 		Action:     `remove_property`,
 		GroupID:    params.ByName(`group`),
-		BucketID:   cReq.Group.BucketId,
+		BucketID:   cReq.Group.BucketID,
 	}) {
 		DispatchForbidden(&w, nil)
 		return
@@ -354,7 +354,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

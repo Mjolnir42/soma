@@ -24,7 +24,7 @@ func (ter *Repository) Find(f FindRequest, b bool) Attacher {
 		goto skip
 	}
 	rawResult = make(chan Attacher, len(ter.Children))
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		wg.Add(1)
 		c := child
 		go func(fr FindRequest, bl bool) {
@@ -47,9 +47,8 @@ skip:
 	case len(res) == 0:
 		if b {
 			return ter.Fault
-		} else {
-			return nil
 		}
+		return nil
 	case len(res) > 1:
 		return ter.Fault
 	}

@@ -50,7 +50,7 @@ func (s *Supervisor) sectionList(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.SectionObj = append(mr.SectionObj, proto.Section{
-			Id:   sectionID,
+			ID:   sectionID,
 			Name: sectionName,
 		})
 	}
@@ -71,7 +71,7 @@ func (s *Supervisor) sectionShow(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = s.stmtSectionShow.QueryRow(
-		q.SectionObj.Id,
+		q.SectionObj.ID,
 	).Scan(
 		&sectionID,
 		&sectionName,
@@ -88,7 +88,7 @@ func (s *Supervisor) sectionShow(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.SectionObj = append(mr.SectionObj, proto.Section{
-		Id:       sectionID,
+		ID:       sectionID,
 		Name:     sectionName,
 		Category: category,
 		Details: &proto.DetailsCreation{
@@ -126,7 +126,7 @@ func (s *Supervisor) sectionSearch(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.SectionObj = append(mr.SectionObj, proto.Section{
-			Id:   sectionID,
+			ID:   sectionID,
 			Name: sectionName,
 		})
 	}

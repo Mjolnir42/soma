@@ -39,7 +39,7 @@ func NodeList(w http.ResponseWriter, r *http.Request,
 		goto skip
 	}
 
-	_ = DecodeJsonBody(r, &cReq)
+	_ = DecodeJSONBody(r, &cReq)
 	if cReq.Filter.Node.Name != "" {
 		filtered := []somaNodeResult{}
 		for _, i := range result.Nodes {
@@ -118,7 +118,7 @@ func NodeAssign(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.NewNodeRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -171,7 +171,7 @@ func NodeAddProperty(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.NewNodeRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -232,7 +232,7 @@ func NodeRemoveProperty(w http.ResponseWriter, r *http.Request,
 	defer PanicCatcher(w)
 
 	cReq := proto.NewNodeRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -322,7 +322,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

@@ -18,7 +18,7 @@ import (
 )
 
 type Bucket struct {
-	Id              uuid.UUID
+	ID              uuid.UUID
 	Name            string
 	Environment     string
 	Type            string
@@ -46,7 +46,7 @@ type Bucket struct {
 }
 
 type BucketSpec struct {
-	Id          string
+	ID          string
 	Name        string
 	Environment string
 	Team        string
@@ -64,7 +64,7 @@ func NewBucket(spec BucketSpec) *Bucket {
 	}
 
 	teb := new(Bucket)
-	teb.Id, _ = uuid.FromString(spec.Id)
+	teb.ID, _ = uuid.FromString(spec.ID)
 	teb.Name = spec.Name
 	teb.Team, _ = uuid.FromString(spec.Team)
 	teb.Environment = spec.Environment
@@ -103,7 +103,7 @@ func (teb Bucket) CloneRepository() RepositoryAttacher {
 		ordNumChildNod: teb.ordNumChildNod,
 		log:            teb.log,
 	}
-	cl.Id, _ = uuid.FromString(teb.Id.String())
+	cl.ID, _ = uuid.FromString(teb.ID.String())
 	cl.Team, _ = uuid.FromString(teb.Team.String())
 	cl.Repository, _ = uuid.FromString(teb.Repository.String())
 
@@ -167,7 +167,7 @@ func (teb Bucket) CloneRepository() RepositoryAttacher {
 //
 // Interface: Builder
 func (teb *Bucket) GetID() string {
-	return teb.Id.String()
+	return teb.ID.String()
 }
 
 func (teb *Bucket) GetName() string {
@@ -184,19 +184,19 @@ func (teb *Bucket) setAction(c chan *Action) {
 
 func (teb *Bucket) setActionDeep(c chan *Action) {
 	teb.setAction(c)
-	for ch, _ := range teb.Children {
+	for ch := range teb.Children {
 		teb.Children[ch].setActionDeep(c)
 	}
 }
 
-func (b *Bucket) setLog(newlog *log.Logger) {
-	b.log = newlog
+func (teb *Bucket) setLog(newlog *log.Logger) {
+	teb.log = newlog
 }
 
-func (b *Bucket) setLoggerDeep(newlog *log.Logger) {
-	b.setLog(newlog)
-	for ch, _ := range b.Children {
-		b.Children[ch].setLoggerDeep(newlog)
+func (teb *Bucket) setLoggerDeep(newlog *log.Logger) {
+	teb.setLog(newlog)
+	for ch := range teb.Children {
+		teb.Children[ch].setLoggerDeep(newlog)
 	}
 }
 
@@ -221,11 +221,11 @@ func (teb *Bucket) GetRepositoryName() string {
 //
 //
 func (teb *Bucket) ComputeCheckInstances() {
-	teb.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s",
+	teb.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s",
 		teb.GetRepositoryName(),
 		`ComputeCheckInstances`,
 		`bucket`,
-		teb.Id.String(),
+		teb.ID.String(),
 	)
 	/* var wg sync.WaitGroup
 	for child, _ := range teb.Children {
@@ -261,7 +261,7 @@ func (teb *Bucket) ComputeCheckInstances() {
 //
 func (teb *Bucket) ClearLoadInfo() {
 	var wg sync.WaitGroup
-	for child, _ := range teb.Children {
+	for child := range teb.Children {
 		wg.Add(1)
 		c := child
 		go func() {
@@ -276,7 +276,7 @@ func (teb *Bucket) ClearLoadInfo() {
 //
 func (teb *Bucket) export() proto.Bucket {
 	return proto.Bucket{
-		ID:           teb.Id.String(),
+		ID:           teb.ID.String(),
 		Name:         teb.Name,
 		RepositoryID: teb.Repository.String(),
 		TeamID:       teb.Team.String(),
@@ -339,7 +339,7 @@ func (teb *Bucket) actionProperty(a Action) {
 	a.Bucket = teb.export()
 
 	a.Property.RepositoryID = teb.Repository.String()
-	a.Property.BucketID = teb.Id.String()
+	a.Property.BucketID = teb.ID.String()
 	switch a.Property.Type {
 	case `custom`:
 		a.Property.Custom.RepositoryID = a.Property.RepositoryID
@@ -355,8 +355,8 @@ func (teb *Bucket) actionCheckNew(a Action) {
 	a.Action = "check_new"
 	a.Type = teb.Type
 	a.Bucket = teb.export()
-	a.Check.RepositoryId = teb.Repository.String()
-	a.Check.BucketId = teb.Id.String()
+	a.Check.RepositoryID = teb.Repository.String()
+	a.Check.BucketID = teb.ID.String()
 
 	teb.Action <- &a
 }
@@ -365,8 +365,8 @@ func (teb *Bucket) actionCheckRemoved(a Action) {
 	a.Action = `check_removed`
 	a.Type = teb.Type
 	a.Bucket = teb.export()
-	a.Check.RepositoryId = teb.Repository.String()
-	a.Check.BucketId = teb.Id.String()
+	a.Check.RepositoryID = teb.Repository.String()
+	a.Check.BucketID = teb.ID.String()
 
 	teb.Action <- &a
 }

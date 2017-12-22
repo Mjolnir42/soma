@@ -40,7 +40,7 @@ func RepositoryList(w http.ResponseWriter, r *http.Request,
 		goto skip
 	}
 
-	_ = DecodeJsonBody(r, &cReq)
+	_ = DecodeJSONBody(r, &cReq)
 	if cReq.Filter.Repository.Name != "" {
 		filtered := []somaRepositoryResult{}
 		for _, i := range result.Repositories {
@@ -76,7 +76,7 @@ func RepositoryShow(w http.ResponseWriter, r *http.Request,
 		action: "show",
 		reply:  returnChannel,
 		Repository: proto.Repository{
-			Id: params.ByName("repository"),
+			ID: params.ByName("repository"),
 		},
 	}
 	result := <-returnChannel
@@ -99,7 +99,7 @@ func RepositoryCreate(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewRepositoryRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -120,7 +120,7 @@ func RepositoryCreate(w http.ResponseWriter, r *http.Request,
 		user:       params.ByName(`AuthenticatedUser`),
 		Repository: proto.Repository{
 			Name:      cReq.Repository.Name,
-			TeamId:    cReq.Repository.TeamId,
+			TeamID:    cReq.Repository.TeamID,
 			IsDeleted: cReq.Repository.IsDeleted,
 			IsActive:  cReq.Repository.IsActive,
 		},
@@ -146,16 +146,16 @@ func RepositoryAddProperty(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewRepositoryRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
 	switch {
-	case params.ByName("repository") != cReq.Repository.Id:
+	case params.ByName("repository") != cReq.Repository.ID:
 		DispatchBadRequest(&w,
 			fmt.Errorf("Mismatched repository ids: %s, %s",
 				params.ByName("repository"),
-				cReq.Repository.Id))
+				cReq.Repository.ID))
 		return
 	case len(*cReq.Repository.Properties) != 1:
 		DispatchBadRequest(&w,
@@ -207,7 +207,7 @@ func RepositoryRemoveProperty(w http.ResponseWriter, r *http.Request,
 	}
 
 	repo := &proto.Repository{
-		Id: params.ByName(`repository`),
+		ID: params.ByName(`repository`),
 		Properties: &[]proto.Property{
 			proto.Property{
 				Type:             params.ByName(`type`),
@@ -254,7 +254,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

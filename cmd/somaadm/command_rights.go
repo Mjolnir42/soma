@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerRights(app cli.App) *cli.App {
@@ -23,14 +23,14 @@ func registerRights(app cli.App) *cli.App {
 						Usage:        "Grant a permission",
 						Action:       runtime(cmdRightGrant),
 						Description:  help.Text(`RightsGrant`),
-						BashComplete: cmpl.Triple_ToOn,
+						BashComplete: cmpl.TripleToOn,
 					},
 					{
 						Name:         "revoke",
 						Usage:        "Revoke a permission",
 						Action:       runtime(cmdRightRevoke),
 						Description:  help.Text(`RightsRevoke`),
-						BashComplete: cmpl.Triple_FromOn,
+						BashComplete: cmpl.TripleFromOn,
 					},
 					{
 						Name:        `list`,
@@ -100,10 +100,10 @@ func cmdRightGrant(c *cli.Context) error {
 	}
 
 	// lookup permissionid
-	if err = adm.LookupPermIdRef(
+	if err = adm.LookupPermIDRef(
 		permissionSlice[1],
 		req.Grant.Category,
-		&req.Grant.PermissionId,
+		&req.Grant.PermissionID,
 	); err != nil {
 		return err
 	}
@@ -115,7 +115,7 @@ func cmdRightGrant(c *cli.Context) error {
 	switch opts[`to`][0][0] {
 	case `user`:
 		req.Grant.RecipientType = `user`
-		if req.Grant.RecipientId, err = adm.LookupUserId(
+		if req.Grant.RecipientID, err = adm.LookupUserID(
 			opts[`to`][0][1]); err != nil {
 			return err
 		}
@@ -133,14 +133,14 @@ func cmdRightGrant(c *cli.Context) error {
 			switch opts[`on`][0][0] {
 			case `repository`:
 				req.Grant.ObjectType = `repository`
-				if req.Grant.ObjectId, err = adm.LookupRepoId(
+				if req.Grant.ObjectID, err = adm.LookupRepoID(
 					opts[`on`][0][1],
 				); err != nil {
 					return err
 				}
 			case `bucket`:
 				req.Grant.ObjectType = `bucket`
-				if req.Grant.ObjectId, err = adm.LookupBucketId(
+				if req.Grant.ObjectID, err = adm.LookupBucketID(
 					opts[`on`][0][1],
 				); err != nil {
 					return err
@@ -152,7 +152,7 @@ func cmdRightGrant(c *cli.Context) error {
 			switch opts[`on`][0][0] {
 			case `team`:
 				req.Grant.ObjectType = `team`
-				if req.Grant.ObjectId, err = adm.LookupTeamId(
+				if req.Grant.ObjectID, err = adm.LookupTeamID(
 					opts[`on`][0][1],
 				); err != nil {
 					return err
@@ -164,7 +164,7 @@ func cmdRightGrant(c *cli.Context) error {
 			switch opts[`on`][0][0] {
 			case `monitoring`:
 				req.Grant.ObjectType = `monitoring`
-				if req.Grant.ObjectId, err = adm.LookupMonitoringId(
+				if req.Grant.ObjectID, err = adm.LookupMonitoringID(
 					opts[`on`][0][1],
 				); err != nil {
 					return err
@@ -176,7 +176,7 @@ func cmdRightGrant(c *cli.Context) error {
 	}
 
 	path := fmt.Sprintf("/category/%s/permissions/%s/grant/",
-		req.Grant.Category, req.Grant.PermissionId)
+		req.Grant.Category, req.Grant.PermissionID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
@@ -198,12 +198,12 @@ func cmdRightRevoke(c *cli.Context) error {
 			err                     error
 			userId, permId, grantId string
 		)
-		if err = adm.LookupPermIdRef(c.Args().First(),
+		if err = adm.LookupPermIDRef(c.Args().First(),
 			`foobar`, // dummy value for new structs
 			&permId); err != nil {
 			return err
 		}
-		if userId, err = adm.LookupUserId(opts[`from`][0][1]); err != nil {
+		if userId, err = adm.LookupUserID(opts[`from`][0][1]); err != nil {
 			return err
 		}
 		if err = adm.LookupGrantIdRef(`user`, userId, permId, `category`,

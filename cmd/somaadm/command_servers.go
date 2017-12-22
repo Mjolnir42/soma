@@ -113,7 +113,7 @@ func cmdServerMarkAsDeleted(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	sid, err := adm.LookupServerId(c.Args().First())
+	sid, err := adm.LookupServerID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -196,11 +196,11 @@ func cmdServerShow(c *cli.Context) error {
 		return err
 	}
 
-	serverId, err := adm.LookupServerId(c.Args().First())
+	serverID, err := adm.LookupServerID(c.Args().First())
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/servers/%s", serverId)
+	path := fmt.Sprintf("/servers/%s", serverID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

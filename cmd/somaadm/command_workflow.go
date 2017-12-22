@@ -11,9 +11,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerWorkflow(app cli.App) *cli.App {
@@ -87,7 +87,7 @@ func cmdWorkflowRetry(c *cli.Context) error {
 	}
 
 	req := proto.NewWorkflowRequest()
-	req.Workflow.InstanceId = c.Args().First()
+	req.Workflow.InstanceID = c.Args().First()
 
 	path := `/workflow/retry`
 	return adm.Perform(`patchbody`, path, `command`, req, c)
@@ -118,7 +118,7 @@ func cmdWorkflowSet(c *cli.Context) error {
 	}
 	req := proto.NewWorkflowRequest()
 	req.Flags.Forced = c.Bool(`force`)
-	req.Workflow.InstanceConfigId = c.Args().First()
+	req.Workflow.InstanceConfigID = c.Args().First()
 	req.Workflow.Status = opts[`status`][0]
 	req.Workflow.NextStatus = opts[`next`][0]
 

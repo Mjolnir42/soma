@@ -31,10 +31,10 @@ func (ter *Repository) SetProperty(p Property) {
 		case `custom`:
 			cstUUID, _ := uuid.FromString(prop.GetKey())
 			ter.deletePropertyInherited(&PropertyCustom{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
-				CustomId:  cstUUID,
+				CustomID:  cstUUID,
 				Key:       prop.(*PropertyCustom).GetKeyField(),
 				Value:     prop.(*PropertyCustom).GetValueField(),
 			})
@@ -42,14 +42,14 @@ func (ter *Repository) SetProperty(p Property) {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			ter.deletePropertyInherited(&PropertyService{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
 				Service:   prop.GetKey(),
 			})
 		case `system`:
 			ter.deletePropertyInherited(&PropertySystem{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
 				Key:       prop.GetKey(),
@@ -58,30 +58,30 @@ func (ter *Repository) SetProperty(p Property) {
 		case `oncall`:
 			oncUUID, _ := uuid.FromString(prop.GetKey())
 			ter.deletePropertyInherited(&PropertyOncall{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
-				OncallId:  oncUUID,
+				OncallID:  oncUUID,
 				Name:      prop.(*PropertyOncall).GetName(),
 				Number:    prop.(*PropertyOncall).GetNumber(),
 			})
 		}
 	}
-	p.SetId(p.GetInstanceId(ter.Type, ter.Id, ter.log))
+	p.SetID(p.GetInstanceID(ter.Type, ter.ID, ter.log))
 	if p.Equal(uuid.Nil) {
-		p.SetId(uuid.NewV4())
+		p.SetID(uuid.NewV4())
 	}
 	// this property is the source instance
-	p.SetInheritedFrom(ter.Id)
+	p.SetInheritedFrom(ter.ID)
 	p.SetInherited(false)
 	p.SetSourceType(ter.Type)
 	if i, e := uuid.FromString(p.GetID()); e == nil {
-		p.SetSourceId(i)
+		p.SetSourceID(i)
 	}
 	// send a scrubbed copy down
 	f := p.Clone()
 	f.SetInherited(true)
-	f.SetId(uuid.UUID{})
+	f.SetID(uuid.UUID{})
 	if f.hasInheritance() {
 		ter.setPropertyOnChildren(f)
 	}
@@ -93,9 +93,9 @@ func (ter *Repository) SetProperty(p Property) {
 
 func (ter *Repository) setPropertyInherited(p Property) {
 	f := p.Clone()
-	f.SetId(f.GetInstanceId(ter.Type, ter.Id, ter.log))
+	f.SetID(f.GetInstanceID(ter.Type, ter.ID, ter.log))
 	if f.Equal(uuid.Nil) {
-		f.SetId(uuid.NewV4())
+		f.SetID(uuid.NewV4())
 	}
 	f.clearInstances()
 
@@ -118,14 +118,14 @@ func (ter *Repository) setPropertyInherited(p Property) {
 		return
 	}
 	ter.addProperty(f)
-	p.SetId(uuid.UUID{})
+	p.SetID(uuid.UUID{})
 	ter.setPropertyOnChildren(p)
 	ter.actionPropertyNew(f.MakeAction())
 }
 
 func (ter *Repository) setPropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -163,7 +163,7 @@ func (ter *Repository) UpdateProperty(p Property) {
 	}
 
 	// keep a copy for ourselves, no shared pointers
-	p.SetInheritedFrom(ter.Id)
+	p.SetInheritedFrom(ter.ID)
 	p.SetSourceType(ter.Type)
 	p.SetInherited(true)
 	f := p.Clone()
@@ -188,7 +188,7 @@ func (ter *Repository) updatePropertyInherited(p Property) {
 
 func (ter *Repository) updatePropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -199,7 +199,7 @@ func (ter *Repository) updatePropertyOnChildren(p Property) {
 }
 
 func (ter *Repository) switchProperty(p Property) bool {
-	uid := ter.findIdForSource(
+	uid := ter.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
@@ -216,8 +216,8 @@ func (ter *Repository) switchProperty(p Property) bool {
 			Action: `repository.switchProperty property not found`}
 		return false
 	}
-	updId, _ := uuid.FromString(uid)
-	p.SetId(updId)
+	updID, _ := uuid.FromString(uid)
+	p.SetID(updID)
 	curr := ter.getCurrentProperty(p)
 	if curr == nil {
 		return false
@@ -233,10 +233,10 @@ func (ter *Repository) switchProperty(p Property) bool {
 		case `custom`:
 			cstUUID, _ := uuid.FromString(curr.GetKey())
 			ter.deletePropertyOnChildren(&PropertyCustom{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
-				CustomId:    cstUUID,
+				CustomID:    cstUUID,
 				Key:         curr.(*PropertyCustom).GetKeyField(),
 				Value:       curr.(*PropertyCustom).GetValueField(),
 				Inheritance: true,
@@ -245,7 +245,7 @@ func (ter *Repository) switchProperty(p Property) bool {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			ter.deletePropertyOnChildren(&PropertyService{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
 				Service:     curr.GetKey(),
@@ -253,7 +253,7 @@ func (ter *Repository) switchProperty(p Property) bool {
 			})
 		case `system`:
 			ter.deletePropertyOnChildren(&PropertySystem{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
 				Key:         curr.GetKey(),
@@ -263,10 +263,10 @@ func (ter *Repository) switchProperty(p Property) bool {
 		case `oncall`:
 			oncUUID, _ := uuid.FromString(curr.GetKey())
 			ter.deletePropertyOnChildren(&PropertyOncall{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
-				OncallId:    oncUUID,
+				OncallID:    oncUUID,
 				Name:        curr.(*PropertyOncall).GetName(),
 				Number:      curr.(*PropertyOncall).GetNumber(),
 				Inheritance: true,
@@ -326,7 +326,7 @@ func (ter *Repository) deletePropertyInherited(p Property) {
 
 func (ter *Repository) deletePropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -391,11 +391,11 @@ func (ter *Repository) deletePropertyAllLocal() {
 }
 
 func (ter *Repository) rmProperty(p Property) bool {
-	delId := ter.findIdForSource(
+	delID := ter.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
-	if delId == `` {
+	if delID == `` {
 		// we do not have the property for which we received a delete
 		if dupe, deleteOK, _ := ter.checkDuplicate(p); dupe && !deleteOK {
 			// the delete is duplicate to a property for which we
@@ -414,28 +414,28 @@ func (ter *Repository) rmProperty(p Property) bool {
 	switch p.GetType() {
 	case `custom`:
 		ter.actionPropertyDelete(
-			ter.PropertyCustom[delId].MakeAction(),
+			ter.PropertyCustom[delID].MakeAction(),
 		)
-		hasInheritance = ter.PropertyCustom[delId].hasInheritance()
-		delete(ter.PropertyCustom, delId)
+		hasInheritance = ter.PropertyCustom[delID].hasInheritance()
+		delete(ter.PropertyCustom, delID)
 	case `service`:
 		ter.actionPropertyDelete(
-			ter.PropertyService[delId].MakeAction(),
+			ter.PropertyService[delID].MakeAction(),
 		)
-		hasInheritance = ter.PropertyService[delId].hasInheritance()
-		delete(ter.PropertyService, delId)
+		hasInheritance = ter.PropertyService[delID].hasInheritance()
+		delete(ter.PropertyService, delID)
 	case `system`:
 		ter.actionPropertyDelete(
-			ter.PropertySystem[delId].MakeAction(),
+			ter.PropertySystem[delID].MakeAction(),
 		)
-		hasInheritance = ter.PropertySystem[delId].hasInheritance()
-		delete(ter.PropertySystem, delId)
+		hasInheritance = ter.PropertySystem[delID].hasInheritance()
+		delete(ter.PropertySystem, delID)
 	case `oncall`:
 		ter.actionPropertyDelete(
-			ter.PropertyOncall[delId].MakeAction(),
+			ter.PropertyOncall[delID].MakeAction(),
 		)
-		hasInheritance = ter.PropertyOncall[delId].hasInheritance()
-		delete(ter.PropertyOncall, delId)
+		hasInheritance = ter.PropertyOncall[delID].hasInheritance()
+		delete(ter.PropertyOncall, delID)
 	default:
 		ter.Fault.Error <- &Error{Action: `repository.rmProperty unknown type`}
 		return false
@@ -477,31 +477,31 @@ bailout:
 	return false
 }
 
-func (ter *Repository) findIdForSource(source, prop string) string {
+func (ter *Repository) findIDForSource(source, prop string) string {
 	switch prop {
 	case `custom`:
-		for id, _ := range ter.PropertyCustom {
+		for id := range ter.PropertyCustom {
 			if ter.PropertyCustom[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `system`:
-		for id, _ := range ter.PropertySystem {
+		for id := range ter.PropertySystem {
 			if ter.PropertySystem[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `service`:
-		for id, _ := range ter.PropertyService {
+		for id := range ter.PropertyService {
 			if ter.PropertyService[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `oncall`:
-		for id, _ := range ter.PropertyOncall {
+		for id := range ter.PropertyOncall {
 			if ter.PropertyOncall[id].GetSourceInstance() != source {
 				continue
 			}
@@ -512,99 +512,99 @@ func (ter *Repository) findIdForSource(source, prop string) string {
 }
 
 //
-func (ter *Repository) resyncProperty(srcId, pType, childId string) {
-	pId := ter.findIdForSource(srcId, pType)
-	if pId == `` {
+func (ter *Repository) resyncProperty(srcID, pType, childID string) {
+	pID := ter.findIDForSource(srcID, pType)
+	if pID == `` {
 		return
 	}
 
 	var f Property
 	switch pType {
 	case `custom`:
-		f = ter.PropertyCustom[pId].(*PropertyCustom).Clone()
+		f = ter.PropertyCustom[pID].(*PropertyCustom).Clone()
 	case `oncall`:
-		f = ter.PropertyOncall[pId].(*PropertyOncall).Clone()
+		f = ter.PropertyOncall[pID].(*PropertyOncall).Clone()
 	case `service`:
-		f = ter.PropertyService[pId].(*PropertyService).Clone()
+		f = ter.PropertyService[pID].(*PropertyService).Clone()
 	case `system`:
-		f = ter.PropertySystem[pId].(*PropertySystem).Clone()
+		f = ter.PropertySystem[pID].(*PropertySystem).Clone()
 	}
 	if !f.hasInheritance() {
 		return
 	}
 	f.SetInherited(true)
-	f.SetId(uuid.UUID{})
+	f.SetID(uuid.UUID{})
 	f.clearInstances()
-	ter.Children[childId].setPropertyInherited(f)
+	ter.Children[childID].setPropertyInherited(f)
 }
 
-// when a child attaches, it calls self.Parent.syncProperty(self.Id)
+// when a child attaches, it calls self.Parent.syncProperty(self.ID)
 // to get get all properties of that part of the tree
-func (ter *Repository) syncProperty(childId string) {
+func (ter *Repository) syncProperty(childID string) {
 customloop:
-	for prop, _ := range ter.PropertyCustom {
+	for prop := range ter.PropertyCustom {
 		if !ter.PropertyCustom[prop].hasInheritance() {
 			continue customloop
 		}
 		f := ter.PropertyCustom[prop].(*PropertyCustom).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		ter.Children[childId].setPropertyInherited(f)
+		ter.Children[childID].setPropertyInherited(f)
 	}
 oncallloop:
-	for prop, _ := range ter.PropertyOncall {
+	for prop := range ter.PropertyOncall {
 		if !ter.PropertyOncall[prop].hasInheritance() {
 			continue oncallloop
 		}
 		f := ter.PropertyOncall[prop].(*PropertyOncall).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		ter.Children[childId].setPropertyInherited(f)
+		ter.Children[childID].setPropertyInherited(f)
 	}
 serviceloop:
-	for prop, _ := range ter.PropertyService {
+	for prop := range ter.PropertyService {
 		if !ter.PropertyService[prop].hasInheritance() {
 			continue serviceloop
 		}
 		f := ter.PropertyService[prop].(*PropertyService).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		ter.Children[childId].setPropertyInherited(f)
+		ter.Children[childID].setPropertyInherited(f)
 	}
 systemloop:
-	for prop, _ := range ter.PropertySystem {
+	for prop := range ter.PropertySystem {
 		if !ter.PropertySystem[prop].hasInheritance() {
 			continue systemloop
 		}
 		f := ter.PropertySystem[prop].(*PropertySystem).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		ter.Children[childId].setPropertyInherited(f)
+		ter.Children[childID].setPropertyInherited(f)
 	}
 }
 
 // function to be used by a child to check if the parent has a
 // specific Property
-func (ter *Repository) checkProperty(propType string, propId string) bool {
+func (ter *Repository) checkProperty(propType string, propID string) bool {
 	switch propType {
 	case "custom":
-		if _, ok := ter.PropertyCustom[propId]; ok {
+		if _, ok := ter.PropertyCustom[propID]; ok {
 			return true
 		}
 	case "service":
-		if _, ok := ter.PropertyService[propId]; ok {
+		if _, ok := ter.PropertyService[propID]; ok {
 			return true
 		}
 	case "system":
-		if _, ok := ter.PropertySystem[propId]; ok {
+		if _, ok := ter.PropertySystem[propID]; ok {
 			return true
 		}
 	case "oncall":
-		if _, ok := ter.PropertyOncall[propId]; ok {
+		if _, ok := ter.PropertyOncall[propID]; ok {
 			return true
 		}
 	}

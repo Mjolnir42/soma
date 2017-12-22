@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mjolnir42/soma/internal/adm"
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/boltdb/bolt"
 	"github.com/codegangsta/cli"
+	"github.com/mjolnir42/soma/internal/adm"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 func registerJobs(app cli.App) *cli.App {
@@ -106,7 +106,7 @@ func cmdJobLocalOutstanding(c *cli.Context) error {
 	pj := []proto.Job{}
 	for _, iArray := range jobs {
 		pj = append(pj, proto.Job{
-			Id:       iArray[1],
+			ID:       iArray[1],
 			TsQueued: iArray[2],
 			Type:     iArray[3],
 		})
@@ -136,7 +136,7 @@ func cmdJobLocalUpdate(c *cli.Context) error {
 	for _, v := range jobs {
 		// jobID -> storeID
 		jobMap[v[1]] = v[0]
-		req.Filter.Job.IdList = append(req.Filter.Job.IdList, v[1])
+		req.Filter.Job.IDList = append(req.Filter.Job.IDList, v[1])
 	}
 	resp, err := adm.PostReqBody(req, `/filter/jobs/`)
 	if err != nil {
@@ -154,7 +154,7 @@ func cmdJobLocalUpdate(c *cli.Context) error {
 			// only finish Jobs in DB that actually finished
 			continue
 		}
-		strID := jobMap[j.Id]
+		strID := jobMap[j.ID]
 		var storeID uint64
 		if err := adm.ValidateLBoundUint64(strID, &storeID,
 			0); err != nil {
@@ -178,7 +178,7 @@ func cmdJobLocalList(c *cli.Context) error {
 	jobs := []proto.Job{}
 	for _, iArray := range active {
 		jobs = append(jobs, proto.Job{
-			Id:       iArray[1],
+			ID:       iArray[1],
 			TsQueued: iArray[2],
 			Type:     iArray[3],
 		})

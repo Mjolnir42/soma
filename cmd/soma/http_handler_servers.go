@@ -111,7 +111,7 @@ func ServerSearch(w http.ResponseWriter, r *http.Request,
 		reply: returnChannel,
 	}
 	cReq := proto.NewServerFilter()
-	_ = DecodeJsonBody(r, &cReq)
+	_ = DecodeJSONBody(r, &cReq)
 	if cReq.Filter.Server.Name != "" {
 		ssr.action = "search/name"
 		ssr.Filter = proto.Filter{Server: &proto.ServerFilter{
@@ -147,7 +147,7 @@ func ServerAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewServerRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -178,7 +178,7 @@ func ServerRemove(w http.ResponseWriter, r *http.Request,
 	action := `remove`
 
 	cReq := proto.NewServerRequest()
-	if err := DecodeJsonBody(r, &cReq); err != nil {
+	if err := DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -225,7 +225,7 @@ func ServerUpdate(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewServerRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -271,7 +271,7 @@ func ServerAddNull(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewServerRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -315,7 +315,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

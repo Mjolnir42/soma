@@ -16,14 +16,14 @@ import "github.com/satori/go.uuid"
 // Checker:> Add Check
 
 func (ten *Node) SetCheck(c Check) {
-	c.Id = c.GetItemId(ten.Type, ten.Id)
-	if uuid.Equal(c.Id, uuid.Nil) {
-		c.Id = uuid.NewV4()
+	c.ID = c.GetItemID(ten.Type, ten.ID)
+	if uuid.Equal(c.ID, uuid.Nil) {
+		c.ID = uuid.NewV4()
 	}
 	// this check is the source check
-	c.InheritedFrom = ten.Id
+	c.InheritedFrom = ten.ID
 	c.Inherited = false
-	c.SourceId, _ = uuid.FromString(c.Id.String())
+	c.SourceID, _ = uuid.FromString(c.ID.String())
 	c.SourceType = ten.Type
 	// scrub checkitem startup information prior to storing
 	c.Items = nil
@@ -33,9 +33,9 @@ func (ten *Node) SetCheck(c Check) {
 func (ten *Node) setCheckInherited(c Check) {
 	// we keep a local copy, that way we know it is ours....
 	f := c.Clone()
-	f.Id = f.GetItemId(ten.Type, ten.Id)
-	if uuid.Equal(f.Id, uuid.Nil) {
-		f.Id = uuid.NewV4()
+	f.ID = f.GetItemID(ten.Type, ten.ID)
+	if uuid.Equal(f.ID, uuid.Nil) {
+		f.ID = uuid.NewV4()
 	}
 	f.Items = nil
 	ten.addCheck(f)
@@ -46,7 +46,7 @@ func (ten *Node) setCheckOnChildren(c Check) {
 
 func (ten *Node) addCheck(c Check) {
 	ten.hasUpdate = true
-	ten.Checks[c.Id.String()] = c
+	ten.Checks[c.ID.String()] = c
 	ten.actionCheckNew(ten.setupCheckAction(c))
 }
 
@@ -65,8 +65,8 @@ func (ten *Node) deleteCheckOnChildren(c Check) {
 }
 
 func (ten *Node) rmCheck(c Check) {
-	for id, _ := range ten.Checks {
-		if uuid.Equal(ten.Checks[id].SourceId, c.SourceId) {
+	for id := range ten.Checks {
+		if uuid.Equal(ten.Checks[id].SourceID, c.SourceID) {
 			ten.hasUpdate = true
 			ten.actionCheckRemoved(ten.setupCheckAction(ten.Checks[id]))
 			delete(ten.Checks, id)
@@ -76,11 +76,11 @@ func (ten *Node) rmCheck(c Check) {
 }
 
 // noop, satisfy interface
-func (ten *Node) syncCheck(childId string) {
+func (ten *Node) syncCheck(childID string) {
 }
 
-func (ten *Node) checkCheck(checkId string) bool {
-	if _, ok := ten.Checks[checkId]; ok {
+func (ten *Node) checkCheck(checkID string) bool {
+	if _, ok := ten.Checks[checkID]; ok {
 		return true
 	}
 	return false
@@ -88,12 +88,12 @@ func (ten *Node) checkCheck(checkId string) bool {
 
 //
 func (ten *Node) LoadInstance(i CheckInstance) {
-	ckId := i.CheckId.String()
-	ckInstId := i.InstanceId.String()
-	if ten.loadedInstances[ckId] == nil {
-		ten.loadedInstances[ckId] = map[string]CheckInstance{}
+	ckID := i.CheckID.String()
+	ckInstID := i.InstanceID.String()
+	if ten.loadedInstances[ckID] == nil {
+		ten.loadedInstances[ckID] = map[string]CheckInstance{}
 	}
-	ten.loadedInstances[ckId][ckInstId] = i
+	ten.loadedInstances[ckID][ckInstID] = i
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

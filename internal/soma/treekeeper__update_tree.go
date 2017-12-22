@@ -21,7 +21,7 @@ func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 	switch q.Action {
 	case `create_bucket`:
 		tree.NewBucket(tree.BucketSpec{
-			Id:          uuid.NewV4().String(),
+			ID:          uuid.NewV4().String(),
 			Name:        q.Bucket.Name,
 			Environment: q.Bucket.Environment,
 			Team:        tk.meta.teamID,
@@ -31,7 +31,7 @@ func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `repository`,
-			ParentId:   tk.meta.repoID,
+			ParentID:   tk.meta.repoID,
 			ParentName: tk.meta.repoName,
 		})
 	}
@@ -41,32 +41,32 @@ func (tk *TreeKeeper) treeGroup(q *msg.Request) {
 	switch q.Action {
 	case `create_group`:
 		tree.NewGroup(tree.GroupSpec{
-			Id:   uuid.NewV4().String(),
+			ID:   uuid.NewV4().String(),
 			Name: q.Group.Name,
 			Team: tk.meta.teamID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `bucket`,
-			ParentId:   q.Group.BucketId,
+			ParentID:   q.Group.BucketID,
 		})
 	case `delete_group`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `group`,
-			ElementId:   q.Group.Id,
+			ElementID:   q.Group.ID,
 		}, true).(tree.BucketAttacher).Destroy()
 	case `reset_group_to_bucket`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `group`,
-			ElementId:   q.Group.Id,
+			ElementID:   q.Group.ID,
 		}, true).(tree.BucketAttacher).Detach()
 	case `add_group_to_group`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `group`,
-			ElementId:   (*q.Group.MemberGroups)[0].Id,
+			ElementID:   (*q.Group.MemberGroups)[0].ID,
 		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `group`,
-			ParentId:   q.Group.Id,
+			ParentID:   q.Group.ID,
 		})
 	}
 }
@@ -75,32 +75,32 @@ func (tk *TreeKeeper) treeCluster(q *msg.Request) {
 	switch q.Action {
 	case `create_cluster`:
 		tree.NewCluster(tree.ClusterSpec{
-			Id:   uuid.NewV4().String(),
+			ID:   uuid.NewV4().String(),
 			Name: q.Cluster.Name,
 			Team: tk.meta.teamID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `bucket`,
-			ParentId:   q.Cluster.BucketID,
+			ParentID:   q.Cluster.BucketID,
 		})
 	case `delete_cluster`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `cluster`,
-			ElementId:   q.Cluster.ID,
+			ElementID:   q.Cluster.ID,
 		}, true).(tree.BucketAttacher).Destroy()
 	case `reset_cluster_to_bucket`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `cluster`,
-			ElementId:   q.Cluster.ID,
+			ElementID:   q.Cluster.ID,
 		}, true).(tree.BucketAttacher).Detach()
 	case `add_cluster_to_group`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `cluster`,
-			ElementId:   (*q.Group.MemberClusters)[0].ID,
+			ElementID:   (*q.Group.MemberClusters)[0].ID,
 		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `group`,
-			ParentId:   q.Group.Id,
+			ParentID:   q.Group.ID,
 		})
 	}
 }
@@ -109,45 +109,45 @@ func (tk *TreeKeeper) treeNode(q *msg.Request) {
 	switch q.Action {
 	case `assign_node`:
 		tree.NewNode(tree.NodeSpec{
-			Id:       q.Node.ID,
-			AssetId:  q.Node.AssetID,
+			ID:       q.Node.ID,
+			AssetID:  q.Node.AssetID,
 			Name:     q.Node.Name,
 			Team:     q.Node.TeamID,
-			ServerId: q.Node.ServerID,
+			ServerID: q.Node.ServerID,
 			Online:   q.Node.IsOnline,
 			Deleted:  q.Node.IsDeleted,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `bucket`,
-			ParentId:   q.Node.Config.BucketID,
+			ParentID:   q.Node.Config.BucketID,
 		})
 	case `delete_node`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `node`,
-			ElementId:   q.Node.ID,
+			ElementID:   q.Node.ID,
 		}, true).(tree.BucketAttacher).Destroy()
 	case `reset_node_to_bucket`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `node`,
-			ElementId:   q.Node.ID,
+			ElementID:   q.Node.ID,
 		}, true).(tree.BucketAttacher).Detach()
 	case `add_node_to_group`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `node`,
-			ElementId:   (*q.Group.MemberNodes)[0].ID,
+			ElementID:   (*q.Group.MemberNodes)[0].ID,
 		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `group`,
-			ParentId:   q.Group.Id,
+			ParentID:   q.Group.ID,
 		})
 	case `add_node_to_cluster`:
 		tk.tree.Find(tree.FindRequest{
 			ElementType: `node`,
-			ElementId:   (*q.Cluster.Members)[0].ID,
+			ElementID:   (*q.Cluster.Members)[0].ID,
 		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: `cluster`,
-			ParentId:   q.Cluster.ID,
+			ParentID:   q.Cluster.ID,
 		})
 	}
 }

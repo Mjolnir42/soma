@@ -198,7 +198,7 @@ func cmdGroupCreate(c *cli.Context) error {
 		return err
 	}
 
-	bucketId, err := adm.LookupBucketId(opts["in"][0])
+	bucketID, err := adm.LookupBucketID(opts["in"][0])
 	if err != nil {
 		return err
 	}
@@ -206,7 +206,7 @@ func cmdGroupCreate(c *cli.Context) error {
 	var req proto.Request
 	req.Group = &proto.Group{}
 	req.Group.Name = c.Args().First()
-	req.Group.BucketId = bucketId
+	req.Group.BucketID = bucketID
 
 	if err := adm.ValidateRuneCountRange(req.Group.Name, 4, 256); err != nil {
 		return err
@@ -234,16 +234,16 @@ func cmdGroupDelete(c *cli.Context) error {
 
 	var (
 		err               error
-		bucketId, groupId string
+		bucketID, groupID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts["in"][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(c.Args().First(),
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/groups/%s", groupId)
+	path := fmt.Sprintf("/groups/%s", groupID)
 
 	if resp, err := adm.DeleteReq(path); err != nil {
 		return err
@@ -267,13 +267,13 @@ func cmdGroupRename(c *cli.Context) error {
 
 	var (
 		err               error
-		bucketId, groupId string
+		bucketID, groupID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts["in"][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(c.Args().First(),
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
 
@@ -281,7 +281,7 @@ func cmdGroupRename(c *cli.Context) error {
 	req.Group = &proto.Group{}
 	req.Group.Name = opts["to"][0]
 
-	path := fmt.Sprintf("/groups/%s", groupId)
+	path := fmt.Sprintf("/groups/%s", groupID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -309,17 +309,17 @@ func cmdGroupShow(c *cli.Context) error {
 
 	var (
 		err               error
-		bucketId, groupId string
+		bucketID, groupID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts[`in`][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(c.Args().First(),
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/groups/%s", groupId)
+	path := fmt.Sprintf("/groups/%s", groupID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -338,17 +338,17 @@ func cmdGroupTree(c *cli.Context) error {
 
 	var (
 		err               error
-		bucketId, groupId string
+		bucketID, groupID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts[`in`][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(c.Args().First(),
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/groups/%s/tree/tree", groupId)
+	path := fmt.Sprintf("/groups/%s/tree/tree", groupID)
 	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 
@@ -367,30 +367,30 @@ func cmdGroupMemberAddGroup(c *cli.Context) error {
 
 	var (
 		err                         error
-		bucketId, mGroupId, groupId string
+		bucketID, mGroupID, groupID string
 		req                         proto.Request
 		group                       proto.Group
 	)
-	if bucketId, err = adm.LookupBucketId(
+	if bucketID, err = adm.LookupBucketID(
 		opts["in"][0]); err != nil {
 		return err
 	}
-	if mGroupId, err = adm.LookupGroupId(c.Args().First(),
-		bucketId); err != nil {
+	if mGroupID, err = adm.LookupGroupID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(opts["to"][0],
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(opts["to"][0],
+		bucketID); err != nil {
 		return err
 	}
 
-	group.Id = mGroupId
+	group.ID = mGroupID
 	req.Group = &proto.Group{}
-	req.Group.Id = groupId
-	req.Group.BucketId = bucketId
+	req.Group.ID = groupID
+	req.Group.BucketID = bucketID
 	*req.Group.MemberGroups = append(*req.Group.MemberGroups, group)
 
-	path := fmt.Sprintf("/groups/%s/members/", groupId)
+	path := fmt.Sprintf("/groups/%s/members/", groupID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
@@ -409,31 +409,31 @@ func cmdGroupMemberAddCluster(c *cli.Context) error {
 
 	var (
 		err                           error
-		bucketId, mClusterId, groupId string
+		bucketID, mClusterID, groupID string
 		req                           proto.Request
 		cluster                       proto.Cluster
 	)
-	if bucketId, err = adm.LookupBucketId(
+	if bucketID, err = adm.LookupBucketID(
 		opts["in"][0]); err != nil {
 		return err
 	}
-	if mClusterId, err = adm.LookupGroupId(c.Args().First(),
-		bucketId); err != nil {
+	if mClusterID, err = adm.LookupGroupID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupClusterId(opts["to"][0],
-		bucketId); err != nil {
+	if groupID, err = adm.LookupClusterID(opts["to"][0],
+		bucketID); err != nil {
 		return err
 	}
 
-	cluster.ID = mClusterId
+	cluster.ID = mClusterID
 	req.Group = &proto.Group{}
-	req.Group.Id = groupId
-	req.Group.BucketId = bucketId
+	req.Group.ID = groupID
+	req.Group.BucketID = bucketID
 	*req.Group.MemberClusters = append(
 		*req.Group.MemberClusters, cluster)
 
-	path := fmt.Sprintf("/groups/%s/members/", groupId)
+	path := fmt.Sprintf("/groups/%s/members/", groupID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
@@ -452,28 +452,28 @@ func cmdGroupMemberAddNode(c *cli.Context) error {
 
 	var (
 		err                        error
-		bucketId, groupId, mNodeId string
+		bucketID, groupID, mNodeID string
 		req                        proto.Request
 		node                       proto.Node
 	)
-	if bucketId, err = adm.LookupBucketId(opts[`in`][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if mNodeId, err = adm.LookupNodeId(c.Args().First()); err != nil {
+	if mNodeID, err = adm.LookupNodeID(c.Args().First()); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(opts[`to`][0],
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(opts[`to`][0],
+		bucketID); err != nil {
 		return err
 	}
 
-	node.ID = mNodeId
+	node.ID = mNodeID
 	req.Group = &proto.Group{}
-	req.Group.Id = groupId
-	req.Group.BucketId = bucketId
+	req.Group.ID = groupID
+	req.Group.BucketID = bucketID
 	*req.Group.MemberNodes = append(*req.Group.MemberNodes, node)
 
-	path := fmt.Sprintf("/groups/%s/members/", groupId)
+	path := fmt.Sprintf("/groups/%s/members/", groupID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
@@ -492,22 +492,22 @@ func cmdGroupMemberDeleteGroup(c *cli.Context) error {
 
 	var (
 		err                         error
-		bucketId, mGroupId, groupId string
+		bucketID, mGroupID, groupID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts[`in`][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if mGroupId, err = adm.LookupGroupId(c.Args().First(),
-		bucketId); err != nil {
+	if mGroupID, err = adm.LookupGroupID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(opts[`from`][0],
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(opts[`from`][0],
+		bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/groups/%s/members/%s", groupId,
-		mGroupId)
+	path := fmt.Sprintf("/groups/%s/members/%s", groupID,
+		mGroupID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -526,22 +526,22 @@ func cmdGroupMemberDeleteCluster(c *cli.Context) error {
 
 	var (
 		err                           error
-		bucketId, mClusterId, groupId string
+		bucketID, mClusterID, groupID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts[`in`][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if mClusterId, err = adm.LookupClusterId(c.Args().First(),
-		bucketId); err != nil {
+	if mClusterID, err = adm.LookupClusterID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(opts[`from`][0],
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(opts[`from`][0],
+		bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/groups/%s/members/%s", groupId,
-		mClusterId)
+	path := fmt.Sprintf("/groups/%s/members/%s", groupID,
+		mClusterID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -560,21 +560,21 @@ func cmdGroupMemberDeleteNode(c *cli.Context) error {
 
 	var (
 		err                        error
-		bucketId, groupId, mNodeId string
+		bucketID, groupID, mNodeID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts[`in`][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if mNodeId, err = adm.LookupNodeId(c.Args().First()); err != nil {
+	if mNodeID, err = adm.LookupNodeID(c.Args().First()); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(opts[`from`][0],
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(opts[`from`][0],
+		bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/groups/%s/members/%s", groupId,
-		mNodeId)
+	path := fmt.Sprintf("/groups/%s/members/%s", groupID,
+		mNodeID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -593,17 +593,17 @@ func cmdGroupMemberList(c *cli.Context) error {
 
 	var (
 		err               error
-		bucketId, groupId string
+		bucketID, groupID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts["in"][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(c.Args().First(),
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(c.Args().First(),
+		bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/groups/%s/members/", groupId)
+	path := fmt.Sprintf("/groups/%s/members/", groupID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
@@ -654,13 +654,13 @@ func cmdGroupPropertyDelete(c *cli.Context, pType string) error {
 	}
 	var (
 		err               error
-		bucketId, groupId string
+		bucketID, groupID string
 	)
-	if bucketId, err = adm.LookupBucketId(opts["in"][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
 		return err
 	}
-	if groupId, err = adm.LookupGroupId(opts[`from`][0],
-		bucketId); err != nil {
+	if groupID, err = adm.LookupGroupID(opts[`from`][0],
+		bucketID); err != nil {
 		return err
 	}
 
@@ -670,18 +670,18 @@ func cmdGroupPropertyDelete(c *cli.Context, pType string) error {
 			return err
 		}
 	}
-	var sourceId string
+	var sourceID string
 	if err := adm.FindGroupPropSrcID(pType, c.Args().First(),
-		opts[`view`][0], groupId, &sourceId); err != nil {
+		opts[`view`][0], groupID, &sourceID); err != nil {
 		return err
 	}
 
 	req := proto.NewGroupRequest()
-	req.Group.Id = groupId
-	req.Group.BucketId = bucketId
+	req.Group.ID = groupID
+	req.Group.BucketID = bucketID
 
 	path := fmt.Sprintf("/groups/%s/property/%s/%s",
-		groupId, pType, sourceId)
+		groupID, pType, sourceID)
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 

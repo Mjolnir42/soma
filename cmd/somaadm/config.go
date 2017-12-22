@@ -14,7 +14,7 @@ import (
 )
 
 type Config struct {
-	Api        string       `json:"api"`
+	API        string       `json:"api"`
 	Cert       string       `json:"cert"`
 	LogDir     string       `json:"logdir"`
 	Timeout    uint         `json:"timeout,string"`
@@ -67,12 +67,12 @@ func (c *Config) populateFromFile(fname string) error {
 	}
 
 	// take detour via JSON to load UCL into struct
-	uclJson, err := json.Marshal(uclData)
+	uclJSON, err := json.Marshal(uclData)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "JSON marshal error: %s\n", err.Error())
 		os.Exit(1)
 	}
-	json.Unmarshal([]byte(uclJson), &c)
+	json.Unmarshal([]byte(uclJSON), &c)
 
 	return nil
 }

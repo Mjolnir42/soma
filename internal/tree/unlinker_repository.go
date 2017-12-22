@@ -21,7 +21,7 @@ func (ter *Repository) Unlink(u UnlinkRequest) {
 		}
 		return
 	}
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		ter.Children[child].(Unlinker).Unlink(u)
 	}
 }
@@ -31,12 +31,12 @@ func (ter *Repository) unlinkBucket(u UnlinkRequest) {
 	if unlinkRequestCheck(u, ter) {
 		switch u.ChildType {
 		case "bucket":
-			if _, ok := ter.Children[u.ChildId]; ok {
-				if u.ChildName == ter.Children[u.ChildId].GetName() {
-					ter.Children[u.ChildId].clearParent()
-					delete(ter.Children, u.ChildId)
+			if _, ok := ter.Children[u.ChildID]; ok {
+				if u.ChildName == ter.Children[u.ChildID].GetName() {
+					ter.Children[u.ChildID].clearParent()
+					delete(ter.Children, u.ChildID)
 					for i, bck := range ter.ordChildrenBck {
-						if bck == u.ChildId {
+						if bck == u.ChildID {
 							delete(ter.ordChildrenBck, i)
 						}
 					}

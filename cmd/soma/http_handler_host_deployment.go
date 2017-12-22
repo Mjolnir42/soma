@@ -61,7 +61,7 @@ func HostDeploymentAssemble(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.Request{}
-	if err = DecodeJsonBody(r, &cReq); err != nil {
+	if err = DecodeJSONBody(r, &cReq); err != nil {
 		DispatchBadRequest(&w, err)
 		return
 	}
@@ -78,7 +78,7 @@ func HostDeploymentAssemble(w http.ResponseWriter, r *http.Request,
 		reply:   returnChannel,
 		system:  params.ByName("system"),
 		assetid: assetid,
-		idlist:  cReq.HostDeployment.CurrentCheckInstanceIdList,
+		idlist:  cReq.HostDeployment.CurrentCheckInstanceIDList,
 	}
 	result := <-returnChannel
 	SendHostDeploymentReply(&w, &result)
@@ -94,7 +94,7 @@ func SendHostDeploymentReply(w *http.ResponseWriter, r *somaResult) {
 		if i.Delete {
 			*result.HostDeployments = append(*result.HostDeployments, proto.HostDeployment{
 				DeleteInstance:  true,
-				CheckInstanceId: i.DeleteId,
+				CheckInstanceID: i.DeleteId,
 			})
 			continue
 		}
@@ -109,7 +109,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

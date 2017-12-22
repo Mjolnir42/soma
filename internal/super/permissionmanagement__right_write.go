@@ -77,7 +77,7 @@ func (s *Supervisor) rightGrantGlobal(q *msg.Request, mr *msg.Result) {
 		adminID, userID, toolID, teamID sql.NullString
 	)
 
-	if q.Grant.ObjectType != `` || q.Grant.ObjectId != `` {
+	if q.Grant.ObjectType != `` || q.Grant.ObjectID != `` {
 		mr.BadRequest(fmt.Errorf(
 			`Invalid global grant specification`))
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
@@ -86,27 +86,27 @@ func (s *Supervisor) rightGrantGlobal(q *msg.Request, mr *msg.Result) {
 
 	switch q.Grant.RecipientType {
 	case msg.SubjectAdmin:
-		adminID.String = q.Grant.RecipientId
+		adminID.String = q.Grant.RecipientID
 		adminID.Valid = true
 	case msg.SubjectUser:
-		userID.String = q.Grant.RecipientId
+		userID.String = q.Grant.RecipientID
 		userID.Valid = true
 	case msg.SubjectTool:
-		toolID.String = q.Grant.RecipientId
+		toolID.String = q.Grant.RecipientID
 		toolID.Valid = true
 	case msg.SubjectTeam:
-		teamID.String = q.Grant.RecipientId
+		teamID.String = q.Grant.RecipientID
 		teamID.Valid = true
 	}
 
-	q.Grant.Id = uuid.NewV4().String()
+	q.Grant.ID = uuid.NewV4().String()
 	if res, err = s.stmtGrantAuthorizationGlobal.Exec(
-		q.Grant.Id,
+		q.Grant.ID,
 		adminID,
 		userID,
 		toolID,
 		teamID,
-		q.Grant.PermissionId,
+		q.Grant.PermissionID,
 		q.Grant.Category,
 		q.AuthUser,
 	); err != nil {
@@ -134,12 +134,12 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request, mr *msg.Result) {
 
 	switch q.Grant.ObjectType {
 	case msg.EntityRepository:
-		repoID.String = q.Grant.ObjectId
+		repoID.String = q.Grant.ObjectID
 		repoID.Valid = true
 	case msg.EntityBucket:
 		if err = s.conn.QueryRow(
-			stmt.RepoByBucketId,
-			q.Grant.ObjectId,
+			stmt.RepoByBucketID,
+			q.Grant.ObjectID,
 		).Scan(
 			repoID,
 			repoName,
@@ -153,7 +153,7 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request, mr *msg.Result) {
 			return
 		}
 
-		bucketID.String = q.Grant.ObjectId
+		bucketID.String = q.Grant.ObjectID
 		bucketID.Valid = true
 	case msg.EntityGroup, msg.EntityCluster, msg.EntityNode:
 		mr.NotImplemented(fmt.Errorf(
@@ -169,24 +169,24 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request, mr *msg.Result) {
 
 	switch q.Grant.RecipientType {
 	case msg.SubjectUser:
-		userID.String = q.Grant.RecipientId
+		userID.String = q.Grant.RecipientID
 		userID.Valid = true
 	case msg.SubjectTool:
-		toolID.String = q.Grant.RecipientId
+		toolID.String = q.Grant.RecipientID
 		toolID.Valid = true
 	case msg.SubjectTeam:
-		teamID.String = q.Grant.RecipientId
+		teamID.String = q.Grant.RecipientID
 		teamID.Valid = true
 	}
 
-	q.Grant.Id = uuid.NewV4().String()
+	q.Grant.ID = uuid.NewV4().String()
 	if res, err = s.stmtGrantAuthorizationRepository.Exec(
-		q.Grant.Id,
+		q.Grant.ID,
 		userID,
 		toolID,
 		teamID,
 		q.Grant.Category,
-		q.Grant.PermissionId,
+		q.Grant.PermissionID,
 		q.Grant.ObjectType,
 		repoID,
 		bucketID,
@@ -216,25 +216,25 @@ func (s *Supervisor) rightGrantTeam(q *msg.Request, mr *msg.Result) {
 
 	switch q.Grant.RecipientType {
 	case msg.SubjectUser:
-		userID.String = q.Grant.RecipientId
+		userID.String = q.Grant.RecipientID
 		userID.Valid = true
 	case msg.SubjectTool:
-		toolID.String = q.Grant.RecipientId
+		toolID.String = q.Grant.RecipientID
 		toolID.Valid = true
 	case msg.SubjectTeam:
-		teamID.String = q.Grant.RecipientId
+		teamID.String = q.Grant.RecipientID
 		teamID.Valid = true
 	}
 
-	q.Grant.Id = uuid.NewV4().String()
+	q.Grant.ID = uuid.NewV4().String()
 	if res, err = s.stmtGrantAuthorizationTeam.Exec(
-		q.Grant.Id,
+		q.Grant.ID,
 		userID,
 		toolID,
 		teamID,
 		q.Grant.Category,
-		q.Grant.PermissionId,
-		q.Grant.ObjectId,
+		q.Grant.PermissionID,
+		q.Grant.ObjectID,
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -258,25 +258,25 @@ func (s *Supervisor) rightGrantMonitoring(q *msg.Request, mr *msg.Result) {
 
 	switch q.Grant.RecipientType {
 	case msg.SubjectUser:
-		userID.String = q.Grant.RecipientId
+		userID.String = q.Grant.RecipientID
 		userID.Valid = true
 	case msg.SubjectTool:
-		toolID.String = q.Grant.RecipientId
+		toolID.String = q.Grant.RecipientID
 		toolID.Valid = true
 	case msg.SubjectTeam:
-		teamID.String = q.Grant.RecipientId
+		teamID.String = q.Grant.RecipientID
 		teamID.Valid = true
 	}
 
-	q.Grant.Id = uuid.NewV4().String()
+	q.Grant.ID = uuid.NewV4().String()
 	if res, err = s.stmtGrantAuthorizationMonitoring.Exec(
-		q.Grant.Id,
+		q.Grant.ID,
 		userID,
 		toolID,
 		teamID,
 		q.Grant.Category,
-		q.Grant.PermissionId,
-		q.Grant.ObjectId,
+		q.Grant.PermissionID,
+		q.Grant.ObjectID,
 		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -296,8 +296,8 @@ func (s *Supervisor) rightRevokeGlobal(q *msg.Request, mr *msg.Result) {
 	var res sql.Result
 
 	if res, err = s.stmtRevokeAuthorizationGlobal.Exec(
-		q.Grant.Id,
-		q.Grant.PermissionId,
+		q.Grant.ID,
+		q.Grant.PermissionID,
 		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -317,8 +317,8 @@ func (s *Supervisor) rightRevokeRepository(q *msg.Request, mr *msg.Result) {
 	var res sql.Result
 
 	if res, err = s.stmtRevokeAuthorizationRepository.Exec(
-		q.Grant.Id,
-		q.Grant.PermissionId,
+		q.Grant.ID,
+		q.Grant.PermissionID,
 		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -338,8 +338,8 @@ func (s *Supervisor) rightRevokeTeam(q *msg.Request, mr *msg.Result) {
 	var res sql.Result
 
 	if res, err = s.stmtRevokeAuthorizationTeam.Exec(
-		q.Grant.Id,
-		q.Grant.PermissionId,
+		q.Grant.ID,
+		q.Grant.PermissionID,
 		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -359,8 +359,8 @@ func (s *Supervisor) rightRevokeMonitoring(q *msg.Request, mr *msg.Result) {
 	var res sql.Result
 
 	if res, err = s.stmtRevokeAuthorizationMonitoring.Exec(
-		q.Grant.Id,
-		q.Grant.PermissionId,
+		q.Grant.ID,
+		q.Grant.PermissionID,
 		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)

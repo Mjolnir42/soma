@@ -19,7 +19,7 @@ func TestCheckClone(t *testing.T) {
 
 	clone := check.Clone()
 
-	if !uuid.Equal(check.Id, clone.Id) {
+	if !uuid.Equal(check.ID, clone.ID) {
 		t.Errorf(`Illegal clone`)
 	}
 }
@@ -27,11 +27,11 @@ func TestCheckClone(t *testing.T) {
 func TestCheckGetter(t *testing.T) {
 	check := testSpawnCheck(false, false, true)
 
-	if _, err := uuid.FromString(check.GetSourceCheckId()); err != nil {
+	if _, err := uuid.FromString(check.GetSourceCheckID()); err != nil {
 		t.Error(`Received error`, err)
 	}
 
-	if _, err := uuid.FromString(check.GetCheckConfigId()); err != nil {
+	if _, err := uuid.FromString(check.GetCheckConfigID()); err != nil {
 		t.Error(`Received error`, err)
 	}
 
@@ -39,7 +39,7 @@ func TestCheckGetter(t *testing.T) {
 		t.Error(`Received empty Check.SourceType`)
 	}
 
-	if _, err := uuid.FromString(check.GetCapabilityId()); err != nil {
+	if _, err := uuid.FromString(check.GetCapabilityID()); err != nil {
 		t.Error(`Received error`, err)
 	}
 
@@ -76,7 +76,7 @@ func TestCheckInherited(t *testing.T) {
 	var id, idFrom uuid.UUID
 	var err error
 
-	if id, err = uuid.FromString(check.GetCheckId()); err != nil {
+	if id, err = uuid.FromString(check.GetCheckID()); err != nil {
 		t.Error(`Received error`, err)
 	}
 	if idFrom, err = uuid.FromString(check.GetInheritedFrom()); err != nil {
@@ -97,7 +97,7 @@ func TestCheckNotInherited(t *testing.T) {
 	var id, idFrom uuid.UUID
 	var err error
 
-	if id, err = uuid.FromString(check.GetCheckId()); err != nil {
+	if id, err = uuid.FromString(check.GetCheckID()); err != nil {
 		t.Error(`Received error`, err)
 	}
 	if idFrom, err = uuid.FromString(check.GetInheritedFrom()); err != nil {
@@ -113,7 +113,7 @@ func TestCheckAction(t *testing.T) {
 
 	action := check.MakeAction()
 
-	if action.Check.CheckId != check.GetCheckId() {
+	if action.Check.CheckID != check.GetCheckID() {
 		t.Errorf(`Created action is incorrect`)
 	}
 }
@@ -121,40 +121,40 @@ func TestCheckAction(t *testing.T) {
 func TestCheckGetItemNotNil(t *testing.T) {
 	check := testSpawnCheck(false, false, false)
 
-	if check.GetCheckId() != check.GetItemId(`node`, uuid.Nil).String() {
-		t.Errorf(`GetItemId did not return already set ID`)
+	if check.GetCheckID() != check.GetItemID(`node`, uuid.Nil).String() {
+		t.Errorf(`GetItemID did not return already set ID`)
 	}
 }
 
 func TestCheckGetItemNoMatch(t *testing.T) {
 	check := testSpawnCheck(false, false, false)
-	check.Id = uuid.UUID{}
+	check.ID = uuid.UUID{}
 
-	if !uuid.Equal(uuid.Nil, check.GetItemId(`node`, uuid.Nil)) {
-		t.Errorf(`GetItemId did not return uuid.Nil in non-match case`)
+	if !uuid.Equal(uuid.Nil, check.GetItemID(`node`, uuid.Nil)) {
+		t.Errorf(`GetItemID did not return uuid.Nil in non-match case`)
 	}
 }
 
 func TestCheckGetItem(t *testing.T) {
 	check := testSpawnCheck(false, false, false)
-	check.Id = uuid.UUID{}
+	check.ID = uuid.UUID{}
 
-	itemId := uuid.NewV4()
-	objId := uuid.NewV4()
+	itemID := uuid.NewV4()
+	objID := uuid.NewV4()
 	check.Items = append(check.Items, CheckItem{
-		ObjectId: func() uuid.UUID {
-			ui, _ := uuid.FromString(objId.String())
+		ObjectID: func() uuid.UUID {
+			ui, _ := uuid.FromString(objID.String())
 			return ui
 		}(),
 		ObjectType: `node`,
-		ItemId: func() uuid.UUID {
-			ui, _ := uuid.FromString(itemId.String())
+		ItemID: func() uuid.UUID {
+			ui, _ := uuid.FromString(itemID.String())
 			return ui
 		}(),
 	})
 
-	if !uuid.Equal(itemId, check.GetItemId(`node`, objId)) {
-		t.Errorf(`GetItemId did not correctly match objects`)
+	if !uuid.Equal(itemID, check.GetItemID(`node`, objID)) {
+		t.Errorf(`GetItemID did not correctly match objects`)
 	}
 }
 
@@ -164,14 +164,14 @@ func TestCheckInstanceClone(t *testing.T) {
 
 	clone := instance.Clone()
 
-	if !uuid.Equal(instance.InstanceId, clone.InstanceId) {
+	if !uuid.Equal(instance.InstanceID, clone.InstanceID) {
 		t.Errorf(`Faulty checkinstance clone`)
 	}
-	if !uuid.Equal(instance.CheckId, clone.CheckId) {
-		t.Errorf(`Faulty checkinstance clone - CheckId`)
+	if !uuid.Equal(instance.CheckID, clone.CheckID) {
+		t.Errorf(`Faulty checkinstance clone - CheckID`)
 	}
-	if !uuid.Equal(instance.ConfigId, clone.ConfigId) {
-		t.Errorf(`Faulty checkinstance clone - ConfigId`)
+	if !uuid.Equal(instance.ConfigID, clone.ConfigID) {
+		t.Errorf(`Faulty checkinstance clone - ConfigID`)
 	}
 }
 
@@ -181,23 +181,23 @@ func TestCheckInstanceAction(t *testing.T) {
 
 	action := instance.MakeAction()
 
-	if action.CheckInstance.InstanceId != instance.InstanceId.String() {
+	if action.CheckInstance.InstanceID != instance.InstanceID.String() {
 		t.Errorf(`Created instance action is incorrect`)
 	}
 }
 
 func testSpawnCheckInstance(chk Check) CheckInstance {
 	ci := CheckInstance{
-		InstanceId: uuid.NewV4(),
-		CheckId: func(id string) uuid.UUID {
+		InstanceID: uuid.NewV4(),
+		CheckID: func(id string) uuid.UUID {
 			f, _ := uuid.FromString(id)
 			return f
-		}(chk.GetCheckId()),
-		ConfigId: func(id string) uuid.UUID {
+		}(chk.GetCheckID()),
+		ConfigID: func(id string) uuid.UUID {
 			f, _ := uuid.FromString(id)
 			return f
-		}(chk.GetCheckConfigId()),
-		InstanceConfigId:    uuid.NewV4(),
+		}(chk.GetCheckConfigID()),
+		InstanceConfigID:    uuid.NewV4(),
 		ConstraintOncall:    ``,
 		ConstraintService:   map[string]string{},
 		ConstraintSystem:    map[string]string{},
@@ -248,12 +248,12 @@ func testSpawnCheck(inherited, inheritance, childrenOnly bool) Check {
 
 	return Check{
 		Id:            id,
-		SourceId:      uuid.NewV4(),
+		SourceID:      uuid.NewV4(),
 		SourceType:    `sourceType`,
 		Inherited:     inherited,
 		InheritedFrom: idFrom,
-		CapabilityId:  uuid.NewV4(),
-		ConfigId:      uuid.NewV4(),
+		CapabilityID:  uuid.NewV4(),
+		ConfigID:      uuid.NewV4(),
 		Inheritance:   inheritance,
 		ChildrenOnly:  childrenOnly,
 		View:          `any`,
@@ -304,9 +304,9 @@ func testSpawnCheck(inherited, inheritance, childrenOnly bool) Check {
 		},
 		Items: []CheckItem{
 			{
-				ObjectId:   uuid.NewV4(),
+				ObjectID:   uuid.NewV4(),
 				ObjectType: `objectType`,
-				ItemId:     uuid.NewV4(),
+				ItemID:     uuid.NewV4(),
 			},
 		},
 	}

@@ -16,7 +16,7 @@ func PropertyList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	prType, _ := GetPropertyTypeFromUrl(r.URL)
+	prType, _ := GetPropertyTypeFromURL(r.URL)
 	var section string
 	switch prType {
 	case `native`, `system`, `custom`, `service`, `template`:
@@ -68,7 +68,7 @@ func PropertyList(w http.ResponseWriter, r *http.Request,
 		goto skip
 	}
 
-	_ = DecodeJsonBody(r, &cReq)
+	_ = DecodeJSONBody(r, &cReq)
 	if (cReq.Filter.Property.Type == "custom") && (cReq.Filter.Property.Name != "") &&
 		(cReq.Filter.Property.RepositoryID != "") {
 		filtered := []somaPropertyResult{}
@@ -118,7 +118,7 @@ func PropertyShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	prType, _ := GetPropertyTypeFromUrl(r.URL)
+	prType, _ := GetPropertyTypeFromURL(r.URL)
 	var section string
 	switch prType {
 	case `native`, `system`, `custom`, `service`, `template`:
@@ -176,7 +176,7 @@ func PropertyAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	prType, _ := GetPropertyTypeFromUrl(r.URL)
+	prType, _ := GetPropertyTypeFromURL(r.URL)
 	var section string
 	switch prType {
 	case `native`, `system`, `custom`, `service`, `template`:
@@ -197,7 +197,7 @@ func PropertyAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.NewPropertyRequest()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -248,7 +248,7 @@ func PropertyRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer PanicCatcher(w)
 
-	prType, _ := GetPropertyTypeFromUrl(r.URL)
+	prType, _ := GetPropertyTypeFromURL(r.URL)
 	var section string
 	switch prType {
 	case `native`, `system`, `custom`, `service`, `template`:
@@ -370,7 +370,7 @@ dispatch:
 		DispatchInternalError(w, err)
 		return
 	}
-	DispatchJsonReply(w, &json)
+	DispatchJSONReply(w, &json)
 	return
 }
 

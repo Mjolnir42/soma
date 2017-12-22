@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerMetrics(app cli.App) *cli.App {
@@ -70,7 +70,7 @@ func cmdMetricCreate(c *cli.Context) error {
 	req.Metric.Unit = opts["unit"][0]
 	req.Metric.Description = opts["description"][0]
 
-	pkgs := make([]proto.MetricPackage, 0)
+	pkgs := []proto.MetricPackage{}
 	if _, ok := opts["package"]; ok {
 		for _, p := range opts["package"] {
 			split := strings.SplitN(p, "::", 2)

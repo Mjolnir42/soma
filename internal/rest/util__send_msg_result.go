@@ -176,7 +176,7 @@ func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 		result.OK()
 	case 202:
 		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 202)
-		result.JobId = r.JobId
+		result.JobID = r.JobID
 		result.Accepted()
 	case 400:
 		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)

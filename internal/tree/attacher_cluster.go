@@ -25,8 +25,8 @@ func (tec *Cluster) Attach(a AttachRequest) {
 		panic(`Cluster.Attach`)
 	}
 
-	tec.Parent.(Propertier).syncProperty(tec.Id.String())
-	tec.Parent.(Checker).syncCheck(tec.Id.String())
+	tec.Parent.(Propertier).syncProperty(tec.ID.String())
+	tec.Parent.(Checker).syncCheck(tec.ID.String())
 }
 
 func (tec *Cluster) ReAttach(a AttachRequest) {
@@ -39,16 +39,16 @@ func (tec *Cluster) ReAttach(a AttachRequest) {
 	tec.Parent.Unlink(UnlinkRequest{
 		ParentType: tec.Parent.(Builder).GetType(),
 		ParentName: tec.Parent.(Builder).GetName(),
-		ParentId:   tec.Parent.(Builder).GetID(),
+		ParentID:   tec.Parent.(Builder).GetID(),
 		ChildType:  tec.GetType(),
 		ChildName:  tec.GetName(),
-		ChildId:    tec.GetID(),
+		ChildID:    tec.GetID(),
 	},
 	)
 
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  tec.GetType(),
 		Cluster:    tec,
@@ -59,8 +59,8 @@ func (tec *Cluster) ReAttach(a AttachRequest) {
 		panic(`Group.ReAttach: not reattached`)
 	}
 	tec.actionUpdate()
-	tec.Parent.(Propertier).syncProperty(tec.Id.String())
-	tec.Parent.(Checker).syncCheck(tec.Id.String())
+	tec.Parent.(Propertier).syncProperty(tec.ID.String())
+	tec.Parent.(Checker).syncCheck(tec.ID.String())
 }
 
 func (tec *Cluster) Destroy() {
@@ -76,7 +76,7 @@ func (tec *Cluster) Destroy() {
 	// TODO delete all inherited checks + check instances
 
 	wg := new(sync.WaitGroup)
-	for child, _ := range tec.Children {
+	for child := range tec.Children {
 		wg.Add(1)
 		go func(c string) {
 			defer wg.Done()
@@ -87,11 +87,11 @@ func (tec *Cluster) Destroy() {
 
 	tec.Parent.Unlink(UnlinkRequest{
 		ParentType: tec.Parent.(Builder).GetType(),
-		ParentId:   tec.Parent.(Builder).GetID(),
+		ParentID:   tec.Parent.(Builder).GetID(),
 		ParentName: tec.Parent.(Builder).GetName(),
 		ChildType:  tec.GetType(),
 		ChildName:  tec.GetName(),
-		ChildId:    tec.GetID(),
+		ChildID:    tec.GetID(),
 	},
 	)
 
@@ -110,17 +110,17 @@ func (tec *Cluster) Detach() {
 
 	tec.Parent.Unlink(UnlinkRequest{
 		ParentType: tec.Parent.(Builder).GetType(),
-		ParentId:   tec.Parent.(Builder).GetID(),
+		ParentID:   tec.Parent.(Builder).GetID(),
 		ParentName: tec.Parent.(Builder).GetName(),
 		ChildType:  tec.GetType(),
 		ChildName:  tec.GetName(),
-		ChildId:    tec.GetID(),
+		ChildID:    tec.GetID(),
 	},
 	)
 
 	bucket.Receive(ReceiveRequest{
 		ParentType: bucket.(Builder).GetType(),
-		ParentId:   bucket.(Builder).GetID(),
+		ParentID:   bucket.(Builder).GetID(),
 		ParentName: bucket.(Builder).GetName(),
 		ChildType:  tec.Type,
 		Cluster:    tec,
@@ -128,7 +128,7 @@ func (tec *Cluster) Detach() {
 	)
 
 	tec.actionUpdate()
-	tec.Parent.(Propertier).syncProperty(tec.Id.String())
+	tec.Parent.(Propertier).syncProperty(tec.ID.String())
 }
 
 //
@@ -136,7 +136,7 @@ func (tec *Cluster) Detach() {
 func (tec *Cluster) attachToBucket(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  tec.Type,
 		Cluster:    tec,
@@ -154,7 +154,7 @@ func (tec *Cluster) attachToBucket(a AttachRequest) {
 func (tec *Cluster) attachToGroup(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  tec.Type,
 		Cluster:    tec,

@@ -71,7 +71,7 @@ func SectionShow(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		SectionObj: proto.Section{
-			Id: params.ByName(`section`),
+			ID: params.ByName(`section`),
 		},
 	}
 	result := <-returnChannel
@@ -94,7 +94,7 @@ func SectionSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.Request{}
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -138,7 +138,7 @@ func SectionAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	cReq := proto.Request{}
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -185,7 +185,7 @@ func SectionRemove(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		SectionObj: proto.Section{
-			Id: params.ByName(`section`),
+			ID: params.ByName(`section`),
 		},
 	}
 	result := <-returnChannel

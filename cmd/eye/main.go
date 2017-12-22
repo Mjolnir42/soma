@@ -79,7 +79,7 @@ func main() {
 	 */
 	Eye.Daemon.url = &url.URL{}
 	Eye.Daemon.url.Host = fmt.Sprintf("%s:%s", Eye.Daemon.Listen, Eye.Daemon.Port)
-	if Eye.Daemon.Tls {
+	if Eye.Daemon.TLS {
 		Eye.Daemon.url.Scheme = "https"
 		if ok, ptype := govalidator.IsFilePath(Eye.Daemon.Cert); !ok {
 			log.Fatal("Missing required certificate configuration config/daemon/cert-file")
@@ -105,18 +105,18 @@ func main() {
 	connectToDatabase()
 	prepareStatements()
 	// Close() must be deferred here since it triggers on function exit
-	defer Eye.run.check_item.Close()
-	defer Eye.run.check_lookup.Close()
-	defer Eye.run.delete_item.Close()
-	defer Eye.run.delete_lookup.Close()
-	defer Eye.run.get_config.Close()
-	defer Eye.run.get_items.Close()
-	defer Eye.run.get_lookup.Close()
-	defer Eye.run.insert_item.Close()
-	defer Eye.run.insert_lookup.Close()
-	defer Eye.run.item_count.Close()
+	defer Eye.run.checkItem.Close()
+	defer Eye.run.checkLookup.Close()
+	defer Eye.run.deleteItem.Close()
+	defer Eye.run.deleteLookup.Close()
+	defer Eye.run.getConfig.Close()
+	defer Eye.run.getItems.Close()
+	defer Eye.run.getLookup.Close()
+	defer Eye.run.insertItem.Close()
+	defer Eye.run.insertLookup.Close()
+	defer Eye.run.itemCount.Close()
 	defer Eye.run.retrieve.Close()
-	defer Eye.run.update_item.Close()
+	defer Eye.run.updateItem.Close()
 	go pingDatabase()
 
 	/*
@@ -132,7 +132,7 @@ func main() {
 	router.POST("/api/v1/notify/", FetchConfigurationItems)
 	router.POST("/api/v1/notify", FetchConfigurationItems)
 
-	if Eye.Daemon.Tls {
+	if Eye.Daemon.TLS {
 		log.Fatal(http.ListenAndServeTLS(
 			Eye.Daemon.url.Host,
 			Eye.Daemon.Cert,

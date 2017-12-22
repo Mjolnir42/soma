@@ -21,7 +21,7 @@ type Result struct {
 	Action  string
 	Code    uint16
 	Error   error
-	JobId   string
+	JobID   string
 
 	Super Supervisor
 

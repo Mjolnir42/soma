@@ -101,7 +101,7 @@ func (w *MonitoringWrite) create(q *msg.Request, mr *msg.Result) {
 		callback sql.NullString
 	)
 
-	q.Monitoring.Id = uuid.NewV4().String()
+	q.Monitoring.ID = uuid.NewV4().String()
 	if q.Monitoring.Callback != `` {
 		callback = sql.NullString{
 			String: q.Monitoring.Callback,
@@ -109,11 +109,11 @@ func (w *MonitoringWrite) create(q *msg.Request, mr *msg.Result) {
 		}
 	}
 	if res, err = w.stmtCreate.Exec(
-		q.Monitoring.Id,
+		q.Monitoring.ID,
 		q.Monitoring.Name,
 		q.Monitoring.Mode,
 		q.Monitoring.Contact,
-		q.Monitoring.TeamId,
+		q.Monitoring.TeamID,
 		callback,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -132,7 +132,7 @@ func (w *MonitoringWrite) delete(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtDelete.Exec(
-		q.Monitoring.Id,
+		q.Monitoring.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

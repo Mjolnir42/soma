@@ -53,7 +53,7 @@ AND    NOT server_deleted
 AND    NOT server_id = '00000000-0000-0000-0000-000000000000'
 AND    server_name = $1::varchar;`
 
-	SearchServerByAssetId = `
+	SearchServerByAssetID = `
 SELECT server_id,
        server_name,
        server_asset_id
@@ -108,7 +108,7 @@ func init() {
 	m[DeleteServers] = `DeleteServers`
 	m[ListServers] = `ListServers`
 	m[PurgeServers] = `PurgeServers`
-	m[SearchServerByAssetId] = `SearchServerByAssetId`
+	m[SearchServerByAssetID] = `SearchServerByAssetID`
 	m[SearchServerByName] = `SearchServerByName`
 	m[ShowServers] = `ShowServers`
 	m[SyncServers] = `SyncServers`

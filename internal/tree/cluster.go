@@ -19,7 +19,7 @@ import (
 )
 
 type Cluster struct {
-	Id              uuid.UUID
+	ID              uuid.UUID
 	Name            string
 	State           string
 	Team            uuid.UUID
@@ -43,7 +43,7 @@ type Cluster struct {
 }
 
 type ClusterSpec struct {
-	Id   string
+	ID   string
 	Name string
 	Team string
 }
@@ -57,7 +57,7 @@ func NewCluster(spec ClusterSpec) *Cluster {
 	}
 
 	tec := new(Cluster)
-	tec.Id, _ = uuid.FromString(spec.Id)
+	tec.ID, _ = uuid.FromString(spec.ID)
 	tec.Name = spec.Name
 	tec.Team, _ = uuid.FromString(spec.Team)
 	tec.Type = "cluster"
@@ -86,7 +86,7 @@ func (tec Cluster) Clone() *Cluster {
 		ordNumChildNod: tec.ordNumChildNod,
 		log:            tec.log,
 	}
-	cl.Id, _ = uuid.FromString(tec.Id.String())
+	cl.ID, _ = uuid.FromString(tec.ID.String())
 	cl.Team, _ = uuid.FromString(tec.Team.String())
 
 	f := make(map[string]ClusterAttacher, 0)
@@ -133,7 +133,7 @@ func (tec Cluster) Clone() *Cluster {
 	cl.loadedInstances = make(map[string]map[string]CheckInstance)
 
 	ci := make(map[string][]string)
-	for k, _ := range tec.CheckInstances {
+	for k := range tec.CheckInstances {
 		for _, str := range tec.CheckInstances[k] {
 			t := str
 			ci[k] = append(ci[k], t)
@@ -161,7 +161,7 @@ func (tec Cluster) CloneGroup() GroupAttacher {
 //
 // Interface: Builder
 func (tec *Cluster) GetID() string {
-	return tec.Id.String()
+	return tec.ID.String()
 }
 
 func (tec *Cluster) GetName() string {
@@ -192,26 +192,26 @@ func (tec *Cluster) setAction(c chan *Action) {
 
 func (tec *Cluster) setActionDeep(c chan *Action) {
 	tec.setAction(c)
-	for ch, _ := range tec.Children {
+	for ch := range tec.Children {
 		tec.Children[ch].setActionDeep(c)
 	}
 }
 
-func (c *Cluster) setLog(newlog *log.Logger) {
-	c.log = newlog
+func (tec *Cluster) setLog(newlog *log.Logger) {
+	tec.log = newlog
 }
 
-func (c *Cluster) setLoggerDeep(newlog *log.Logger) {
-	c.setLog(newlog)
-	for ch, _ := range c.Children {
-		c.Children[ch].setLoggerDeep(newlog)
+func (tec *Cluster) setLoggerDeep(newlog *log.Logger) {
+	tec.setLog(newlog)
+	for ch := range tec.Children {
+		tec.Children[ch].setLoggerDeep(newlog)
 	}
 }
 
 func (tec *Cluster) updateParentRecursive(p Receiver) {
 	tec.setParent(p)
 	var wg sync.WaitGroup
-	for child, _ := range tec.Children {
+	for child := range tec.Children {
 		wg.Add(1)
 		c := child
 		go func(str Receiver) {
@@ -239,7 +239,7 @@ func (tec *Cluster) setFault(f *Fault) {
 func (tec *Cluster) updateFaultRecursive(f *Fault) {
 	tec.setFault(f)
 	var wg sync.WaitGroup
-	for child, _ := range tec.Children {
+	for child := range tec.Children {
 		wg.Add(1)
 		c := child
 		go func(ptr *Fault) {
@@ -278,14 +278,14 @@ func (tec *Cluster) GetEnvironment() string {
 //
 //
 func (tec *Cluster) ComputeCheckInstances() {
-	tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s",
+	tec.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s",
 		tec.GetRepositoryName(),
 		`ComputeCheckInstances`,
 		`cluster`,
-		tec.Id.String(),
+		tec.ID.String(),
 	)
 	/* var wg sync.WaitGroup
-	for child, _ := range tec.Children {
+	for child := range tec.Children {
 		wg.Add(1)
 		c := child
 		go func() {
@@ -306,7 +306,7 @@ func (tec *Cluster) ComputeCheckInstances() {
 //
 func (tec *Cluster) ClearLoadInfo() {
 	var wg sync.WaitGroup
-	for child, _ := range tec.Children {
+	for child := range tec.Children {
 		wg.Add(1)
 		c := child
 		go func() {
@@ -323,7 +323,7 @@ func (tec *Cluster) ClearLoadInfo() {
 func (tec *Cluster) export() proto.Cluster {
 	bucket := tec.Parent.(Bucketeer).GetBucket()
 	return proto.Cluster{
-		ID:          tec.Id.String(),
+		ID:          tec.ID.String(),
 		Name:        tec.Name,
 		BucketID:    bucket.(Builder).GetID(),
 		ObjectState: tec.State,
@@ -405,14 +405,14 @@ func (tec *Cluster) actionProperty(a Action) {
 
 //
 func (tec *Cluster) actionCheckNew(a Action) {
-	a.Check.RepositoryId = tec.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Check.BucketId = tec.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Check.RepositoryID = tec.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Check.BucketID = tec.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 	tec.actionDispatch("check_new", a)
 }
 
 func (tec *Cluster) actionCheckRemoved(a Action) {
-	a.Check.RepositoryId = tec.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
-	a.Check.BucketId = tec.Parent.(Bucketeer).GetBucket().(Builder).GetID()
+	a.Check.RepositoryID = tec.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
+	a.Check.BucketID = tec.Parent.(Bucketeer).GetBucket().(Builder).GetID()
 	tec.actionDispatch(`check_removed`, a)
 }
 

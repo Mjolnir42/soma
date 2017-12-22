@@ -60,14 +60,14 @@ func (tef *Fault) verifySourceInstance(id, prop string) bool {
 	return false
 }
 
-func (tef *Fault) findIdForSource(source, prop string) string {
+func (tef *Fault) findIDForSource(source, prop string) string {
 	return ``
 }
 
-func (tef *Fault) syncProperty(childId string) {
+func (tef *Fault) syncProperty(childID string) {
 }
 
-func (tef *Fault) checkProperty(propType, propId string) bool {
+func (tef *Fault) checkProperty(propType, propID string) bool {
 	return false
 }
 
@@ -75,7 +75,7 @@ func (tef *Fault) checkDuplicate(p Property) (bool, bool, Property) {
 	return true, false, nil
 }
 
-func (tef *Fault) resyncProperty(srcId, pType, childId string) {
+func (tef *Fault) resyncProperty(srcID, pType, childID string) {
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

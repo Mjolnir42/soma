@@ -17,18 +17,18 @@ import (
 func TestCheckerAddCheck(t *testing.T) {
 	sTree, actionC, errC := testSpawnCheckTree()
 
-	chkConfigId := uuid.NewV4()
-	capId := uuid.NewV4()
+	chkConfigID := uuid.NewV4()
+	capID := uuid.NewV4()
 
 	chk := Check{
 		Id:            uuid.Nil,
-		SourceId:      uuid.Nil,
+		SourceID:      uuid.Nil,
 		InheritedFrom: uuid.Nil,
 		Inheritance:   true,
 		ChildrenOnly:  false,
 		Interval:      60,
-		ConfigId:      chkConfigId,
-		CapabilityId:  capId,
+		ConfigID:      chkConfigID,
+		CapabilityID:  capID,
 		View:          `any`,
 		Thresholds: []CheckThreshold{
 			{
@@ -130,19 +130,19 @@ func TestCheckerAddCheck(t *testing.T) {
 func TestCheckerDeleteCheck(t *testing.T) {
 	sTree, actionC, errC := testSpawnCheckTree()
 
-	chkConfigId := uuid.NewV4()
-	capId := uuid.NewV4()
-	chkId := uuid.NewV4()
+	chkConfigID := uuid.NewV4()
+	capID := uuid.NewV4()
+	chkID := uuid.NewV4()
 
 	chk := Check{
-		Id:            chkId,
-		SourceId:      uuid.Nil,
+		Id:            chkID,
+		SourceID:      uuid.Nil,
 		InheritedFrom: uuid.Nil,
 		Inheritance:   true,
 		ChildrenOnly:  false,
 		Interval:      60,
-		ConfigId:      chkConfigId,
-		CapabilityId:  capId,
+		ConfigID:      chkConfigID,
+		CapabilityID:  capID,
 		View:          `any`,
 		Thresholds: []CheckThreshold{
 			{
@@ -169,8 +169,8 @@ func TestCheckerDeleteCheck(t *testing.T) {
 	delChk := Check{
 		Id:            uuid.Nil,
 		InheritedFrom: uuid.Nil,
-		SourceId:      chkId,
-		ConfigId:      chkConfigId,
+		SourceID:      chkID,
+		ConfigID:      chkConfigID,
 	}
 
 	sTree.Find(FindRequest{
@@ -277,10 +277,10 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
 	grp1Id := uuid.NewV4().String()
 	grp2Id := uuid.NewV4().String()
 	clr1Id := uuid.NewV4().String()
@@ -295,177 +295,177 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	srv4Id := uuid.NewV4().String()
 
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_checkTest`,
 		Action: actionC,
 	})
 
 	NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `checkTest`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 
 	NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `checkTest_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 
 	NewGroup(GroupSpec{
 		Id:   grp1Id,
 		Name: `testGroup1`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	NewGroup(GroupSpec{
 		Id:   grp2Id,
 		Name: `testGroup2`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	NewCluster(ClusterSpec{
 		Id:   clr1Id,
 		Name: `testcluster1`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	NewCluster(ClusterSpec{
 		Id:   clr2Id,
 		Name: `testcluster2`,
-		Team: teamId,
+		Team: teamID,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	NewNode(NodeSpec{
 		Id:       nod1Id,
-		AssetId:  1,
+		AssetID:  1,
 		Name:     `testnode1`,
-		Team:     teamId,
-		ServerId: srv1Id,
+		Team:     teamID,
+		ServerID: srv1Id,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	NewNode(NodeSpec{
 		Id:       nod2Id,
-		AssetId:  2,
+		AssetID:  2,
 		Name:     `testnode2`,
-		Team:     teamId,
-		ServerId: srv2Id,
+		Team:     teamID,
+		ServerID: srv2Id,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	NewNode(NodeSpec{
 		Id:       nod3Id,
-		AssetId:  3,
+		AssetID:  3,
 		Name:     `testnode3`,
-		Team:     teamId,
-		ServerId: srv3Id,
+		Team:     teamID,
+		ServerID: srv3Id,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	NewNode(NodeSpec{
 		Id:       nod4Id,
-		AssetId:  4,
+		AssetID:  4,
 		Name:     `testnode4`,
-		Team:     teamId,
-		ServerId: srv4Id,
+		Team:     teamID,
+		ServerID: srv4Id,
 		Online:   true,
 		Deleted:  false,
 	}).Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `group`,
-		ElementId:   grp2Id,
+		ElementID:   grp2Id,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grp1Id,
+		ParentID:   grp1Id,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `cluster`,
-		ElementId:   clr1Id,
+		ElementID:   clr1Id,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grp2Id,
+		ParentID:   grp2Id,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nod1Id,
+		ElementID:   nod1Id,
 	}, true).(ClusterAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   clr1Id,
+		ParentID:   clr1Id,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nod2Id,
+		ElementID:   nod2Id,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `group`,
-		ParentId:   grp2Id,
+		ParentID:   grp2Id,
 	})
 
 	sTree.Find(FindRequest{
 		ElementType: `node`,
-		ElementId:   nod3Id,
+		ElementID:   nod3Id,
 	}, true).(GroupAttacher).ReAttach(AttachRequest{
 		Root:       sTree,
 		ParentType: `cluster`,
-		ParentId:   clr2Id,
+		ParentID:   clr2Id,
 	})
 
 	return sTree, actionC, errC

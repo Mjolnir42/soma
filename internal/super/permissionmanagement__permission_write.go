@@ -147,7 +147,7 @@ func (s *Supervisor) permissionRemove(q *msg.Request, mr *msg.Result) {
 		`permission_rm_tx_rev_rp`: stmt.PermissionRevokeRepository,
 		`permission_rm_tx_rev_tm`: stmt.PermissionRevokeTeam,
 		`permission_rm_tx_rev_mn`: stmt.PermissionRevokeMonitoring,
-		`permission_rm_tx_lookup`: stmt.PermissionLookupGrantId,
+		`permission_rm_tx_lookup`: stmt.PermissionLookupGrantID,
 		`permission_rm_tx_unlink`: stmt.PermissionRemoveLink,
 		`permission_rm_tx_remove`: stmt.PermissionRemove,
 		`permission_rm_tx_unmapa`: stmt.PermissionUnmapAll,
@@ -185,7 +185,7 @@ func (s *Supervisor) permissionRemove(q *msg.Request, mr *msg.Result) {
 	mr.Permission = append(mr.Permission, q.Permission)
 	mr.Super.Audit.WithField(`Code`, mr.Code).
 		Infoln(fmt.Sprintf(
-			"Successfully removed permission %s", q.Permission.Id))
+			"Successfully removed permission %s", q.Permission.ID))
 }
 
 func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
@@ -203,7 +203,7 @@ func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
 		actionID.String = (*q.Permission.Actions)[0].ID
 		actionID.Valid = true
 	} else if q.Permission.Sections != nil {
-		sectionID.String = (*q.Permission.Sections)[0].Id
+		sectionID.String = (*q.Permission.Sections)[0].ID
 		sectionID.Valid = true
 	} else {
 		mr.ServerError(fmt.Errorf(`Nothing to map`), q.Section)
@@ -215,7 +215,7 @@ func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
 	if res, err = s.stmtPermissionMapEntry.Exec(
 		mapID,
 		q.Permission.Category,
-		q.Permission.Id,
+		q.Permission.ID,
 		sectionID,
 		actionID,
 	); err != nil {
@@ -248,7 +248,7 @@ func (s *Supervisor) permissionUnmap(q *msg.Request, mr *msg.Result) {
 		actionID.String = (*q.Permission.Actions)[0].ID
 		actionID.Valid = true
 	} else if q.Permission.Sections != nil {
-		sectionID.String = (*q.Permission.Sections)[0].Id
+		sectionID.String = (*q.Permission.Sections)[0].ID
 		sectionID.Valid = true
 	} else {
 		mr.ServerError(fmt.Errorf(`Nothing to map`), q.Section)
@@ -257,7 +257,7 @@ func (s *Supervisor) permissionUnmap(q *msg.Request, mr *msg.Result) {
 	}
 
 	if res, err = s.stmtPermissionUnmapEntry.Exec(
-		q.Permission.Id,
+		q.Permission.ID,
 		q.Permission.Category,
 		sectionID,
 		actionID,
@@ -285,7 +285,7 @@ func (s *Supervisor) permissionAddTx(q *msg.Request,
 		grantPermID, grantCategory string
 	)
 
-	q.Permission.Id = uuid.NewV4().String()
+	q.Permission.ID = uuid.NewV4().String()
 	grantPermID = uuid.NewV4().String()
 	switch q.Permission.Category {
 	case msg.CategoryGlobal:
@@ -303,7 +303,7 @@ func (s *Supervisor) permissionAddTx(q *msg.Request,
 	}
 
 	if res, err = txMap[`permission_add_tx_perm`].Exec(
-		q.Permission.Id,
+		q.Permission.ID,
 		q.Permission.Name,
 		q.Permission.Category,
 		q.AuthUser,
@@ -324,7 +324,7 @@ func (s *Supervisor) permissionAddTx(q *msg.Request,
 		grantCategory,
 		grantPermID,
 		q.Permission.Category,
-		q.Permission.Id,
+		q.Permission.ID,
 	)
 }
 
@@ -353,7 +353,7 @@ func (s *Supervisor) permissionRemoveTx(q *msg.Request,
 
 	// lookup which permission grants this permission
 	if err = txMap[`permission_rm_tx_lookup`].QueryRow(
-		q.Permission.Id,
+		q.Permission.ID,
 	).Scan(
 		&grantingPermissionID,
 	); err != nil {
@@ -369,7 +369,7 @@ func (s *Supervisor) permissionRemoveTx(q *msg.Request,
 
 	// sever the link between permission and granting permission
 	if res, err = txMap[`permission_rm_tx_unlink`].Exec(
-		q.Permission.Id,
+		q.Permission.ID,
 	); err != nil {
 		return res, err
 	}
@@ -383,20 +383,20 @@ func (s *Supervisor) permissionRemoveTx(q *msg.Request,
 
 	// revoke all grants of the permission
 	if res, err = txMap[revocation].Exec(
-		q.Permission.Id,
+		q.Permission.ID,
 	); err != nil {
 		return res, err
 	}
 
 	// unmap all sections & actions from the permission
 	if res, err = txMap[`permission_rm_tx_unmapa`].Exec(
-		q.Permission.Id,
+		q.Permission.ID,
 	); err != nil {
 		return res, err
 	}
 
 	// remove permission
-	return txMap[`permission_rm_tx_remove`].Exec(q.Permission.Id)
+	return txMap[`permission_rm_tx_remove`].Exec(q.Permission.ID)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

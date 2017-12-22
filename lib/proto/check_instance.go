@@ -10,10 +10,10 @@
 package proto
 
 type CheckInstance struct {
-	InstanceId            string `json:"instanceId,omitempty"`
-	CheckId               string `json:"checkId,omitempty"`
-	ConfigId              string `json:"configId,omitempty"`
-	InstanceConfigId      string `json:"instanceConfigId,omitempty"`
+	InstanceID            string `json:"instanceId,omitempty"`
+	CheckID               string `json:"checkId,omitempty"`
+	ConfigID              string `json:"configId,omitempty"`
+	InstanceConfigID      string `json:"instanceConfigID,omitempty"`
 	Version               uint64 `json:"version"`
 	ConstraintHash        string `json:"constraintHash,omitempty"`
 	ConstraintValHash     string `json:"constraintValHash,omitempty"`
@@ -23,10 +23,10 @@ type CheckInstance struct {
 }
 
 func (t *CheckInstance) DeepCompare(a *CheckInstance) bool {
-	if t.InstanceId != a.InstanceId || t.CheckId != a.CheckId || t.ConfigId != a.ConfigId ||
+	if t.InstanceID != a.InstanceID || t.CheckID != a.CheckID || t.ConfigID != a.ConfigID ||
 		t.ConstraintHash != a.ConstraintHash || t.ConstraintValHash != a.ConstraintValHash ||
 		t.InstanceSvcCfgHash != a.InstanceSvcCfgHash || t.InstanceService != a.InstanceService {
-		// - InstanceConfigId is a randomly generated uuid on every instance calculation
+		// - InstanceConfigID is a randomly generated uuid on every instance calculation
 		// - Version is incremented on every instance calculation
 		// - InstanceServiceConfig is compared as deploymentdetails.Service
 		return false

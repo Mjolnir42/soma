@@ -19,19 +19,19 @@ import (
 //
 // Checker:> Add Check
 func (ter *Repository) SetCheck(c Check) {
-	c.Id = c.GetItemId(ter.Type, ter.Id)
-	if uuid.Equal(c.Id, uuid.Nil) {
-		c.Id = uuid.NewV4()
+	c.ID = c.GetItemID(ter.Type, ter.ID)
+	if uuid.Equal(c.ID, uuid.Nil) {
+		c.ID = uuid.NewV4()
 	}
 	// this check is the source check
-	c.InheritedFrom = ter.Id
+	c.InheritedFrom = ter.ID
 	c.Inherited = false
-	c.SourceId, _ = uuid.FromString(c.Id.String())
+	c.SourceID, _ = uuid.FromString(c.ID.String())
 	c.SourceType = ter.Type
 	// send a scrubbed copy downward
 	f := c.Clone()
 	f.Inherited = true
-	f.Id = uuid.Nil
+	f.ID = uuid.Nil
 	ter.setCheckOnChildren(f)
 	// scrub checkitem startup information prior to storing
 	c.Items = nil
@@ -41,12 +41,12 @@ func (ter *Repository) SetCheck(c Check) {
 func (ter *Repository) setCheckInherited(c Check) {
 	// we keep a local copy, that way we know it is ours....
 	f := c.Clone()
-	f.Id = f.GetItemId(ter.Type, ter.Id)
-	if uuid.Equal(f.Id, uuid.Nil) {
-		f.Id = uuid.NewV4()
+	f.ID = f.GetItemID(ter.Type, ter.ID)
+	if uuid.Equal(f.ID, uuid.Nil) {
+		f.ID = uuid.NewV4()
 	}
 	// send original check downwards
-	c.Id = uuid.Nil
+	c.ID = uuid.Nil
 	ter.setCheckOnChildren(c)
 	f.Items = nil
 	ter.addCheck(f)
@@ -73,7 +73,7 @@ func (ter *Repository) setCheckOnChildren(c Check) {
 }
 
 func (ter *Repository) addCheck(c Check) {
-	ter.Checks[c.Id.String()] = c
+	ter.Checks[c.ID.String()] = c
 	ter.actionCheckNew(c.MakeAction())
 }
 
@@ -110,8 +110,8 @@ func (ter *Repository) deleteCheckOnChildren(c Check) {
 }
 
 func (ter *Repository) rmCheck(c Check) {
-	for id, _ := range ter.Checks {
-		if uuid.Equal(ter.Checks[id].SourceId, c.SourceId) {
+	for id := range ter.Checks {
+		if uuid.Equal(ter.Checks[id].SourceID, c.SourceID) {
 			ter.actionCheckRemoved(ter.setupCheckAction(ter.Checks[id]))
 			delete(ter.Checks, id)
 			return
@@ -122,8 +122,8 @@ func (ter *Repository) rmCheck(c Check) {
 //
 // Checker:> Meta
 
-func (ter *Repository) syncCheck(childId string) {
-	for check, _ := range ter.Checks {
+func (ter *Repository) syncCheck(childID string) {
+	for check := range ter.Checks {
 		if !ter.Checks[check].Inheritance {
 			continue
 		}
@@ -131,14 +131,14 @@ func (ter *Repository) syncCheck(childId string) {
 		f := ter.Checks[check]
 		c := f.Clone()
 		c.Inherited = true
-		c.Id = uuid.Nil
+		c.ID = uuid.Nil
 		c.Items = nil
-		ter.Children[childId].(Checker).setCheckInherited(c)
+		ter.Children[childID].(Checker).setCheckInherited(c)
 	}
 }
 
-func (ter *Repository) checkCheck(checkId string) bool {
-	if _, ok := ter.Checks[checkId]; ok {
+func (ter *Repository) checkCheck(checkID string) bool {
+	if _, ok := ter.Checks[checkID]; ok {
 		return true
 	}
 	return false

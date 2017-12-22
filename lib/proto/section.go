@@ -10,7 +10,7 @@
 package proto
 
 type Section struct {
-	Id       string           `json:"id,omitempty"`
+	ID       string           `json:"id,omitempty"`
 	Name     string           `json:"name,omitempty"`
 	Category string           `json:"category,omitempty"`
 	Details  *DetailsCreation `json:"details,omitempty"`

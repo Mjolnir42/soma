@@ -18,32 +18,32 @@ func TestErrorChannelNode(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
-	buckId := uuid.NewV4().String()
-	nodeId := uuid.NewV4().String()
-	servId := uuid.NewV4().String()
+	rootID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	nodeID := uuid.NewV4().String()
+	servID := uuid.NewV4().String()
 
 	// create tree
 	sTree := New(TreeSpec{
-		Id:     rootId,
+		Id:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	repo := NewRepository(RepositorySpec{
-		Id:      repoId,
+		Id:      repoID,
 		Name:    `test`,
-		Team:    teamId,
+		Team:    teamID,
 		Deleted: false,
 		Active:  true,
 	})
 	repo.Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `root`,
-		ParentId:   rootId,
+		ParentID:   rootID,
 	})
 	sTree.SetError(errC)
 	if repo.Fault.Error == nil {
@@ -54,18 +54,18 @@ func TestErrorChannelNode(t *testing.T) {
 
 	// create bucket
 	buck := NewBucket(BucketSpec{
-		Id:          buckId,
+		Id:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
-		Team:        teamId,
+		Team:        teamID,
 		Deleted:     false,
 		Frozen:      false,
-		Repository:  repoId,
+		Repository:  repoID,
 	})
 	buck.Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `repository`,
-		ParentId:   repoId,
+		ParentID:   repoID,
 	})
 	if buck.Fault.Error == nil {
 		t.Errorf(`Bucket.Fault.Error is nil`)
@@ -75,11 +75,11 @@ func TestErrorChannelNode(t *testing.T) {
 
 	// create new node
 	node := NewNode(NodeSpec{
-		Id:       nodeId,
-		AssetId:  1,
+		Id:       nodeID,
+		AssetID:  1,
 		Name:     `testnode`,
-		Team:     teamId,
-		ServerId: servId,
+		Team:     teamID,
+		ServerID: servID,
 		Online:   true,
 		Deleted:  false,
 	})
@@ -87,7 +87,7 @@ func TestErrorChannelNode(t *testing.T) {
 	node.Attach(AttachRequest{
 		Root:       sTree,
 		ParentType: `bucket`,
-		ParentId:   buckId,
+		ParentID:   buckID,
 	})
 
 	if node.Fault.Error == nil {

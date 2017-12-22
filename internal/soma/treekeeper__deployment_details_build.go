@@ -42,30 +42,30 @@ deploymentbuilder:
 
 		//
 		detail.CheckInstance = &proto.CheckInstance{
-			InstanceConfigId: instanceCfgID,
+			InstanceConfigID: instanceCfgID,
 		}
 		tk.stmtCheckInstance.QueryRow(instanceCfgID).Scan(
 			&detail.CheckInstance.Version,
-			&detail.CheckInstance.InstanceId,
+			&detail.CheckInstance.InstanceID,
 			&detail.CheckInstance.ConstraintHash,
 			&detail.CheckInstance.ConstraintValHash,
 			&detail.CheckInstance.InstanceService,
 			&detail.CheckInstance.InstanceSvcCfgHash,
 			&detail.CheckInstance.InstanceServiceConfig,
-			&detail.CheckInstance.CheckId,
-			&detail.CheckInstance.ConfigId,
+			&detail.CheckInstance.CheckID,
+			&detail.CheckInstance.ConfigID,
 		)
 
 		//
 		detail.Check = &proto.Check{
-			CheckId: detail.CheckInstance.CheckId,
+			CheckID: detail.CheckInstance.CheckID,
 		}
-		tk.stmtCheck.QueryRow(detail.CheckInstance.CheckId).Scan(
-			&detail.Check.RepositoryId,
-			&detail.Check.SourceCheckId,
+		tk.stmtCheck.QueryRow(detail.CheckInstance.CheckID).Scan(
+			&detail.Check.RepositoryID,
+			&detail.Check.SourceCheckID,
 			&detail.Check.SourceType,
 			&detail.Check.InheritedFrom,
-			&detail.Check.CapabilityId,
+			&detail.Check.CapabilityID,
 			&objID,
 			&objType,
 			&detail.Check.Inheritance,
@@ -75,20 +75,20 @@ deploymentbuilder:
 		if detail.Check.InheritedFrom != objID {
 			detail.Check.IsInherited = true
 		}
-		detail.Check.CheckConfigId = detail.CheckInstance.ConfigId
+		detail.Check.CheckConfigID = detail.CheckInstance.ConfigID
 
 		//
 		detail.CheckConfig = &proto.CheckConfig{
-			ID:           detail.Check.CheckConfigId,
-			RepositoryID: detail.Check.RepositoryId,
-			BucketID:     detail.Check.BucketId,
-			CapabilityID: detail.Check.CapabilityId,
+			ID:           detail.Check.CheckConfigID,
+			RepositoryID: detail.Check.RepositoryID,
+			BucketID:     detail.Check.BucketID,
+			CapabilityID: detail.Check.CapabilityID,
 			ObjectID:     objID,
 			ObjectType:   objType,
 			Inheritance:  detail.Check.Inheritance,
 			ChildrenOnly: detail.Check.ChildrenOnly,
 		}
-		tk.stmtCheckConfig.QueryRow(detail.Check.CheckConfigId).Scan(
+		tk.stmtCheckConfig.QueryRow(detail.Check.CheckConfigID).Scan(
 			&detail.CheckConfig.Name,
 			&detail.CheckConfig.Interval,
 			&detail.CheckConfig.IsActive,
@@ -133,7 +133,7 @@ deploymentbuilder:
 
 		//
 		detail.Capability = &proto.Capability{
-			ID: detail.Check.CapabilityId,
+			ID: detail.Check.CapabilityID,
 		}
 		detail.Monitoring = &proto.Monitoring{}
 		detail.Metric = &proto.Metric{}
@@ -146,7 +146,7 @@ deploymentbuilder:
 			&detail.Monitoring.Name,
 			&detail.Monitoring.Mode,
 			&detail.Monitoring.Contact,
-			&detail.Monitoring.TeamId,
+			&detail.Monitoring.TeamID,
 			&callback,
 			&detail.Metric.Unit,
 			&detail.Metric.Description,
@@ -159,7 +159,7 @@ deploymentbuilder:
 		}
 		detail.Unit.Unit = detail.Metric.Unit
 		detail.Metric.Path = detail.Capability.Metric
-		detail.Monitoring.Id = detail.Capability.MonitoringID
+		detail.Monitoring.ID = detail.Capability.MonitoringID
 		detail.Capability.Name = fmt.Sprintf("%s.%s.%s",
 			detail.Monitoring.Name,
 			detail.Capability.View,
@@ -193,25 +193,28 @@ deploymentbuilder:
 		case "group":
 			// fetch the group object
 			detail.Group = &proto.Group{
-				Id: objID,
+				ID: objID,
 			}
 			tk.stmtGroup.QueryRow(objID).Scan(
-				&detail.Group.BucketId,
+				&detail.Group.BucketID,
 				&detail.Group.Name,
 				&detail.Group.ObjectState,
-				&detail.Group.TeamId,
+				&detail.Group.TeamID,
 				&detail.Bucket,
 				&detail.Environment,
 				&detail.Repository,
 			)
 			// fetch team information
 			detail.Team = &proto.Team{
-				Id: detail.Group.TeamId,
+				ID: detail.Group.TeamID,
 			}
 			// fetch oncall information if the property is set,
 			// otherwise cleanup detail.Oncall
-			err = tk.stmtGroupOncall.QueryRow(detail.Group.Id, detail.View).Scan(
-				&detail.Oncall.Id,
+			err = tk.stmtGroupOncall.QueryRow(
+				detail.Group.ID,
+				detail.View,
+			).Scan(
+				&detail.Oncall.ID,
 				&detail.Oncall.Name,
 				&detail.Oncall.Number,
 			)
@@ -250,7 +253,7 @@ deploymentbuilder:
 			}
 			// fetch system properties
 			detail.Properties = &[]proto.PropertySystem{}
-			gSysProps, _ = tk.stmtGroupSysProp.Query(detail.Group.Id, detail.View)
+			gSysProps, _ = tk.stmtGroupSysProp.Query(detail.Group.ID, detail.View)
 			defer gSysProps.Close()
 
 			for gSysProps.Next() {
@@ -273,7 +276,7 @@ deploymentbuilder:
 			}
 			// fetch custom properties
 			detail.CustomProperties = &[]proto.PropertyCustom{}
-			gCustProps, _ = tk.stmtGroupCustProp.Query(detail.Group.Id, detail.View)
+			gCustProps, _ = tk.stmtGroupCustProp.Query(detail.Group.ID, detail.View)
 			defer gCustProps.Close()
 
 			for gCustProps.Next() {
@@ -308,12 +311,12 @@ deploymentbuilder:
 			)
 			// fetch team information
 			detail.Team = &proto.Team{
-				Id: detail.Cluster.TeamID,
+				ID: detail.Cluster.TeamID,
 			}
 			// fetch oncall information if the property is set,
 			// otherwise cleanup detail.Oncall
 			err = tk.stmtClusterOncall.QueryRow(detail.Cluster.ID, detail.View).Scan(
-				&detail.Oncall.Id,
+				&detail.Oncall.ID,
 				&detail.Oncall.Name,
 				&detail.Oncall.Number,
 			)
@@ -412,12 +415,12 @@ deploymentbuilder:
 			detail.Datacenter = detail.Server.Datacenter
 			// fetch team information
 			detail.Team = &proto.Team{
-				Id: detail.Node.TeamID,
+				ID: detail.Node.TeamID,
 			}
 			// fetch oncall information if the property is set,
 			// otherwise cleanup detail.Oncall
 			err = tk.stmtNodeOncall.QueryRow(detail.Node.ID, detail.View).Scan(
-				&detail.Oncall.Id,
+				&detail.Oncall.ID,
 				&detail.Oncall.Name,
 				&detail.Oncall.Number,
 			)
@@ -487,9 +490,9 @@ deploymentbuilder:
 			}
 		}
 
-		tk.stmtTeam.QueryRow(detail.Team.Id).Scan(
+		tk.stmtTeam.QueryRow(detail.Team.ID).Scan(
 			&detail.Team.Name,
-			&detail.Team.LdapId,
+			&detail.Team.LdapID,
 		)
 
 		// if no datacenter information was gathered, use the default DC
@@ -501,16 +504,16 @@ deploymentbuilder:
 		var detailJSON []byte
 		if detailJSON, err = json.Marshal(&detail); err != nil {
 			tk.treeLog.Println(`Failed to JSON marshal deployment details:`,
-				detail.CheckInstance.InstanceConfigId, err)
+				detail.CheckInstance.InstanceConfigID, err)
 			break deploymentbuilder
 		}
 		if _, err = tk.stmtUpdate.Exec(
 			detailJSON,
-			detail.Monitoring.Id,
-			detail.CheckInstance.InstanceConfigId,
+			detail.Monitoring.ID,
+			detail.CheckInstance.InstanceConfigID,
 		); err != nil {
 			tk.treeLog.Println(`Failed to save DeploymentDetails.JSON:`,
-				detail.CheckInstance.InstanceConfigId, err)
+				detail.CheckInstance.InstanceConfigID, err)
 			break deploymentbuilder
 		}
 	}

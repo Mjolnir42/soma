@@ -86,7 +86,7 @@ func connectToDatabase(appLog, errLog *log.Logger) {
 		errLog.Fatal("Schema check: ", err)
 	}
 	if len(required) != 0 {
-		for s, _ := range required {
+		for s := range required {
 			errLog.Printf("Missing schema: %s", s)
 		}
 		errLog.Fatal("FATAL - database incomplete")

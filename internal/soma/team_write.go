@@ -113,11 +113,11 @@ func (w *TeamWrite) add(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.Team.Id = uuid.NewV4().String()
+	q.Team.ID = uuid.NewV4().String()
 	if res, err = w.stmtAdd.Exec(
-		q.Team.Id,
+		q.Team.ID,
 		q.Team.Name,
-		q.Team.LdapId,
+		q.Team.LdapID,
 		q.Team.IsSystem,
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -136,7 +136,7 @@ func (w *TeamWrite) remove(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRemove.Exec(
-		q.Team.Id,
+		q.Team.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -155,9 +155,9 @@ func (w *TeamWrite) update(q *msg.Request, mr *msg.Result) {
 
 	if res, err = w.stmtUpdate.Exec(
 		q.Team.Name,
-		q.Team.LdapId,
+		q.Team.LdapID,
 		q.Team.IsSystem,
-		q.Team.Id,
+		q.Team.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

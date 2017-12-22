@@ -67,7 +67,7 @@ func configSetup(c *cli.Context) error {
 			case "timeout":
 				Cfg.Timeout = strconv.Itoa(c.GlobalInt(params[p]))
 			case "tls":
-				Cfg.TlsMode = c.GlobalString(params[p])
+				Cfg.TLSMode = c.GlobalString(params[p])
 			}
 			continue
 		}
@@ -99,9 +99,9 @@ func configSetup(c *cli.Context) error {
 				Cfg.Timeout = strconv.Itoa(3)
 			}
 		case "tls":
-			if Cfg.TlsMode == "" {
+			if Cfg.TLSMode == "" {
 				log.Printf("Setting default value for %s", params[p])
-				Cfg.TlsMode = "verify-full"
+				Cfg.TLSMode = "verify-full"
 			}
 		}
 	}

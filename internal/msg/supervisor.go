@@ -44,7 +44,7 @@ type Supervisor struct {
 	User   proto.User
 	Team   proto.Team
 	// Fields for Grant revocation
-	GrantId string
+	GrantID string
 }
 
 func (s *Supervisor) Clear() {
@@ -63,7 +63,7 @@ func (s *Supervisor) Clear() {
 	s.Object = ``
 	s.User = proto.User{}
 	s.Team = proto.Team{}
-	s.GrantId = ``
+	s.GrantID = ``
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

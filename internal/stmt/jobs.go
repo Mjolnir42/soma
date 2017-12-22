@@ -36,7 +36,7 @@ WHERE  iu.user_uid = $1::varchar
   (    SELECT user_id FROM inventory.users
        WHERE user_uid = $1::varchar);`
 
-	JobResultForId = `
+	JobResultForID = `
 SELECT job_id,
        job_status,
        job_result,
@@ -93,7 +93,7 @@ WHERE  iu.user_uid = $6::varchar;`
 )
 
 func init() {
-	m[JobResultForId] = `JobResultForId`
+	m[JobResultForID] = `JobResultForID`
 	m[JobResultsForList] = `JobResultsForList`
 	m[JobSave] = `JobSave`
 	m[ListAllOutstandingJobs] = `ListAllOutstandingJobs`

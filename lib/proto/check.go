@@ -10,26 +10,26 @@
 package proto
 
 type Check struct {
-	CheckId       string `json:"checkId,omitempty"`
-	SourceCheckId string `json:"sourceCheckId,omitempty"`
-	CheckConfigId string `json:"checkConfigId,omitempty"`
+	CheckID       string `json:"checkId,omitempty"`
+	SourceCheckID string `json:"sourceCheckID,omitempty"`
+	CheckConfigID string `json:"checkConfigID,omitempty"`
 	SourceType    string `json:"sourceType,omitempty"`
 	IsInherited   bool   `json:"isInherited,omitempty"`
 	InheritedFrom string `json:"inheritedFrom,omitempty"`
 	Inheritance   bool   `json:"inheritance,omitempty"`
 	ChildrenOnly  bool   `json:"childrenOnly,omitempty"`
-	RepositoryId  string `json:"repositoryId,omitempty"`
-	BucketId      string `json:"bucketId,omitempty"`
-	CapabilityId  string `json:"capabilityId,omitempty"`
+	RepositoryID  string `json:"repositoryId,omitempty"`
+	BucketID      string `json:"bucketId,omitempty"`
+	CapabilityID  string `json:"capabilityId,omitempty"`
 }
 
 func (t *Check) DeepCompare(a *Check) bool {
-	if t.CheckId != a.CheckId || t.SourceCheckId != a.SourceCheckId ||
-		t.CheckConfigId != a.CheckConfigId || t.SourceType != a.SourceType ||
+	if t.CheckID != a.CheckID || t.SourceCheckID != a.SourceCheckID ||
+		t.CheckConfigID != a.CheckConfigID || t.SourceType != a.SourceType ||
 		t.IsInherited != a.IsInherited || t.InheritedFrom != a.InheritedFrom ||
 		t.Inheritance != a.Inheritance || t.ChildrenOnly != a.ChildrenOnly ||
-		t.RepositoryId != a.RepositoryId || t.BucketId != a.BucketId ||
-		t.CapabilityId != a.CapabilityId {
+		t.RepositoryID != a.RepositoryID || t.BucketID != a.BucketID ||
+		t.CapabilityID != a.CapabilityID {
 		return false
 	}
 	return true

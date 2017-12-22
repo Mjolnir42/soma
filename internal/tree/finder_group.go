@@ -24,7 +24,7 @@ func (teg *Group) Find(f FindRequest, b bool) Attacher {
 		goto skip
 	}
 	rawResult = make(chan Attacher, len(teg.Children))
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		c := child
 		go func(fr FindRequest, bl bool) {
@@ -47,9 +47,8 @@ skip:
 	case len(res) == 0:
 		if b {
 			return teg.Fault
-		} else {
-			return nil
 		}
+		return nil
 	case len(res) > 1:
 		return teg.Fault
 	}

@@ -27,7 +27,7 @@ func (teb *Bucket) Receive(r ReceiveRequest) {
 		return
 	}
 loop:
-	for child, _ := range teb.Children {
+	for child := range teb.Children {
 		if teb.Children[child].(Builder).GetType() == "node" {
 			continue loop
 		}

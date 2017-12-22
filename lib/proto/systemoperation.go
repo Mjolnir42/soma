@@ -11,7 +11,7 @@ package proto
 
 type SystemOperation struct {
 	Request      string `json:"request,omitempty"`
-	RepositoryId string `json:"repositoryId,omitempty"`
+	RepositoryID string `json:"repositoryId,omitempty"`
 	RebuildLevel string `json:"rebuildLevel,omitempty"`
 }
 

@@ -36,18 +36,18 @@ func CheckAdd(c *cli.Context) {
 	hasCHILDRENONLY := false
 	hasEXTERN := false
 
-	hasTHR_predicate := false
-	hasTHR_level := false
-	hasTHR_value := false
+	hasTHRPredicate := false
+	hasTHRLevel := false
+	hasTHRValue := false
 
-	hasCTR_service := false
-	hasCTR_oncall := false
-	hasCTR_attribute := false
-	hasCTR_system := false
-	hasCTR_native := false
-	hasCTR_custom := false
-	hasCTR_selected_service := false
-	hasCTR_selected_oncall := false
+	hasCTRService := false
+	hasCTROncall := false
+	hasCTRAttribute := false
+	hasCTRSystem := false
+	hasCTRNative := false
+	hasCTRCustom := false
+	hasCTRSelectedService := false
+	hasCTRSelectedOncall := false
 
 	for _, t := range c.Args().Tail() {
 		if skipNext > 0 {
@@ -59,74 +59,74 @@ func CheckAdd(c *cli.Context) {
 			subON = false
 		}
 		if subTHRESHOLD {
-			if hasTHR_predicate && hasTHR_level && hasTHR_value {
+			if hasTHRPredicate && hasTHRLevel && hasTHRValue {
 				subTHRESHOLD = false
-				hasTHR_predicate = false
-				hasTHR_level = false
-				hasTHR_value = false
+				hasTHRPredicate = false
+				hasTHRLevel = false
+				hasTHRValue = false
 			} else {
 				switch t {
 				case `predicate`:
 					skipNext = 1
-					hasTHR_predicate = true
+					hasTHRPredicate = true
 					continue
 				case `level`:
 					skipNext = 1
-					hasTHR_level = true
+					hasTHRLevel = true
 					continue
 				case `value`:
 					skipNext = 1
-					hasTHR_value = true
+					hasTHRValue = true
 					continue
 				}
 			}
 		}
 		if subCONSTRAINT {
-			if hasCTR_selected_service {
+			if hasCTRSelectedService {
 				skipNext = 1
-				hasCTR_selected_service = false
+				hasCTRSelectedService = false
 				continue
 			}
-			if hasCTR_selected_oncall {
+			if hasCTRSelectedOncall {
 				skipNext = 1
-				hasCTR_selected_oncall = false
+				hasCTRSelectedOncall = false
 				continue
 			}
-			if hasCTR_service || hasCTR_oncall || hasCTR_attribute || hasCTR_system || hasCTR_native || hasCTR_custom {
+			if hasCTRService || hasCTROncall || hasCTRAttribute || hasCTRSystem || hasCTRNative || hasCTRCustom {
 				subCONSTRAINT = false
-				hasCTR_service = false
-				hasCTR_oncall = false
-				hasCTR_attribute = false
-				hasCTR_system = false
-				hasCTR_native = false
-				hasCTR_custom = false
-				hasCTR_selected_service = false
-				hasCTR_selected_oncall = false
+				hasCTRService = false
+				hasCTROncall = false
+				hasCTRAttribute = false
+				hasCTRSystem = false
+				hasCTRNative = false
+				hasCTRCustom = false
+				hasCTRSelectedService = false
+				hasCTRSelectedOncall = false
 			} else {
 				switch t {
 				case `service`:
-					hasCTR_selected_service = true
-					hasCTR_service = true
+					hasCTRSelectedService = true
+					hasCTRService = true
 					continue
 				case `oncall`:
-					hasCTR_selected_oncall = true
-					hasCTR_oncall = true
+					hasCTRSelectedOncall = true
+					hasCTROncall = true
 					continue
 				case `attribute`:
 					skipNext = 2
-					hasCTR_attribute = true
+					hasCTRAttribute = true
 					continue
 				case `system`:
 					skipNext = 2
-					hasCTR_system = true
+					hasCTRSystem = true
 					continue
 				case `native`:
 					skipNext = 2
-					hasCTR_native = true
+					hasCTRNative = true
 					continue
 				case `custom`:
 					skipNext = 2
-					hasCTR_custom = true
+					hasCTRCustom = true
 					continue
 				}
 			}
@@ -182,11 +182,11 @@ func CheckAdd(c *cli.Context) {
 	}
 	// in subchain: CONSTRAINT
 	if subCONSTRAINT {
-		if hasCTR_selected_service || hasCTR_selected_oncall {
+		if hasCTRSelectedService || hasCTRSelectedOncall {
 			fmt.Println(`name`)
 			return
 		}
-		if !(hasCTR_service || hasCTR_oncall || hasCTR_attribute || hasCTR_system || hasCTR_native || hasCTR_custom) {
+		if !(hasCTRService || hasCTROncall || hasCTRAttribute || hasCTRSystem || hasCTRNative || hasCTRCustom) {
 			for _, t := range ctrArgs {
 				fmt.Println(t)
 			}
@@ -195,19 +195,19 @@ func CheckAdd(c *cli.Context) {
 	}
 	// in subchain: THRESHOLD
 	if subTHRESHOLD {
-		if !(hasTHR_predicate && hasTHR_level && hasTHR_value) {
+		if !(hasTHRPredicate && hasTHRLevel && hasTHRValue) {
 			for _, t := range thrArgs {
 				switch t {
 				case `predicate`:
-					if !hasTHR_predicate {
+					if !hasTHRPredicate {
 						fmt.Println(t)
 					}
 				case `level`:
-					if !hasTHR_level {
+					if !hasTHRLevel {
 						fmt.Println(t)
 					}
 				case `value`:
-					if !hasTHR_value {
+					if !hasTHRValue {
 						fmt.Println(t)
 					}
 				}

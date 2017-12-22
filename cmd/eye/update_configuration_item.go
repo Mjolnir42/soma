@@ -30,8 +30,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/satori/go.uuid"
 )
 
@@ -72,7 +72,7 @@ func UpdateConfigurationItem(w http.ResponseWriter, r *http.Request, params http
 		return
 	}
 
-	if item.ConfigurationItemId.String() != params.ByName("item") {
+	if item.ConfigurationItemID.String() != params.ByName("item") {
 		dispatchBadRequest(&w, "Mismatching ConfigurationItemID")
 		return
 	}
@@ -97,15 +97,15 @@ func updateItem(item *ConfigurationItem, lookupID string) error {
 
 	// since this was an explicit update request, non-existence is a
 	// hard error
-	if err = Eye.run.check_item.QueryRow(item.ConfigurationItemId.String()).Scan(&itemID); err != nil {
+	if err = Eye.run.checkItem.QueryRow(item.ConfigurationItemID.String()).Scan(&itemID); err != nil {
 		return err
 	}
-	if itemID != item.ConfigurationItemId.String() {
+	if itemID != item.ConfigurationItemID.String() {
 		panic(`Database corrupted`)
 	}
 
-	_, err = Eye.run.update_item.Exec(
-		item.ConfigurationItemId.String(),
+	_, err = Eye.run.updateItem.Exec(
+		item.ConfigurationItemID.String(),
 		lookupID,
 		jsonb,
 	)

@@ -130,21 +130,21 @@ func (r *TreeRead) process(q *msg.Request) {
 
 	var err error
 	tree := proto.Tree{
-		Id:   q.Tree.Id,
+		ID:   q.Tree.ID,
 		Type: q.Tree.Type,
 	}
 
 	switch tree.Type {
 	case msg.EntityRepository:
-		tree.Repository, err = r.repository(tree.Id, 0)
+		tree.Repository, err = r.repository(tree.ID, 0)
 	case msg.EntityBucket:
-		tree.Bucket, err = r.bucket(tree.Id, 0)
+		tree.Bucket, err = r.bucket(tree.ID, 0)
 	case msg.EntityGroup:
-		tree.Group, err = r.group(tree.Id, 0)
+		tree.Group, err = r.group(tree.ID, 0)
 	case msg.EntityCluster:
-		tree.Cluster, err = r.cluster(tree.Id, 0)
+		tree.Cluster, err = r.cluster(tree.ID, 0)
 	case msg.EntityNode:
-		tree.Node, err = r.node(tree.Id, 0)
+		tree.Node, err = r.node(tree.ID, 0)
 	default:
 		result.UnknownRequest(q)
 		goto skip
@@ -194,9 +194,9 @@ func (r *TreeRead) repository(id string, depth int) (*proto.Repository, error) {
 	}
 
 	repo := proto.Repository{
-		Id:        id,
+		ID:        id,
 		Name:      name,
-		TeamId:    teamID,
+		TeamID:    teamID,
 		IsDeleted: isDeleted,
 		IsActive:  isActive,
 		Details: &proto.Details{
@@ -341,11 +341,11 @@ func (r *TreeRead) group(id string, depth int) (*proto.Group, error) {
 	}
 
 	group := proto.Group{
-		Id:          id,
-		BucketId:    bucketID,
+		ID:          id,
+		BucketID:    bucketID,
 		Name:        name,
 		ObjectState: state,
-		TeamId:      teamID,
+		TeamID:      teamID,
 		Details: &proto.Details{
 			CreatedBy: createdBy,
 			CreatedAt: createdAt.UTC().Format(time.RFC3339),

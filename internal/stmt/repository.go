@@ -138,12 +138,12 @@ JOIN   soma.team_service_properties stsp
 WHERE  source_instance_id = $1::uuid
   AND  source_instance_id = instance_id;`
 
-	RepoNameById = `
+	RepoNameByID = `
 SELECT repository_name
 FROM   soma.repositories
 WHERE  repository_id = $1::uuid;`
 
-	RepoByBucketId = `
+	RepoByBucketID = `
 SELECT sb.repository_id,
        sr.repository_name
 FROM   soma.buckets sb
@@ -155,10 +155,10 @@ WHERE  sb.bucket_id = $1::uuid;`
 func init() {
 	m[ListAllRepositories] = `ListAllRepositories`
 	m[ListScopedRepositories] = `ListScopedRepositories`
-	m[RepoByBucketId] = `RepoByBucketId`
+	m[RepoByBucketID] = `RepoByBucketID`
 	m[RepoCstProps] = `RepoCstProps`
 	m[RepoCustomPropertyForDelete] = `RepoCustomPropertyForDelete`
-	m[RepoNameById] = `RepoNameById`
+	m[RepoNameByID] = `RepoNameByID`
 	m[RepoOncProps] = `RepoOncProps`
 	m[RepoOncallPropertyForDelete] = `RepoOncallPropertyForDelete`
 	m[RepoServicePropertyForDelete] = `RepoServicePropertyForDelete`

@@ -10,9 +10,9 @@
 package proto
 
 type HostDeployment struct {
-	CheckInstanceId            string   `json:"checkInstanceId"`
+	CheckInstanceID            string   `json:"checkInstanceID"`
 	DeleteInstance             bool     `json:"deleteInstance"`
-	CurrentCheckInstanceIdList []string `json:"currentCheckInstanceIdList,omitempty"`
+	CurrentCheckInstanceIDList []string `json:"currentCheckInstanceIDList,omitempty"`
 }
 
 func NewHostDeploymentRequest() Request {

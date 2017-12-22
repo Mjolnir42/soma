@@ -46,7 +46,7 @@ func registerPermissions(app cli.App) *cli.App {
 						Usage:        "List all permissions in a category",
 						Description:  help.Text(`PermissionsList`),
 						Action:       runtime(cmdPermissionList),
-						BashComplete: cmpl.Direct_In,
+						BashComplete: cmpl.DirectIn,
 					},
 					{
 						Name:         "show",
@@ -117,20 +117,20 @@ func cmdPermissionDel(c *cli.Context) error {
 	); err != nil {
 		return err
 	}
-	var permissionId string
+	var permissionID string
 	if err := adm.ValidateCategory(opts[`from`][0]); err != nil {
 		return err
 	}
-	if err := adm.LookupPermIdRef(c.Args().First(),
+	if err := adm.LookupPermIDRef(c.Args().First(),
 		opts[`from`][0],
-		&permissionId,
+		&permissionID,
 	); err != nil {
 		return err
 	}
 
 	esc := url.QueryEscape(opts[`from`][0])
 	path := fmt.Sprintf("/category/%s/permissions/%s",
-		esc, permissionId)
+		esc, permissionID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -169,20 +169,20 @@ func cmdPermissionShow(c *cli.Context) error {
 	); err != nil {
 		return err
 	}
-	var permissionId string
+	var permissionID string
 	if err := adm.ValidateCategory(opts[`in`][0]); err != nil {
 		return err
 	}
-	if err := adm.LookupPermIdRef(c.Args().First(),
+	if err := adm.LookupPermIDRef(c.Args().First(),
 		opts[`in`][0],
-		&permissionId,
+		&permissionID,
 	); err != nil {
 		return err
 	}
 
 	esc := url.QueryEscape(opts[`in`][0])
 	path := fmt.Sprintf("/category/%s/permissions/%s",
-		esc, permissionId)
+		esc, permissionID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -217,7 +217,7 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 	var (
 		err                                   error
 		section, action, category, permission string
-		sectionId, actionId, permissionId     string
+		sectionID, actionID, permissionID     string
 		sectionMapping                        bool
 	)
 	actionSlice := strings.Split(c.Args().First(), `::`)
@@ -246,24 +246,24 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 		return err
 	}
 	// lookup permissionid
-	if err = adm.LookupPermIdRef(
+	if err = adm.LookupPermIDRef(
 		permission,
 		category,
-		&permissionId,
+		&permissionID,
 	); err != nil {
 		return err
 	}
 	// lookup sectionid
-	if sectionId, err = adm.LookupSectionId(
+	if sectionID, err = adm.LookupSectionID(
 		section,
 	); err != nil {
 		return err
 	}
 	if !sectionMapping {
 		// lookup actionid
-		if actionId, err = adm.LookupActionId(
+		if actionID, err = adm.LookupActionID(
 			action,
-			sectionId,
+			sectionID,
 		); err != nil {
 			return err
 		}
@@ -276,22 +276,22 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 	case `unmap`:
 		req.Flags.Remove = true
 	}
-	req.Permission.Id = permissionId
+	req.Permission.ID = permissionID
 	req.Permission.Name = permission
 	req.Permission.Category = category
 	if !sectionMapping {
 		req.Permission.Actions = &[]proto.Action{
 			proto.Action{
-				ID:        actionId,
+				ID:        actionID,
 				Name:      action,
-				SectionID: sectionId,
+				SectionID: sectionID,
 				Category:  category,
 			},
 		}
 	} else {
 		req.Permission.Sections = &[]proto.Section{
 			proto.Section{
-				Id:       sectionId,
+				ID:       sectionID,
 				Name:     section,
 				Category: category,
 			},
@@ -300,7 +300,7 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 
 	esc := url.QueryEscape(category)
 	path := fmt.Sprintf("/category/%s/permissions/%s",
-		esc, permissionId)
+		esc, permissionID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 

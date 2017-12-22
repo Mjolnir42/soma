@@ -87,17 +87,17 @@ func cmdSectionAdd(c *cli.Context) error {
 func cmdSectionRemove(c *cli.Context) error {
 	var (
 		err       error
-		sectionId string
+		sectionID string
 	)
 	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	if sectionId, err = adm.LookupSectionId(
+	if sectionID, err = adm.LookupSectionID(
 		c.Args().First()); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s", sectionId)
+	path := fmt.Sprintf("/sections/%s", sectionID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -112,17 +112,17 @@ func cmdSectionList(c *cli.Context) error {
 func cmdSectionShow(c *cli.Context) error {
 	var (
 		err       error
-		sectionId string
+		sectionID string
 	)
 	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	if sectionId, err = adm.LookupSectionId(
+	if sectionID, err = adm.LookupSectionID(
 		c.Args().First()); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s", sectionId)
+	path := fmt.Sprintf("/sections/%s", sectionID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

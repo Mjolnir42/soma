@@ -19,19 +19,19 @@ import (
 // Checker:> Add Check
 
 func (teb *Bucket) SetCheck(c Check) {
-	c.Id = c.GetItemId(teb.Type, teb.Id)
-	if uuid.Equal(c.Id, uuid.Nil) {
-		c.Id = uuid.NewV4()
+	c.ID = c.GetItemID(teb.Type, teb.ID)
+	if uuid.Equal(c.ID, uuid.Nil) {
+		c.ID = uuid.NewV4()
 	}
 	// this check is the source check
-	c.InheritedFrom = teb.Id
+	c.InheritedFrom = teb.ID
 	c.Inherited = false
-	c.SourceId, _ = uuid.FromString(c.Id.String())
+	c.SourceID, _ = uuid.FromString(c.ID.String())
 	c.SourceType = teb.Type
 	// send a scrubbed copy downward
 	f := c.Clone()
 	f.Inherited = true
-	f.Id = uuid.Nil
+	f.ID = uuid.Nil
 	teb.setCheckOnChildren(f)
 	// scrub checkitem startup information prior to storing
 	c.Items = nil
@@ -41,12 +41,12 @@ func (teb *Bucket) SetCheck(c Check) {
 func (teb *Bucket) setCheckInherited(c Check) {
 	// we keep a local copy, that way we know it is ours....
 	f := c.Clone()
-	f.Id = f.GetItemId(teb.Type, teb.Id)
-	if uuid.Equal(f.Id, uuid.Nil) {
-		f.Id = uuid.NewV4()
+	f.ID = f.GetItemID(teb.Type, teb.ID)
+	if uuid.Equal(f.ID, uuid.Nil) {
+		f.ID = uuid.NewV4()
 	}
 	// send original check downwards
-	c.Id = uuid.Nil
+	c.ID = uuid.Nil
 	teb.setCheckOnChildren(c)
 	f.Items = nil
 	teb.addCheck(f)
@@ -85,7 +85,7 @@ func (teb *Bucket) setCheckOnChildren(c Check) {
 }
 
 func (teb *Bucket) addCheck(c Check) {
-	teb.Checks[c.Id.String()] = c
+	teb.Checks[c.ID.String()] = c
 	teb.actionCheckNew(teb.setupCheckAction(c))
 }
 
@@ -134,8 +134,8 @@ func (teb *Bucket) deleteCheckOnChildren(c Check) {
 }
 
 func (teb *Bucket) rmCheck(c Check) {
-	for id, _ := range teb.Checks {
-		if uuid.Equal(teb.Checks[id].SourceId, c.SourceId) {
+	for id := range teb.Checks {
+		if uuid.Equal(teb.Checks[id].SourceID, c.SourceID) {
 			teb.actionCheckRemoved(teb.setupCheckAction(teb.Checks[id]))
 			delete(teb.Checks, id)
 			return
@@ -146,8 +146,8 @@ func (teb *Bucket) rmCheck(c Check) {
 //
 // Checker:> Meta
 
-func (teb *Bucket) syncCheck(childId string) {
-	for check, _ := range teb.Checks {
+func (teb *Bucket) syncCheck(childID string) {
+	for check := range teb.Checks {
 		if !teb.Checks[check].Inheritance {
 			continue
 		}
@@ -155,14 +155,14 @@ func (teb *Bucket) syncCheck(childId string) {
 		f := teb.Checks[check]
 		c := f.Clone()
 		c.Inherited = true
-		c.Id = uuid.Nil
+		c.ID = uuid.Nil
 		c.Items = nil
-		teb.Children[childId].(Checker).setCheckInherited(c)
+		teb.Children[childID].(Checker).setCheckInherited(c)
 	}
 }
 
-func (teb *Bucket) checkCheck(checkId string) bool {
-	if _, ok := teb.Checks[checkId]; ok {
+func (teb *Bucket) checkCheck(checkID string) bool {
+	if _, ok := teb.Checks[checkID]; ok {
 		return true
 	}
 	return false

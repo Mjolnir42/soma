@@ -30,17 +30,17 @@ func (tec *Cluster) unlinkNode(u UnlinkRequest) {
 	if unlinkRequestCheck(u, tec) {
 		switch u.ChildType {
 		case "node":
-			if _, ok := tec.Children[u.ChildId]; ok {
-				if u.ChildName == tec.Children[u.ChildId].GetName() {
+			if _, ok := tec.Children[u.ChildID]; ok {
+				if u.ChildName == tec.Children[u.ChildID].GetName() {
 					a := Action{
 						ChildType: "node",
-						ChildNode: tec.Children[u.ChildId].(*Node).export(),
+						ChildNode: tec.Children[u.ChildID].(*Node).export(),
 					}
 
-					tec.Children[u.ChildId].clearParent()
-					delete(tec.Children, u.ChildId)
+					tec.Children[u.ChildID].clearParent()
+					delete(tec.Children, u.ChildID)
 					for i, nod := range tec.ordChildrenNod {
-						if nod == u.ChildId {
+						if nod == u.ChildID {
 							delete(tec.ordChildrenNod, i)
 						}
 					}

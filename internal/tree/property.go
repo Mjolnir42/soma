@@ -16,7 +16,7 @@ import (
 
 type Property interface {
 	GetID() string
-	GetInstanceId(objType string, objId uuid.UUID, l *log.Logger) uuid.UUID
+	GetInstanceID(objType string, objID uuid.UUID, l *log.Logger) uuid.UUID
 	GetIsInherited() bool
 	GetKey() string
 	GetSource() string
@@ -26,10 +26,10 @@ type Property interface {
 	GetValue() string
 	GetView() string
 
-	SetId(id uuid.UUID)
+	SetID(id uuid.UUID)
 	SetInherited(inherited bool)
 	SetInheritedFrom(id uuid.UUID)
-	SetSourceId(id uuid.UUID)
+	SetSourceID(id uuid.UUID)
 	SetSourceType(s string)
 
 	Clone() Property
@@ -42,25 +42,25 @@ type Property interface {
 }
 
 type PropertyInstance struct {
-	ObjectId   uuid.UUID
+	ObjectID   uuid.UUID
 	ObjectType string
-	InstanceId uuid.UUID
+	InstanceID uuid.UUID
 }
 
 //
 // Custom
 type PropertyCustom struct {
-	// Id of the custom property
-	Id uuid.UUID
-	// Id of the source custom property this was inherited from
-	SourceId uuid.UUID
+	// ID of the custom property
+	ID uuid.UUID
+	// ID of the source custom property this was inherited from
+	SourceID uuid.UUID
 	// ObjectType the source property was attached to
 	SourceType string
-	// Id of the custom property type
-	CustomId uuid.UUID
+	// ID of the custom property type
+	CustomID uuid.UUID
 	// Indicator if this was inherited
 	Inherited bool
-	// Id of the object the SourceId property is on
+	// ID of the object the SourceID property is on
 	InheritedFrom uuid.UUID
 	// Inheritance is enabled/disabled
 	Inheritance bool
@@ -81,7 +81,7 @@ func (p *PropertyCustom) GetType() string {
 }
 
 func (p *PropertyCustom) GetID() string {
-	return p.Id.String()
+	return p.ID.String()
 }
 
 func (p *PropertyCustom) GetSource() string {
@@ -97,7 +97,7 @@ func (p *PropertyCustom) isChildrenOnly() bool {
 }
 
 func (p *PropertyCustom) GetSourceInstance() string {
-	return p.SourceId.String()
+	return p.SourceID.String()
 }
 
 func (p *PropertyCustom) GetSourceType() string {
@@ -113,7 +113,7 @@ func (p *PropertyCustom) GetView() string {
 }
 
 func (p *PropertyCustom) GetKey() string {
-	return p.CustomId.String()
+	return p.CustomID.String()
 }
 
 func (p *PropertyCustom) GetValue() string {
@@ -128,25 +128,25 @@ func (p *PropertyCustom) GetValueField() string {
 	return p.Value
 }
 
-func (p *PropertyCustom) GetInstanceId(objType string, objId uuid.UUID, l *log.Logger) uuid.UUID {
-	if !uuid.Equal(p.Id, uuid.Nil) {
-		return p.Id
+func (p *PropertyCustom) GetInstanceID(objType string, objID uuid.UUID, l *log.Logger) uuid.UUID {
+	if !uuid.Equal(p.ID, uuid.Nil) {
+		return p.ID
 	}
 	for _, instance := range p.Instances {
-		if objType == instance.ObjectType && uuid.Equal(instance.ObjectId, objId) {
-			l.Printf("tree.Property.GetInstanceId() found existing instance: %s\n", instance.InstanceId)
-			return instance.InstanceId
+		if objType == instance.ObjectType && uuid.Equal(instance.ObjectID, objID) {
+			l.Printf("tree.Property.GetInstanceID() found existing instance: %s\n", instance.InstanceID)
+			return instance.InstanceID
 		}
 	}
 	return uuid.Nil
 }
 
-func (p *PropertyCustom) SetId(id uuid.UUID) {
-	p.Id, _ = uuid.FromString(id.String())
+func (p *PropertyCustom) SetID(id uuid.UUID) {
+	p.ID, _ = uuid.FromString(id.String())
 }
 
 func (p *PropertyCustom) Equal(id uuid.UUID) bool {
-	return uuid.Equal(p.Id, id)
+	return uuid.Equal(p.ID, id)
 }
 
 func (p *PropertyCustom) clearInstances() {
@@ -161,8 +161,8 @@ func (p *PropertyCustom) SetInherited(inherited bool) {
 	p.Inherited = inherited
 }
 
-func (p *PropertyCustom) SetSourceId(id uuid.UUID) {
-	p.SourceId, _ = uuid.FromString(id.String())
+func (p *PropertyCustom) SetSourceID(id uuid.UUID) {
+	p.SourceID, _ = uuid.FromString(id.String())
 }
 
 func (p *PropertyCustom) SetSourceType(s string) {
@@ -179,10 +179,10 @@ func (p PropertyCustom) Clone() Property {
 		Key:          p.Key,
 		Value:        p.Value,
 	}
-	cl.Id, _ = uuid.FromString(p.Id.String())
+	cl.ID, _ = uuid.FromString(p.ID.String())
 	cl.InheritedFrom, _ = uuid.FromString(p.InheritedFrom.String())
-	cl.SourceId, _ = uuid.FromString(p.SourceId.String())
-	cl.CustomId, _ = uuid.FromString(p.CustomId.String())
+	cl.SourceID, _ = uuid.FromString(p.SourceID.String())
+	cl.CustomID, _ = uuid.FromString(p.CustomID.String())
 	cl.Instances = make([]PropertyInstance, len(p.Instances))
 	copy(cl.Instances, p.Instances)
 
@@ -202,7 +202,7 @@ func (p *PropertyCustom) MakeAction() Action {
 			ChildrenOnly:     p.isChildrenOnly(),
 			View:             p.GetView(),
 			Custom: &proto.PropertyCustom{
-				ID:    p.CustomId.String(),
+				ID:    p.CustomID.String(),
 				Name:  p.Key,
 				Value: p.Value,
 			},
@@ -213,8 +213,8 @@ func (p *PropertyCustom) MakeAction() Action {
 //
 // Service
 type PropertyService struct {
-	Id            uuid.UUID
-	SourceId      uuid.UUID
+	ID            uuid.UUID
+	SourceID      uuid.UUID
 	SourceType    string
 	Inherited     bool
 	InheritedFrom uuid.UUID
@@ -231,7 +231,7 @@ func (p *PropertyService) GetType() string {
 }
 
 func (p *PropertyService) GetID() string {
-	return p.Id.String()
+	return p.ID.String()
 }
 
 func (p *PropertyService) GetSource() string {
@@ -247,7 +247,7 @@ func (p *PropertyService) isChildrenOnly() bool {
 }
 
 func (p *PropertyService) GetSourceInstance() string {
-	return p.SourceId.String()
+	return p.SourceID.String()
 }
 
 func (p *PropertyService) GetSourceType() string {
@@ -269,28 +269,28 @@ func (p *PropertyService) GetKey() string {
 // service has no Value per se, so ensure comparing values never
 // succeeds, but Interface is fulfilled
 func (p *PropertyService) GetValue() string {
-	return p.Id.String()
+	return p.ID.String()
 }
 
-func (p *PropertyService) GetInstanceId(objType string, objId uuid.UUID, l *log.Logger) uuid.UUID {
-	if !uuid.Equal(p.Id, uuid.Nil) {
-		return p.Id
+func (p *PropertyService) GetInstanceID(objType string, objID uuid.UUID, l *log.Logger) uuid.UUID {
+	if !uuid.Equal(p.ID, uuid.Nil) {
+		return p.ID
 	}
 	for _, instance := range p.Instances {
-		if objType == instance.ObjectType && uuid.Equal(instance.ObjectId, objId) {
-			l.Printf("tree.Property.GetInstanceId() found existing instance: %s\n", instance.InstanceId)
-			return instance.InstanceId
+		if objType == instance.ObjectType && uuid.Equal(instance.ObjectID, objID) {
+			l.Printf("tree.Property.GetInstanceID() found existing instance: %s\n", instance.InstanceID)
+			return instance.InstanceID
 		}
 	}
 	return uuid.Nil
 }
 
-func (p *PropertyService) SetId(id uuid.UUID) {
-	p.Id, _ = uuid.FromString(id.String())
+func (p *PropertyService) SetID(id uuid.UUID) {
+	p.ID, _ = uuid.FromString(id.String())
 }
 
 func (p *PropertyService) Equal(id uuid.UUID) bool {
-	return uuid.Equal(p.Id, id)
+	return uuid.Equal(p.ID, id)
 }
 
 func (p *PropertyService) clearInstances() {
@@ -305,8 +305,8 @@ func (p *PropertyService) SetInherited(inherited bool) {
 	p.Inherited = inherited
 }
 
-func (p *PropertyService) SetSourceId(id uuid.UUID) {
-	p.SourceId, _ = uuid.FromString(id.String())
+func (p *PropertyService) SetSourceID(id uuid.UUID) {
+	p.SourceID, _ = uuid.FromString(id.String())
 }
 
 func (p *PropertyService) SetSourceType(s string) {
@@ -322,8 +322,8 @@ func (p PropertyService) Clone() Property {
 		View:         p.View,
 		Service:      p.Service,
 	}
-	cl.Id, _ = uuid.FromString(p.Id.String())
-	cl.SourceId, _ = uuid.FromString(p.SourceId.String())
+	cl.ID, _ = uuid.FromString(p.ID.String())
+	cl.SourceID, _ = uuid.FromString(p.SourceID.String())
 	cl.InheritedFrom, _ = uuid.FromString(p.InheritedFrom.String())
 	cl.Attributes = make([]proto.ServiceAttribute, 0)
 	for _, attr := range p.Attributes {
@@ -370,8 +370,8 @@ func (p *PropertyService) MakeAction() Action {
 //
 // System
 type PropertySystem struct {
-	Id            uuid.UUID
-	SourceId      uuid.UUID
+	ID            uuid.UUID
+	SourceID      uuid.UUID
 	SourceType    string
 	Inherited     bool
 	InheritedFrom uuid.UUID
@@ -388,7 +388,7 @@ func (p *PropertySystem) GetType() string {
 }
 
 func (p *PropertySystem) GetID() string {
-	return p.Id.String()
+	return p.ID.String()
 }
 
 func (p *PropertySystem) GetSource() string {
@@ -404,7 +404,7 @@ func (p *PropertySystem) isChildrenOnly() bool {
 }
 
 func (p *PropertySystem) GetSourceInstance() string {
-	return p.SourceId.String()
+	return p.SourceID.String()
 }
 
 func (p *PropertySystem) GetSourceType() string {
@@ -427,25 +427,25 @@ func (p *PropertySystem) GetValue() string {
 	return p.Value
 }
 
-func (p *PropertySystem) GetInstanceId(objType string, objId uuid.UUID, l *log.Logger) uuid.UUID {
-	if !uuid.Equal(p.Id, uuid.Nil) {
-		return p.Id
+func (p *PropertySystem) GetInstanceID(objType string, objID uuid.UUID, l *log.Logger) uuid.UUID {
+	if !uuid.Equal(p.ID, uuid.Nil) {
+		return p.ID
 	}
 	for _, instance := range p.Instances {
-		if objType == instance.ObjectType && uuid.Equal(instance.ObjectId, objId) {
-			l.Printf("tree.Property.GetInstanceId() found existing instance: %s\n", instance.InstanceId)
-			return instance.InstanceId
+		if objType == instance.ObjectType && uuid.Equal(instance.ObjectID, objID) {
+			l.Printf("tree.Property.GetInstanceID() found existing instance: %s\n", instance.InstanceID)
+			return instance.InstanceID
 		}
 	}
 	return uuid.Nil
 }
 
-func (p *PropertySystem) SetId(id uuid.UUID) {
-	p.Id, _ = uuid.FromString(id.String())
+func (p *PropertySystem) SetID(id uuid.UUID) {
+	p.ID, _ = uuid.FromString(id.String())
 }
 
 func (p *PropertySystem) Equal(id uuid.UUID) bool {
-	return uuid.Equal(p.Id, id)
+	return uuid.Equal(p.ID, id)
 }
 
 func (p *PropertySystem) clearInstances() {
@@ -460,8 +460,8 @@ func (p *PropertySystem) SetInherited(inherited bool) {
 	p.Inherited = inherited
 }
 
-func (p *PropertySystem) SetSourceId(id uuid.UUID) {
-	p.SourceId, _ = uuid.FromString(id.String())
+func (p *PropertySystem) SetSourceID(id uuid.UUID) {
+	p.SourceID, _ = uuid.FromString(id.String())
 }
 
 func (p *PropertySystem) SetSourceType(s string) {
@@ -478,8 +478,8 @@ func (p PropertySystem) Clone() Property {
 		Key:          p.Key,
 		Value:        p.Value,
 	}
-	cl.Id, _ = uuid.FromString(p.Id.String())
-	cl.SourceId, _ = uuid.FromString(p.SourceId.String())
+	cl.ID, _ = uuid.FromString(p.ID.String())
+	cl.SourceID, _ = uuid.FromString(p.SourceID.String())
 	cl.InheritedFrom, _ = uuid.FromString(p.InheritedFrom.String())
 	cl.Instances = make([]PropertyInstance, len(p.Instances))
 	copy(cl.Instances, p.Instances)
@@ -510,10 +510,10 @@ func (p *PropertySystem) MakeAction() Action {
 //
 // Oncall
 type PropertyOncall struct {
-	Id            uuid.UUID
-	SourceId      uuid.UUID
+	ID            uuid.UUID
+	SourceID      uuid.UUID
 	SourceType    string
-	OncallId      uuid.UUID
+	OncallID      uuid.UUID
 	Inherited     bool
 	InheritedFrom uuid.UUID
 	Inheritance   bool
@@ -529,7 +529,7 @@ func (p *PropertyOncall) GetType() string {
 }
 
 func (p *PropertyOncall) GetID() string {
-	return p.Id.String()
+	return p.ID.String()
 }
 
 func (p *PropertyOncall) GetSource() string {
@@ -545,7 +545,7 @@ func (p *PropertyOncall) isChildrenOnly() bool {
 }
 
 func (p *PropertyOncall) GetSourceInstance() string {
-	return p.SourceId.String()
+	return p.SourceID.String()
 }
 
 func (p *PropertyOncall) GetSourceType() string {
@@ -561,7 +561,7 @@ func (p *PropertyOncall) GetView() string {
 }
 
 func (p *PropertyOncall) GetKey() string {
-	return p.OncallId.String()
+	return p.OncallID.String()
 }
 
 func (p *PropertyOncall) GetValue() string {
@@ -576,25 +576,25 @@ func (p *PropertyOncall) GetNumber() string {
 	return p.Number
 }
 
-func (p *PropertyOncall) GetInstanceId(objType string, objId uuid.UUID, l *log.Logger) uuid.UUID {
-	if !uuid.Equal(p.Id, uuid.Nil) {
-		return p.Id
+func (p *PropertyOncall) GetInstanceID(objType string, objID uuid.UUID, l *log.Logger) uuid.UUID {
+	if !uuid.Equal(p.ID, uuid.Nil) {
+		return p.ID
 	}
 	for _, instance := range p.Instances {
-		if objType == instance.ObjectType && uuid.Equal(instance.ObjectId, objId) {
-			l.Printf("tree.Property.GetInstanceId() found existing instance: %s\n", instance.InstanceId)
-			return instance.InstanceId
+		if objType == instance.ObjectType && uuid.Equal(instance.ObjectID, objID) {
+			l.Printf("tree.Property.GetInstanceID() found existing instance: %s\n", instance.InstanceID)
+			return instance.InstanceID
 		}
 	}
 	return uuid.Nil
 }
 
-func (p *PropertyOncall) SetId(id uuid.UUID) {
-	p.Id, _ = uuid.FromString(id.String())
+func (p *PropertyOncall) SetID(id uuid.UUID) {
+	p.ID, _ = uuid.FromString(id.String())
 }
 
 func (p *PropertyOncall) Equal(id uuid.UUID) bool {
-	return uuid.Equal(p.Id, id)
+	return uuid.Equal(p.ID, id)
 }
 
 func (p *PropertyOncall) clearInstances() {
@@ -609,8 +609,8 @@ func (p *PropertyOncall) SetInherited(inherited bool) {
 	p.Inherited = inherited
 }
 
-func (p *PropertyOncall) SetSourceId(id uuid.UUID) {
-	p.SourceId, _ = uuid.FromString(id.String())
+func (p *PropertyOncall) SetSourceID(id uuid.UUID) {
+	p.SourceID, _ = uuid.FromString(id.String())
 }
 
 func (p *PropertyOncall) SetSourceType(s string) {
@@ -627,9 +627,9 @@ func (p PropertyOncall) Clone() Property {
 		Name:         p.Name,
 		Number:       p.Number,
 	}
-	cl.Id, _ = uuid.FromString(p.Id.String())
-	cl.SourceId, _ = uuid.FromString(p.SourceId.String())
-	cl.OncallId, _ = uuid.FromString(p.OncallId.String())
+	cl.ID, _ = uuid.FromString(p.ID.String())
+	cl.SourceID, _ = uuid.FromString(p.SourceID.String())
+	cl.OncallID, _ = uuid.FromString(p.OncallID.String())
 	cl.InheritedFrom, _ = uuid.FromString(p.InheritedFrom.String())
 	cl.Instances = make([]PropertyInstance, len(p.Instances))
 	copy(cl.Instances, p.Instances)
@@ -650,7 +650,7 @@ func (p *PropertyOncall) MakeAction() Action {
 			ChildrenOnly:     p.isChildrenOnly(),
 			View:             p.GetView(),
 			Oncall: &proto.PropertyOncall{
-				ID:     p.OncallId.String(),
+				ID:     p.OncallID.String(),
 				Name:   p.Name,
 				Number: p.Number,
 			},

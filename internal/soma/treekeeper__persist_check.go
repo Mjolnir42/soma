@@ -148,12 +148,12 @@ func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 	bucket := sql.NullString{String: a.Bucket.ID, Valid: true}
 	switch a.Type {
 	case `repository`:
-		id = a.Repository.Id
+		id = a.Repository.ID
 		bucket = sql.NullString{String: "", Valid: false}
 	case `bucket`:
 		id = a.Bucket.ID
 	case `group`:
-		id = a.Group.Id
+		id = a.Group.ID
 	case `cluster`:
 		id = a.Cluster.ID
 	case `node`:
@@ -161,14 +161,14 @@ func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 	}
 	statement := stm[`CreateCheck`]
 	_, err := statement.Exec(
-		a.Check.CheckId,
-		a.Check.RepositoryId,
+		a.Check.CheckID,
+		a.Check.RepositoryID,
 		bucket,
-		a.Check.SourceCheckId,
+		a.Check.SourceCheckID,
 		a.Check.SourceType,
 		a.Check.InheritedFrom,
-		a.Check.CheckConfigId,
-		a.Check.CapabilityId,
+		a.Check.CheckConfigID,
+		a.Check.CapabilityID,
 		id,
 		a.Type,
 	)
@@ -178,7 +178,7 @@ func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 func (tk *TreeKeeper) txCheckRemoved(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	statement := stm[`DeleteCheck`]
-	_, err := statement.Exec(a.Check.CheckId)
+	_, err := statement.Exec(a.Check.CheckID)
 	return err
 }
 
@@ -210,9 +210,9 @@ func (tk *TreeKeeper) txCheckInstanceCreate(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	statement := stm[`CreateCheckInstance`]
 	_, err := statement.Exec(
-		a.CheckInstance.InstanceId,
-		a.CheckInstance.CheckId,
-		a.CheckInstance.ConfigId,
+		a.CheckInstance.InstanceID,
+		a.CheckInstance.CheckID,
+		a.CheckInstance.ConfigID,
 		`00000000-0000-0000-0000-000000000000`,
 		time.Now().UTC(),
 	)
@@ -223,9 +223,9 @@ func (tk *TreeKeeper) txCheckInstanceConfigCreate(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	statement := stm[`CreateCheckInstanceConfiguration`]
 	_, err := statement.Exec(
-		a.CheckInstance.InstanceConfigId,
+		a.CheckInstance.InstanceConfigID,
 		a.CheckInstance.Version,
-		a.CheckInstance.InstanceId,
+		a.CheckInstance.InstanceID,
 		a.CheckInstance.ConstraintHash,
 		a.CheckInstance.ConstraintValHash,
 		a.CheckInstance.InstanceService,
@@ -244,7 +244,7 @@ func (tk *TreeKeeper) txCheckInstanceDelete(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	statement := stm[`DeleteCheckInstance`]
 	_, err := statement.Exec(
-		a.CheckInstance.InstanceId,
+		a.CheckInstance.InstanceID,
 	)
 	return err
 }

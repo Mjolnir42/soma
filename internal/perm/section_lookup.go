@@ -33,12 +33,12 @@ func newSectionLookup() *sectionLookup {
 // add inserts a section into the cache
 func (m *sectionLookup) add(ID, name, category string) {
 	s := &proto.Section{
-		Id:       ID,
+		ID:       ID,
 		Name:     name,
 		Category: category,
 	}
 	m.byName[s.Name] = s
-	m.byID[s.Id] = s
+	m.byID[s.ID] = s
 
 	if _, ok := m.byCategory[category]; !ok {
 		m.byCategory[category] = []*proto.Section{}
@@ -58,10 +58,10 @@ func (m *sectionLookup) rmByName(name string) {
 		return
 	}
 
-	delete(m.byID, s.Id)
+	delete(m.byID, s.ID)
 	delete(m.byName, s.Name)
 	for i, p := range m.byCategory[s.Category] {
-		if p.Id != s.Id {
+		if p.ID != s.ID {
 			continue
 		}
 		m.byCategory[s.Category] = append(m.byCategory[s.Category][:i],
@@ -83,10 +83,10 @@ func (m *sectionLookup) rmByID(id string) {
 		return
 	}
 
-	delete(m.byID, s.Id)
+	delete(m.byID, s.ID)
 	delete(m.byName, s.Name)
 	for i, p := range m.byCategory[s.Category] {
-		if p.Id != s.Id {
+		if p.ID != s.ID {
 			continue
 		}
 		m.byCategory[s.Category] = append(m.byCategory[s.Category][:i],

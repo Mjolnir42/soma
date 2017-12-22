@@ -46,7 +46,7 @@ bucketloop:
 			return
 		}
 		tree.NewBucket(tree.BucketSpec{
-			Id:          bucketID,
+			ID:          bucketID,
 			Name:        bucketName,
 			Environment: environment,
 			Team:        teamID,
@@ -56,7 +56,7 @@ bucketloop:
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "repository",
-			ParentId:   tk.meta.repoID,
+			ParentID:   tk.meta.repoID,
 			ParentName: tk.meta.repoName,
 		})
 		tk.drain(`action`)
@@ -101,13 +101,13 @@ grouploop:
 			return
 		}
 		tree.NewGroup(tree.GroupSpec{
-			Id:   groupID,
+			ID:   groupID,
 			Name: groupName,
 			Team: teamID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "bucket",
-			ParentId:   bucketID,
+			ParentID:   bucketID,
 		})
 		tk.drain(`action`)
 		tk.drain(`error`)
@@ -151,11 +151,11 @@ memberloop:
 
 		tk.tree.Find(tree.FindRequest{
 			ElementType: "group",
-			ElementId:   childGroupID,
+			ElementID:   childGroupID,
 		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "group",
-			ParentId:   groupID,
+			ParentID:   groupID,
 		})
 	}
 	tk.drain(`action`)
@@ -200,13 +200,13 @@ clusterloop:
 		}
 
 		tree.NewCluster(tree.ClusterSpec{
-			Id:   clusterID,
+			ID:   clusterID,
 			Name: clusterName,
 			Team: teamID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "group",
-			ParentId:   groupID,
+			ParentID:   groupID,
 		})
 	}
 	tk.drain(`action`)
@@ -251,13 +251,13 @@ clusterloop:
 		}
 
 		tree.NewCluster(tree.ClusterSpec{
-			Id:   clusterID,
+			ID:   clusterID,
 			Name: clusterName,
 			Team: teamID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
 			ParentType: "bucket",
-			ParentId:   bucketID,
+			ParentID:   bucketID,
 		})
 	}
 	tk.drain(`action`)
@@ -311,11 +311,11 @@ nodeloop:
 		}
 
 		node := tree.NewNode(tree.NodeSpec{
-			Id:       nodeID,
-			AssetId:  uint64(assetID),
+			ID:       nodeID,
+			AssetID:  uint64(assetID),
 			Name:     nodeName,
 			Team:     teamID,
-			ServerId: serverID,
+			ServerID: serverID,
 			Online:   nodeOnline,
 			Deleted:  nodeDeleted,
 		})
@@ -323,19 +323,19 @@ nodeloop:
 			node.Attach(tree.AttachRequest{
 				Root:       tk.tree,
 				ParentType: "cluster",
-				ParentId:   clusterID.String,
+				ParentID:   clusterID.String,
 			})
 		} else if groupID.Valid {
 			node.Attach(tree.AttachRequest{
 				Root:       tk.tree,
 				ParentType: "group",
-				ParentId:   groupID.String,
+				ParentID:   groupID.String,
 			})
 		} else {
 			node.Attach(tree.AttachRequest{
 				Root:       tk.tree,
 				ParentType: "bucket",
-				ParentId:   bucketID,
+				ParentID:   bucketID,
 			})
 		}
 	}

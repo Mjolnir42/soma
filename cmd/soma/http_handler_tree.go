@@ -82,7 +82,7 @@ func OutputTree(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Tree: proto.Tree{
-			Id:   params.ByName(treeT),
+			ID:   params.ByName(treeT),
 			Type: treeT,
 		},
 	}

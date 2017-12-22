@@ -134,9 +134,9 @@ func (r *GroupRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Group = append(mr.Group, proto.Group{
-			Id:       groupID,
+			ID:       groupID,
 			Name:     groupName,
-			BucketId: bucketID,
+			BucketID: bucketID,
 		})
 	}
 	if err = rows.Err(); err != nil {
@@ -158,7 +158,7 @@ func (r *GroupRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Group.Id,
+		q.Group.ID,
 	).Scan(
 		&groupID,
 		&bucketID,
@@ -172,11 +172,11 @@ func (r *GroupRead) show(q *msg.Request, mr *msg.Result) {
 		goto fail
 	}
 	group = proto.Group{
-		Id:          groupID,
+		ID:          groupID,
 		Name:        groupName,
-		BucketId:    bucketID,
+		BucketID:    bucketID,
 		ObjectState: groupState,
-		TeamId:      teamID,
+		TeamID:      teamID,
 	}
 
 	// add properties
@@ -205,7 +205,7 @@ func (r *GroupRead) show(q *msg.Request, mr *msg.Result) {
 	}
 	if checkConfigs, err = exportCheckConfigObjectTX(
 		tx,
-		q.Group.Id,
+		q.Group.ID,
 	); err != nil {
 		tx.Rollback()
 		goto fail
@@ -237,14 +237,14 @@ func (r *GroupRead) memberList(q *msg.Request, mr *msg.Result) {
 		rows                               *sql.Rows
 	)
 
-	group.Id = q.Group.Id
+	group.ID = q.Group.ID
 	group.MemberGroups = &[]proto.Group{}
 	group.MemberClusters = &[]proto.Cluster{}
 	group.MemberNodes = &[]proto.Node{}
 
 	// fetch member groups
 	if rows, err = r.stmtMemberListGroup.Query(
-		q.Group.Id,
+		q.Group.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -262,7 +262,7 @@ func (r *GroupRead) memberList(q *msg.Request, mr *msg.Result) {
 		}
 		group.Name = groupName
 		*group.MemberGroups = append(*group.MemberGroups, proto.Group{
-			Id:   memberGroupID,
+			ID:   memberGroupID,
 			Name: memberGroupName,
 		})
 	}
@@ -277,7 +277,7 @@ func (r *GroupRead) memberList(q *msg.Request, mr *msg.Result) {
 
 	// fetch member clusters
 	if rows, err = r.stmtMemberListCluster.Query(
-		q.Group.Id,
+		q.Group.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -310,7 +310,7 @@ func (r *GroupRead) memberList(q *msg.Request, mr *msg.Result) {
 
 	// fetch member nodes
 	if rows, err = r.stmtMemberListNode.Query(
-		q.Group.Id,
+		q.Group.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

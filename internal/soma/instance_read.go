@@ -113,7 +113,7 @@ func (r *InstanceRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Instance.Id,
+		q.Instance.ID,
 	).Scan(
 		&instanceID,
 		&version,
@@ -144,14 +144,14 @@ func (r *InstanceRead) show(q *msg.Request, mr *msg.Result) {
 	}
 
 	mr.Instance = append(mr.Instance, proto.Instance{
-		Id:               instanceID,
+		ID:               instanceID,
 		Version:          uint64(version),
-		CheckId:          checkID,
-		ConfigId:         configID,
-		InstanceConfigId: instanceConfigID,
-		RepositoryId:     repositoryID,
-		BucketId:         bucketID,
-		ObjectId:         objectID,
+		CheckID:          checkID,
+		ConfigID:         configID,
+		InstanceConfigID: instanceConfigID,
+		RepositoryID:     repositoryID,
+		BucketID:         bucketID,
+		ObjectID:         objectID,
 		ObjectType:       objectType,
 		CurrentStatus:    status,
 		NextStatus:       nextStatus,
@@ -177,10 +177,10 @@ func (r *InstanceRead) list(q *msg.Request, mr *msg.Result) {
 
 	switch q.Instance.ObjectType {
 	case msg.EntityRepository:
-		nullRepositoryID.String = q.Instance.ObjectId
+		nullRepositoryID.String = q.Instance.ObjectID
 		nullRepositoryID.Valid = true
 	case msg.EntityBucket:
-		nullBucketID.String = q.Instance.ObjectId
+		nullBucketID.String = q.Instance.ObjectID
 		nullBucketID.Valid = true
 	default:
 		// only run an unscoped query if the flag has been explicitly
@@ -232,14 +232,14 @@ func (r *InstanceRead) list(q *msg.Request, mr *msg.Result) {
 		}
 
 		mr.Instance = append(mr.Instance, proto.Instance{
-			Id:               instanceID,
+			ID:               instanceID,
 			Version:          uint64(version),
-			CheckId:          checkID,
-			ConfigId:         configID,
-			InstanceConfigId: instanceConfigID,
-			RepositoryId:     repositoryID,
-			BucketId:         bucketID,
-			ObjectId:         objectID,
+			CheckID:          checkID,
+			ConfigID:         configID,
+			InstanceConfigID: instanceConfigID,
+			RepositoryID:     repositoryID,
+			BucketID:         bucketID,
+			ObjectID:         objectID,
 			ObjectType:       objectType,
 			CurrentStatus:    status,
 			NextStatus:       nextStatus,
@@ -266,7 +266,7 @@ func (r *InstanceRead) versions(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = r.stmtVersions.Query(
-		q.Instance.Id,
+		q.Instance.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -291,9 +291,9 @@ func (r *InstanceRead) versions(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		inst := proto.Instance{
-			InstanceConfigId: instanceConfigID,
+			InstanceConfigID: instanceConfigID,
 			Version:          uint64(version),
-			Id:               instanceID,
+			ID:               instanceID,
 			CurrentStatus:    status,
 			NextStatus:       nextStatus,
 			IsInherited:      isInherited,

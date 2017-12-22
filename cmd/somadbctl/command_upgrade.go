@@ -14,30 +14,30 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 	//		201605060001: mock_upgrade_inventory_201605060001,
 	//	},
 	"auth": map[int]func(int, string, bool) int{
-		201605060001: upgrade_auth_to_201605150002,
-		201605150002: upgrade_auth_to_201605190001,
-		201605190001: upgrade_auth_to_201711080001,
+		201605060001: upgradeAuthTo201605150002,
+		201605150002: upgradeAuthTo201605190001,
+		201605190001: upgradeAuthTo201711080001,
 	},
 	"soma": map[int]func(int, string, bool) int{
-		201605060001: upgrade_soma_to_201605210001,
-		201605210001: upgrade_soma_to_201605240001,
-		201605240001: upgrade_soma_to_201605240002,
-		201605240002: upgrade_soma_to_201605270001,
-		201605270001: upgrade_soma_to_201605310001,
-		201605310001: upgrade_soma_to_201606150001,
-		201606150001: upgrade_soma_to_201606160001,
-		201606160001: upgrade_soma_to_201606210001,
-		201606210001: upgrade_soma_to_201607070001,
-		201607070001: upgrade_soma_to_201609080001,
-		201609080001: upgrade_soma_to_201609120001,
-		201609120001: upgrade_soma_to_201610290001,
-		201610290001: upgrade_soma_to_201611060001,
-		201611060001: upgrade_soma_to_201611100001,
-		201611100001: upgrade_soma_to_201611130001,
+		201605060001: upgradeSomaTo201605210001,
+		201605210001: upgradeSomaTo201605240001,
+		201605240001: upgradeSomaTo201605240002,
+		201605240002: upgradeSomaTo201605270001,
+		201605270001: upgradeSomaTo201605310001,
+		201605310001: upgradeSomaTo201606150001,
+		201606150001: upgradeSomaTo201606160001,
+		201606160001: upgradeSomaTo201606210001,
+		201606210001: upgradeSomaTo201607070001,
+		201607070001: upgradeSomaTo201609080001,
+		201609080001: upgradeSomaTo201609120001,
+		201609120001: upgradeSomaTo201610290001,
+		201610290001: upgradeSomaTo201611060001,
+		201611060001: upgradeSomaTo201611100001,
+		201611100001: upgradeSomaTo201611130001,
 	},
 	"root": map[int]func(int, string, bool) int{
-		000000000001: install_root_201605150001,
-		201605150001: upgrade_root_to_201605160001,
+		000000000001: installRoot201605150001,
+		201605150001: upgradeRootTo201605160001,
 	},
 }
 
@@ -53,7 +53,7 @@ func commandUpgradeSchema(done chan bool, target int, tool string, printOnly boo
 	}
 
 loop:
-	for schema, _ := range UpgradeVersions {
+	for schema := range UpgradeVersions {
 		// fetch current version from database
 		version := getCurrentSchemaVersion(schema)
 
@@ -77,7 +77,7 @@ loop:
 	done <- true
 }
 
-func upgrade_auth_to_201605150002(curr int, tool string, printOnly bool) int {
+func upgradeAuthTo201605150002(curr int, tool string, printOnly bool) int {
 	if curr != 201605060001 {
 		return 0
 	}
@@ -107,7 +107,7 @@ func upgrade_auth_to_201605150002(curr int, tool string, printOnly bool) int {
 	return 201605150002
 }
 
-func upgrade_auth_to_201605190001(curr int, tool string, printOnly bool) int {
+func upgradeAuthTo201605190001(curr int, tool string, printOnly bool) int {
 	if curr != 201605150002 {
 		return 0
 	}
@@ -123,7 +123,7 @@ func upgrade_auth_to_201605190001(curr int, tool string, printOnly bool) int {
 	return 201605190001
 }
 
-func upgrade_auth_to_201711080001(curr int, tool string, printOnly bool) int {
+func upgradeAuthTo201711080001(curr int, tool string, printOnly bool) int {
 	if curr != 201605190001 {
 		return 0
 	}
@@ -142,7 +142,7 @@ func upgrade_auth_to_201711080001(curr int, tool string, printOnly bool) int {
 	return 201711080001
 }
 
-func upgrade_soma_to_201605210001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201605210001(curr int, tool string, printOnly bool) int {
 	if curr != 201605060001 {
 		return 0
 	}
@@ -170,7 +170,7 @@ func upgrade_soma_to_201605210001(curr int, tool string, printOnly bool) int {
 	return 201605210001
 }
 
-func upgrade_soma_to_201605240001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201605240001(curr int, tool string, printOnly bool) int {
 	if curr != 201605210001 {
 		return 0
 	}
@@ -188,7 +188,7 @@ func upgrade_soma_to_201605240001(curr int, tool string, printOnly bool) int {
 	return 201605240001
 }
 
-func upgrade_soma_to_201605240002(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201605240002(curr int, tool string, printOnly bool) int {
 	if curr != 201605240001 {
 		return 0
 	}
@@ -209,7 +209,7 @@ func upgrade_soma_to_201605240002(curr int, tool string, printOnly bool) int {
 	return 201605240002
 }
 
-func upgrade_soma_to_201605270001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201605270001(curr int, tool string, printOnly bool) int {
 	if curr != 201605240002 {
 		return 0
 	}
@@ -236,7 +236,7 @@ func upgrade_soma_to_201605270001(curr int, tool string, printOnly bool) int {
 	return 201605270001
 }
 
-func upgrade_soma_to_201605310001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201605310001(curr int, tool string, printOnly bool) int {
 	if curr != 201605270001 {
 		return 0
 	}
@@ -278,7 +278,7 @@ func upgrade_soma_to_201605310001(curr int, tool string, printOnly bool) int {
 	return 201605310001
 }
 
-func upgrade_soma_to_201606150001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201606150001(curr int, tool string, printOnly bool) int {
 	if curr != 201605310001 {
 		return 0
 	}
@@ -296,7 +296,7 @@ func upgrade_soma_to_201606150001(curr int, tool string, printOnly bool) int {
 	return 201606150001
 }
 
-func upgrade_soma_to_201606160001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201606160001(curr int, tool string, printOnly bool) int {
 	if curr != 201606150001 {
 		return 0
 	}
@@ -316,7 +316,7 @@ func upgrade_soma_to_201606160001(curr int, tool string, printOnly bool) int {
 	return 201606160001
 }
 
-func upgrade_soma_to_201606210001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201606210001(curr int, tool string, printOnly bool) int {
 	if curr != 201606160001 {
 		return 0
 	}
@@ -333,7 +333,7 @@ func upgrade_soma_to_201606210001(curr int, tool string, printOnly bool) int {
 	return 201606210001
 }
 
-func upgrade_soma_to_201607070001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201607070001(curr int, tool string, printOnly bool) int {
 	if curr != 201606210001 {
 		return 0
 	}
@@ -356,7 +356,7 @@ func upgrade_soma_to_201607070001(curr int, tool string, printOnly bool) int {
 	return 201607070001
 }
 
-func upgrade_soma_to_201609080001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201609080001(curr int, tool string, printOnly bool) int {
 	if curr != 201607070001 {
 		return 0
 	}
@@ -379,7 +379,7 @@ func upgrade_soma_to_201609080001(curr int, tool string, printOnly bool) int {
 	return 201609080001
 }
 
-func upgrade_soma_to_201609120001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201609120001(curr int, tool string, printOnly bool) int {
 	if curr != 201609080001 {
 		return 0
 	}
@@ -396,7 +396,7 @@ func upgrade_soma_to_201609120001(curr int, tool string, printOnly bool) int {
 	return 201609120001
 }
 
-func upgrade_soma_to_201610290001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201610290001(curr int, tool string, printOnly bool) int {
 	if curr != 201609120001 {
 		return 0
 	}
@@ -416,7 +416,7 @@ func upgrade_soma_to_201610290001(curr int, tool string, printOnly bool) int {
 	return 201610290001
 }
 
-func upgrade_soma_to_201611060001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201611060001(curr int, tool string, printOnly bool) int {
 	if curr != 201610290001 {
 		return 0
 	}
@@ -429,7 +429,7 @@ func upgrade_soma_to_201611060001(curr int, tool string, printOnly bool) int {
 	return 201611060001
 }
 
-func upgrade_soma_to_201611100001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201611100001(curr int, tool string, printOnly bool) int {
 	if curr != 201611060001 {
 		return 0
 	}
@@ -477,7 +477,7 @@ func upgrade_soma_to_201611100001(curr int, tool string, printOnly bool) int {
 	return 201611100001
 }
 
-func upgrade_soma_to_201611130001(curr int, tool string, printOnly bool) int {
+func upgradeSomaTo201611130001(curr int, tool string, printOnly bool) int {
 	if curr != 201611100001 {
 		return 0
 	}
@@ -523,7 +523,7 @@ func upgrade_soma_to_201611130001(curr int, tool string, printOnly bool) int {
 	return 201611130001
 }
 
-func install_root_201605150001(curr int, tool string, printOnly bool) int {
+func installRoot201605150001(curr int, tool string, printOnly bool) int {
 	if curr != 000000000001 {
 		return 0
 	}
@@ -545,7 +545,7 @@ func install_root_201605150001(curr int, tool string, printOnly bool) int {
 	return 201605150001
 }
 
-func upgrade_root_to_201605160001(curr int, tool string, printOnly bool) int {
+func upgradeRootTo201605160001(curr int, tool string, printOnly bool) int {
 	if curr != 201605150001 {
 		return 0
 	}

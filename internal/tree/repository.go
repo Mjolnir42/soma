@@ -19,7 +19,7 @@ import (
 )
 
 type Repository struct {
-	Id              uuid.UUID
+	ID              uuid.UUID
 	Name            string
 	Team            uuid.UUID
 	Deleted         bool
@@ -41,7 +41,7 @@ type Repository struct {
 }
 
 type RepositorySpec struct {
-	Id      string
+	ID      string
 	Name    string
 	Team    string
 	Deleted bool
@@ -57,7 +57,7 @@ func NewRepository(spec RepositorySpec) *Repository {
 	}
 
 	ter := new(Repository)
-	ter.Id, _ = uuid.FromString(spec.Id)
+	ter.ID, _ = uuid.FromString(spec.ID)
 	ter.Name = spec.Name
 	ter.Team, _ = uuid.FromString(spec.Team)
 	ter.Type = "repository"
@@ -95,8 +95,8 @@ func (ter Repository) Clone() Repository {
 		ordNumChildBck: ter.ordNumChildBck,
 		log:            ter.log,
 	}
-	cl.Id, _ = uuid.FromString(ter.Id.String())
-	cl.Team, _ = uuid.FromString(ter.Id.String())
+	cl.ID, _ = uuid.FromString(ter.ID.String())
+	cl.Team, _ = uuid.FromString(ter.ID.String())
 	f := make(map[string]RepositoryAttacher)
 	for k, child := range ter.Children {
 		f[k] = child.CloneRepository()
@@ -145,7 +145,7 @@ func (ter Repository) Clone() Repository {
 //
 // Interface: Builder
 func (ter *Repository) GetID() string {
-	return ter.Id.String()
+	return ter.ID.String()
 }
 
 func (ter *Repository) GetName() string {
@@ -174,20 +174,20 @@ func (ter *Repository) setAction(c chan *Action) {
 func (ter *Repository) setActionDeep(c chan *Action) {
 	ter.setAction(c)
 	ter.Fault.setActionDeep(c)
-	for ch, _ := range ter.Children {
+	for ch := range ter.Children {
 		ter.Children[ch].setActionDeep(c)
 	}
 }
 
-func (r *Repository) setLog(newlog *log.Logger) {
-	r.log = newlog
+func (ter *Repository) setLog(newlog *log.Logger) {
+	ter.log = newlog
 }
 
-func (r *Repository) setLoggerDeep(newlog *log.Logger) {
-	r.setLog(newlog)
-	r.Fault.setLog(newlog)
-	for ch, _ := range r.Children {
-		r.Children[ch].setLoggerDeep(newlog)
+func (ter *Repository) setLoggerDeep(newlog *log.Logger) {
+	ter.setLog(newlog)
+	ter.Fault.setLog(newlog)
+	for ch := range ter.Children {
+		ter.Children[ch].setLoggerDeep(newlog)
 	}
 }
 
@@ -211,7 +211,7 @@ func (ter *Repository) setRepositoryParent(p RepositoryReceiver) {
 func (ter *Repository) updateParentRecursive(p Receiver) {
 	ter.setParent(p.(RepositoryReceiver))
 	var wg sync.WaitGroup
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		wg.Add(1)
 		c := child
 		go func(str Receiver) {
@@ -234,7 +234,7 @@ func (ter *Repository) setFault(f *Fault) {
 func (ter *Repository) updateFaultRecursive(f *Fault) {
 	ter.setFault(f)
 	var wg sync.WaitGroup
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		wg.Add(1)
 		c := child
 		go func(ptr *Fault) {
@@ -246,14 +246,14 @@ func (ter *Repository) updateFaultRecursive(f *Fault) {
 }
 
 func (ter *Repository) ComputeCheckInstances() {
-	ter.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s",
+	ter.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s",
 		ter.Name,
 		`ComputeCheckInstances`,
 		`repository`,
-		ter.Id.String(),
+		ter.ID.String(),
 	)
 	/*	var wg sync.WaitGroup
-		for child, _ := range ter.Children {
+		for child := range ter.Children {
 			wg.Add(1)
 			c := child
 			go func() {
@@ -271,7 +271,7 @@ func (ter *Repository) ComputeCheckInstances() {
 
 func (ter *Repository) ClearLoadInfo() {
 	var wg sync.WaitGroup
-	for child, _ := range ter.Children {
+	for child := range ter.Children {
 		wg.Add(1)
 		c := child
 		go func() {
@@ -284,9 +284,9 @@ func (ter *Repository) ClearLoadInfo() {
 
 func (ter *Repository) export() proto.Repository {
 	return proto.Repository{
-		Id:        ter.Id.String(),
+		ID:        ter.ID.String(),
 		Name:      ter.Name,
-		TeamId:    ter.Team.String(),
+		TeamID:    ter.Team.String(),
 		IsDeleted: ter.Deleted,
 		IsActive:  ter.Active,
 	}
@@ -334,7 +334,7 @@ func (ter *Repository) actionPropertyDelete(a Action) {
 func (ter *Repository) actionProperty(a Action) {
 	a.Type = ter.Type
 	a.Repository = ter.export()
-	a.Property.RepositoryID = ter.Id.String()
+	a.Property.RepositoryID = ter.ID.String()
 	a.Property.BucketID = ``
 
 	switch a.Property.Type {
@@ -351,8 +351,8 @@ func (ter *Repository) actionCheckNew(a Action) {
 	a.Action = "check_new"
 	a.Type = ter.Type
 	a.Repository = ter.export()
-	a.Check.RepositoryId = ter.Id.String()
-	a.Check.BucketId = ""
+	a.Check.RepositoryID = ter.ID.String()
+	a.Check.BucketID = ""
 
 	ter.Action <- &a
 }
@@ -361,8 +361,8 @@ func (ter *Repository) actionCheckRemoved(a Action) {
 	a.Action = `check_removed`
 	a.Type = ter.Type
 	a.Repository = ter.export()
-	a.Check.RepositoryId = ter.Id.String()
-	a.Check.BucketId = ""
+	a.Check.RepositoryID = ter.ID.String()
+	a.Check.BucketID = ""
 
 	ter.Action <- &a
 }

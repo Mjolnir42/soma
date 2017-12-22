@@ -10,11 +10,11 @@
 package proto
 
 type Group struct {
-	Id             string      `json:"id,omitempty"`
+	ID             string      `json:"id,omitempty"`
 	Name           string      `json:"name,omitempty"`
-	BucketId       string      `json:"bucketId,omitempty"`
+	BucketID       string      `json:"bucketId,omitempty"`
 	ObjectState    string      `json:"objectState,omitempty"`
-	TeamId         string      `json:"teamId,omitempty"`
+	TeamID         string      `json:"teamId,omitempty"`
 	MemberGroups   *[]Group    `json:"memberGroups,omitempty"`
 	MemberClusters *[]Cluster  `json:"memberClusters,omitempty"`
 	MemberNodes    *[]Node     `json:"memberNodes,omitempty"`
@@ -24,7 +24,7 @@ type Group struct {
 
 type GroupFilter struct {
 	Name     string `json:"name,omitempty"`
-	BucketId string `json:"bucketId,omitempty"`
+	BucketID string `json:"bucketId,omitempty"`
 }
 
 //
@@ -32,8 +32,8 @@ func (p *Group) DeepCompare(a *Group) bool {
 	if a == nil {
 		return false
 	}
-	if p.Id != a.Id || p.Name != a.Name || p.BucketId != a.BucketId ||
-		p.ObjectState != a.ObjectState || p.TeamId != a.TeamId {
+	if p.ID != a.ID || p.Name != a.Name || p.BucketID != a.BucketID ||
+		p.ObjectState != a.ObjectState || p.TeamID != a.TeamID {
 		return false
 	}
 	return true

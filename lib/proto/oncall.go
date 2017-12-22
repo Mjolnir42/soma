@@ -10,7 +10,7 @@
 package proto
 
 type Oncall struct {
-	Id      string          `json:"id,omitempty"`
+	ID      string          `json:"id,omitempty"`
 	Name    string          `json:"name,omitempty"`
 	Number  string          `json:"number,omitempty"`
 	Members *[]OncallMember `json:"members,omitempty"`
@@ -23,7 +23,7 @@ type OncallDetails struct {
 
 type OncallMember struct {
 	UserName string `json:"userName,omitempty"`
-	UserId   string `json:"userId,omitempty"`
+	UserID   string `json:"userId,omitempty"`
 }
 
 type OncallFilter struct {
@@ -32,7 +32,7 @@ type OncallFilter struct {
 }
 
 func (p *Oncall) DeepCompare(a *Oncall) bool {
-	if p.Id != a.Id || p.Name != a.Name || p.Number != a.Number {
+	if p.ID != a.ID || p.Name != a.Name || p.Number != a.Number {
 		return false
 	}
 	return true

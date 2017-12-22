@@ -58,7 +58,7 @@ func deleteItem(itemID string) error {
 		err      error
 	)
 
-	if err = Eye.run.get_lookup.QueryRow(itemID).Scan(&lookupID); err == sql.ErrNoRows {
+	if err = Eye.run.getLookup.QueryRow(itemID).Scan(&lookupID); err == sql.ErrNoRows {
 		// not being able to delete what we do not have is ok
 		return nil
 	} else if err != nil {
@@ -66,18 +66,18 @@ func deleteItem(itemID string) error {
 		return err
 	}
 
-	if _, err = Eye.run.delete_item.Exec(itemID); err != nil {
+	if _, err = Eye.run.deleteItem.Exec(itemID); err != nil {
 		return err
 	}
 
-	if err = Eye.run.item_count.QueryRow(lookupID).Scan(&count); err != nil {
+	if err = Eye.run.itemCount.QueryRow(lookupID).Scan(&count); err != nil {
 		return err
 	}
 
 	if count != 0 {
 		return nil
 	}
-	_, err = Eye.run.delete_lookup.Exec(lookupID)
+	_, err = Eye.run.deleteLookup.Exec(lookupID)
 	return err
 }
 

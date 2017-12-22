@@ -117,9 +117,9 @@ func (w *UserWrite) add(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.User.Id = uuid.NewV4().String()
+	q.User.ID = uuid.NewV4().String()
 	if res, err = w.stmtAdd.Exec(
-		q.User.Id,
+		q.User.ID,
 		q.User.UserName,
 		q.User.FirstName,
 		q.User.LastName,
@@ -128,7 +128,7 @@ func (w *UserWrite) add(q *msg.Request, mr *msg.Result) {
 		false,
 		q.User.IsSystem,
 		false,
-		q.User.TeamId,
+		q.User.TeamID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -152,8 +152,8 @@ func (w *UserWrite) update(q *msg.Request, mr *msg.Result) {
 		q.User.EmployeeNumber,
 		q.User.MailAddress,
 		q.User.IsDeleted,
-		q.User.TeamId,
-		q.User.Id,
+		q.User.TeamID,
+		q.User.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -171,7 +171,7 @@ func (w *UserWrite) remove(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRemove.Exec(
-		q.User.Id,
+		q.User.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -189,7 +189,7 @@ func (w *UserWrite) purge(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtPurge.Exec(
-		q.User.Id,
+		q.User.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

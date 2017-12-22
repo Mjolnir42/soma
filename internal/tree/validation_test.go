@@ -17,8 +17,8 @@ import (
 
 func TestInvalidRepoSpec(t *testing.T) {
 
-	repoId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
 	repoName := `repoTest`
 
 	spec := RepositorySpec{
@@ -30,7 +30,7 @@ func TestInvalidRepoSpec(t *testing.T) {
 	if specRepoCheck(spec) {
 		t.Errorf(`Empty repositoryID did not error`)
 	}
-	spec.Id = repoId
+	spec.ID = repoID
 
 	if specRepoCheck(spec) {
 		t.Errorf(`Empty repository name did not error`)
@@ -38,9 +38,9 @@ func TestInvalidRepoSpec(t *testing.T) {
 	spec.Name = repoName
 
 	if specRepoCheck(spec) {
-		t.Errorf(`Empty teamId did not error`)
+		t.Errorf(`Empty teamID did not error`)
 	}
-	spec.Team = teamId
+	spec.Team = teamID
 
 	for i := 1; i < 4; i++ {
 		spec.Name = strings.Repeat(`x`, i)
@@ -55,17 +55,17 @@ func TestInvalidRepoSpec(t *testing.T) {
 	}
 
 	spec.Name = repoName
-	spec.Id = `invalid`
+	spec.ID = `invalid`
 	if specRepoCheck(spec) {
 		t.Error(`Invalid repositoryID uuid did not error`)
 	}
-	spec.Id = repoId
+	spec.ID = repoID
 
 	spec.Team = `invalid`
 	if specRepoCheck(spec) {
 		t.Error(`Invalid teamID uuid did not error`)
 	}
-	spec.Team = teamId
+	spec.Team = teamID
 
 	for i := 4; i < 129; i++ {
 		spec.Name = strings.Repeat(`x`, i)
@@ -76,9 +76,9 @@ func TestInvalidRepoSpec(t *testing.T) {
 }
 
 func TestInvalidBucketSpec(t *testing.T) {
-	buckId := uuid.NewV4().String()
-	teamId := uuid.NewV4().String()
-	repoId := uuid.NewV4().String()
+	buckID := uuid.NewV4().String()
+	teamID := uuid.NewV4().String()
+	repoID := uuid.NewV4().String()
 	bucketName := `bucketTest`
 	bucketEnv := `envTest`
 
@@ -93,7 +93,7 @@ func TestInvalidBucketSpec(t *testing.T) {
 	if specBucketCheck(spec) {
 		t.Errorf(`Empty bucketID did not error`)
 	}
-	spec.Id = buckId
+	spec.ID = buckID
 
 	if specBucketCheck(spec) {
 		t.Errorf(`Empty bucketName did not error`)
@@ -108,12 +108,12 @@ func TestInvalidBucketSpec(t *testing.T) {
 	if specBucketCheck(spec) {
 		t.Errorf(`Empty teamID did not error`)
 	}
-	spec.Team = teamId
+	spec.Team = teamID
 
 	if specBucketCheck(spec) {
 		t.Errorf(`Empty repositoryID did not error`)
 	}
-	spec.Repository = repoId
+	spec.Repository = repoID
 
 	for i := 1; i < 4; i++ {
 		spec.Name = strings.Repeat(`x`, i)
@@ -128,23 +128,23 @@ func TestInvalidBucketSpec(t *testing.T) {
 	}
 	spec.Name = bucketName
 
-	spec.Id = `invalid`
+	spec.ID = `invalid`
 	if specBucketCheck(spec) {
 		t.Errorf(`Invalid bucketId uuid did not error`)
 	}
-	spec.Id = buckId
+	spec.ID = buckID
 
 	spec.Team = `invalid`
 	if specBucketCheck(spec) {
-		t.Errorf(`Invalid teamId uuid did not error`)
+		t.Errorf(`Invalid teamID uuid did not error`)
 	}
-	spec.Team = teamId
+	spec.Team = teamID
 
 	spec.Repository = `invalid`
 	if specBucketCheck(spec) {
 		t.Errorf(`Invalid repositoryId uuid did not error`)
 	}
-	spec.Repository = repoId
+	spec.Repository = repoID
 
 	for i := 4; i < 513; i++ {
 		spec.Name = strings.Repeat(`x`, i)

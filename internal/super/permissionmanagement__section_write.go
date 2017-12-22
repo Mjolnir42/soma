@@ -45,9 +45,9 @@ func (s *Supervisor) sectionAdd(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.SectionObj.Id = uuid.NewV4().String()
+	q.SectionObj.ID = uuid.NewV4().String()
 	if res, err = s.stmtSectionAdd.Exec(
-		q.SectionObj.Id,
+		q.SectionObj.ID,
 		q.SectionObj.Name,
 		q.SectionObj.Category,
 		q.AuthUser,
@@ -98,7 +98,7 @@ func (s *Supervisor) sectionRemove(q *msg.Request, mr *msg.Result) {
 		}
 	}
 
-	if res, err = s.sectionRemoveTx(q.SectionObj.Id,
+	if res, err = s.sectionRemoveTx(q.SectionObj.ID,
 		txMap); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
@@ -123,7 +123,7 @@ func (s *Supervisor) sectionRemove(q *msg.Request, mr *msg.Result) {
 	mr.ActionObj = append(mr.ActionObj, q.ActionObj)
 	mr.Super.Audit.WithField(`Code`, mr.Code).
 		Infoln(fmt.Sprintf(
-			"Successfully removed section %s", q.SectionObj.Id))
+			"Successfully removed section %s", q.SectionObj.ID))
 	return
 }
 

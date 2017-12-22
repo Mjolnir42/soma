@@ -182,12 +182,12 @@ func (m *permissionMapping) unmapAction(sectionID, actionID,
 func (m *permissionMapping) addPermission(permissionID, permissionName,
 	category string) {
 	m.byID[permissionID] = proto.Permission{
-		Id:       permissionID,
+		ID:       permissionID,
 		Name:     permissionName,
 		Category: category,
 	}
 	m.byCategory[category] = append(m.byCategory[category], proto.Permission{
-		Id:       permissionID,
+		ID:       permissionID,
 		Name:     permissionName,
 		Category: category,
 	})
@@ -228,7 +228,7 @@ func (m *permissionMapping) removePermission(permissionID string) {
 	cat := m.byID[permissionID]
 	delete(m.byID, permissionID)
 	for i, p := range m.byCategory[cat.Category] {
-		if p.Id != permissionID {
+		if p.ID != permissionID {
 			continue
 		}
 		m.byCategory[cat.Category] = append(
@@ -338,7 +338,7 @@ func (m *permissionMapping) getIDByName(category,
 	permissionName string) string {
 	for _, perm := range m.byCategory[category] {
 		if perm.Name == permissionName {
-			return perm.Id
+			return perm.ID
 		}
 	}
 	return ``

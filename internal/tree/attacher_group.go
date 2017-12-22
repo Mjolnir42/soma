@@ -25,8 +25,8 @@ func (teg *Group) Attach(a AttachRequest) {
 		panic(`Group.Attach`)
 	}
 
-	teg.Parent.(Propertier).syncProperty(teg.Id.String())
-	teg.Parent.(Checker).syncCheck(teg.Id.String())
+	teg.Parent.(Propertier).syncProperty(teg.ID.String())
+	teg.Parent.(Checker).syncCheck(teg.ID.String())
 }
 
 func (teg *Group) ReAttach(a AttachRequest) {
@@ -39,16 +39,16 @@ func (teg *Group) ReAttach(a AttachRequest) {
 	teg.Parent.Unlink(UnlinkRequest{
 		ParentType: teg.Parent.(Builder).GetType(),
 		ParentName: teg.Parent.(Builder).GetName(),
-		ParentId:   teg.Parent.(Builder).GetID(),
+		ParentID:   teg.Parent.(Builder).GetID(),
 		ChildType:  teg.GetType(),
 		ChildName:  teg.GetName(),
-		ChildId:    teg.GetID(),
+		ChildID:    teg.GetID(),
 	},
 	)
 
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  teg.GetType(),
 		Group:      teg,
@@ -59,8 +59,8 @@ func (teg *Group) ReAttach(a AttachRequest) {
 		panic(`Group.ReAttach: not reattached`)
 	}
 	teg.actionUpdate()
-	teg.Parent.(Propertier).syncProperty(teg.Id.String())
-	teg.Parent.(Checker).syncCheck(teg.Id.String())
+	teg.Parent.(Propertier).syncProperty(teg.ID.String())
+	teg.Parent.(Checker).syncCheck(teg.ID.String())
 }
 
 func (teg *Group) Destroy() {
@@ -76,7 +76,7 @@ func (teg *Group) Destroy() {
 	// TODO delete all inherited checks + check instances
 
 	wg := new(sync.WaitGroup)
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		go func(c string) {
 			defer wg.Done()
@@ -87,11 +87,11 @@ func (teg *Group) Destroy() {
 
 	teg.Parent.Unlink(UnlinkRequest{
 		ParentType: teg.Parent.(Builder).GetType(),
-		ParentId:   teg.Parent.(Builder).GetID(),
+		ParentID:   teg.Parent.(Builder).GetID(),
 		ParentName: teg.Parent.(Builder).GetName(),
 		ChildType:  teg.GetType(),
 		ChildName:  teg.GetName(),
-		ChildId:    teg.GetID(),
+		ChildID:    teg.GetID(),
 	},
 	)
 
@@ -110,17 +110,17 @@ func (teg *Group) Detach() {
 
 	teg.Parent.Unlink(UnlinkRequest{
 		ParentType: teg.Parent.(Builder).GetType(),
-		ParentId:   teg.Parent.(Builder).GetID(),
+		ParentID:   teg.Parent.(Builder).GetID(),
 		ParentName: teg.Parent.(Builder).GetName(),
 		ChildType:  teg.GetType(),
 		ChildName:  teg.GetName(),
-		ChildId:    teg.GetID(),
+		ChildID:    teg.GetID(),
 	},
 	)
 
 	bucket.Receive(ReceiveRequest{
 		ParentType: bucket.(Builder).GetType(),
-		ParentId:   bucket.(Builder).GetID(),
+		ParentID:   bucket.(Builder).GetID(),
 		ParentName: bucket.(Builder).GetName(),
 		ChildType:  teg.Type,
 		Group:      teg,
@@ -128,7 +128,7 @@ func (teg *Group) Detach() {
 	)
 
 	teg.actionUpdate()
-	teg.Parent.(Propertier).syncProperty(teg.Id.String())
+	teg.Parent.(Propertier).syncProperty(teg.ID.String())
 }
 
 //
@@ -136,7 +136,7 @@ func (teg *Group) Detach() {
 func (teg *Group) attachToBucket(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  teg.Type,
 		Group:      teg,
@@ -154,7 +154,7 @@ func (teg *Group) attachToBucket(a AttachRequest) {
 func (teg *Group) attachToGroup(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{
 		ParentType: a.ParentType,
-		ParentId:   a.ParentId,
+		ParentID:   a.ParentID,
 		ParentName: a.ParentName,
 		ChildType:  teg.Type,
 		Group:      teg,

@@ -40,7 +40,7 @@ func InstanceShow(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Instance: proto.Instance{
-			Id: params.ByName(`instance`),
+			ID: params.ByName(`instance`),
 		},
 	}
 	result := <-returnChannel
@@ -72,7 +72,7 @@ func InstanceVersions(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Instance: proto.Instance{
-			Id: params.ByName(`instance`),
+			ID: params.ByName(`instance`),
 		},
 	}
 	result := <-returnChannel
@@ -125,7 +125,7 @@ func InstanceList(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Instance: proto.Instance{
-			ObjectId:   params.ByName(listT),
+			ObjectID:   params.ByName(listT),
 			ObjectType: listT,
 		},
 	}

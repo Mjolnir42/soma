@@ -39,7 +39,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-func CalculateLookupId(id uint64, metric string) string {
+func CalculateLookupID(id uint64, metric string) string {
 	asset := strconv.FormatUint(id, 10)
 	hash := sha256.New()
 	hash.Write([]byte(asset))
@@ -50,22 +50,22 @@ func CalculateLookupId(id uint64, metric string) string {
 
 func Itemize(details *proto.Deployment) (string, *ConfigurationItem, error) {
 	var (
-		fqdn, dns_zone string
-		err            error
+		fqdn, dnsZone string
+		err           error
 	)
-	lookupID := CalculateLookupId(details.Node.AssetID, details.Metric.Path)
+	lookupID := CalculateLookupID(details.Node.AssetID, details.Metric.Path)
 
 	item := &ConfigurationItem{
 		Metric:   details.Metric.Path,
 		Interval: details.CheckConfig.Interval,
-		HostId:   strconv.FormatUint(details.Node.AssetID, 10),
+		HostID:   strconv.FormatUint(details.Node.AssetID, 10),
 		Metadata: ConfigurationMetaData{
 			Monitoring: details.Monitoring.Name,
 			Team:       details.Team.Name,
 		},
 		Thresholds: []ConfigurationThreshold{},
 	}
-	if item.ConfigurationItemId, err = uuid.FromString(details.CheckInstance.InstanceId); err != nil {
+	if item.ConfigurationItemID, err = uuid.FromString(details.CheckInstance.InstanceID); err != nil {
 		return "", nil, err
 	}
 
@@ -83,11 +83,11 @@ func Itemize(details *proto.Deployment) (string, *ConfigurationItem, error) {
 		}
 		item.Metric = fmt.Sprintf("%s:%s", item.Metric, mpt)
 		// recalculate lookupID
-		lookupID = CalculateLookupId(details.Node.AssetID, item.Metric)
+		lookupID = CalculateLookupID(details.Node.AssetID, item.Metric)
 	}
 
 	// set oncall duty if available
-	if details.Oncall != nil && details.Oncall.Id != "" {
+	if details.Oncall != nil && details.Oncall.ID != "" {
 		item.Oncall = fmt.Sprintf("%s (%s)", details.Oncall.Name, details.Oncall.Number)
 	}
 
@@ -98,15 +98,15 @@ func Itemize(details *proto.Deployment) (string, *ConfigurationItem, error) {
 			case "fqdn":
 				fqdn = prop.Value
 			case "dns_zone":
-				dns_zone = prop.Value
+				dnsZone = prop.Value
 			}
 		}
 	}
 	switch {
 	case len(fqdn) > 0:
 		item.Metadata.Targethost = fqdn
-	case len(dns_zone) > 0:
-		item.Metadata.Targethost = fmt.Sprintf("%s.%s", details.Node.Name, dns_zone)
+	case len(dnsZone) > 0:
+		item.Metadata.Targethost = fmt.Sprintf("%s.%s", details.Node.Name, dnsZone)
 	default:
 		item.Metadata.Targethost = details.Node.Name
 	}
@@ -158,7 +158,7 @@ func abortOnError(err error) {
 }
 
 // 200
-func dispatchJsonOK(w *http.ResponseWriter, jsonb *[]byte) {
+func dispatchJSONOK(w *http.ResponseWriter, jsonb *[]byte) {
 	(*w).Header().Set("Content-Type", "application/json")
 	(*w).WriteHeader(http.StatusOK)
 	(*w).Write(*jsonb)

@@ -67,8 +67,8 @@ func (c *Cluster) DeepCompare(a *Cluster) bool {
 
 	if c.Members != nil && a.Members != nil {
 	member:
-		for i, _ := range *c.Members {
-			for j, _ := range *a.Members {
+		for i := range *c.Members {
+			for j := range *a.Members {
 				if (*c.Members)[i].ID == (*a.Members)[j].ID {
 					continue member
 				}

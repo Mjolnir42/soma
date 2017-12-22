@@ -44,7 +44,7 @@ func (f *ForestCustodian) stop(q *msg.Request, mr *msg.Result) {
 
 	// look up name of the repository
 	if err = f.stmtRepoName.QueryRow(
-		q.System.RepositoryId,
+		q.System.RepositoryID,
 	).Scan(
 		&repoName,
 		&teamID,
@@ -77,9 +77,9 @@ func (f *ForestCustodian) stop(q *msg.Request, mr *msg.Result) {
 
 	// store for later in rebuild/restart handlers
 	q.Repository = proto.Repository{
-		Id:        q.System.RepositoryId,
+		ID:        q.System.RepositoryID,
 		Name:      repoName,
-		TeamId:    teamID,
+		TeamID:    teamID,
 		IsDeleted: false,
 		IsActive:  true,
 	}
@@ -130,7 +130,7 @@ func (f *ForestCustodian) rebuild(q *msg.Request, mr *msg.Result) {
 	// mark all existing check instances as deleted - instances
 	// are deleted for both rebuild levels checks and instances
 	if _, err = f.stmtRebuildInstance.Exec(
-		q.System.RepositoryId,
+		q.System.RepositoryID,
 	); err != nil {
 		mr.ServerError(err)
 		return
@@ -139,7 +139,7 @@ func (f *ForestCustodian) rebuild(q *msg.Request, mr *msg.Result) {
 	// only delete checks for rebuild level checks
 	if q.System.RebuildLevel == `checks` {
 		if _, err = f.stmtRebuildCheck.Exec(
-			q.System.RepositoryId,
+			q.System.RepositoryID,
 		); err != nil {
 			mr.ServerError(err)
 			return

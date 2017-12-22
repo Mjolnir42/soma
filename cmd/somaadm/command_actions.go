@@ -44,7 +44,7 @@ func registerAction(app cli.App) *cli.App {
 						Usage:        `List permission actions in a section`,
 						Description:  help.Text(`ActionsList`),
 						Action:       runtime(cmdActionList),
-						BashComplete: cmpl.Direct_In,
+						BashComplete: cmpl.DirectIn,
 					},
 					{
 						Name:         `show`,
@@ -63,7 +63,7 @@ func registerAction(app cli.App) *cli.App {
 func cmdActionAdd(c *cli.Context) error {
 	var (
 		err       error
-		sectionId string
+		sectionID string
 	)
 	unique := []string{`to`}
 	required := []string{`to`}
@@ -81,7 +81,7 @@ func cmdActionAdd(c *cli.Context) error {
 		return err
 	}
 
-	if sectionId, err = adm.LookupSectionId(
+	if sectionID, err = adm.LookupSectionID(
 		opts[`to`][0],
 	); err != nil {
 		return err
@@ -89,15 +89,15 @@ func cmdActionAdd(c *cli.Context) error {
 
 	req := proto.NewActionRequest()
 	req.Action.Name = c.Args().First()
-	req.Action.SectionID = sectionId
-	path := fmt.Sprintf("/sections/%s/actions/", sectionId)
+	req.Action.SectionID = sectionID
+	path := fmt.Sprintf("/sections/%s/actions/", sectionID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
 func cmdActionRemove(c *cli.Context) error {
 	var (
 		err                 error
-		sectionId, actionId string
+		sectionID, actionID string
 	)
 	unique := []string{`from`}
 	required := []string{`from`}
@@ -111,26 +111,26 @@ func cmdActionRemove(c *cli.Context) error {
 	); err != nil {
 		return err
 	}
-	if sectionId, err = adm.LookupSectionId(
+	if sectionID, err = adm.LookupSectionID(
 		opts[`from`][0],
 	); err != nil {
 		return err
 	}
-	if actionId, err = adm.LookupActionId(
+	if actionID, err = adm.LookupActionID(
 		c.Args().First(),
-		sectionId,
+		sectionID,
 	); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s/actions/%s", sectionId, actionId)
+	path := fmt.Sprintf("/sections/%s/actions/%s", sectionID, actionID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
 func cmdActionList(c *cli.Context) error {
 	var (
 		err       error
-		sectionId string
+		sectionID string
 	)
 	unique := []string{`in`}
 	required := []string{`in`}
@@ -144,20 +144,20 @@ func cmdActionList(c *cli.Context) error {
 	); err != nil {
 		return err
 	}
-	if sectionId, err = adm.LookupSectionId(
+	if sectionID, err = adm.LookupSectionID(
 		opts[`in`][0],
 	); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s/actions/", sectionId)
+	path := fmt.Sprintf("/sections/%s/actions/", sectionID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
 func cmdActionShow(c *cli.Context) error {
 	var (
 		err                 error
-		sectionId, actionId string
+		sectionID, actionID string
 	)
 	unique := []string{`in`}
 	required := []string{`in`}
@@ -171,19 +171,19 @@ func cmdActionShow(c *cli.Context) error {
 	); err != nil {
 		return err
 	}
-	if sectionId, err = adm.LookupSectionId(
+	if sectionID, err = adm.LookupSectionID(
 		opts[`in`][0],
 	); err != nil {
 		return err
 	}
-	if actionId, err = adm.LookupActionId(
+	if actionID, err = adm.LookupActionID(
 		c.Args().First(),
-		sectionId,
+		sectionID,
 	); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s/actions/%s", sectionId, actionId)
+	path := fmt.Sprintf("/sections/%s/actions/%s", sectionID, actionID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

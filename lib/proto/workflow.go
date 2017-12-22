@@ -10,8 +10,8 @@
 package proto
 
 type Workflow struct {
-	InstanceId       string           `json:"instanceId,omitempty"`
-	InstanceConfigId string           `json:"instanceConfigId,omitempty"`
+	InstanceID       string           `json:"instanceId,omitempty"`
+	InstanceConfigID string           `json:"instanceConfigID,omitempty"`
 	Status           string           `json:"status,omitempty"`
 	NextStatus       string           `json:"nextStatus,omitempty"`
 	Summary          *WorkflowSummary `json:"summary,omitempty"`

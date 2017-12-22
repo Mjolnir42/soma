@@ -125,7 +125,7 @@ func (r *RepositoryRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Repository = append(mr.Repository, proto.Repository{
-			Id:   repoID,
+			ID:   repoID,
 			Name: repoName,
 		})
 	}
@@ -145,7 +145,7 @@ func (r *RepositoryRead) show(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = r.stmtShow.QueryRow(
-		q.Repository.Id,
+		q.Repository.ID,
 	).Scan(
 		&repoID,
 		&repoName,
@@ -159,9 +159,9 @@ func (r *RepositoryRead) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	repo := proto.Repository{
-		Id:        repoID,
+		ID:        repoID,
 		Name:      repoName,
-		TeamId:    teamID,
+		TeamID:    teamID,
 		IsDeleted: false,
 		IsActive:  isActive,
 	}

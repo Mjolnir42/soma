@@ -157,7 +157,7 @@ func (s *Supervisor) categoryRemove(q *msg.Request, mr *msg.Result) {
 		`category_tx_permlist`:    stmt.CategoryListPermissions,
 		`grant_tx_rm_system`:      stmt.GrantRemoveSystem,
 		`permission_rm_tx_byname`: stmt.PermissionRemoveByName,
-		`permission_rm_tx_lookup`: stmt.PermissionLookupGrantId,
+		`permission_rm_tx_lookup`: stmt.PermissionLookupGrantID,
 		`permission_rm_tx_remove`: stmt.PermissionRemove,
 		`permission_rm_tx_rev_gl`: stmt.PermissionRevokeGlobal,
 		`permission_rm_tx_rev_mn`: stmt.PermissionRevokeMonitoring,
@@ -260,7 +260,7 @@ func (s *Supervisor) categoryRemoveTx(q *msg.Request,
 		}
 		if res, err = s.permissionRemoveTx(&msg.Request{
 			Permission: proto.Permission{
-				Id:       permissionID,
+				ID:       permissionID,
 				Category: q.Category.Name,
 			}}, txMap); err != nil {
 			rows.Close()

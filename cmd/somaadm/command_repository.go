@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerRepository(app cli.App) *cli.App {
@@ -164,7 +164,7 @@ func cmdRepositoryCreate(c *cli.Context) error {
 		return err
 	}
 
-	teamId, err := adm.LookupTeamId(opts[`team`][0])
+	teamID, err := adm.LookupTeamID(opts[`team`][0])
 	if err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func cmdRepositoryCreate(c *cli.Context) error {
 	var req proto.Request
 	req.Repository = &proto.Repository{}
 	req.Repository.Name = c.Args().Get(0)
-	req.Repository.TeamId = teamId
+	req.Repository.TeamID = teamID
 
 	if err := adm.ValidateRuneCountRange(req.Repository.Name,
 		4, 128); err != nil {
@@ -186,7 +186,7 @@ func cmdRepositoryDelete(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -199,7 +199,7 @@ func cmdRepositoryRestore(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func cmdRepositoryPurge(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -237,7 +237,7 @@ func cmdRepositoryClear(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -262,7 +262,7 @@ func cmdRepositoryRename(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -285,11 +285,11 @@ func cmdRepositoryRepossess(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
-	teamId, err := adm.LookupTeamId(opts[`team`][0])
+	teamID, err := adm.LookupTeamID(opts[`team`][0])
 	if err != nil {
 		return err
 	}
@@ -297,7 +297,7 @@ func cmdRepositoryRepossess(c *cli.Context) error {
 
 	var req proto.Request
 	req.Repository = &proto.Repository{}
-	req.Repository.TeamId = teamId
+	req.Repository.TeamID = teamID
 
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
@@ -306,7 +306,7 @@ func cmdRepositoryActivate(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -333,7 +333,7 @@ func cmdRepositoryShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -346,7 +346,7 @@ func cmdRepositoryInstance(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -359,7 +359,7 @@ func cmdRepositoryTree(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupRepoId(c.Args().First())
+	id, err := adm.LookupRepoID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -417,7 +417,7 @@ func cmdRepositoryPropertyDelete(c *cli.Context, pType string) error {
 	); err != nil {
 		return err
 	}
-	repositoryId, err := adm.LookupRepoId(opts[`from`][0])
+	repositoryID, err := adm.LookupRepoID(opts[`from`][0])
 	if err != nil {
 		return err
 	}
@@ -428,14 +428,14 @@ func cmdRepositoryPropertyDelete(c *cli.Context, pType string) error {
 			return err
 		}
 	}
-	var sourceId string
+	var sourceID string
 	if err := adm.FindRepoPropSrcID(pType, c.Args().First(),
-		opts[`view`][0], repositoryId, &sourceId); err != nil {
+		opts[`view`][0], repositoryID, &sourceID); err != nil {
 		return err
 	}
 
 	path := fmt.Sprintf("/repository/%s/property/%s/%s",
-		repositoryId, pType, sourceId)
+		repositoryID, pType, sourceID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 

@@ -365,16 +365,16 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		// add source check as well so it gets recreated with the
 		// correct UUID
 		ckItem = tree.CheckItem{ObjectType: victim.ObjectType}
-		ckItem.ObjectId, _ = uuid.FromString(victim.ObjectID)
-		ckItem.ItemId, _ = uuid.FromString(checkID)
+		ckItem.ObjectID, _ = uuid.FromString(victim.ObjectID)
+		ckItem.ItemID, _ = uuid.FromString(checkID)
 		ckTree.Items = []tree.CheckItem{ckItem}
 		tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, SrcCheckId=%s, CheckId=%s",
 			tk.meta.repoName,
 			`AssociateCheck`,
 			ckItem.ObjectType,
-			ckItem.ObjectId,
+			ckItem.ObjectID,
 			checkID,
-			ckItem.ItemId,
+			ckItem.ItemID,
 		)
 
 		if itRows, err = stMap[`LoadItems`].Query(tk.meta.repoID, checkID); err != nil {
@@ -393,8 +393,8 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 
 			// create new object per iteration
 			ckItem := tree.CheckItem{ObjectType: objType}
-			ckItem.ObjectId, _ = uuid.FromString(objID)
-			ckItem.ItemId, _ = uuid.FromString(itemID)
+			ckItem.ObjectID, _ = uuid.FromString(objID)
+			ckItem.ItemID, _ = uuid.FromString(itemID)
 			ckTree.Items = append(ckTree.Items, ckItem)
 			tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, SrcCheckId=%s, CheckId=%s",
 				tk.meta.repoName,
@@ -428,7 +428,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 				for ck := range ckOrder[objKey] {
 					tk.tree.Find(tree.FindRequest{
 						ElementType: cfgMap[ck].ObjectType,
-						ElementId:   cfgMap[ck].ObjectID,
+						ElementID:   cfgMap[ck].ObjectID,
 					}, true).SetCheck(ckOrder[objKey][ck])
 					tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s",
 						tk.meta.repoName,
@@ -465,7 +465,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 					for ck := range ckOrder[objKey] {
 						tk.tree.Find(tree.FindRequest{
 							ElementType: cfgMap[ck].ObjectType,
-							ElementId:   cfgMap[ck].ObjectID,
+							ElementID:   cfgMap[ck].ObjectID,
 						}, true).SetCheck(ckOrder[objKey][ck])
 						tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s",
 							tk.meta.repoName,
@@ -506,7 +506,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 				for ck := range ckOrder[objKey] {
 					tk.tree.Find(tree.FindRequest{
 						ElementType: cfgMap[ck].ObjectType,
-						ElementId:   cfgMap[ck].ObjectID,
+						ElementID:   cfgMap[ck].ObjectID,
 					}, true).SetCheck(ckOrder[objKey][ck])
 					tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s",
 						tk.meta.repoName,
@@ -541,7 +541,7 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 			for ck := range ckOrder[objKey] {
 				tk.tree.Find(tree.FindRequest{
 					ElementType: cfgMap[ck].ObjectType,
-					ElementId:   cfgMap[ck].ObjectID,
+					ElementID:   cfgMap[ck].ObjectID,
 				}, true).SetCheck(ckOrder[objKey][ck])
 				tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s",
 					tk.meta.repoName,
@@ -652,23 +652,23 @@ directinstances:
 					goto fail
 				}
 			}
-			ckInstance.InstanceId, _ = uuid.FromString(itemID)
-			ckInstance.CheckId, _ = uuid.FromString(checkID)
-			ckInstance.ConfigId, _ = uuid.FromString(configID)
-			ckInstance.InstanceConfigId, _ = uuid.FromString(itemCfgID)
+			ckInstance.InstanceID, _ = uuid.FromString(itemID)
+			ckInstance.CheckID, _ = uuid.FromString(checkID)
+			ckInstance.ConfigID, _ = uuid.FromString(configID)
+			ckInstance.InstanceConfigID, _ = uuid.FromString(itemCfgID)
 
 			// attach instance to tree
 			tk.tree.Find(tree.FindRequest{
 				ElementType: typ,
-				ElementId:   objID,
+				ElementID:   objID,
 			}, true).LoadInstance(ckInstance)
 			tk.startLog.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
 				tk.meta.repoName,
 				`LoadInstance`,
 				typ,
 				objID,
-				ckInstance.CheckId.String(),
-				ckInstance.InstanceId.String(),
+				ckInstance.CheckID.String(),
+				ckInstance.InstanceID.String(),
 			)
 		}
 		if err = inRows.Err(); err != nil {
@@ -880,7 +880,7 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 			// 4. apply config
 			tk.tree.Find(tree.FindRequest{
 				ElementType: conf.ObjectType,
-				ElementId:   conf.ObjectID,
+				ElementID:   conf.ObjectID,
 			}, true).SetCheck(*treeCheck)
 		} else {
 			tk.startLog.Printf("Rebuild error during check conversion: %s", err)

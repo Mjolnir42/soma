@@ -16,7 +16,7 @@ import (
 
 func specRepoCheck(spec RepositorySpec) bool {
 	switch {
-	case spec.Id == "":
+	case spec.ID == "":
 		return false
 	case spec.Name == "":
 		return false
@@ -30,7 +30,7 @@ func specRepoCheck(spec RepositorySpec) bool {
 	case l > 128:
 		return false
 	}
-	if _, err := uuid.FromString(spec.Id); err != nil {
+	if _, err := uuid.FromString(spec.ID); err != nil {
 		return false
 	}
 	if _, err := uuid.FromString(spec.Team); err != nil {
@@ -41,7 +41,7 @@ func specRepoCheck(spec RepositorySpec) bool {
 
 func specBucketCheck(spec BucketSpec) bool {
 	switch {
-	case spec.Id == "":
+	case spec.ID == "":
 		return false
 	case spec.Name == "":
 		return false
@@ -59,7 +59,7 @@ func specBucketCheck(spec BucketSpec) bool {
 	case l > 512:
 		return false
 	}
-	if _, err := uuid.FromString(spec.Id); err != nil {
+	if _, err := uuid.FromString(spec.ID); err != nil {
 		return false
 	}
 	if _, err := uuid.FromString(spec.Team); err != nil {
@@ -73,7 +73,7 @@ func specBucketCheck(spec BucketSpec) bool {
 
 func specGroupCheck(spec GroupSpec) bool {
 	switch {
-	case spec.Id == "":
+	case spec.ID == "":
 		return false
 	case spec.Name == "":
 		return false
@@ -87,7 +87,7 @@ func specGroupCheck(spec GroupSpec) bool {
 	case l > 256:
 		return false
 	}
-	if _, err := uuid.FromString(spec.Id); err != nil {
+	if _, err := uuid.FromString(spec.ID); err != nil {
 		return false
 	}
 	if _, err := uuid.FromString(spec.Team); err != nil {
@@ -98,7 +98,7 @@ func specGroupCheck(spec GroupSpec) bool {
 
 func specClusterCheck(spec ClusterSpec) bool {
 	switch {
-	case spec.Id == "":
+	case spec.ID == "":
 		return false
 	case spec.Name == "":
 		return false
@@ -112,7 +112,7 @@ func specClusterCheck(spec ClusterSpec) bool {
 	case l > 256:
 		return false
 	}
-	if _, err := uuid.FromString(spec.Id); err != nil {
+	if _, err := uuid.FromString(spec.ID); err != nil {
 		return false
 	}
 	if _, err := uuid.FromString(spec.Team); err != nil {
@@ -123,13 +123,13 @@ func specClusterCheck(spec ClusterSpec) bool {
 
 func specNodeCheck(spec NodeSpec) bool {
 	switch {
-	case spec.Id == "":
+	case spec.ID == "":
 		return false
 	case spec.Name == "":
 		return false
 	case spec.Team == "":
 		return false
-	case spec.ServerId == "":
+	case spec.ServerID == "":
 		return false
 	}
 	l := utf8.RuneCountInString(spec.Name)
@@ -139,13 +139,13 @@ func specNodeCheck(spec NodeSpec) bool {
 	case l > 256:
 		return false
 	}
-	if _, err := uuid.FromString(spec.Id); err != nil {
+	if _, err := uuid.FromString(spec.ID); err != nil {
 		return false
 	}
 	if _, err := uuid.FromString(spec.Team); err != nil {
 		return false
 	}
-	if _, err := uuid.FromString(spec.ServerId); err != nil {
+	if _, err := uuid.FromString(spec.ServerID); err != nil {
 		return false
 	}
 	return true

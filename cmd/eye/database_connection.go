@@ -32,7 +32,7 @@ func connectToDatabase() {
 		"port",
 		Eye.Database.Port,
 		"sslmode",
-		Eye.Database.TlsMode,
+		Eye.Database.TLSMode,
 		"connect_timeout",
 		Eye.Database.Timeout,
 	)
@@ -65,43 +65,43 @@ func pingDatabase() {
 func prepareStatements() {
 	var err error
 
-	Eye.run.check_item, err = Eye.run.conn.Prepare(stmtCheckItemExists)
+	Eye.run.checkItem, err = Eye.run.conn.Prepare(stmtCheckItemExists)
 	log.Println("Preparing: check_item")
 	abortOnError(err)
 
-	Eye.run.check_lookup, err = Eye.run.conn.Prepare(stmtCheckLookupExists)
+	Eye.run.checkLookup, err = Eye.run.conn.Prepare(stmtCheckLookupExists)
 	log.Println("Preparing: check_lookup")
 	abortOnError(err)
 
-	Eye.run.delete_item, err = Eye.run.conn.Prepare(stmtDeleteConfigurationItem)
+	Eye.run.deleteItem, err = Eye.run.conn.Prepare(stmtDeleteConfigurationItem)
 	log.Println("Preparing: delete_item")
 	abortOnError(err)
 
-	Eye.run.delete_lookup, err = Eye.run.conn.Prepare(stmtDeleteLookupId)
+	Eye.run.deleteLookup, err = Eye.run.conn.Prepare(stmtDeleteLookupID)
 	log.Println("Preparing: delete_lookup")
 	abortOnError(err)
 
-	Eye.run.get_config, err = Eye.run.conn.Prepare(stmtGetSingleConfiguration)
+	Eye.run.getConfig, err = Eye.run.conn.Prepare(stmtGetSingleConfiguration)
 	log.Println("Preparing: get_config")
 	abortOnError(err)
 
-	Eye.run.get_items, err = Eye.run.conn.Prepare(stmtGetConfigurationItemIds)
+	Eye.run.getItems, err = Eye.run.conn.Prepare(stmtGetConfigurationItemIds)
 	log.Println("Preparing: get_items")
 	abortOnError(err)
 
-	Eye.run.get_lookup, err = Eye.run.conn.Prepare(stmtGetLookupIdForItem)
+	Eye.run.getLookup, err = Eye.run.conn.Prepare(stmtGetLookupIDForItem)
 	log.Println("Preparing: get_lookup")
 	abortOnError(err)
 
-	Eye.run.insert_item, err = Eye.run.conn.Prepare(stmtInsertConfigurationItem)
+	Eye.run.insertItem, err = Eye.run.conn.Prepare(stmtInsertConfigurationItem)
 	log.Println("Preparing: insert_item")
 	abortOnError(err)
 
-	Eye.run.insert_lookup, err = Eye.run.conn.Prepare(stmtInsertLookupInformation)
+	Eye.run.insertLookup, err = Eye.run.conn.Prepare(stmtInsertLookupInformation)
 	log.Println("Preparing: insert_lookup")
 	abortOnError(err)
 
-	Eye.run.item_count, err = Eye.run.conn.Prepare(stmtGetItemCountForLookupId)
+	Eye.run.itemCount, err = Eye.run.conn.Prepare(stmtGetItemCountForLookupID)
 	log.Println("Preparing: item_count")
 	abortOnError(err)
 
@@ -109,7 +109,7 @@ func prepareStatements() {
 	log.Println("Preparing: retrieve")
 	abortOnError(err)
 
-	Eye.run.update_item, err = Eye.run.conn.Prepare(stmtUpdateConfigurationItem)
+	Eye.run.updateItem, err = Eye.run.conn.Prepare(stmtUpdateConfigurationItem)
 	log.Println("Preparing: update_item")
 	abortOnError(err)
 }

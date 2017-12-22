@@ -24,7 +24,7 @@ FROM   soma.checks sc
 WHERE  sci.check_id = sc.check_id
 AND    sc.repository_id = $1::uuid;`
 
-	ForestRepoNameById = `
+	ForestRepoNameByID = `
 SELECT repository_name,
        organizational_team_id
 FROM   soma.repositories
@@ -66,7 +66,7 @@ func init() {
 	m[ForestLoadRepository] = `ForestLoadRepository`
 	m[ForestRebuildDeleteChecks] = `ForestRebuildDeleteChecks`
 	m[ForestRebuildDeleteInstances] = `ForestRebuildDeleteInstances`
-	m[ForestRepoNameById] = `ForestRepoNameById`
+	m[ForestRepoNameByID] = `ForestRepoNameByID`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

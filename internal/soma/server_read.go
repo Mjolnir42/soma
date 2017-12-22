@@ -57,7 +57,7 @@ func (r *ServerRead) Run() {
 		stmt.ShowServers:           r.stmtShow,
 		stmt.SyncServers:           r.stmtSync,
 		stmt.SearchServerByName:    r.stmtSearchByName,
-		stmt.SearchServerByAssetId: r.stmtSearchByAssetID,
+		stmt.SearchServerByAssetID: r.stmtSearchByAssetID,
 	} {
 		if prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`servers`, err, stmt.Name(statement))

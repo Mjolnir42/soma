@@ -121,7 +121,7 @@ func JobShow(w http.ResponseWriter, r *http.Request,
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Flag:       msg.Flags{JobDetail: withDetails},
-		Job:        proto.Job{Id: params.ByName(`jobid`)},
+		Job:        proto.Job{ID: params.ByName(`jobid`)},
 	}
 	result := <-returnChannel
 	SendMsgResult(&w, &result)
@@ -150,7 +150,7 @@ func JobSearch(w http.ResponseWriter, r *http.Request,
 	})
 
 	cReq := proto.NewJobFilter()
-	err := DecodeJsonBody(r, &cReq)
+	err := DecodeJSONBody(r, &cReq)
 	if err != nil {
 		DispatchBadRequest(&w, err)
 		return
@@ -168,7 +168,7 @@ func JobSearch(w http.ResponseWriter, r *http.Request,
 		Search: msg.Filter{
 			IsDetailed: cReq.Flags.Detailed,
 			Job: proto.JobFilter{
-				IdList: cReq.Filter.Job.IdList,
+				IDList: cReq.Filter.Job.IDList,
 			},
 		},
 	}

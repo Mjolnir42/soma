@@ -162,7 +162,7 @@ func cmdUserAdd(c *cli.Context) error {
 	req.User.MailAddress = opts["mailaddr"][0]
 	req.User.EmployeeNumber = opts["employeenr"][0]
 	req.User.IsDeleted = false
-	if req.User.TeamId, err = adm.LookupTeamId(
+	if req.User.TeamID, err = adm.LookupTeamID(
 		opts["team"][0]); err != nil {
 		return err
 	}
@@ -226,13 +226,13 @@ func cmdUserUpdate(c *cli.Context) error {
 	}
 
 	req := proto.NewUserRequest()
-	req.User.Id = c.Args().First()
+	req.User.ID = c.Args().First()
 	req.User.UserName = opts[`username`][0]
 	req.User.FirstName = opts["firstname"][0]
 	req.User.LastName = opts["lastname"][0]
 	req.User.MailAddress = opts["mailaddr"][0]
 	req.User.EmployeeNumber = opts["employeenr"][0]
-	if req.User.TeamId, err = adm.LookupTeamId(
+	if req.User.TeamID, err = adm.LookupTeamID(
 		opts[`team`][0]); err != nil {
 		return err
 	}
@@ -242,7 +242,7 @@ func cmdUserUpdate(c *cli.Context) error {
 			" boolean: %s, %s", opts[`deleted`][0], err.Error())
 	}
 
-	path := fmt.Sprintf("/users/%s", req.User.Id)
+	path := fmt.Sprintf("/users/%s", req.User.ID)
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -253,13 +253,13 @@ func cmdUserMarkDeleted(c *cli.Context) error {
 
 	var (
 		err    error
-		userId string
+		userID string
 	)
-	if userId, err = adm.LookupUserId(c.Args().First()); err != nil {
+	if userID, err = adm.LookupUserID(c.Args().First()); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/users/%s", userId)
+	path := fmt.Sprintf("/users/%s", userID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -270,9 +270,9 @@ func cmdUserPurgeDeleted(c *cli.Context) error {
 
 	var (
 		err    error
-		userId string
+		userID string
 	)
-	if userId, err = adm.LookupUserId(c.Args().First()); err != nil {
+	if userID, err = adm.LookupUserID(c.Args().First()); err != nil {
 		return err
 	}
 
@@ -282,7 +282,7 @@ func cmdUserPurgeDeleted(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/users/%s", userId)
+	path := fmt.Sprintf("/users/%s", userID)
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 
@@ -404,7 +404,7 @@ func cmdUserShow(c *cli.Context) error {
 		err error
 		id  string
 	)
-	if id, err = adm.LookupUserId(c.Args().First()); err != nil {
+	if id, err = adm.LookupUserID(c.Args().First()); err != nil {
 		return err
 	}
 

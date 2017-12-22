@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerOncall(app cli.App) *cli.App {
@@ -215,21 +215,21 @@ func cmdOnCallMemberAdd(c *cli.Context) error {
 
 	var (
 		err              error
-		userId, oncallId string
+		userID, oncallID string
 	)
-	if userId, err = adm.LookupUserId(c.Args().First()); err != nil {
+	if userID, err = adm.LookupUserID(c.Args().First()); err != nil {
 		return err
 	}
-	if oncallId, err = adm.LookupOncallID(opts[`to`][0]); err != nil {
+	if oncallID, err = adm.LookupOncallID(opts[`to`][0]); err != nil {
 		return err
 	}
 
 	req := proto.NewOncallRequest()
 	req.Oncall.Members = &[]proto.OncallMember{
-		proto.OncallMember{UserId: userId},
+		proto.OncallMember{UserID: userID},
 	}
 
-	path := fmt.Sprintf("/oncall/%s/members", oncallId)
+	path := fmt.Sprintf("/oncall/%s/members", oncallID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
@@ -247,17 +247,17 @@ func cmdOnCallMemberDel(c *cli.Context) error {
 
 	var (
 		err              error
-		userId, oncallId string
+		userID, oncallID string
 	)
-	if userId, err = adm.LookupUserId(c.Args().First()); err != nil {
+	if userID, err = adm.LookupUserID(c.Args().First()); err != nil {
 		return err
 	}
-	if oncallId, err = adm.LookupOncallID(
+	if oncallID, err = adm.LookupOncallID(
 		opts[`from`][0]); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/oncall/%s/members/%s", oncallId, userId)
+	path := fmt.Sprintf("/oncall/%s/members/%s", oncallID, userID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -266,12 +266,12 @@ func cmdOnCallMemberList(c *cli.Context) error {
 		return err
 	}
 
-	oncallId, err := adm.LookupOncallID(c.Args().First())
+	oncallID, err := adm.LookupOncallID(c.Args().First())
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/oncall/%s/members/", oncallId)
+	path := fmt.Sprintf("/oncall/%s/members/", oncallID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 

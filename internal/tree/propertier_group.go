@@ -31,10 +31,10 @@ func (teg *Group) SetProperty(p Property) {
 		case `custom`:
 			cstUUID, _ := uuid.FromString(prop.GetKey())
 			teg.deletePropertyInherited(&PropertyCustom{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
-				CustomId:  cstUUID,
+				CustomID:  cstUUID,
 				Key:       prop.(*PropertyCustom).GetKeyField(),
 				Value:     prop.(*PropertyCustom).GetValueField(),
 			})
@@ -42,14 +42,14 @@ func (teg *Group) SetProperty(p Property) {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			teg.deletePropertyInherited(&PropertyService{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
 				Service:   prop.GetKey(),
 			})
 		case `system`:
 			teg.deletePropertyInherited(&PropertySystem{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
 				Key:       prop.GetKey(),
@@ -58,30 +58,30 @@ func (teg *Group) SetProperty(p Property) {
 		case `oncall`:
 			oncUUID, _ := uuid.FromString(prop.GetKey())
 			teg.deletePropertyInherited(&PropertyOncall{
-				SourceId:  srcUUID,
+				SourceID:  srcUUID,
 				View:      prop.GetView(),
 				Inherited: true,
-				OncallId:  oncUUID,
+				OncallID:  oncUUID,
 				Name:      prop.(*PropertyOncall).GetName(),
 				Number:    prop.(*PropertyOncall).GetNumber(),
 			})
 		}
 	}
-	p.SetId(p.GetInstanceId(teg.Type, teg.Id, teg.log))
+	p.SetID(p.GetInstanceID(teg.Type, teg.ID, teg.log))
 	if p.Equal(uuid.Nil) {
-		p.SetId(uuid.NewV4())
+		p.SetID(uuid.NewV4())
 	}
 	// this property is the source instance
-	p.SetInheritedFrom(teg.Id)
+	p.SetInheritedFrom(teg.ID)
 	p.SetInherited(false)
 	p.SetSourceType(teg.Type)
 	if i, e := uuid.FromString(p.GetID()); e == nil {
-		p.SetSourceId(i)
+		p.SetSourceID(i)
 	}
 	// send a scrubbed copy down
 	f := p.Clone()
 	f.SetInherited(true)
-	f.SetId(uuid.UUID{})
+	f.SetID(uuid.UUID{})
 	if f.hasInheritance() {
 		teg.setPropertyOnChildren(f)
 	}
@@ -93,9 +93,9 @@ func (teg *Group) SetProperty(p Property) {
 
 func (teg *Group) setPropertyInherited(p Property) {
 	f := p.Clone()
-	f.SetId(f.GetInstanceId(teg.Type, teg.Id, teg.log))
+	f.SetID(f.GetInstanceID(teg.Type, teg.ID, teg.log))
 	if f.Equal(uuid.Nil) {
-		f.SetId(uuid.NewV4())
+		f.SetID(uuid.NewV4())
 	}
 	f.clearInstances()
 
@@ -118,14 +118,14 @@ func (teg *Group) setPropertyInherited(p Property) {
 		return
 	}
 	teg.addProperty(f)
-	p.SetId(uuid.UUID{})
+	p.SetID(uuid.UUID{})
 	teg.setPropertyOnChildren(p)
 	teg.actionPropertyNew(f.MakeAction())
 }
 
 func (teg *Group) setPropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -165,7 +165,7 @@ func (teg *Group) UpdateProperty(p Property) {
 	}
 
 	// keep a copy for ourselves, no shared pointers
-	p.SetInheritedFrom(teg.Id)
+	p.SetInheritedFrom(teg.ID)
 	p.SetSourceType(teg.Type)
 	p.SetInherited(true)
 	f := p.Clone()
@@ -190,7 +190,7 @@ func (teg *Group) updatePropertyInherited(p Property) {
 
 func (teg *Group) updatePropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -201,7 +201,7 @@ func (teg *Group) updatePropertyOnChildren(p Property) {
 }
 
 func (teg *Group) switchProperty(p Property) bool {
-	uid := teg.findIdForSource(
+	uid := teg.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
@@ -218,8 +218,8 @@ func (teg *Group) switchProperty(p Property) bool {
 			Action: `group.switchProperty property not found`}
 		return false
 	}
-	updId, _ := uuid.FromString(uid)
-	p.SetId(updId)
+	updID, _ := uuid.FromString(uid)
+	p.SetID(updID)
 	curr := teg.getCurrentProperty(p)
 	if curr == nil {
 		return false
@@ -235,10 +235,10 @@ func (teg *Group) switchProperty(p Property) bool {
 		case `custom`:
 			cstUUID, _ := uuid.FromString(curr.GetKey())
 			teg.deletePropertyOnChildren(&PropertyCustom{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
-				CustomId:    cstUUID,
+				CustomID:    cstUUID,
 				Key:         curr.(*PropertyCustom).GetKeyField(),
 				Value:       curr.(*PropertyCustom).GetValueField(),
 				Inheritance: true,
@@ -247,7 +247,7 @@ func (teg *Group) switchProperty(p Property) bool {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			teg.deletePropertyOnChildren(&PropertyService{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
 				Service:     curr.GetKey(),
@@ -255,7 +255,7 @@ func (teg *Group) switchProperty(p Property) bool {
 			})
 		case `system`:
 			teg.deletePropertyOnChildren(&PropertySystem{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
 				Key:         curr.GetKey(),
@@ -265,10 +265,10 @@ func (teg *Group) switchProperty(p Property) bool {
 		case `oncall`:
 			oncUUID, _ := uuid.FromString(curr.GetKey())
 			teg.deletePropertyOnChildren(&PropertyOncall{
-				SourceId:    srcUUID,
+				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
-				OncallId:    oncUUID,
+				OncallID:    oncUUID,
 				Name:        curr.(*PropertyOncall).GetName(),
 				Number:      curr.(*PropertyOncall).GetNumber(),
 				Inheritance: true,
@@ -315,11 +315,11 @@ func (teg *Group) DeleteProperty(p Property) {
 
 	var flow Property
 	resync := false
-	delId := teg.findIdForSource(
+	delID := teg.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
-	if delId != `` {
+	if delID != `` {
 		// this is a delete for a locally set property. It might be a
 		// delete for an overwrite property, in which case we need to
 		// ask the parent to sync it to us again.
@@ -331,13 +331,13 @@ func (teg *Group) DeleteProperty(p Property) {
 		var delProp Property
 		switch p.GetType() {
 		case `custom`:
-			delProp = teg.PropertyCustom[delId]
+			delProp = teg.PropertyCustom[delID]
 		case `system`:
-			delProp = teg.PropertySystem[delId]
+			delProp = teg.PropertySystem[delID]
 		case `service`:
-			delProp = teg.PropertyService[delId]
+			delProp = teg.PropertyService[delID]
 		case `oncall`:
-			delProp = teg.PropertyOncall[delId]
+			delProp = teg.PropertyOncall[delID]
 		}
 		resync, _, flow = teg.Parent.(Propertier).checkDuplicate(
 			delProp,
@@ -356,7 +356,7 @@ func (teg *Group) DeleteProperty(p Property) {
 		teg.Parent.(Propertier).resyncProperty(
 			flow.GetSourceInstance(),
 			p.GetType(),
-			teg.Id.String(),
+			teg.ID.String(),
 		)
 	}
 }
@@ -369,7 +369,7 @@ func (teg *Group) deletePropertyInherited(p Property) {
 
 func (teg *Group) deletePropertyOnChildren(p Property) {
 	var wg sync.WaitGroup
-	for child, _ := range teg.Children {
+	for child := range teg.Children {
 		wg.Add(1)
 		go func(stp Property, c string) {
 			defer wg.Done()
@@ -434,11 +434,11 @@ func (teg *Group) deletePropertyAllLocal() {
 }
 
 func (teg *Group) rmProperty(p Property) bool {
-	delId := teg.findIdForSource(
+	delID := teg.findIDForSource(
 		p.GetSourceInstance(),
 		p.GetType(),
 	)
-	if delId == `` {
+	if delID == `` {
 		// we do not have the property for which we received a delete
 		if dupe, deleteOK, _ := teg.checkDuplicate(p); dupe && !deleteOK {
 			// the delete is duplicate to a property for which we
@@ -458,28 +458,28 @@ func (teg *Group) rmProperty(p Property) bool {
 	switch p.GetType() {
 	case `custom`:
 		teg.actionPropertyDelete(
-			teg.PropertyCustom[delId].MakeAction(),
+			teg.PropertyCustom[delID].MakeAction(),
 		)
-		hasInheritance = teg.PropertyCustom[delId].hasInheritance()
-		delete(teg.PropertyCustom, delId)
+		hasInheritance = teg.PropertyCustom[delID].hasInheritance()
+		delete(teg.PropertyCustom, delID)
 	case `service`:
 		teg.actionPropertyDelete(
-			teg.PropertyService[delId].MakeAction(),
+			teg.PropertyService[delID].MakeAction(),
 		)
-		hasInheritance = teg.PropertyService[delId].hasInheritance()
-		delete(teg.PropertyService, delId)
+		hasInheritance = teg.PropertyService[delID].hasInheritance()
+		delete(teg.PropertyService, delID)
 	case `system`:
 		teg.actionPropertyDelete(
-			teg.PropertySystem[delId].MakeAction(),
+			teg.PropertySystem[delID].MakeAction(),
 		)
-		hasInheritance = teg.PropertySystem[delId].hasInheritance()
-		delete(teg.PropertySystem, delId)
+		hasInheritance = teg.PropertySystem[delID].hasInheritance()
+		delete(teg.PropertySystem, delID)
 	case `oncall`:
 		teg.actionPropertyDelete(
-			teg.PropertyOncall[delId].MakeAction(),
+			teg.PropertyOncall[delID].MakeAction(),
 		)
-		hasInheritance = teg.PropertyOncall[delId].hasInheritance()
-		delete(teg.PropertyOncall, delId)
+		hasInheritance = teg.PropertyOncall[delID].hasInheritance()
+		delete(teg.PropertyOncall, delID)
 	default:
 		teg.hasUpdate = false
 		teg.Fault.Error <- &Error{Action: `group.rmProperty unknown type`}
@@ -523,31 +523,31 @@ bailout:
 }
 
 //
-func (teg *Group) findIdForSource(source, prop string) string {
+func (teg *Group) findIDForSource(source, prop string) string {
 	switch prop {
 	case `custom`:
-		for id, _ := range teg.PropertyCustom {
+		for id := range teg.PropertyCustom {
 			if teg.PropertyCustom[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `system`:
-		for id, _ := range teg.PropertySystem {
+		for id := range teg.PropertySystem {
 			if teg.PropertySystem[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `service`:
-		for id, _ := range teg.PropertyService {
+		for id := range teg.PropertyService {
 			if teg.PropertyService[id].GetSourceInstance() != source {
 				continue
 			}
 			return id
 		}
 	case `oncall`:
-		for id, _ := range teg.PropertyOncall {
+		for id := range teg.PropertyOncall {
 			if teg.PropertyOncall[id].GetSourceInstance() != source {
 				continue
 			}
@@ -558,99 +558,99 @@ func (teg *Group) findIdForSource(source, prop string) string {
 }
 
 //
-func (teg *Group) resyncProperty(srcId, pType, childId string) {
-	pId := teg.findIdForSource(srcId, pType)
-	if pId == `` {
+func (teg *Group) resyncProperty(srcID, pType, childID string) {
+	pID := teg.findIDForSource(srcID, pType)
+	if pID == `` {
 		return
 	}
 
 	var f Property
 	switch pType {
 	case `custom`:
-		f = teg.PropertyCustom[pId].(*PropertyCustom).Clone()
+		f = teg.PropertyCustom[pID].(*PropertyCustom).Clone()
 	case `oncall`:
-		f = teg.PropertyOncall[pId].(*PropertyOncall).Clone()
+		f = teg.PropertyOncall[pID].(*PropertyOncall).Clone()
 	case `service`:
-		f = teg.PropertyService[pId].(*PropertyService).Clone()
+		f = teg.PropertyService[pID].(*PropertyService).Clone()
 	case `system`:
-		f = teg.PropertySystem[pId].(*PropertySystem).Clone()
+		f = teg.PropertySystem[pID].(*PropertySystem).Clone()
 	}
 	if !f.hasInheritance() {
 		return
 	}
 	f.SetInherited(true)
-	f.SetId(uuid.UUID{})
+	f.SetID(uuid.UUID{})
 	f.clearInstances()
-	teg.Children[childId].setPropertyInherited(f)
+	teg.Children[childID].setPropertyInherited(f)
 }
 
-// when a child attaches, it calls self.Parent.syncProperty(self.Id)
+// when a child attaches, it calls self.Parent.syncProperty(self.ID)
 // to get get all properties of that part of the tree
-func (teg *Group) syncProperty(childId string) {
+func (teg *Group) syncProperty(childID string) {
 customloop:
-	for prop, _ := range teg.PropertyCustom {
+	for prop := range teg.PropertyCustom {
 		if !teg.PropertyCustom[prop].hasInheritance() {
 			continue customloop
 		}
 		f := teg.PropertyCustom[prop].(*PropertyCustom).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		teg.Children[childId].setPropertyInherited(f)
+		teg.Children[childID].setPropertyInherited(f)
 	}
 oncallloop:
-	for prop, _ := range teg.PropertyOncall {
+	for prop := range teg.PropertyOncall {
 		if !teg.PropertyOncall[prop].hasInheritance() {
 			continue oncallloop
 		}
 		f := teg.PropertyOncall[prop].(*PropertyOncall).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		teg.Children[childId].setPropertyInherited(f)
+		teg.Children[childID].setPropertyInherited(f)
 	}
 serviceloop:
-	for prop, _ := range teg.PropertyService {
+	for prop := range teg.PropertyService {
 		if !teg.PropertyService[prop].hasInheritance() {
 			continue serviceloop
 		}
 		f := teg.PropertyService[prop].(*PropertyService).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		teg.Children[childId].setPropertyInherited(f)
+		teg.Children[childID].setPropertyInherited(f)
 	}
 systemloop:
-	for prop, _ := range teg.PropertySystem {
+	for prop := range teg.PropertySystem {
 		if !teg.PropertySystem[prop].hasInheritance() {
 			continue systemloop
 		}
 		f := teg.PropertySystem[prop].(*PropertySystem).Clone()
 		f.SetInherited(true)
-		f.SetId(uuid.UUID{})
+		f.SetID(uuid.UUID{})
 		f.clearInstances()
-		teg.Children[childId].setPropertyInherited(f)
+		teg.Children[childID].setPropertyInherited(f)
 	}
 }
 
 // function to be used by a child to check if the parent has a
 // specific Property
-func (teg *Group) checkProperty(propType string, propId string) bool {
+func (teg *Group) checkProperty(propType string, propID string) bool {
 	switch propType {
 	case "custom":
-		if _, ok := teg.PropertyCustom[propId]; ok {
+		if _, ok := teg.PropertyCustom[propID]; ok {
 			return true
 		}
 	case "service":
-		if _, ok := teg.PropertyService[propId]; ok {
+		if _, ok := teg.PropertyService[propID]; ok {
 			return true
 		}
 	case "system":
-		if _, ok := teg.PropertySystem[propId]; ok {
+		if _, ok := teg.PropertySystem[propID]; ok {
 			return true
 		}
 	case "oncall":
-		if _, ok := teg.PropertyOncall[propId]; ok {
+		if _, ok := teg.PropertyOncall[propID]; ok {
 			return true
 		}
 	}

@@ -76,7 +76,7 @@ func cmdCapabilityDeclare(c *cli.Context) error {
 		},
 	}
 	var err error
-	if req.Capability.MonitoringID, err = adm.LookupMonitoringId(
+	if req.Capability.MonitoringID, err = adm.LookupMonitoringID(
 		c.Args().First()); err != nil {
 		return err
 	}
@@ -84,18 +84,17 @@ func cmdCapabilityDeclare(c *cli.Context) error {
 	return adm.Perform(`postbody`, `/capability/`, `command`, req, c)
 }
 
-func cmdCapabilityRevoke(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
+func cmdCapabilityRevoke(c *cli.Context) (err error) {
+	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
 
-	var path string
-	if id, err := adm.LookupCapabilityId(
+	var id, path string
+	if id, err = adm.LookupCapabilityID(
 		c.Args().First()); err != nil {
 		return err
-	} else {
-		path = fmt.Sprintf("/capability/%s", id)
 	}
+	path = fmt.Sprintf("/capability/%s", id)
 
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
@@ -108,18 +107,17 @@ func cmdCapabilityList(c *cli.Context) error {
 	return adm.Perform(`get`, `/capability/`, `list`, nil, c)
 }
 
-func cmdCapabilityShow(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
+func cmdCapabilityShow(c *cli.Context) (err error) {
+	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
 
-	var path string
-	if id, err := adm.LookupCapabilityId(
+	var id, path string
+	if id, err = adm.LookupCapabilityID(
 		c.Args().First()); err != nil {
 		return err
-	} else {
-		path = fmt.Sprintf("/capability/%s", id)
 	}
+	path = fmt.Sprintf("/capability/%s", id)
 
 	return adm.Perform(`get`, path, `show`, nil, c)
 }

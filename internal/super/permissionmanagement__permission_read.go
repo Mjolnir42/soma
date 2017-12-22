@@ -53,7 +53,7 @@ func (s *Supervisor) permissionList(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Permission = append(mr.Permission, proto.Permission{
-			Id:       id,
+			ID:       id,
 			Name:     name,
 			Category: q.Permission.Category,
 		})
@@ -147,7 +147,7 @@ func (s *Supervisor) permissionSearch(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.Permission = append(mr.Permission, proto.Permission{
-			Id:       id,
+			ID:       id,
 			Name:     name,
 			Category: q.Permission.Category,
 		})
@@ -172,7 +172,7 @@ func (s *Supervisor) permissionShowTx(q *msg.Request,
 
 	// query base permission
 	if err = txMap[`permission_show`].QueryRow(
-		q.Permission.Id,
+		q.Permission.ID,
 		q.Permission.Category,
 	).Scan(
 		&id,
@@ -185,7 +185,7 @@ func (s *Supervisor) permissionShowTx(q *msg.Request,
 	}
 
 	perm = proto.Permission{
-		Id:       id,
+		ID:       id,
 		Name:     name,
 		Category: category,
 		Actions:  &[]proto.Action{},
@@ -198,7 +198,7 @@ func (s *Supervisor) permissionShowTx(q *msg.Request,
 
 	// query mapped actions
 	if rows, err = txMap[`permission_actions`].Query(
-		q.Permission.Id,
+		q.Permission.ID,
 		q.Permission.Category,
 	); err != nil {
 		return proto.Permission{}, err
@@ -229,7 +229,7 @@ func (s *Supervisor) permissionShowTx(q *msg.Request,
 
 	// query mapped sections
 	if rows, err = txMap[`permission_sections`].Query(
-		q.Permission.Id,
+		q.Permission.ID,
 		q.Permission.Category,
 	); err != nil {
 		return proto.Permission{}, err
@@ -245,7 +245,7 @@ func (s *Supervisor) permissionShowTx(q *msg.Request,
 			return proto.Permission{}, err
 		}
 		*perm.Sections = append(*perm.Sections, proto.Section{
-			Id:       sectionID,
+			ID:       sectionID,
 			Name:     sectionName,
 			Category: category,
 		})

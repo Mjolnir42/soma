@@ -10,11 +10,11 @@
 package proto
 
 type Monitoring struct {
-	Id       string             `json:"id,omitempty"`
+	ID       string             `json:"id,omitempty"`
 	Name     string             `json:"name,omitempty"`
 	Mode     string             `json:"mode,omitempty"`
 	Contact  string             `json:"contact,omitempty"`
-	TeamId   string             `json:"teamId,omitempty"`
+	TeamID   string             `json:"teamId,omitempty"`
 	Callback string             `json:"callback,omitempty"`
 	Details  *MonitoringDetails `json:"details,omitempty"`
 }
@@ -23,7 +23,7 @@ type MonitoringFilter struct {
 	Name    string `json:"name,omitempty"`
 	Mode    string `json:"mode,omitempty"`
 	Contact string `json:"contact,omitempty"`
-	TeamId  string `json:"teamId,omitempty"`
+	TeamID  string `json:"teamId,omitempty"`
 }
 
 type MonitoringDetails struct {
@@ -33,8 +33,8 @@ type MonitoringDetails struct {
 }
 
 func (p *Monitoring) DeepCompare(a *Monitoring) bool {
-	if p.Id != a.Id || p.Name != a.Name || p.Mode != a.Mode ||
-		p.Contact != a.Contact || p.TeamId != a.TeamId || p.Callback != a.Callback {
+	if p.ID != a.ID || p.Name != a.Name || p.Mode != a.Mode ||
+		p.Contact != a.Contact || p.TeamID != a.TeamID || p.Callback != a.Callback {
 		return false
 	}
 	return true

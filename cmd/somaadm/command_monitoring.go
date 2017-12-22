@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerMonitoring(app cli.App) *cli.App {
@@ -65,11 +65,11 @@ func cmdMonitoringCreate(c *cli.Context) error {
 	req.Monitoring.Name = c.Args().First()
 	req.Monitoring.Mode = opts["mode"][0]
 	var err error
-	if req.Monitoring.Contact, err = adm.LookupUserId(
+	if req.Monitoring.Contact, err = adm.LookupUserID(
 		opts[`contact`][0]); err != nil {
 		return err
 	}
-	req.Monitoring.TeamId, err = adm.LookupTeamId(opts[`team`][0])
+	req.Monitoring.TeamID, err = adm.LookupTeamID(opts[`team`][0])
 	if err != nil {
 		return err
 	}
@@ -91,12 +91,12 @@ func cmdMonitoringDelete(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	monitoringId, err := adm.LookupMonitoringId(c.Args().First())
+	monitoringID, err := adm.LookupMonitoringID(c.Args().First())
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/monitoring/%s", monitoringId)
+	path := fmt.Sprintf("/monitoring/%s", monitoringID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -112,12 +112,12 @@ func cmdMonitoringShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	monitoringId, err := adm.LookupMonitoringId(c.Args().First())
+	monitoringID, err := adm.LookupMonitoringID(c.Args().First())
 	if err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/monitoring/%s", monitoringId)
+	path := fmt.Sprintf("/monitoring/%s", monitoringID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

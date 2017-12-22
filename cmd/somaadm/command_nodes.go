@@ -209,7 +209,7 @@ func cmdNodeAdd(c *cli.Context) error {
 		req.Node.IsOnline = true
 	}
 	if _, ok := opts[`server`]; ok {
-		if req.Node.ServerID, err = adm.LookupServerId(
+		if req.Node.ServerID, err = adm.LookupServerID(
 			opts[`server`][0]); err != nil {
 			return err
 		}
@@ -219,7 +219,7 @@ func cmdNodeAdd(c *cli.Context) error {
 		return err
 	}
 	req.Node.Name = opts[`name`][0]
-	if req.Node.TeamID, err = adm.LookupTeamId(
+	if req.Node.TeamID, err = adm.LookupTeamID(
 		opts[`team`][0]); err != nil {
 		return nil
 	}
@@ -260,7 +260,7 @@ func cmdNodeUpdate(c *cli.Context) error {
 		&req.Node.IsDeleted); err != nil {
 		return err
 	}
-	if req.Node.ServerID, err = adm.LookupServerId(
+	if req.Node.ServerID, err = adm.LookupServerID(
 		opts[`server`][0]); err != nil {
 		return err
 	}
@@ -268,7 +268,7 @@ func cmdNodeUpdate(c *cli.Context) error {
 		&req.Node.AssetID, 1); err != nil {
 		return err
 	}
-	if req.Node.TeamID, err = adm.LookupTeamId(
+	if req.Node.TeamID, err = adm.LookupTeamID(
 		opts[`team`][0]); err != nil {
 		return err
 	}
@@ -276,39 +276,37 @@ func cmdNodeUpdate(c *cli.Context) error {
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
-func cmdNodeDel(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
+func cmdNodeDel(c *cli.Context) (err error) {
+	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	var path string
-	if id, err := adm.LookupNodeId(c.Args().First()); err != nil {
+	var id, path string
+	if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 		return err
-	} else {
-		path = fmt.Sprintf("/nodes/%s", id)
 	}
+	path = fmt.Sprintf("/nodes/%s", id)
 
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
-func cmdNodePurge(c *cli.Context) error {
+func cmdNodePurge(c *cli.Context) (err error) {
 	var (
-		path string
-		req  proto.Request
+		id, path string
+		req      proto.Request
 	)
-	if c.Bool("all") {
-		if err := adm.VerifyNoArgument(c); err != nil {
+	if c.Bool(`all`) {
+		if err = adm.VerifyNoArgument(c); err != nil {
 			return err
 		}
 		path = "/nodes/"
 	} else {
-		if err := adm.VerifySingleArgument(c); err != nil {
+		if err = adm.VerifySingleArgument(c); err != nil {
 			return err
 		}
-		if id, err := adm.LookupNodeId(c.Args().First()); err != nil {
+		if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 			return err
-		} else {
-			path = fmt.Sprintf("/nodes/%s", id)
 		}
+		path = fmt.Sprintf("/nodes/%s", id)
 	}
 
 	req = proto.Request{
@@ -320,25 +318,24 @@ func cmdNodePurge(c *cli.Context) error {
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 
-func cmdNodeRestore(c *cli.Context) error {
+func cmdNodeRestore(c *cli.Context) (err error) {
 	var (
-		path string
-		req  proto.Request
+		id, path string
+		req      proto.Request
 	)
-	if c.Bool("all") {
-		if err := adm.VerifyNoArgument(c); err != nil {
+	if c.Bool(`all`) {
+		if err = adm.VerifyNoArgument(c); err != nil {
 			return err
 		}
 		path = "/nodes/"
 	} else {
-		if err := adm.VerifySingleArgument(c); err != nil {
+		if err = adm.VerifySingleArgument(c); err != nil {
 			return err
 		}
-		if id, err := adm.LookupNodeId(c.Args().First()); err != nil {
+		if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 			return err
-		} else {
-			path = fmt.Sprintf("/nodes/%s", id)
 		}
+		path = fmt.Sprintf("/nodes/%s", id)
 	}
 
 	req = proto.Request{
@@ -350,9 +347,9 @@ func cmdNodeRestore(c *cli.Context) error {
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 
-func cmdNodeRename(c *cli.Context) error {
+func cmdNodeRename(c *cli.Context) (err error) {
 	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
+	if err = adm.ParseVariadicArguments(
 		opts,
 		[]string{},
 		[]string{`to`},
@@ -360,12 +357,11 @@ func cmdNodeRename(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	var path string
-	if id, err := adm.LookupNodeId(c.Args().First()); err != nil {
+	var id, path string
+	if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 		return err
-	} else {
-		path = fmt.Sprintf("/nodes/%s", id)
 	}
+	path = fmt.Sprintf("/nodes/%s", id)
 
 	req := proto.NewNodeRequest()
 	req.Node.Name = opts[`to`][0]
@@ -383,13 +379,13 @@ func cmdNodeRepo(c *cli.Context) error {
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	var id, teamId string
+	var id, teamID string
 	{
 		var err error
-		if id, err = adm.LookupNodeId(c.Args().First()); err != nil {
+		if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 			return err
 		}
-		if teamId, err = adm.LookupTeamId(opts[`to`][0]); err != nil {
+		if teamID, err = adm.LookupTeamID(opts[`to`][0]); err != nil {
 			return err
 		}
 	}
@@ -397,7 +393,7 @@ func cmdNodeRepo(c *cli.Context) error {
 
 	req := proto.Request{}
 	req.Node = &proto.Node{}
-	req.Node.TeamID = teamId
+	req.Node.TeamID = teamID
 
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
@@ -415,12 +411,12 @@ func cmdNodeMove(c *cli.Context) error {
 	var id string
 	{
 		var err error
-		if id, err = adm.LookupNodeId(c.Args().First()); err != nil {
+		if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 			return err
 		}
 	}
 	server := opts[`to`][0]
-	serverId, err := adm.LookupServerId(server)
+	serverID, err := adm.LookupServerID(server)
 	if err != nil {
 		return err
 	}
@@ -428,7 +424,7 @@ func cmdNodeMove(c *cli.Context) error {
 
 	req := proto.Request{}
 	req.Node = &proto.Node{}
-	req.Node.ServerID = serverId
+	req.Node.ServerID = serverID
 
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
@@ -437,7 +433,7 @@ func cmdNodeOnline(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupNodeId(c.Args().First())
+	id, err := adm.LookupNodeID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -454,7 +450,7 @@ func cmdNodeOffline(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupNodeId(c.Args().First())
+	id, err := adm.LookupNodeID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -484,22 +480,22 @@ func cmdNodeAssign(c *cli.Context) error {
 	}
 	var (
 		err                      error
-		bucketId, repoId, nodeId string
+		bucketID, repoID, nodeID string
 		bucketTId, nodeTId       string
 	)
-	if bucketId, err = adm.LookupBucketId(opts["to"][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts["to"][0]); err != nil {
 		return err
 	}
-	if repoId, err = adm.LookupRepoByBucket(bucketId); err != nil {
+	if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
-	if nodeId, err = adm.LookupNodeId(c.Args().First()); err != nil {
+	if nodeID, err = adm.LookupNodeID(c.Args().First()); err != nil {
 		return err
 	}
-	if bucketTId, err = adm.LookupTeamByBucket(bucketId); err != nil {
+	if bucketTId, err = adm.LookupTeamByBucket(bucketID); err != nil {
 		return err
 	}
-	if nodeTId, err = adm.LookupTeamByNode(nodeId); err != nil {
+	if nodeTId, err = adm.LookupTeamByNode(nodeID); err != nil {
 		return err
 	}
 	if bucketTId != nodeTId {
@@ -509,12 +505,12 @@ func cmdNodeAssign(c *cli.Context) error {
 	}
 
 	req := proto.NewNodeRequest()
-	req.Node.ID = nodeId
+	req.Node.ID = nodeID
 	req.Node.Config = &proto.NodeConfig{}
-	req.Node.Config.RepositoryID = repoId
-	req.Node.Config.BucketID = bucketId
+	req.Node.Config.RepositoryID = repoID
+	req.Node.Config.BucketID = bucketID
 
-	path := fmt.Sprintf("/nodes/%s/config", nodeId)
+	path := fmt.Sprintf("/nodes/%s/config", nodeID)
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -530,7 +526,7 @@ func cmdNodeShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupNodeId(c.Args().First())
+	id, err := adm.LookupNodeID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -551,7 +547,7 @@ func cmdNodeConfig(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	id, err := adm.LookupNodeId(c.Args().First())
+	id, err := adm.LookupNodeID(c.Args().First())
 	if err != nil {
 		return err
 	}
@@ -611,13 +607,13 @@ func cmdNodePropertyDelete(c *cli.Context, pType string) error {
 	}
 	var (
 		err              error
-		nodeId, sourceId string
+		nodeID, sourceID string
 		config           *proto.NodeConfig
 	)
-	if nodeId, err = adm.LookupNodeId(c.Args().First()); err != nil {
+	if nodeID, err = adm.LookupNodeID(c.Args().First()); err != nil {
 		return err
 	}
-	if config, err = adm.LookupNodeConfig(nodeId); err != nil {
+	if config, err = adm.LookupNodeConfig(nodeID); err != nil {
 		return err
 	}
 	if pType == `system` {
@@ -627,16 +623,16 @@ func cmdNodePropertyDelete(c *cli.Context, pType string) error {
 		}
 	}
 	if err = adm.FindNodePropSrcID(pType, c.Args().First(),
-		opts[`view`][0], nodeId, &sourceId); err != nil {
+		opts[`view`][0], nodeID, &sourceID); err != nil {
 		return err
 	}
 
 	req := proto.NewNodeRequest()
-	req.Node.ID = nodeId
+	req.Node.ID = nodeID
 	req.Node.Config = config
 
 	path := fmt.Sprintf("/nodes/%s/property/%s/%s",
-		nodeId, pType, sourceId)
+		nodeID, pType, sourceID)
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 

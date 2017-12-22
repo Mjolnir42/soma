@@ -43,7 +43,7 @@ func ListConfigurationItems(w http.ResponseWriter, r *http.Request, _ httprouter
 		jsonb []byte
 	)
 
-	if items, err = Eye.run.get_items.Query(); err != nil {
+	if items, err = Eye.run.getItems.Query(); err != nil {
 		dispatchInternalServerError(&w, err.Error())
 		return
 	}
@@ -59,7 +59,7 @@ func ListConfigurationItems(w http.ResponseWriter, r *http.Request, _ httprouter
 			return
 		}
 		i := item
-		list.ConfigurationItemIdList = append(list.ConfigurationItemIdList, i)
+		list.ConfigurationItemIDList = append(list.ConfigurationItemIDList, i)
 	}
 	if err = items.Err(); err != nil {
 		if err == sql.ErrNoRows {
@@ -69,7 +69,7 @@ func ListConfigurationItems(w http.ResponseWriter, r *http.Request, _ httprouter
 		}
 		return
 	}
-	if len(list.ConfigurationItemIdList) == 0 {
+	if len(list.ConfigurationItemIDList) == 0 {
 		dispatchNotFound(&w)
 		return
 	}
@@ -79,7 +79,7 @@ func ListConfigurationItems(w http.ResponseWriter, r *http.Request, _ httprouter
 		return
 	}
 
-	dispatchJsonOK(&w, &jsonb)
+	dispatchJSONOK(&w, &jsonb)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

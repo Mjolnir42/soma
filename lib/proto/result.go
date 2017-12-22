@@ -46,8 +46,8 @@ type Result struct {
 
 	// Errors is set for StatusCode >399
 	Errors *[]string `json:"errors,omitempty"`
-	// JobId is set for StatusCode 202 (async processing)
-	JobId   string `json:"jobId,omitempty"`
+	// JobID is set for StatusCode 202 (async processing)
+	JobID   string `json:"jobId,omitempty"`
 	JobType string `json:"jobType,omitempty"`
 	// List of (outstanding) deployment IDs
 	DeploymentsList *[]string `json:"deploymentsList,omitempty"`
@@ -206,7 +206,7 @@ func (r *Result) ErrorMark(err error, imp bool, found bool,
 		return true
 	}
 	if jobid != "" {
-		r.JobId = jobid
+		r.JobID = jobid
 		r.JobType = jobtype
 		r.Accepted()
 		return true

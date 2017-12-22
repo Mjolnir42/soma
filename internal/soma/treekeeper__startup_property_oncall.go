@@ -68,8 +68,8 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 				Name:         oncallName,
 				Number:       oncallNumber,
 			}
-			prop.Id, _ = uuid.FromString(instanceID)
-			prop.OncallId, _ = uuid.FromString(oncallID)
+			prop.ID, _ = uuid.FromString(instanceID)
+			prop.OncallID, _ = uuid.FromString(oncallID)
 			prop.Instances = make([]tree.PropertyInstance, 0)
 
 			instanceRows, err = stMap[`LoadPropOncallInstance`].Query(
@@ -120,9 +120,9 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 				}
 
 				pi := tree.PropertyInstance{
-					ObjectId:   propObjectID,
+					ObjectID:   propObjectID,
 					ObjectType: inObjectType,
-					InstanceId: propInstanceID,
+					InstanceID: propInstanceID,
 				}
 				prop.Instances = append(prop.Instances, pi)
 			}
@@ -130,7 +130,7 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 			// lookup the object and set the prepared property
 			tk.tree.Find(tree.FindRequest{
 				ElementType: loopType,
-				ElementId:   objectID,
+				ElementID:   objectID,
 			}, true).SetProperty(&prop)
 
 			// throw away all generated actions, we do this for every

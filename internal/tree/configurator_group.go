@@ -15,11 +15,11 @@ func (teg *Group) updateCheckInstances() {
 
 	// object may have no checks, but there could be instances to mop up
 	if len(teg.Checks) == 0 && len(teg.Instances) == 0 {
-		teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, HasChecks=%t",
+		teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, HasChecks=%t",
 			repoName,
 			`UpdateCheckInstances`,
 			`group`,
-			teg.Id.String(),
+			teg.ID.String(),
 			false,
 		)
 		// found nothing to do, ensure update flag is unset again
@@ -43,7 +43,7 @@ func (teg *Group) updateCheckInstances() {
 	// scan over all current checkinstances if their check still exists.
 	// If not the check has been deleted and the spawned instances need
 	// a good deletion
-	for ck, _ := range teg.CheckInstances {
+	for ck := range teg.CheckInstances {
 		if _, ok := teg.Checks[ck]; ok {
 			// check still exists
 			continue
@@ -53,11 +53,11 @@ func (teg *Group) updateCheckInstances() {
 		inst := teg.CheckInstances[ck]
 		for _, i := range inst {
 			teg.actionCheckInstanceDelete(teg.Instances[i].MakeAction())
-			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 				repoName,
 				`CleanupInstance`,
 				`group`,
-				teg.Id.String(),
+				teg.ID.String(),
 				ck,
 				i,
 			)
@@ -68,7 +68,7 @@ func (teg *Group) updateCheckInstances() {
 
 	// loop over all checks and test if there is a reason to disable
 	// its check instances. And with disable we mean delete.
-	for chk, _ := range teg.Checks {
+	for chk := range teg.Checks {
 		disableThis := false
 		// disable this check if the system property
 		// `disable_all_monitoring` is set for the view that the check
@@ -85,7 +85,7 @@ func (teg *Group) updateCheckInstances() {
 		// check_configuration that spawned this check
 		if _, hit, _ := teg.evalSystemProp(
 			`disable_check_configuration`,
-			teg.Checks[chk].ConfigId.String(),
+			teg.Checks[chk].ConfigID.String(),
 			teg.Checks[chk].View,
 		); hit {
 			disableThis = true
@@ -96,11 +96,11 @@ func (teg *Group) updateCheckInstances() {
 			if instanceArray, ok := teg.CheckInstances[chk]; ok {
 				for _, i := range instanceArray {
 					teg.actionCheckInstanceDelete(teg.Instances[i].MakeAction())
-					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`RemoveDisabledInstance`,
 						`group`,
-						teg.Id.String(),
+						teg.ID.String(),
 						chk,
 						i,
 					)
@@ -113,7 +113,7 @@ func (teg *Group) updateCheckInstances() {
 
 	// process remaining checks
 checksloop:
-	for i, _ := range teg.Checks {
+	for i := range teg.Checks {
 		if teg.Checks[i].Inherited == false && teg.Checks[i].ChildrenOnly == true {
 			continue checksloop
 		}
@@ -133,7 +133,7 @@ checksloop:
 		// property
 		if _, hit, _ := teg.evalSystemProp(
 			`disable_check_configuration`,
-			teg.Checks[i].ConfigId.String(),
+			teg.Checks[i].ConfigID.String(),
 			teg.Checks[i].View,
 		); hit {
 			continue checksloop
@@ -150,7 +150,7 @@ checksloop:
 		nativeC := map[string]string{}                 // Property->Value
 		serviceC := map[string]string{}                // Id->Value
 		customC := map[string]string{}                 // Id->Value
-		attributeC := map[string]map[string][]string{} // svcId->attr->[ value, ... ]
+		attributeC := map[string]map[string][]string{} // svcID->attr->[ value, ... ]
 
 		newInstances := map[string]CheckInstance{}
 		newCheckInstances := []string{}
@@ -202,11 +202,11 @@ checksloop:
 			}
 		}
 		if hasBrokenConstraint {
-			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 				repoName,
 				`ConstraintEvaluation`,
 				`group`,
-				teg.Id.String(),
+				teg.ID.String(),
 				i,
 				false,
 			)
@@ -220,7 +220,7 @@ checksloop:
 		 */
 		if hasServiceConstraint && hasAttributeConstraint {
 		svcattrloop:
-			for id, _ := range serviceC {
+			for id := range serviceC {
 				for _, attr := range attributes {
 					hit, bind := teg.evalAttributeOfService(id, view, attr.Key, attr.Value)
 					if hit {
@@ -243,10 +243,10 @@ checksloop:
 		} else if hasAttributeConstraint {
 			attrCount := len(attributes)
 			for _, attr := range attributes {
-				hit, svcIdMap := teg.evalAttributeProp(view, attr.Key, attr.Value)
+				hit, svcIDMap := teg.evalAttributeProp(view, attr.Key, attr.Value)
 				if hit {
-					for id, bind := range svcIdMap {
-						serviceC[id] = svcIdMap[id]
+					for id, bind := range svcIDMap {
+						serviceC[id] = svcIDMap[id]
 						if attributeC[id] == nil {
 							// attributeC[id] might still be a nil map
 							attributeC[id] = make(map[string][]string)
@@ -259,7 +259,7 @@ checksloop:
 			//
 			// if a check has two attribute constraints on the same
 			// attribute, then len(attributeC[id]) != len(attributes)
-			for id, _ := range attributeC {
+			for id := range attributeC {
 				if teg.countAttribC(attributeC[id]) != attrCount {
 					delete(serviceC, id)
 					delete(attributeC, id)
@@ -275,22 +275,22 @@ checksloop:
 			}
 		}
 		if hasBrokenConstraint {
-			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 				repoName,
 				`ConstraintEvaluation`,
 				`group`,
-				teg.Id.String(),
+				teg.ID.String(),
 				i,
 				false,
 			)
 			continue checksloop
 		}
 		// check triggered, create instances
-		teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, Match=%t",
+		teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
 			repoName,
 			`ConstraintEvaluation`,
 			`group`,
-			teg.Id.String(),
+			teg.ID.String(),
 			i,
 			true,
 		)
@@ -300,16 +300,16 @@ checksloop:
 		 */
 		if !hasServiceConstraint {
 			inst := CheckInstance{
-				InstanceId: uuid.UUID{},
-				CheckId: func(id string) uuid.UUID {
+				InstanceID: uuid.UUID{},
+				CheckID: func(id string) uuid.UUID {
 					f, _ := uuid.FromString(id)
 					return f
 				}(i),
-				ConfigId: func(id string) uuid.UUID {
-					f, _ := uuid.FromString(teg.Checks[id].ConfigId.String())
+				ConfigID: func(id string) uuid.UUID {
+					f, _ := uuid.FromString(teg.Checks[id].ConfigID.String())
 					return f
 				}(i),
-				InstanceConfigId:      uuid.NewV4(),
+				InstanceConfigID:      uuid.NewV4(),
 				ConstraintOncall:      oncallC,
 				ConstraintService:     serviceC,
 				ConstraintSystem:      systemC,
@@ -325,28 +325,28 @@ checksloop:
 
 			if startupLoad {
 			nosvcstartinstanceloop:
-				for ldInstId, ldInst := range teg.loadedInstances[i] {
+				for ldInstID, ldInst := range teg.loadedInstances[i] {
 					if ldInst.InstanceSvcCfgHash != "" {
 						continue nosvcstartinstanceloop
 					}
 					// check if an instance exists bound against the
 					// same constraints
 					if ldInst.ConstraintHash == inst.ConstraintHash &&
-						uuid.Equal(ldInst.ConfigId, inst.ConfigId) &&
+						uuid.Equal(ldInst.ConfigID, inst.ConfigID) &&
 						ldInst.ConstraintValHash == inst.ConstraintValHash {
 
 						// found a match
-						inst.InstanceId, _ = uuid.FromString(ldInstId)
-						inst.InstanceConfigId, _ = uuid.FromString(ldInst.InstanceConfigId.String())
+						inst.InstanceID, _ = uuid.FromString(ldInstID)
+						inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
 						inst.Version = ldInst.Version
-						delete(teg.loadedInstances[i], ldInstId)
-						teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+						delete(teg.loadedInstances[i], ldInstID)
+						teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 							repoName,
 							`ComputeInstance`,
 							`group`,
-							teg.Id.String(),
+							teg.ID.String(),
 							i,
-							ldInstId,
+							ldInstID,
 							false,
 						)
 						goto nosvcstartinstancematch
@@ -356,14 +356,14 @@ checksloop:
 				// that we could not match to any loaded instances
 				// -> something is wrong
 				teg.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
-					" ObjType=%s, ObjId=%s, CheckId=%s", `group`, teg.Id.String(), i, repoName)
+					" ObjType=%s, ObjId=%s, CheckID=%s", `group`, teg.ID.String(), i, repoName)
 				teg.Fault.Error <- &Error{Action: `Failed to match a computed instance to loaded data`}
 				return
 			nosvcstartinstancematch:
 			} else {
 			nosvcinstanceloop:
-				for _, exInstId := range teg.CheckInstances[i] {
-					exInst := teg.Instances[exInstId]
+				for _, exInstID := range teg.CheckInstances[i] {
+					exInst := teg.Instances[exInstID]
 					// ignore instances with service constraints
 					if exInst.InstanceSvcCfgHash != "" {
 						continue nosvcinstanceloop
@@ -371,29 +371,29 @@ checksloop:
 					// check if an instance exists bound against the same
 					// constraints
 					if exInst.ConstraintHash == inst.ConstraintHash {
-						inst.InstanceId, _ = uuid.FromString(exInst.InstanceId.String())
+						inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
 						inst.Version = exInst.Version + 1
 						break nosvcinstanceloop
 					}
 				}
-				if uuid.Equal(uuid.Nil, inst.InstanceId) {
+				if uuid.Equal(uuid.Nil, inst.InstanceID) {
 					// no match was found during nosvcinstanceloop, this
 					// is a new instance
 					inst.Version = 0
-					inst.InstanceId = uuid.NewV4()
+					inst.InstanceID = uuid.NewV4()
 				}
-				teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+				teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 					repoName,
 					`ComputeInstance`,
 					`group`,
-					teg.Id.String(),
+					teg.ID.String(),
 					i,
-					inst.InstanceId.String(),
+					inst.InstanceID.String(),
 					false,
 				)
 			}
-			newInstances[inst.InstanceId.String()] = inst
-			newCheckInstances = append(newCheckInstances, inst.InstanceId.String())
+			newInstances[inst.InstanceID.String()] = inst
+			newCheckInstances = append(newCheckInstances, inst.InstanceID.String())
 		}
 
 		/* if service constraints are in effect, then we generate
@@ -407,24 +407,24 @@ checksloop:
 		* permutations.
 		 */
 	serviceconstraintloop:
-		for svcId, _ := range serviceC {
+		for svcID := range serviceC {
 			if !hasServiceConstraint {
 				break serviceconstraintloop
 			}
 
-			svcCfg := teg.getServiceMap(svcId)
+			svcCfg := teg.getServiceMap(svcID)
 
 			// calculate how many instances this service spawns
 			combinations := 1
-			for attr, _ := range svcCfg {
+			for attr := range svcCfg {
 				combinations = combinations * len(svcCfg[attr])
 			}
 
 			// build all attribute combinations
 			results := make([]map[string]string, 0, combinations)
-			for attr, _ := range svcCfg {
+			for attr := range svcCfg {
 				if len(results) == 0 {
-					for i, _ := range svcCfg[attr] {
+					for i := range svcCfg[attr] {
 						res := map[string]string{}
 						res[attr] = svcCfg[attr][i]
 						results = append(results, res)
@@ -432,8 +432,8 @@ checksloop:
 					continue
 				}
 				ires := make([]map[string]string, 0, combinations)
-				for r, _ := range results {
-					for j, _ := range svcCfg[attr] {
+				for r := range results {
+					for j := range svcCfg[attr] {
 						res := map[string]string{}
 						for k, v := range results[r] {
 							res[k] = v
@@ -452,23 +452,23 @@ checksloop:
 					cfg[k] = v
 				}
 				inst := CheckInstance{
-					InstanceId: uuid.UUID{},
-					CheckId: func(id string) uuid.UUID {
+					InstanceID: uuid.UUID{},
+					CheckID: func(id string) uuid.UUID {
 						f, _ := uuid.FromString(id)
 						return f
 					}(i),
-					ConfigId: func(id string) uuid.UUID {
-						f, _ := uuid.FromString(teg.Checks[id].ConfigId.String())
+					ConfigID: func(id string) uuid.UUID {
+						f, _ := uuid.FromString(teg.Checks[id].ConfigID.String())
 						return f
 					}(i),
-					InstanceConfigId:      uuid.NewV4(),
+					InstanceConfigID:      uuid.NewV4(),
 					ConstraintOncall:      oncallC,
 					ConstraintService:     serviceC,
 					ConstraintSystem:      systemC,
 					ConstraintCustom:      customC,
 					ConstraintNative:      nativeC,
 					ConstraintAttribute:   attributeC,
-					InstanceService:       svcId,
+					InstanceService:       svcID,
 					InstanceServiceConfig: cfg,
 				}
 				inst.calcConstraintHash()
@@ -476,29 +476,29 @@ checksloop:
 				inst.calcInstanceSvcCfgHash()
 
 				if startupLoad {
-					for ldInstId, ldInst := range teg.loadedInstances[i] {
+					for ldInstID, ldInst := range teg.loadedInstances[i] {
 						// check for data from loaded instance
 						if ldInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash &&
 							ldInst.ConstraintHash == inst.ConstraintHash &&
 							ldInst.ConstraintValHash == inst.ConstraintValHash &&
 							ldInst.InstanceService == inst.InstanceService &&
-							uuid.Equal(ldInst.ConfigId, inst.ConfigId) {
+							uuid.Equal(ldInst.ConfigID, inst.ConfigID) {
 
 							// found a match
-							inst.InstanceId, _ = uuid.FromString(ldInstId)
-							inst.InstanceConfigId, _ = uuid.FromString(ldInst.InstanceConfigId.String())
+							inst.InstanceID, _ = uuid.FromString(ldInstID)
+							inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
 							inst.Version = ldInst.Version
 							// we can assume InstanceServiceConfig to
 							// be equal, since InstanceSvcCfgHash is
 							// equal
-							delete(teg.loadedInstances[i], ldInstId)
-							teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+							delete(teg.loadedInstances[i], ldInstID)
+							teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 								repoName,
 								`ComputeInstance`,
 								`group`,
-								teg.Id.String(),
+								teg.ID.String(),
 								i,
-								ldInstId,
+								ldInstID,
 								true,
 							)
 							goto startinstancematch
@@ -508,7 +508,7 @@ checksloop:
 					// instance that we could not match to any
 					// loaded instances -> something is wrong
 					teg.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
-						" ObjType=%s, ObjId=%s, CheckId=%s", `group`, teg.Id.String(), i, repoName)
+						" ObjType=%s, ObjId=%s, CheckID=%s", `group`, teg.ID.String(), i, repoName)
 					teg.Fault.Error <- &Error{Action: `Failed to match a computed instance to loaded data`}
 					return
 				startinstancematch:
@@ -516,34 +516,34 @@ checksloop:
 					// lookup existing instance ids for check in teg.CheckInstances
 					// to determine if this is an update
 				instanceloop:
-					for _, exInstId := range teg.CheckInstances[i] {
-						exInst := teg.Instances[exInstId]
+					for _, exInstID := range teg.CheckInstances[i] {
+						exInst := teg.Instances[exInstID]
 						// this existing instance is for the same service
 						// configuration -> this is an update
 						if exInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash {
-							inst.InstanceId, _ = uuid.FromString(exInst.InstanceId.String())
+							inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
 							inst.Version = exInst.Version + 1
 							break instanceloop
 						}
 					}
-					if uuid.Equal(uuid.Nil, inst.InstanceId) {
+					if uuid.Equal(uuid.Nil, inst.InstanceID) {
 						// no match was found during instanceloop, this is
 						// a new instance
 						inst.Version = 0
-						inst.InstanceId = uuid.NewV4()
+						inst.InstanceID = uuid.NewV4()
 					}
-					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s, ServiceConstrained=%t",
+					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 						repoName,
 						`ComputeInstance`,
 						`group`,
-						teg.Id.String(),
+						teg.ID.String(),
 						i,
-						inst.InstanceId.String(),
+						inst.InstanceID.String(),
 						true,
 					)
 				}
-				newInstances[inst.InstanceId.String()] = inst
-				newCheckInstances = append(newCheckInstances, inst.InstanceId.String())
+				newInstances[inst.InstanceID.String()] = inst
+				newCheckInstances = append(newCheckInstances, inst.InstanceID.String())
 			}
 		} // LOOPEND: range serviceC
 
@@ -558,57 +558,57 @@ checksloop:
 		// all new check instances have been built, check which
 		// existing instances did not get an update and need to be
 		// deleted
-		for _, oldInstanceId := range teg.CheckInstances[i] {
-			if _, ok := newInstances[oldInstanceId]; !ok {
+		for _, oldInstanceID := range teg.CheckInstances[i] {
+			if _, ok := newInstances[oldInstanceID]; !ok {
 				// there is no new version for this instance id
-				teg.actionCheckInstanceDelete(teg.Instances[oldInstanceId].MakeAction())
-				teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+				teg.actionCheckInstanceDelete(teg.Instances[oldInstanceID].MakeAction())
+				teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 					repoName,
 					`DeleteInstance`,
 					`group`,
-					teg.Id.String(),
+					teg.ID.String(),
 					i,
-					oldInstanceId,
+					oldInstanceID,
 				)
-				delete(teg.Instances, oldInstanceId)
+				delete(teg.Instances, oldInstanceID)
 				continue
 			}
-			delete(teg.Instances, oldInstanceId)
-			teg.Instances[oldInstanceId] = newInstances[oldInstanceId]
-			teg.actionCheckInstanceUpdate(teg.Instances[oldInstanceId].MakeAction())
-			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+			delete(teg.Instances, oldInstanceID)
+			teg.Instances[oldInstanceID] = newInstances[oldInstanceID]
+			teg.actionCheckInstanceUpdate(teg.Instances[oldInstanceID].MakeAction())
+			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 				repoName,
 				`UpdateInstance`,
 				`group`,
-				teg.Id.String(),
+				teg.ID.String(),
 				i,
-				oldInstanceId,
+				oldInstanceID,
 			)
 		}
-		for _, newInstanceId := range newCheckInstances {
-			if _, ok := teg.Instances[newInstanceId]; !ok {
+		for _, newInstanceID := range newCheckInstances {
+			if _, ok := teg.Instances[newInstanceID]; !ok {
 				// this instance is new, not an update
-				teg.Instances[newInstanceId] = newInstances[newInstanceId]
+				teg.Instances[newInstanceID] = newInstances[newInstanceID]
 				// no need to send a create action during load; the
 				// action channel is drained anyway
 				if !startupLoad {
-					teg.actionCheckInstanceCreate(teg.Instances[newInstanceId].MakeAction())
-					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					teg.actionCheckInstanceCreate(teg.Instances[newInstanceID].MakeAction())
+					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`CreateInstance`,
 						`group`,
-						teg.Id.String(),
+						teg.ID.String(),
 						i,
-						newInstanceId,
+						newInstanceID,
 					)
 				} else {
-					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectId=%s, CheckId=%s, InstanceId=%s",
+					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
 						repoName,
 						`RecreateInstance`,
 						`group`,
-						teg.Id.String(),
+						teg.ID.String(),
 						i,
-						newInstanceId,
+						newInstanceID,
 					)
 				}
 			}
@@ -656,8 +656,8 @@ func (teg *Group) evalSystemProp(prop string, val string, view string) (string, 
 func (teg *Group) evalOncallProp(prop string, val string, view string) (string, bool) {
 	for _, v := range teg.PropertyOncall {
 		t := v.(*PropertyOncall)
-		if "OncallId" == prop && t.Id.String() == val && (t.View == view || t.View == `any`) {
-			return t.Id.String(), true
+		if "OncallID" == prop && t.ID.String() == val && (t.View == view || t.View == `any`) {
+			return t.ID.String(), true
 		}
 	}
 	return "", false
@@ -677,14 +677,14 @@ func (teg *Group) evalServiceProp(prop string, val string, view string) (string,
 	for _, v := range teg.PropertyService {
 		t := v.(*PropertyService)
 		if prop == "name" && (t.Service == val || val == `@defined`) && (t.View == view || t.View == `any`) {
-			return t.Id.String(), true, t.Service
+			return t.ID.String(), true, t.Service
 		}
 	}
 	return "", false, ""
 }
 
-func (teg *Group) evalAttributeOfService(svcId string, view string, attribute string, value string) (bool, string) {
-	t := teg.PropertyService[svcId].(*PropertyService)
+func (teg *Group) evalAttributeOfService(svcID string, view string, attribute string, value string) (bool, string) {
+	t := teg.PropertyService[svcID].(*PropertyService)
 	for _, a := range t.Attributes {
 		if a.Name == attribute && (t.View == view || t.View == `any`) && (a.Value == value || value == `@defined`) {
 			return true, a.Value
@@ -700,7 +700,7 @@ svcloop:
 		t := v.(*PropertyService)
 		for _, a := range t.Attributes {
 			if a.Name == attr && (a.Value == value || value == `@defined`) && (t.View == view || t.View == `any`) {
-				f[t.Id.String()] = a.Value
+				f[t.ID.String()] = a.Value
 				continue svcloop
 			}
 		}
@@ -711,9 +711,9 @@ svcloop:
 	return false, f
 }
 
-func (teg *Group) getServiceMap(serviceId string) map[string][]string {
+func (teg *Group) getServiceMap(serviceID string) map[string][]string {
 	svc := new(PropertyService)
-	svc = teg.PropertyService[serviceId].(*PropertyService)
+	svc = teg.PropertyService[serviceID].(*PropertyService)
 
 	res := map[string][]string{}
 	for _, v := range svc.Attributes {
@@ -723,8 +723,8 @@ func (teg *Group) getServiceMap(serviceId string) map[string][]string {
 }
 
 func (teg *Group) countAttribC(attributeC map[string][]string) int {
-	var count int = 0
-	for key, _ := range attributeC {
+	var count int
+	for key := range attributeC {
 		count = count + len(attributeC[key])
 	}
 	return count
