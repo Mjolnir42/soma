@@ -6,10 +6,13 @@
  * that can be found in the LICENSE file.
  */
 
-package msg
+package msg // import "github.com/mjolnir42/soma/internal/msg"
 
 import (
+	"net/http"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
@@ -68,6 +71,17 @@ type Request struct {
 	Validity    proto.Validity
 	View        proto.View
 	Workflow    proto.Workflow
+}
+
+// New returns a Request
+func New(r *http.Request, params httprouter.Params) Request {
+	returnChannel := make(chan Result, 1)
+	return Request{
+		ID:         requestID(params),
+		RemoteAddr: remoteAddr(r),
+		AuthUser:   authUser(params),
+		Reply:      returnChannel,
+	}
 }
 
 type Filter struct {
