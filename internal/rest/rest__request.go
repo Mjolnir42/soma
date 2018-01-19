@@ -7,6 +7,7 @@
 
 // Package rest implements the REST routes to access SOMA.
 package rest // import "github.com/mjolnir42/soma/internal/rest"
+
 import (
 	"net/http"
 

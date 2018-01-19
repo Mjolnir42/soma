@@ -30,7 +30,7 @@ The following code is nearly verbatim the example code from the httprouter
 distribution. Therefor copyright is set to the license text of that distribution.
 */
 
-package rest
+package rest // import "github.com/mjolnir42/soma/internal/rest"
 
 import (
 	"bytes"
