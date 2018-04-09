@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"time"
 
-	"gopkg.in/resty.v0"
+	"github.com/go-resty/resty"
 )
 
 func Failed(id string) {

@@ -16,12 +16,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mjolnir42/soma/lib/proto"
-
-	"gopkg.in/resty.v0"
-
 	"github.com/asaskevich/govalidator"
+	"github.com/go-resty/resty"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 type NotifyMessage struct {
