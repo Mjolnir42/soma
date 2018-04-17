@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 2016-2017, Jörg Pernfuß
- * Copyright (c) 2016, 1&1 Internet SE
+ * Copyright (c) 2016,2018 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -16,6 +16,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/lib/proto"
 	"gopkg.in/resty.v0"
 )
 
@@ -37,15 +38,6 @@ type LifeCycle struct {
 	errLog            *logrus.Logger
 	pokers            map[string]chan string
 	soma              *Soma
-}
-
-// PokeMessage is the JSON that is sent to notify a monitoring system
-// about an available update.
-type PokeMessage struct {
-	UUID string `json:"uuid"`
-	// path should be used to tell the client system the basepath
-	// where to get it so SOMA + path + item_id === complete_url
-	Path string `json:"path"`
 }
 
 // newLifeCycle returns a new LifeCycle handler
@@ -471,7 +463,7 @@ func (lc *LifeCycle) pokeSystem(callback string, in chan string) {
 				lc.soma.conf.PokeTimeout) * time.Millisecond,
 			)
 			if _, err := client.R().SetBody(
-				PokeMessage{
+				proto.PushNotification{
 					UUID: chkID,
 					Path: lc.soma.conf.PokePath,
 				},
