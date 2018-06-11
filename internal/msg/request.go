@@ -89,6 +89,7 @@ type Filter struct {
 	Job        proto.JobFilter
 	Server     proto.Server
 	Level      proto.Level
+	SectionObj proto.Section
 }
 
 type UpdateData struct {

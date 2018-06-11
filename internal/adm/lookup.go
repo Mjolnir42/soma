@@ -928,7 +928,7 @@ func sectionIDByName(section string) (string, error) {
 	req := proto.NewSectionFilter()
 	req.Filter.Section.Name = section
 
-	res, err := fetchFilter(req, `/filter/sections/`)
+	res, err := fetchFilter(req, `/search/section/`)
 	if err != nil {
 		goto abort
 	}

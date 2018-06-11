@@ -90,7 +90,7 @@ func cmdActionAdd(c *cli.Context) error {
 	req := proto.NewActionRequest()
 	req.Action.Name = c.Args().First()
 	req.Action.SectionID = sectionID
-	path := fmt.Sprintf("/sections/%s/actions/", sectionID)
+	path := fmt.Sprintf("/section/%s/actions/", sectionID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
@@ -123,7 +123,7 @@ func cmdActionRemove(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s/actions/%s", sectionID, actionID)
+	path := fmt.Sprintf("/section/%s/actions/%s", sectionID, actionID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -150,7 +150,7 @@ func cmdActionList(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s/actions/", sectionID)
+	path := fmt.Sprintf("/section/%s/actions/", sectionID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
@@ -183,7 +183,7 @@ func cmdActionShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s/actions/%s", sectionID, actionID)
+	path := fmt.Sprintf("/section/%s/actions/%s", sectionID, actionID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

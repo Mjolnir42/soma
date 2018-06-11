@@ -11,11 +11,11 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerSection(app cli.App) *cli.App {
@@ -81,7 +81,7 @@ func cmdSectionAdd(c *cli.Context) error {
 	req := proto.NewSectionRequest()
 	req.Section.Name = c.Args().First()
 	req.Section.Category = opts[`to`][0]
-	return adm.Perform(`postbody`, `/sections/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/section/`, `command`, req, c)
 }
 
 func cmdSectionRemove(c *cli.Context) error {
@@ -97,7 +97,7 @@ func cmdSectionRemove(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s", sectionID)
+	path := fmt.Sprintf("/section/%s", sectionID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -106,7 +106,7 @@ func cmdSectionList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/sections/`, `list`, nil, c)
+	return adm.Perform(`get`, `/section/`, `list`, nil, c)
 }
 
 func cmdSectionShow(c *cli.Context) error {
@@ -122,7 +122,7 @@ func cmdSectionShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/sections/%s", sectionID)
+	path := fmt.Sprintf("/section/%s", sectionID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
