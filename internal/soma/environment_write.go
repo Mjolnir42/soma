@@ -83,10 +83,10 @@ func (w *EnvironmentWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionCreate:
-		w.create(q, &result)
-	case msg.ActionDelete:
-		w.delete(q, &result)
+	case msg.ActionAdd:
+		w.add(q, &result)
+	case msg.ActionRemove:
+		w.remove(q, &result)
 	case msg.ActionRename:
 		w.rename(q, &result)
 	default:
@@ -96,8 +96,8 @@ func (w *EnvironmentWrite) process(q *msg.Request) {
 	q.Reply <- result
 }
 
-// create inserts a new environment
-func (w *EnvironmentWrite) create(q *msg.Request, mr *msg.Result) {
+// add inserts a new environment
+func (w *EnvironmentWrite) add(q *msg.Request, mr *msg.Result) {
 	var (
 		err error
 		res sql.Result
@@ -114,8 +114,8 @@ func (w *EnvironmentWrite) create(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// delete removes an environment
-func (w *EnvironmentWrite) delete(q *msg.Request, mr *msg.Result) {
+// remove deletes an environment
+func (w *EnvironmentWrite) remove(q *msg.Request, mr *msg.Result) {
 	var (
 		err error
 		res sql.Result
