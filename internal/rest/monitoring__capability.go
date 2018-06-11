@@ -144,7 +144,7 @@ func (x *Rest) CapabilityRemove(w http.ResponseWriter, r *http.Request,
 
 	request := newRequest(r, params)
 	request.Section = msg.SectionCapability
-	request.Action = msg.ActionAdd
+	request.Action = msg.ActionRemove
 	request.Capability = proto.Capability{
 		ID: params.ByName(`capabilityID`),
 	}
