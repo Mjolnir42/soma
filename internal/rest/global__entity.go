@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2015-2017, Jörg Pernfuß
+ * Copyright (c) 2015-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -20,7 +20,7 @@ func (x *Rest) EntityList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionEntity
 	request.Action = msg.ActionList
 
@@ -40,7 +40,7 @@ func (x *Rest) EntityShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionEntity
 	request.Action = msg.ActionShow
 	request.Entity = proto.Entity{
@@ -69,7 +69,7 @@ func (x *Rest) EntityAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionEntity
 	request.Action = msg.ActionAdd
 	request.Entity = proto.Entity{
