@@ -176,7 +176,7 @@ func ValidateSystemProperty(s string) error {
 // ValidateEnvironment tests against the server if string s is a
 // valid system property
 func ValidateEnvironment(s string) error {
-	res, err := fetchObjList(`/environments/`)
+	res, err := fetchObjList(`/environment/`)
 	if err != nil {
 		return err
 	}

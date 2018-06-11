@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerEnvironments(app cli.App) *cli.App {
@@ -58,7 +58,7 @@ func cmdEnvironmentsAdd(c *cli.Context) error {
 	req := proto.NewEnvironmentRequest()
 	req.Environment.Name = c.Args().First()
 
-	return adm.Perform(`postbody`, `/environments/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/environment/`, `command`, req, c)
 }
 
 func cmdEnvironmentsRemove(c *cli.Context) error {
@@ -66,7 +66,7 @@ func cmdEnvironmentsRemove(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/environments/%s", c.Args().First())
+	path := fmt.Sprintf("/environment/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -82,7 +82,7 @@ func cmdEnvironmentsRename(c *cli.Context) error {
 	req := proto.NewEnvironmentRequest()
 	req.Environment.Name = opts[`to`][0]
 
-	path := fmt.Sprintf("/environments/%s", c.Args().First())
+	path := fmt.Sprintf("/environment/%s", c.Args().First())
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -91,7 +91,7 @@ func cmdEnvironmentsList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/environments/`, `list`, nil, c)
+	return adm.Perform(`get`, `/environment/`, `list`, nil, c)
 }
 
 func cmdEnvironmentsShow(c *cli.Context) error {
@@ -99,7 +99,7 @@ func cmdEnvironmentsShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/environments/%s", c.Args().First())
+	path := fmt.Sprintf("/environment/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
