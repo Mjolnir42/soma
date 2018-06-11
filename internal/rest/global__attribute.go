@@ -24,9 +24,6 @@ func (x *Rest) AttributeList(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionList
-	request.ActionObj = proto.Action{
-		SectionID: params.ByName(`section`),
-	}
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
