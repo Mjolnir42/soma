@@ -83,7 +83,7 @@ func (w *ValidityWrite) process(q *msg.Request) {
 	switch q.Action {
 	case msg.ActionCreate:
 		w.add(q, &result)
-	case msg.ActionDelete:
+	case msg.ActionRemove:
 		w.remove(q, &result)
 	default:
 		result.UnknownRequest(q)
