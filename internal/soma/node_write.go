@@ -86,9 +86,9 @@ func (w *NodeWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionCreate:
+	case msg.ActionAdd:
 		w.add(q, &result)
-	case msg.ActionDelete:
+	case msg.ActionRemove:
 		w.remove(q, &result)
 	case msg.ActionUpdate:
 		w.update(q, &result)
