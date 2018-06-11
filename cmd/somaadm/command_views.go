@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerViews(app cli.App) *cli.App {
@@ -61,7 +61,7 @@ func cmdViewsAdd(c *cli.Context) error {
 		return fmt.Errorf(`Views must not contain the character '.'`)
 	}
 
-	return adm.Perform(`postbody`, `/views/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/view/`, `command`, req, c)
 }
 
 func cmdViewsRemove(c *cli.Context) error {
@@ -69,7 +69,7 @@ func cmdViewsRemove(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/views/%s", c.Args().First())
+	path := fmt.Sprintf("/view/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -89,7 +89,7 @@ func cmdViewsRename(c *cli.Context) error {
 	req.View = &proto.View{}
 	req.View.Name = opts["to"][0]
 
-	path := fmt.Sprintf("/views/%s", c.Args().First())
+	path := fmt.Sprintf("/view/%s", c.Args().First())
 	return adm.Perform(`patchbody`, path, `command`, nil, c)
 }
 
@@ -98,7 +98,7 @@ func cmdViewsList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/views/`, `list`, nil, c)
+	return adm.Perform(`get`, `/view/`, `list`, nil, c)
 }
 
 func cmdViewsShow(c *cli.Context) error {
@@ -106,7 +106,7 @@ func cmdViewsShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/views/%s", c.Args().First())
+	path := fmt.Sprintf("/view/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
