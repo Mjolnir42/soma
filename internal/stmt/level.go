@@ -24,6 +24,13 @@ SELECT level_name,
 FROM   soma.notification_levels
 WHERE  level_name = $1;`
 
+	LevelSearch = `
+SELECT level_name,
+       level_shortname
+FROM   soma.notification_levels
+WHERE  ( level_name = $1::varchar OR $1::varchar IS NULL)
+   OR  ( level_shortname = $2::varchar OR $2::varchar IS NULL);`
+
 	LevelAdd = `
 INSERT INTO soma.notification_levels (
             level_name,
@@ -46,6 +53,7 @@ func init() {
 	m[LevelAdd] = `LevelAdd`
 	m[LevelDel] = `LevelDel`
 	m[LevelList] = `LevelList`
+	m[LevelSearch] = `LevelSearch`
 	m[LevelShow] = `LevelShow`
 }
 

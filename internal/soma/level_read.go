@@ -19,14 +19,15 @@ import (
 
 // LevelRead handles read requests for alert levels
 type LevelRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input      chan msg.Request
+	Shutdown   chan struct{}
+	conn       *sql.DB
+	stmtList   *sql.Stmt
+	stmtSearch *sql.Stmt
+	stmtShow   *sql.Stmt
+	appLog     *logrus.Logger
+	reqLog     *logrus.Logger
+	errLog     *logrus.Logger
 }
 
 // newLevelRead return a new LevelRead handler with input buffer of
@@ -51,8 +52,9 @@ func (r *LevelRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.LevelList: r.stmtList,
-		stmt.LevelShow: r.stmtShow,
+		stmt.LevelList:   r.stmtList,
+		stmt.LevelSearch: r.stmtSearch,
+		stmt.LevelShow:   r.stmtShow,
 	} {
 		if prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`level`, err, stmt.Name(statement))
@@ -81,6 +83,8 @@ func (r *LevelRead) process(q *msg.Request) {
 	switch q.Action {
 	case msg.ActionList:
 		r.list(q, &result)
+	case msg.ActionSearch:
+		r.search(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
 	default:
@@ -146,6 +150,51 @@ func (r *LevelRead) show(q *msg.Request, mr *msg.Result) {
 		ShortName: short,
 		Numeric:   numeric,
 	})
+	mr.OK()
+}
+
+// search returns a specific alert level
+func (r *LevelRead) search(q *msg.Request, mr *msg.Result) {
+	var (
+		searchName, searchShort sql.NullString
+		level, short            string
+		rows                    *sql.Rows
+		err                     error
+	)
+
+	if q.Search.Level.Name != `` {
+		searchName.String = q.Search.Level.Name
+		searchName.Valid = true
+	}
+
+	if q.Search.Level.ShortName != `` {
+		searchShort.String = q.Search.Level.ShortName
+		searchShort.Valid = true
+	}
+
+	if rows, err = r.stmtSearch.Query(
+		searchName,
+		searchShort,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(&level, &short); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		mr.Level = append(mr.Level, proto.Level{
+			Name:      level,
+			ShortName: short,
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err)
+		return
+	}
 	mr.OK()
 }
 

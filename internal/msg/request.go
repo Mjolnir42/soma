@@ -88,6 +88,7 @@ type Filter struct {
 	IsDetailed bool
 	Job        proto.JobFilter
 	Server     proto.Server
+	Level      proto.Level
 }
 
 type UpdateData struct {

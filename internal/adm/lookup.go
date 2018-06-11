@@ -1195,7 +1195,7 @@ func levelByName(lvl string) (string, error) {
 	req.Filter.Level.Name = lvl
 	req.Filter.Level.ShortName = lvl
 
-	res, err := fetchFilter(req, `/filter/levels/`)
+	res, err := fetchFilter(req, `/search/level/`)
 	if err != nil {
 		goto abort
 	}

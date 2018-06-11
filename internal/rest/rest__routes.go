@@ -34,6 +34,8 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/entity/`, x.Verify(x.EntityList))
 	router.GET(`/environment/:environment`, x.Verify(x.EnvironmentShow))
 	router.GET(`/environment/`, x.Verify(x.EnvironmentList))
+	router.GET(`/level/:level`, x.Verify(x.LevelShow))
+	router.GET(`/level/`, x.Verify(x.LevelList))
 	router.GET(`/sections/:section/actions/:action`, x.Verify(x.ActionShow))
 	router.GET(`/sections/:section/actions/`, x.Verify(x.ActionList))
 	router.GET(`/sync/datacenter/`, x.Verify(x.DatacenterSync))
@@ -46,6 +48,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(`/search/capability/`, x.Verify(x.CapabilitySearch))
 	router.POST(`/search/checkconfig/:repositoryID/`, x.Verify(x.CheckConfigSearch))
 	router.POST(`/search/cluster/`, x.Verify(x.ClusterSearch))
+	router.POST(`/search/level/`, x.Verify(x.LevelSearch))
 
 	if !x.conf.ReadOnly {
 		if !x.conf.Observer {
@@ -59,6 +62,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(`/datacenter/:datacenter`, x.Verify(x.DatacenterRemove))
 			router.DELETE(`/entity/:entity`, x.Verify(x.EntityRemove))
 			router.DELETE(`/environment/:environment`, x.Verify(x.EnvironmentRemove))
+			router.DELETE(`/level/:level`, x.Verify(x.LevelRemove))
 			router.DELETE(`/node/:nodeID`, x.Verify(x.NodeMgmtRemove))
 			router.DELETE(`/sections/:section/actions/:action`, x.Verify(x.ActionRemove))
 			router.DELETE(`/tokens/global`, x.Verify(x.SupervisorTokenInvalidateGlobal))
@@ -79,6 +83,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.POST(`/entity/`, x.Verify(x.EntityAdd))
 			router.POST(`/environment/`, x.Verify(x.EnvironmentAdd))
 			router.POST(`/kex/`, x.CheckShutdown(x.SupervisorKex))
+			router.POST(`/level/`, x.Verify(x.LevelAdd))
 			router.POST(`/node/`, x.Verify(x.NodeMgmtAdd))
 			router.POST(`/sections/:section/actions/`, x.Verify(x.ActionAdd))
 			router.POST(`/validity/`, x.Verify(x.ValidityAdd))

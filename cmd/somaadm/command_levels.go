@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerLevels(app cli.App) *cli.App {
@@ -37,6 +37,11 @@ func registerLevels(app cli.App) *cli.App {
 						Name:   "show",
 						Usage:  "Show details about a notification level",
 						Action: runtime(cmdLevelShow),
+					},
+					{
+						Name:   `search`,
+						Usage:  `Lookup a notification level by name or shortname`,
+						Action: runtime(cmdLevelSearch),
 					},
 				},
 			}, // end levels
@@ -70,7 +75,7 @@ func cmdLevelCreate(c *cli.Context) error {
 	}
 	req.Level.Numeric = uint16(l)
 
-	return adm.Perform(`postbody`, `/levels/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/level/`, `command`, req, c)
 }
 
 func cmdLevelDelete(c *cli.Context) error {
@@ -78,7 +83,7 @@ func cmdLevelDelete(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/levels/%s", c.Args().First())
+	path := fmt.Sprintf("/level/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -87,7 +92,7 @@ func cmdLevelList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/levels/`, `list`, nil, c)
+	return adm.Perform(`get`, `/level/`, `list`, nil, c)
 }
 
 func cmdLevelShow(c *cli.Context) error {
@@ -95,8 +100,20 @@ func cmdLevelShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/levels/%s", c.Args().First())
+	path := fmt.Sprintf("/level/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
+}
+
+func cmdLevelSearch(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	req := proto.NewLevelFilter()
+	req.Filter.Level.Name = c.Args().First()
+	req.Filter.Level.ShortName = c.Args().First()
+
+	return adm.Perform(`postbody`, `/search/level/`, `list`, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
