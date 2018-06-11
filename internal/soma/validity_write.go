@@ -81,7 +81,7 @@ func (w *ValidityWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionCreate:
+	case msg.ActionAdd:
 		w.add(q, &result)
 	case msg.ActionRemove:
 		w.remove(q, &result)
