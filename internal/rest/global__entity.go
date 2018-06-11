@@ -94,7 +94,7 @@ func (x *Rest) EntityRemove(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionEntity
-	request.Action = msg.ActionAdd
+	request.Action = msg.ActionRemove
 	request.Entity = proto.Entity{
 		Name: params.ByName(`entity`),
 	}
