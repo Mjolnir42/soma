@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerModes(app cli.App) *cli.App {
@@ -52,7 +52,7 @@ func cmdModeCreate(c *cli.Context) error {
 	req.Mode = &proto.Mode{}
 	req.Mode.Mode = c.Args().First()
 
-	return adm.Perform(`postbody`, `/modes/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/mode/`, `command`, req, c)
 }
 
 func cmdModeDelete(c *cli.Context) error {
@@ -60,7 +60,7 @@ func cmdModeDelete(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/modes/%s", c.Args().First())
+	path := fmt.Sprintf("/mode/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -69,7 +69,7 @@ func cmdModeList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/modes/`, `list`, nil, c)
+	return adm.Perform(`get`, `/mode/`, `list`, nil, c)
 }
 
 func cmdModeShow(c *cli.Context) error {
@@ -77,7 +77,7 @@ func cmdModeShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/modes/%s", c.Args().First())
+	path := fmt.Sprintf("/mode/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
