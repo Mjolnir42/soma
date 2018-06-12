@@ -91,7 +91,7 @@ func cmdMetricCreate(c *cli.Context) error {
 		req.Metric.Packages = &pkgs
 	}
 
-	return adm.Perform(`postbody`, `/metrics/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/metric/`, `command`, req, c)
 }
 
 func cmdMetricDelete(c *cli.Context) error {
@@ -99,7 +99,7 @@ func cmdMetricDelete(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/metrics/%s", c.Args().First())
+	path := fmt.Sprintf("/metric/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -108,7 +108,7 @@ func cmdMetricList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/metrics/`, `list`, nil, c)
+	return adm.Perform(`get`, `/metric/`, `list`, nil, c)
 }
 
 func cmdMetricShow(c *cli.Context) error {
@@ -116,7 +116,7 @@ func cmdMetricShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/metrics/%s", c.Args().First())
+	path := fmt.Sprintf("/metric/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

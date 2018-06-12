@@ -17,6 +17,23 @@ type Metric struct {
 	Details     *MetricDetails   `json:"details,omitempty"`
 }
 
+func (m *Metric) Clone() Metric {
+	clone := Metric{
+		Path:        m.Path,
+		Unit:        m.Unit,
+		Description: m.Description,
+		Packages:    &[]MetricPackage{},
+		Details:     m.Details.Clone(),
+	}
+	for i := range *m.Packages {
+		*clone.Packages = append(*clone.Packages, (*m.Packages)[i].Clone())
+	}
+	if len(*clone.Packages) == 0 {
+		clone.Packages = nil
+	}
+	return clone
+}
+
 type MetricFilter struct {
 	Unit     string `json:"unit,omitempty"`
 	Provider string `json:"provider,omitempty"`
@@ -27,9 +44,22 @@ type MetricDetails struct {
 	DetailsCreation
 }
 
+func (d *MetricDetails) Clone() *MetricDetails {
+	return &MetricDetails{
+		DetailsCreation: *d.DetailsCreation.Clone(),
+	}
+}
+
 type MetricPackage struct {
 	Provider string `json:"provider,omitempty"`
 	Name     string `json:"name,omitempty"`
+}
+
+func (p *MetricPackage) Clone() MetricPackage {
+	return MetricPackage{
+		Provider: p.Provider,
+		Name:     p.Name,
+	}
 }
 
 //
