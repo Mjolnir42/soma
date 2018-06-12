@@ -14,8 +14,21 @@ type Status struct {
 	Details *StatusDetails `json:"details,omitempty"`
 }
 
+func (s *Status) Clone() Status {
+	return Status{
+		Name:    s.Name,
+		Details: s.Details.Clone(),
+	}
+}
+
 type StatusDetails struct {
 	DetailsCreation
+}
+
+func (s *StatusDetails) Clone() *StatusDetails {
+	return &StatusDetails{
+		DetailsCreation: *s.DetailsCreation.Clone(),
+	}
 }
 
 func NewStatusRequest() Request {
