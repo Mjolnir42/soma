@@ -40,6 +40,8 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/section/:section/actions/`, x.Verify(x.ActionList))
 	router.GET(`/section/:section`, x.Verify(x.SectionShow))
 	router.GET(`/section/`, x.Verify(x.SectionList))
+	router.GET(`/state/:state`, x.Verify(x.StateShow))
+	router.GET(`/state/`, x.Verify(x.StateList))
 	router.GET(`/sync/datacenter/`, x.Verify(x.DatacenterSync))
 	router.GET(`/sync/node/`, x.Verify(x.NodeMgmtSync))
 	router.GET(`/validity/:property`, x.Verify(x.ValidityShow))
@@ -71,6 +73,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(`/node/:nodeID`, x.Verify(x.NodeMgmtRemove))
 			router.DELETE(`/section/:section/actions/:action`, x.Verify(x.ActionRemove))
 			router.DELETE(`/section/:section`, x.Verify(x.SectionRemove))
+			router.DELETE(`/state/:state`, x.Verify(x.StateRemove))
 			router.DELETE(`/tokens/global`, x.Verify(x.SupervisorTokenInvalidateGlobal))
 			router.DELETE(`/tokens/self/active`, x.Verify(x.SupervisorTokenInvalidate))
 			router.DELETE(`/tokens/self/all`, x.Verify(x.SupervisorTokenInvalidateSelf))
@@ -95,6 +98,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.POST(`/node/`, x.Verify(x.NodeMgmtAdd))
 			router.POST(`/section/:section/actions/`, x.Verify(x.ActionAdd))
 			router.POST(`/section/`, x.Verify(x.SectionAdd))
+			router.POST(`/state/`, x.Verify(x.StateAdd))
 			router.POST(`/validity/`, x.Verify(x.ValidityAdd))
 			router.POST(`/view/`, x.Verify(x.ViewAdd))
 			router.PUT(`/accounts/activate/root/:kexID`, x.CheckShutdown(x.SupervisorActivateRoot))
@@ -104,6 +108,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PUT(`/entity/:entity`, x.Verify(x.EntityRename))
 			router.PUT(`/environment/:environment`, x.Verify(x.EnvironmentRename))
 			router.PUT(`/node/:nodeID`, x.Verify(x.NodeMgmtUpdate))
+			router.PUT(`/state/:state`, x.Verify(x.StateRename))
 			router.PUT(`/tokens/request/:kexID`, x.CheckShutdown(x.SupervisorTokenRequest))
 		}
 	}
