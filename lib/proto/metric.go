@@ -25,8 +25,10 @@ func (m *Metric) Clone() Metric {
 		Packages:    &[]MetricPackage{},
 		Details:     m.Details.Clone(),
 	}
-	for i := range *m.Packages {
-		*clone.Packages = append(*clone.Packages, (*m.Packages)[i].Clone())
+	if m.Packages != nil {
+		for i := range *m.Packages {
+			*clone.Packages = append(*clone.Packages, (*m.Packages)[i].Clone())
+		}
 	}
 	if len(*clone.Packages) == 0 {
 		clone.Packages = nil
