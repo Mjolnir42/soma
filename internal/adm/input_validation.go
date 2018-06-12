@@ -122,7 +122,7 @@ func ValidateLBoundUint64(s string, i *uint64, min uint64) error {
 // ValidateUnit tests against the server if string s is a valid
 // unit.
 func ValidateUnit(s string) error {
-	res, err := fetchObjList(`/units/`)
+	res, err := fetchObjList(`/unit/`)
 	if err != nil {
 		return err
 	}

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerUnits(app cli.App) *cli.App {
@@ -62,7 +62,7 @@ func cmdUnitCreate(c *cli.Context) error {
 	req.Unit.Unit = c.Args().First()
 	req.Unit.Name = opts["name"][0]
 
-	return adm.Perform(`postbody`, `/units/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/unit/`, `command`, req, c)
 }
 
 func cmdUnitDelete(c *cli.Context) error {
@@ -71,7 +71,7 @@ func cmdUnitDelete(c *cli.Context) error {
 	}
 
 	esc := url.QueryEscape(c.Args().First())
-	path := fmt.Sprintf("/units/%s", esc)
+	path := fmt.Sprintf("/unit/%s", esc)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -80,7 +80,7 @@ func cmdUnitList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/units/`, `list`, nil, c)
+	return adm.Perform(`get`, `/unit/`, `list`, nil, c)
 }
 
 func cmdUnitShow(c *cli.Context) error {
@@ -89,7 +89,7 @@ func cmdUnitShow(c *cli.Context) error {
 	}
 
 	esc := url.QueryEscape(c.Args().First())
-	path := fmt.Sprintf("/units/%s", esc)
+	path := fmt.Sprintf("/unit/%s", esc)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
