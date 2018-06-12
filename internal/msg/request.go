@@ -87,10 +87,10 @@ func New(r *http.Request, params httprouter.Params) Request {
 type Filter struct {
 	IsDetailed bool
 	Job        proto.JobFilter
-	Server     proto.Server
 	Level      proto.Level
 	Oncall     proto.Oncall
 	SectionObj proto.Section
+	Server     proto.Server
 }
 
 type UpdateData struct {
