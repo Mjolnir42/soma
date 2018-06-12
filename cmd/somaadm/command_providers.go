@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerProviders(app cli.App) *cli.App {
@@ -17,13 +17,13 @@ func registerProviders(app cli.App) *cli.App {
 				Usage: "SUBCOMMANDS for metric providers",
 				Subcommands: []cli.Command{
 					{
-						Name:   "create",
-						Usage:  "Create a new metric provider",
+						Name:   "add",
+						Usage:  "Add a new metric provider",
 						Action: runtime(cmdProviderCreate),
 					},
 					{
-						Name:   "delete",
-						Usage:  "Delete a metric provider",
+						Name:   "remove",
+						Usage:  "Remove a metric provider",
 						Action: runtime(cmdProviderDelete),
 					},
 					{
@@ -52,7 +52,7 @@ func cmdProviderCreate(c *cli.Context) error {
 	req.Provider = &proto.Provider{}
 	req.Provider.Name = c.Args().First()
 
-	return adm.Perform(`postbody`, `/providers/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/provider/`, `command`, req, c)
 }
 
 func cmdProviderDelete(c *cli.Context) error {
@@ -60,7 +60,7 @@ func cmdProviderDelete(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/providers/%s", c.Args().First())
+	path := fmt.Sprintf("/provider/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -69,7 +69,7 @@ func cmdProviderList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/providers/`, `list`, nil, c)
+	return adm.Perform(`get`, `/provider/`, `list`, nil, c)
 }
 
 func cmdProviderShow(c *cli.Context) error {
@@ -77,7 +77,7 @@ func cmdProviderShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/providers/%s", c.Args().First())
+	path := fmt.Sprintf("/provider/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

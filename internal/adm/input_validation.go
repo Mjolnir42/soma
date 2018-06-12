@@ -140,7 +140,7 @@ func ValidateUnit(s string) error {
 // ValidateProvider tests against the server if string s is a valid
 // provider.
 func ValidateProvider(s string) error {
-	res, err := fetchObjList(`/providers/`)
+	res, err := fetchObjList(`/provider/`)
 	if err != nil {
 		return err
 	}
