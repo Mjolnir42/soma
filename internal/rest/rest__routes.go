@@ -34,6 +34,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/entity/`, x.Verify(x.EntityList))
 	router.GET(`/environment/:environment`, x.Verify(x.EnvironmentShow))
 	router.GET(`/environment/`, x.Verify(x.EnvironmentList))
+	router.GET(`/instance/`, x.Verify(x.InstanceMgmtAll))
 	router.GET(`/level/:level`, x.Verify(x.LevelShow))
 	router.GET(`/level/`, x.Verify(x.LevelList))
 	router.GET(`/metric/:metric`, x.Verify(x.MetricShow))

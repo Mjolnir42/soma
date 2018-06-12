@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -11,8 +11,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/codegangsta/cli"
+	"github.com/mjolnir42/soma/internal/adm"
 )
 
 func registerInstances(app cli.App) *cli.App {
@@ -26,11 +26,6 @@ func registerInstances(app cli.App) *cli.App {
 						Name:   `cascade-delete`,
 						Usage:  `Delete check configuration that created the instance`,
 						Action: runtime(cmdInstanceCascade),
-					},
-					{
-						Name:   `list`,
-						Usage:  `List all check instances`,
-						Action: runtime(cmdInstanceList),
 					},
 					{
 						Name:   `show`,
@@ -68,14 +63,6 @@ func cmdInstanceCascade(c *cli.Context) error {
 
 	path := fmt.Sprintf("/checks/%s/%s", repoID, checkID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
-}
-
-func cmdInstanceList(c *cli.Context) error {
-	if err := adm.VerifyNoArgument(c); err != nil {
-		return err
-	}
-
-	return adm.Perform(`get`, `/instances/`, `list`, nil, c)
 }
 
 func cmdInstanceShow(c *cli.Context) error {

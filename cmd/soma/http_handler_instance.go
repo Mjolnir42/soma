@@ -133,40 +133,4 @@ func InstanceList(w http.ResponseWriter, r *http.Request,
 	SendMsgResult(&w, &result)
 }
 
-// InstanceListAll is an administrative action that lists all
-// check instances on the system
-func InstanceListAll(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer PanicCatcher(w)
-
-	if !fixIsAuthorized(&msg.Authorization{
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		// Section: msg.SectionInstanceMgmt
-		Section: `runtime`,
-		// Action: msg.ActionAll
-		Action: `instance_list_all`,
-	}) {
-		DispatchForbidden(&w, nil)
-		return
-	}
-
-	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`instance_r`].(*instance)
-	handler.input <- msg.Request{
-		// Section: msg.SectionInstanceMgmt
-		Section: `runtime`,
-		// Action: msg.ActionAll
-		Action: `instance_list_all`,
-		// set msg.Request.Flag.Unscoped == true
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Instance:   proto.Instance{},
-		Flag:       msg.Flags{Unscoped: true},
-	}
-	result := <-returnChannel
-	SendMsgResult(&w, &result)
-}
-
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -1093,7 +1093,7 @@ abort:
 // checkConfigIDByInstance implements the actual lookup of the check
 // configuration's UUID from the server via an instance ID it created
 func checkConfigIDByInstance(instance string) (string, string, error) {
-	res, err := fetchObjList(fmt.Sprintf("/instances/%s", instance))
+	res, err := fetchObjList(fmt.Sprintf("/instance/%s", instance))
 	if err != nil {
 		goto abort
 	}

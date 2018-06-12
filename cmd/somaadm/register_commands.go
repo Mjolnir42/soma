@@ -28,6 +28,7 @@ func registerCommands(app cli.App) *cli.App {
 	app = *registerEntities(app)
 	app = *registerEnvironments(app)
 	app = *registerGroups(app)
+	app = *registerInstanceMgmt(app)
 	app = *registerInstances(app)
 	app = *registerJobs(app)
 	app = *registerLevels(app)

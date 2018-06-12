@@ -251,7 +251,6 @@ func main() {
 	router.GET(`/hostdeployment/:system/:assetid`, Check(HostDeploymentFetch))
 	router.GET(`/instances/:instance/versions`, Check(BasicAuth(InstanceVersions)))
 	router.GET(`/instances/:instance`, Check(BasicAuth(InstanceShow)))
-	router.GET(`/instances/`, Check(BasicAuth(InstanceListAll)))
 	router.GET(`/jobs/id/:jobid`, Check(BasicAuth(JobShow)))
 	router.GET(`/jobs/all`, Check(BasicAuth(JobListAll)))
 	router.GET(`/jobs/`, Check(BasicAuth(JobList)))
