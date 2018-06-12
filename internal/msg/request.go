@@ -89,6 +89,7 @@ type Filter struct {
 	Job        proto.JobFilter
 	Server     proto.Server
 	Level      proto.Level
+	Oncall     proto.Oncall
 	SectionObj proto.Section
 }
 
@@ -98,6 +99,7 @@ type UpdateData struct {
 	Environment proto.Environment
 	State       proto.State
 	View        proto.View
+	Oncall      proto.Oncall
 }
 
 type Flags struct {

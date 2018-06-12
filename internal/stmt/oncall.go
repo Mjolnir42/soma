@@ -24,6 +24,12 @@ SELECT oncall_duty_id,
 FROM   inventory.oncall_duty_teams
 WHERE  oncall_duty_id = $1::varchar;`
 
+	OncallSearch = `
+SELECT oncall_duty_id,
+       oncall_duty_name
+FROM   inventory.oncall_duty_teams
+WHERE  oncall_duty_name = $1::varchar;`
+
 	OncallAdd = `
 INSERT INTO inventory.oncall_duty_teams (
             oncall_duty_id,
@@ -58,6 +64,7 @@ func init() {
 	m[OncallAdd] = `OncallAdd`
 	m[OncallDel] = `OncallDel`
 	m[OncallList] = `OncallList`
+	m[OncallSearch] = `OncallSearch`
 	m[OncallShow] = `OncallShow`
 	m[OncallUpdate] = `OncallUpdate`
 }
