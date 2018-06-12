@@ -227,7 +227,7 @@ func ValidateInstance(s string) error {
 // ValidatePredicate tests against the server if s is a valid
 // predicate
 func ValidatePredicate(s string) error {
-	res, err := fetchObjList(fmt.Sprintf("/predicates/%s", s))
+	res, err := fetchObjList(fmt.Sprintf("/predicate/%s", s))
 	if err != nil {
 		return err
 	}

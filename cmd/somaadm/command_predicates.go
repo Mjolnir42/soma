@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerPredicates(app cli.App) *cli.App {
@@ -52,7 +52,7 @@ func cmdPredicateCreate(c *cli.Context) error {
 	req.Predicate = &proto.Predicate{}
 	req.Predicate.Symbol = c.Args().First()
 
-	return adm.Perform(`postbody`, `/predicates/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/predicate/`, `command`, req, c)
 }
 
 func cmdPredicateDelete(c *cli.Context) error {
@@ -60,7 +60,7 @@ func cmdPredicateDelete(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/predicates/%s", c.Args().First())
+	path := fmt.Sprintf("/predicate/%s", c.Args().First())
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -69,7 +69,7 @@ func cmdPredicateList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/predicates/`, `list`, nil, c)
+	return adm.Perform(`get`, `/predicate/`, `list`, nil, c)
 }
 
 func cmdPredicateShow(c *cli.Context) error {
@@ -77,7 +77,7 @@ func cmdPredicateShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/predicates/%s", c.Args().First())
+	path := fmt.Sprintf("/predicate/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
