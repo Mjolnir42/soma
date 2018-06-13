@@ -88,6 +88,7 @@ type Filter struct {
 	IsDetailed bool
 	Job        proto.JobFilter
 	Level      proto.Level
+	Monitoring proto.Monitoring
 	Oncall     proto.Oncall
 	SectionObj proto.Section
 	Server     proto.Server

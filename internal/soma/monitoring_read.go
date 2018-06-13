@@ -149,7 +149,9 @@ func (r *MonitoringRead) listScoped(q *msg.Request, mr *msg.Result) {
 		monitoringName string
 		rows           *sql.Rows
 	)
-	if rows, err = r.stmtListScoped.Query(q.AuthUser); err != nil {
+	if rows, err = r.stmtListScoped.Query(
+		q.AuthUser,
+	); err != nil {
 		mr.ServerError(err)
 		return
 	}
@@ -224,7 +226,7 @@ func (r *MonitoringRead) searchAll(q *msg.Request, mr *msg.Result) {
 	)
 	// search condition has unique constraint
 	if err = r.stmtSearchAll.QueryRow(
-		q.Monitoring.Name,
+		q.Search.Monitoring.Name,
 	).Scan(
 		&monitoringID,
 		&monitoringName,
@@ -253,7 +255,7 @@ func (r *MonitoringRead) searchScoped(q *msg.Request, mr *msg.Result) {
 	// search condition has unique constraint
 	if err = r.stmtSearchScoped.QueryRow(
 		q.AuthUser,
-		q.Monitoring.Name,
+		q.Search.Monitoring.Name,
 	).Scan(
 		&monitoringID,
 		&monitoringName,

@@ -13,20 +13,20 @@ import (
 func registerMonitoring(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
-			// monitoring
+			// monitoringsystem
 			{
-				Name:  "monitoring",
+				Name:  `monitoringsystem`,
 				Usage: "SUBCOMMANDS for monitoring systems",
 				Subcommands: []cli.Command{
 					{
-						Name:         "create",
-						Usage:        "Create a new monitoring system",
+						Name:         `add`,
+						Usage:        `Add a new monitoring system`,
 						Action:       runtime(cmdMonitoringCreate),
 						BashComplete: cmpl.MonitoringCreate,
 					},
 					{
-						Name:   "delete",
-						Usage:  "Delete a monitoring system",
+						Name:   `remove`,
+						Usage:  "Remove a monitoring system",
 						Action: runtime(cmdMonitoringDelete),
 					},
 					{
@@ -39,8 +39,13 @@ func registerMonitoring(app cli.App) *cli.App {
 						Usage:  "Show details about a monitoring system",
 						Action: runtime(cmdMonitoringShow),
 					},
+					{
+						Name:   "search",
+						Usage:  "Lookup a monitoring system ID by name",
+						Action: runtime(cmdMonitoringSearch),
+					},
 				},
-			}, // end monitoring
+			}, // end monitoringsystem
 		}...,
 	)
 	return &app
@@ -84,7 +89,7 @@ func cmdMonitoringCreate(c *cli.Context) error {
 		req.Monitoring.Callback = opts["callback"][0]
 	}
 
-	return adm.Perform(`postbody`, `/monitoring/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/monitoringsystem/`, `command`, req, c)
 }
 
 func cmdMonitoringDelete(c *cli.Context) error {
@@ -96,7 +101,7 @@ func cmdMonitoringDelete(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/monitoring/%s", monitoringID)
+	path := fmt.Sprintf("/monitoringsystem/%s", monitoringID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -105,7 +110,7 @@ func cmdMonitoringList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/monitoring/`, `list`, nil, c)
+	return adm.Perform(`get`, `/monitoringsystem/`, `list`, nil, c)
 }
 
 func cmdMonitoringShow(c *cli.Context) error {
@@ -117,8 +122,18 @@ func cmdMonitoringShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/monitoring/%s", monitoringID)
+	path := fmt.Sprintf("/monitoringsystem/%s", monitoringID)
 	return adm.Perform(`get`, path, `show`, nil, c)
+}
+
+func cmdMonitoringSearch(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+	req := proto.NewMonitoringFilter()
+	req.Filter.Monitoring.Name = c.Args().First()
+
+	return adm.Perform(`postbody`, `/search/monitoringsystem/`, `list`, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

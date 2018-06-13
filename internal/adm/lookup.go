@@ -873,7 +873,7 @@ func monitoringIDByName(monitoring string) (string, error) {
 	req := proto.NewMonitoringFilter()
 	req.Filter.Monitoring.Name = monitoring
 
-	res, err := fetchFilter(req, `/filter/monitoring/`)
+	res, err := fetchFilter(req, `/search/monitoringsystem/`)
 	if err != nil {
 		goto abort
 	}
