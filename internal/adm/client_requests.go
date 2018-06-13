@@ -142,7 +142,7 @@ func asyncWait(result *proto.Result) {
 
 	if result.StatusCode == 202 && result.JobID != "" {
 		fmt.Fprintf(os.Stderr, "Waiting for job: %s\n", result.JobID)
-		_, err := PutReq(fmt.Sprintf("/jobs/id/%s", result.JobID))
+		_, err := PutReq(fmt.Sprintf("/job/%s", result.JobID))
 		if err != nil && err != io.EOF {
 			fmt.Fprintf(os.Stderr, "Wait error: %s\n", err.Error())
 		}

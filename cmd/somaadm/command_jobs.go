@@ -21,12 +21,6 @@ func registerJobs(app cli.App) *cli.App {
 						Name:   `list`,
 						Usage:  `List outstanding jobs (remote)`,
 						Action: runtime(cmdJobList),
-						Flags: []cli.Flag{
-							cli.BoolFlag{
-								Name:  "all, a",
-								Usage: "List all outstanding jobs (admin only)",
-							},
-						},
 					},
 					{
 						Name:   `show`,
@@ -77,10 +71,7 @@ func cmdJobList(c *cli.Context) error {
 		return err
 	}
 
-	if c.Bool(`all`) {
-		return adm.Perform(`get`, `/jobs/all`, `list`, nil, c)
-	}
-	return adm.Perform(`get`, `/jobs/`, `list`, nil, c)
+	return adm.Perform(`get`, `/job/`, `list`, nil, c)
 }
 
 func cmdJobShow(c *cli.Context) error {
@@ -93,7 +84,7 @@ func cmdJobShow(c *cli.Context) error {
 			c.Args().First())
 	}
 
-	path := fmt.Sprintf("/jobs/id/%s", c.Args().First())
+	path := fmt.Sprintf("/job/%s", c.Args().First())
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -138,7 +129,7 @@ func cmdJobLocalUpdate(c *cli.Context) error {
 		jobMap[v[1]] = v[0]
 		req.Filter.Job.IDList = append(req.Filter.Job.IDList, v[1])
 	}
-	resp, err := adm.PostReqBody(req, `/filter/jobs/`)
+	resp, err := adm.PostReqBody(req, `/search/job/`)
 	if err != nil {
 		return fmt.Errorf("Job update request error: %s", err)
 	}

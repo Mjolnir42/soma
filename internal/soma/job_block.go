@@ -16,10 +16,12 @@ import (
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
+// XXX BUG self|job|wait permission can currently block on every known job UUID
+
 // JobBlock handles requests to block a client until an asynchronous job
 // has finished
 type JobBlock struct {
-	Input     chan blockSpec
+	Input     chan msg.Request
 	Shutdown  chan struct{}
 	Notify    chan string
 	blockList map[string][]blockSpec
@@ -33,14 +35,14 @@ type JobBlock struct {
 type blockSpec struct {
 	JobID string
 	RecvT time.Time
-	Reply chan bool
+	Reply chan msg.Result
 }
 
 // newJobBlock returns a new JobBlock handler with input and notify
 // buffers of length
 func newJobBlock(length int) (j *JobBlock) {
 	j = &JobBlock{}
-	j.Input = make(chan blockSpec, length)
+	j.Input = make(chan msg.Request, length)
 	j.Notify = make(chan string, length)
 	j.Shutdown = make(chan struct{})
 	j.blockList = make(map[string][]blockSpec)
@@ -60,8 +62,7 @@ func (j *JobBlock) Register(c *sql.DB, l ...*logrus.Logger) {
 // Intake exposes a dummy channel required to fulfull the Handler
 // interface
 func (j *JobBlock) Intake() chan msg.Request {
-	c := make(chan msg.Request)
-	return c
+	return j.Input
 }
 
 // Run is the event loop for JobBlock
@@ -99,8 +100,12 @@ runloop:
 				close(bs.Reply)
 			}
 			delete(j.blockList, jID)
-		case bs := <-j.Input:
+		case rq := <-j.Input:
 			// a new block request was received
+			bs := blockSpec{
+				JobID: rq.Job.ID,
+				Reply: rq.Reply,
+			}
 
 			// unblock immediate if the Job has already finished
 			if _, ok := j.jobDone[bs.JobID]; ok {

@@ -34,7 +34,6 @@ const (
 	SectionEnvironment           = `environment`
 	SectionHostDeployment        = `hostdeployment`
 	SectionInstanceMgmt          = `instance-mgmt`
-	SectionJob                   = `job`
 	SectionJobMgmt               = `job-mgmt`
 	SectionLevel                 = `level`
 	SectionMetric                = `metric`
@@ -51,9 +50,9 @@ const (
 	SectionServer                = `server`
 	SectionState                 = `state`
 	SectionStatus                = `status`
-	SectionTeam                  = `team`
+	SectionTeamMgmt              = `team-mgmt`
 	SectionUnit                  = `unit`
-	SectionUser                  = `user`
+	SectionUserMgmt              = `user-mgmt`
 	SectionValidity              = `validity`
 	SectionView                  = `view`
 )
@@ -108,6 +107,15 @@ const (
 	SectionMonitoring  = `monitoringsystem`
 )
 
+// Sections in category self are for actions with a per-user
+// scope
+const (
+	CategorySelf = `self`
+	SectionJob   = `job`
+	SectionTeam  = `team`
+	SectionUser  = `user`
+)
+
 // Actions for the various permission sections
 const (
 	ActionAdd             = `add`
@@ -156,6 +164,7 @@ const (
 	ActionUpdate          = `update`
 	ActionUse             = `use`
 	ActionVersions        = `versions`
+	ActionWait            = `wait`
 )
 
 // Section supervisor handles AAA requests outside the permission

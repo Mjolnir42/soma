@@ -92,15 +92,25 @@ func (r *JobRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 	msgRequest(r.reqLog, q)
 
-	switch q.Action {
-	case msg.ActionList:
-		r.list(q, &result)
-	case msg.ActionAll:
-		r.all(q, &result)
-	case msg.ActionShow:
-		r.show(q, &result)
-	case msg.ActionSearchByList:
-		r.search(q, &result)
+	switch q.Section {
+	case msg.SectionJobMgmt:
+		switch q.Action {
+		case msg.ActionList:
+			r.all(q, &result)
+		default:
+			result.UnknownRequest(q)
+		}
+	case msg.SectionJob:
+		switch q.Action {
+		case msg.ActionList:
+			r.list(q, &result)
+		case msg.ActionShow:
+			r.show(q, &result)
+		case msg.ActionSearchByList:
+			r.search(q, &result)
+		default:
+			result.UnknownRequest(q)
+		}
 	default:
 		result.UnknownRequest(q)
 	}
