@@ -351,7 +351,7 @@ func cmdRepositoryInstance(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/repository/%s/instances/", id)
+	path := fmt.Sprintf("/repository/%s/instance/", id)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 

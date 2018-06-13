@@ -27,16 +27,6 @@ func registerInstances(app cli.App) *cli.App {
 						Usage:  `Delete check configuration that created the instance`,
 						Action: runtime(cmdInstanceCascade),
 					},
-					{
-						Name:   `show`,
-						Usage:  `Show details about a check instance`,
-						Action: runtime(cmdInstanceShow),
-					},
-					{
-						Name:   `versions`,
-						Usage:  `Show version history of a check instance`,
-						Action: runtime(cmdInstanceVersion),
-					},
 				},
 			},
 		}...,
@@ -63,32 +53,6 @@ func cmdInstanceCascade(c *cli.Context) error {
 
 	path := fmt.Sprintf("/checks/%s/%s", repoID, checkID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
-}
-
-func cmdInstanceShow(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	if !adm.IsUUID(c.Args().First()) {
-		return fmt.Errorf("Argument is not a UUID: %s",
-			c.Args().First())
-	}
-
-	path := fmt.Sprintf("/instances/%s", c.Args().First())
-	return adm.Perform(`get`, path, `show`, nil, c)
-}
-
-func cmdInstanceVersion(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	if !adm.IsUUID(c.Args().First()) {
-		return fmt.Errorf("Argument is not a UUID: %s",
-			c.Args().First())
-	}
-
-	path := fmt.Sprintf("/instances/%s/versions", c.Args().First())
-	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

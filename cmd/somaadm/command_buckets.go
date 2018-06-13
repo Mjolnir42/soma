@@ -370,7 +370,7 @@ func cmdBucketInstance(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/bucket/%s/instances/", bucketID)
+	path := fmt.Sprintf("/bucket/%s/instance/", bucketID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 

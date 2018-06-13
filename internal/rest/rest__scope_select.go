@@ -48,4 +48,38 @@ func (x *Rest) ScopeSelectMonitoringSearch(w http.ResponseWriter,
 	x.MonitoringSearch(w, r, params)
 }
 
+// ScopeSelectInstanceList function
+func (x *Rest) ScopeSelectInstanceList(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionInstanceMgmt
+	request.Action = msg.ActionAll
+	request.Flag.Unscoped = true
+
+	if x.isAuthorized(&request) {
+		x.InstanceMgmtAll(w, r, params)
+		return
+	}
+
+	x.InstanceList(w, r, params)
+}
+
+// ScopeSelectInstanceShow function
+func (x *Rest) ScopeSelectInstanceShow(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionInstanceMgmt
+	request.Action = msg.ActionShow
+	request.Flag.Unscoped = true
+
+	if x.isAuthorized(&request) {
+		x.InstanceMgmtShow(w, r, params)
+		return
+	}
+
+	x.InstanceShow(w, r, params)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

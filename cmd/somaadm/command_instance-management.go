@@ -9,6 +9,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 )
@@ -21,9 +23,19 @@ func registerInstanceMgmt(app cli.App) *cli.App {
 				Usage: `SUBCOMMANDS for check instance management`,
 				Subcommands: []cli.Command{
 					{
-						Name:   `all`,
+						Name:   `list`,
 						Usage:  `List all check instances`,
 						Action: runtime(cmdInstanceMgmtAll),
+					},
+					{
+						Name:   `show`,
+						Usage:  `Show details about a check instance`,
+						Action: runtime(cmdInstanceMgmtShow),
+					},
+					{
+						Name:   `versions`,
+						Usage:  `Show version history of a check instance`,
+						Action: runtime(cmdInstanceMgmtVersion),
 					},
 				},
 			},
@@ -38,6 +50,32 @@ func cmdInstanceMgmtAll(c *cli.Context) error {
 	}
 
 	return adm.Perform(`get`, `/instance/`, `list`, nil, c)
+}
+
+func cmdInstanceMgmtShow(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+	if !adm.IsUUID(c.Args().First()) {
+		return fmt.Errorf("Argument is not a UUID: %s",
+			c.Args().First())
+	}
+
+	path := fmt.Sprintf("/instance/%s", c.Args().First())
+	return adm.Perform(`get`, path, `show`, nil, c)
+}
+
+func cmdInstanceMgmtVersion(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+	if !adm.IsUUID(c.Args().First()) {
+		return fmt.Errorf("Argument is not a UUID: %s",
+			c.Args().First())
+	}
+
+	path := fmt.Sprintf("/instance/%s/versions", c.Args().First())
+	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
