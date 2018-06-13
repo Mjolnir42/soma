@@ -245,7 +245,6 @@ func main() {
 	router.GET(`/groups/:group/tree/:tree`, Check(BasicAuth(OutputTree)))
 	router.GET(`/groups/:group`, Check(BasicAuth(GroupShow)))
 	router.GET(`/groups/`, Check(BasicAuth(GroupList)))
-	router.GET(`/hostdeployment/:system/:assetid`, Check(HostDeploymentFetch))
 	router.GET(`/jobs/id/:jobid`, Check(BasicAuth(JobShow)))
 	router.GET(`/jobs/all`, Check(BasicAuth(JobListAll)))
 	router.GET(`/jobs/`, Check(BasicAuth(JobList)))
@@ -289,7 +288,6 @@ func main() {
 	router.POST(`/filter/teams/`, Check(BasicAuth(TeamList)))
 	router.POST(`/filter/users/`, Check(BasicAuth(UserList)))
 	router.POST(`/filter/workflow/`, Check(BasicAuth(WorkflowList)))
-	router.POST(`/hostdeployment/:system/:assetid`, Check(HostDeploymentAssemble))
 
 	if !SomaCfg.ReadOnly {
 
