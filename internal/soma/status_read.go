@@ -20,22 +20,24 @@ import (
 
 // StatusRead handles read requests for views
 type StatusRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newStatusRead return a new StatusRead handler with input buffer of length
-func newStatusRead(length int) (r *StatusRead) {
-	r = &StatusRead{}
+func newStatusRead(length int) (string, *StatusRead) {
+	r := &StatusRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -53,7 +55,7 @@ func (r *StatusRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionStatus, action, `status_r`)
+		hmap.Request(msg.SectionStatus, action, r.handlerName)
 	}
 }
 

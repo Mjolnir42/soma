@@ -20,22 +20,24 @@ import (
 
 // ProviderRead handles read requests for providers
 type ProviderRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newProviderRead return a new ProviderRead handler with input buffer of length
-func newProviderRead(length int) (r *ProviderRead) {
-	r = &ProviderRead{}
+func newProviderRead(length int) (string, *ProviderRead) {
+	r := &ProviderRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -53,7 +55,7 @@ func (r *ProviderRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionProvider, action, `provider_r`)
+		hmap.Request(msg.SectionProvider, action, r.handlerName)
 	}
 }
 

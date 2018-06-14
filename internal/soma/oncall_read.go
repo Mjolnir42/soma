@@ -21,23 +21,25 @@ import (
 
 // OncallRead handles read requests for oncall
 type OncallRead struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtList   *sql.Stmt
-	stmtShow   *sql.Stmt
-	stmtSearch *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	stmtSearch  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newOncallRead return a new OncallRead handler with input buffer of length
-func newOncallRead(length int) (r *OncallRead) {
-	r = &OncallRead{}
+func newOncallRead(length int) (string, *OncallRead) {
+	r := &OncallRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -56,7 +58,7 @@ func (r *OncallRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionShow,
 		msg.ActionSearch,
 	} {
-		hmap.Request(msg.SectionOncall, action, `oncall_r`)
+		hmap.Request(msg.SectionOncall, action, r.handlerName)
 	}
 }
 

@@ -20,23 +20,25 @@ import (
 
 // ValidityRead handles read requests for validity definitions
 type ValidityRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newValidityRead returns a new ValidityRead handler with input buffer
 // of length
-func newValidityRead(length int) (r *ValidityRead) {
-	r = &ValidityRead{}
+func newValidityRead(length int) (string, *ValidityRead) {
+	r := &ValidityRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -54,7 +56,7 @@ func (r *ValidityRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionValidity, action, `validity_r`)
+		hmap.Request(msg.SectionValidity, action, r.handlerName)
 	}
 }
 

@@ -21,24 +21,26 @@ import (
 
 // UserRead handles read requests for users
 type UserRead struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtList   *sql.Stmt
-	stmtSearch *sql.Stmt
-	stmtShow   *sql.Stmt
-	stmtSync   *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtSearch  *sql.Stmt
+	stmtShow    *sql.Stmt
+	stmtSync    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newUserRead return a new UserRead handler with input buffer of length
-func newUserRead(length int) (r *UserRead) {
-	r = &UserRead{}
+func newUserRead(length int) (string, *UserRead) {
+	r := &UserRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -58,7 +60,7 @@ func (r *UserRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionShow,
 		msg.ActionSync,
 	} {
-		hmap.Request(msg.SectionUser, action, `user_r`)
+		hmap.Request(msg.SectionUser, action, r.handlerName)
 	}
 }
 

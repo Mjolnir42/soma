@@ -21,23 +21,25 @@ import (
 
 // TeamRead handles read requests for teams
 type TeamRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	stmtSync *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	stmtSync    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newTeamRead return a new TeamRead handler with input buffer of length
-func newTeamRead(length int) (r *TeamRead) {
-	r = &TeamRead{}
+func newTeamRead(length int) (string, *TeamRead) {
+	r := &TeamRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -56,7 +58,7 @@ func (r *TeamRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionShow,
 		msg.ActionSync,
 	} {
-		hmap.Request(msg.SectionTeam, action, `team_r`)
+		hmap.Request(msg.SectionTeam, action, r.handlerName)
 	}
 }
 

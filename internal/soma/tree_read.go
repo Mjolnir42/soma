@@ -40,9 +40,10 @@ import (
 
 // TreeRead handles all read requests for deep tree exports
 type TreeRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
 	// object details
 	stmtShowRepository *sql.Stmt
 	stmtShowBucket     *sql.Stmt
@@ -65,11 +66,12 @@ type TreeRead struct {
 
 // newTreeRead return a new TreeRead handler with input buffer of
 // length
-func newTreeRead(length int) (r *TreeRead) {
-	r = &TreeRead{}
+func newTreeRead(length int) (string, *TreeRead) {
+	r := &TreeRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -90,7 +92,7 @@ func (r *TreeRead) RegisterRequests(hmap *handler.Map) {
 		msg.SectionCluster,
 		msg.SectionNode,
 	} {
-		hmap.Request(section, msg.ActionTree, `tree_r`)
+		hmap.Request(section, msg.ActionTree, r.handlerName)
 	}
 }
 

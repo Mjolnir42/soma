@@ -20,22 +20,24 @@ import (
 
 // PredicateRead handles read requests for predicates
 type PredicateRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newPredicateRead return a new PredicateRead handler with input buffer of length
-func newPredicateRead(length int) (r *PredicateRead) {
-	r = &PredicateRead{}
+func newPredicateRead(length int) (string, *PredicateRead) {
+	r := &PredicateRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -53,7 +55,7 @@ func (r *PredicateRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionPredicate, action, `predicate_r`)
+		hmap.Request(msg.SectionPredicate, action, r.handlerName)
 	}
 }
 

@@ -20,22 +20,24 @@ import (
 
 // UnitRead handles read requests for units
 type UnitRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newUnitRead return a new UnitRead handler with input buffer of length
-func newUnitRead(length int) (r *UnitRead) {
-	r = &UnitRead{}
+func newUnitRead(length int) (string, *UnitRead) {
+	r := &UnitRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -53,7 +55,7 @@ func (r *UnitRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionUnit, action, `unit_r`)
+		hmap.Request(msg.SectionUnit, action, r.handlerName)
 	}
 }
 

@@ -20,23 +20,25 @@ import (
 
 // StateRead handles read requests for object states
 type StateRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newStateRead return a new StateRead handler with input buffer of
 // length
-func newStateRead(length int) (r *StateRead) {
-	r = &StateRead{}
+func newStateRead(length int) (string, *StateRead) {
+	r := &StateRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -54,7 +56,7 @@ func (r *StateRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionState, action, `state_r`)
+		hmap.Request(msg.SectionState, action, r.handlerName)
 	}
 }
 

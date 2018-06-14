@@ -22,6 +22,7 @@ import (
 type NodeRead struct {
 	Input           chan msg.Request
 	Shutdown        chan struct{}
+	handlerName     string
 	conn            *sql.DB
 	stmtList        *sql.Stmt
 	stmtShow        *sql.Stmt
@@ -37,11 +38,12 @@ type NodeRead struct {
 }
 
 // newNodeRead return a new NodeRead handler with input buffer of length
-func newNodeRead(length int) (r *NodeRead) {
-	r = &NodeRead{}
+func newNodeRead(length int) (string, *NodeRead) {
+	r := &NodeRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -61,7 +63,7 @@ func (r *NodeRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionSync,
 		msg.ActionShowConfig,
 	} {
-		hmap.Request(msg.SectionNode, action, `node_r`)
+		hmap.Request(msg.SectionNode, action, r.handlerName)
 	}
 }
 

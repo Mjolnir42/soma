@@ -23,6 +23,7 @@ import (
 type PropertyRead struct {
 	Input            chan msg.Request
 	Shutdown         chan struct{}
+	handlerName      string
 	conn             *sql.DB
 	stmtListCustom   *sql.Stmt
 	stmtListNative   *sql.Stmt
@@ -41,11 +42,12 @@ type PropertyRead struct {
 
 // newPropertyRead return a new PropertyRead handler with input
 // buffer of length
-func newPropertyRead(length int) (r *PropertyRead) {
-	r = &PropertyRead{}
+func newPropertyRead(length int) (string, *PropertyRead) {
+	r := &PropertyRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -69,7 +71,7 @@ func (r *PropertyRead) RegisterRequests(hmap *handler.Map) {
 			msg.ActionList,
 			msg.ActionShow,
 		} {
-			hmap.Request(section, action, `property_r`)
+			hmap.Request(section, action, r.handlerName)
 		}
 	}
 }

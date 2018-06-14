@@ -22,6 +22,7 @@ import (
 type MonitoringRead struct {
 	Input            chan msg.Request
 	Shutdown         chan struct{}
+	handlerName      string
 	conn             *sql.DB
 	stmtListAll      *sql.Stmt
 	stmtListScoped   *sql.Stmt
@@ -35,11 +36,12 @@ type MonitoringRead struct {
 
 // newMonitoringRead return a new MonitoringRead handler with
 // input buffer of length
-func newMonitoringRead(length int) (r *MonitoringRead) {
-	r = &MonitoringRead{}
+func newMonitoringRead(length int) (string, *MonitoringRead) {
+	r := &MonitoringRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -60,7 +62,7 @@ func (r *MonitoringRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionSearch,
 		msg.ActionSearchAll,
 	} {
-		hmap.Request(msg.SectionMonitoring, action, `monitoring_r`)
+		hmap.Request(msg.SectionMonitoring, action, r.handlerName)
 	}
 }
 
