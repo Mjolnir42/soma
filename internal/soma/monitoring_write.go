@@ -113,7 +113,7 @@ func (w *MonitoringWrite) add(q *msg.Request, mr *msg.Result) {
 		callback sql.NullString
 	)
 
-	q.Monitoring.ID = uuid.NewV4().String()
+	q.Monitoring.ID = uuid.Must(uuid.NewV4()).String()
 	if q.Monitoring.Callback != `` {
 		callback = sql.NullString{
 			String: q.Monitoring.Callback,

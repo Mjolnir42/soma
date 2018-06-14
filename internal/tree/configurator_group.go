@@ -309,7 +309,7 @@ checksloop:
 					f, _ := uuid.FromString(teg.Checks[id].ConfigID.String())
 					return f
 				}(i),
-				InstanceConfigID:      uuid.NewV4(),
+				InstanceConfigID:      uuid.Must(uuid.NewV4()),
 				ConstraintOncall:      oncallC,
 				ConstraintService:     serviceC,
 				ConstraintSystem:      systemC,
@@ -380,7 +380,7 @@ checksloop:
 					// no match was found during nosvcinstanceloop, this
 					// is a new instance
 					inst.Version = 0
-					inst.InstanceID = uuid.NewV4()
+					inst.InstanceID = uuid.Must(uuid.NewV4())
 				}
 				teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 					repoName,
@@ -461,7 +461,7 @@ checksloop:
 						f, _ := uuid.FromString(teg.Checks[id].ConfigID.String())
 						return f
 					}(i),
-					InstanceConfigID:      uuid.NewV4(),
+					InstanceConfigID:      uuid.Must(uuid.NewV4()),
 					ConstraintOncall:      oncallC,
 					ConstraintService:     serviceC,
 					ConstraintSystem:      systemC,
@@ -530,7 +530,7 @@ checksloop:
 						// no match was found during instanceloop, this is
 						// a new instance
 						inst.Version = 0
-						inst.InstanceID = uuid.NewV4()
+						inst.InstanceID = uuid.Must(uuid.NewV4())
 					}
 					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 						repoName,

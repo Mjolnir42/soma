@@ -43,7 +43,7 @@ func (s *Supervisor) actionAdd(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.ActionObj.ID = uuid.NewV4().String()
+	q.ActionObj.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = s.stmtActionAdd.Exec(
 		q.ActionObj.ID,
 		q.ActionObj.Name,

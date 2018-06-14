@@ -175,7 +175,7 @@ func (g *GuidePost) process(q *msg.Request) {
 	handler = g.soma.handlerMap.Get(keeper).(*TreeKeeper)
 
 	// store job in database
-	q.JobID = uuid.NewV4()
+	q.JobID = uuid.Must(uuid.NewV4())
 	g.appLog.Infof("Saving job %s (%s/%s) for %s",
 		q.JobID.String(), q.Section, q.Action,
 		q.AuthUser)

@@ -64,7 +64,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		switch task {
 		case `add`:
 			return &tree.PropertyCustom{
-				ID:           uuid.NewV4(),
+				ID:           uuid.Must(uuid.NewV4()),
 				CustomID:     customID,
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
@@ -87,7 +87,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		switch task {
 		case `add`:
 			return &tree.PropertyOncall{
-				ID:           uuid.NewV4(),
+				ID:           uuid.Must(uuid.NewV4()),
 				OncallID:     oncallID,
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
@@ -109,7 +109,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		switch task {
 		case `add`:
 			return &tree.PropertyService{
-				ID:           uuid.NewV4(),
+				ID:           uuid.Must(uuid.NewV4()),
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
 				View:         pp.View,
@@ -128,7 +128,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 		switch task {
 		case `add`:
 			return &tree.PropertySystem{
-				ID:           uuid.NewV4(),
+				ID:           uuid.Must(uuid.NewV4()),
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
 				View:         pp.View,

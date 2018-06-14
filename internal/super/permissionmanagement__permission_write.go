@@ -210,7 +210,7 @@ func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
 	}
-	mapID = uuid.NewV4().String()
+	mapID = uuid.Must(uuid.NewV4()).String()
 
 	if res, err = s.stmtPermissionMapEntry.Exec(
 		mapID,
@@ -285,8 +285,8 @@ func (s *Supervisor) permissionAddTx(q *msg.Request,
 		grantPermID, grantCategory string
 	)
 
-	q.Permission.ID = uuid.NewV4().String()
-	grantPermID = uuid.NewV4().String()
+	q.Permission.ID = uuid.Must(uuid.NewV4()).String()
+	grantPermID = uuid.Must(uuid.NewV4()).String()
 	switch q.Permission.Category {
 	case msg.CategoryGlobal:
 		grantCategory = msg.CategoryGrantGlobal

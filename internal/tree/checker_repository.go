@@ -21,7 +21,7 @@ import (
 func (ter *Repository) SetCheck(c Check) {
 	c.ID = c.GetItemID(ter.Type, ter.ID)
 	if uuid.Equal(c.ID, uuid.Nil) {
-		c.ID = uuid.NewV4()
+		c.ID = uuid.Must(uuid.NewV4())
 	}
 	// this check is the source check
 	c.InheritedFrom = ter.ID
@@ -43,7 +43,7 @@ func (ter *Repository) setCheckInherited(c Check) {
 	f := c.Clone()
 	f.ID = f.GetItemID(ter.Type, ter.ID)
 	if uuid.Equal(f.ID, uuid.Nil) {
-		f.ID = uuid.NewV4()
+		f.ID = uuid.Must(uuid.NewV4())
 	}
 	// send original check downwards
 	c.ID = uuid.Nil

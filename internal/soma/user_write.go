@@ -131,7 +131,7 @@ func (w *UserWrite) add(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.User.ID = uuid.NewV4().String()
+	q.User.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = w.stmtAdd.Exec(
 		q.User.ID,
 		q.User.UserName,

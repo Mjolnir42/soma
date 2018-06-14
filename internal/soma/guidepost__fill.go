@@ -40,7 +40,7 @@ func (g *GuidePost) fillReqData(q *msg.Request) (bool, error) {
 
 // generate CheckConfigId
 func (g *GuidePost) fillCheckConfigID(q *msg.Request) (bool, error) {
-	q.CheckConfig.ID = uuid.NewV4().String()
+	q.CheckConfig.ID = uuid.Must(uuid.NewV4()).String()
 	return false, nil
 }
 

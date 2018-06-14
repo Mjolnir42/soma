@@ -121,7 +121,7 @@ func (s *Supervisor) categoryAddTx(q *msg.Request,
 
 	// create system permission for category, the category
 	// name becomes the permission name in system
-	permID = uuid.NewV4().String()
+	permID = uuid.Must(uuid.NewV4()).String()
 	return txMap[`category_add_tx_perm`].Exec(
 		permID,
 		q.Category.Name,

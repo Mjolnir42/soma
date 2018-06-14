@@ -81,7 +81,7 @@ func (f *ForestCustodian) loadSomaTree(q *msg.Request) error {
 	errChan := make(chan *tree.Error, 1024000)
 
 	sTree := tree.New(tree.Spec{
-		ID:     uuid.NewV4().String(),
+		ID:     uuid.Must(uuid.NewV4()).String(),
 		Name:   fmt.Sprintf("root_%s", q.Repository.Name),
 		Action: actionChan,
 		Log:    f.appLog,

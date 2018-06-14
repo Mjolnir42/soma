@@ -39,7 +39,7 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 	// generate RequestID
 	params = append(params, httprouter.Param{
 		Key:   `RequestID`,
-		Value: uuid.NewV4().String(),
+		Value: uuid.Must(uuid.NewV4()).String(),
 	})
 
 	request := newRequest(r, params)

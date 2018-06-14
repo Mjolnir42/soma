@@ -17,8 +17,8 @@ import (
 
 func TestInvalidRepoSpec(t *testing.T) {
 
-	repoID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
 	repoName := `repoTest`
 
 	spec := RepositorySpec{
@@ -76,9 +76,9 @@ func TestInvalidRepoSpec(t *testing.T) {
 }
 
 func TestInvalidBucketSpec(t *testing.T) {
-	buckID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
+	buckID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
 	bucketName := `bucketTest`
 	bucketEnv := `envTest`
 

@@ -121,7 +121,7 @@ func (w *NodeWrite) add(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.Node.ID = uuid.NewV4().String()
+	q.Node.ID = uuid.Must(uuid.NewV4()).String()
 	if q.Node.ServerID == `` {
 		q.Node.ServerID = `00000000-0000-0000-0000-000000000000`
 	}

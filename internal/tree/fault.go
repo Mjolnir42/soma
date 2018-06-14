@@ -31,7 +31,7 @@ type Fault struct {
 // NEW
 func newFault() *Fault {
 	tef := new(Fault)
-	tef.ID = uuid.NewV4()
+	tef.ID = uuid.Must(uuid.NewV4())
 	tef.Type = "fault"
 	tef.Name = "McFaulty"
 	tef.Errors = make([]error, 0)

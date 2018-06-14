@@ -168,7 +168,7 @@ func (w *CapabilityWrite) add(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	q.Capability.ID = uuid.NewV4().String()
+	q.Capability.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = w.stmtAdd.Exec(
 		q.Capability.ID,
 		q.Capability.MonitoringID,

@@ -17,8 +17,8 @@ import (
 func TestCheckerAddCheck(t *testing.T) {
 	sTree, actionC, errC := testSpawnCheckTree()
 
-	chkConfigID := uuid.NewV4()
-	capID := uuid.NewV4()
+	chkConfigID := uuid.Must(uuid.NewV4())
+	capID := uuid.Must(uuid.NewV4())
 
 	chk := Check{
 		Id:            uuid.Nil,
@@ -130,9 +130,9 @@ func TestCheckerAddCheck(t *testing.T) {
 func TestCheckerDeleteCheck(t *testing.T) {
 	sTree, actionC, errC := testSpawnCheckTree()
 
-	chkConfigID := uuid.NewV4()
-	capID := uuid.NewV4()
-	chkID := uuid.NewV4()
+	chkConfigID := uuid.Must(uuid.NewV4())
+	capID := uuid.Must(uuid.NewV4())
+	chkID := uuid.Must(uuid.NewV4())
 
 	chk := Check{
 		Id:            chkID,
@@ -277,22 +277,22 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
-	grp1Id := uuid.NewV4().String()
-	grp2Id := uuid.NewV4().String()
-	clr1Id := uuid.NewV4().String()
-	clr2Id := uuid.NewV4().String()
-	nod1Id := uuid.NewV4().String()
-	srv1Id := uuid.NewV4().String()
-	nod2Id := uuid.NewV4().String()
-	srv2Id := uuid.NewV4().String()
-	nod3Id := uuid.NewV4().String()
-	srv3Id := uuid.NewV4().String()
-	nod4Id := uuid.NewV4().String()
-	srv4Id := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
+	grp1Id := uuid.Must(uuid.NewV4()).String()
+	grp2Id := uuid.Must(uuid.NewV4()).String()
+	clr1Id := uuid.Must(uuid.NewV4()).String()
+	clr2Id := uuid.Must(uuid.NewV4()).String()
+	nod1Id := uuid.Must(uuid.NewV4()).String()
+	srv1Id := uuid.Must(uuid.NewV4()).String()
+	nod2Id := uuid.Must(uuid.NewV4()).String()
+	srv2Id := uuid.Must(uuid.NewV4()).String()
+	nod3Id := uuid.Must(uuid.NewV4()).String()
+	srv3Id := uuid.Must(uuid.NewV4()).String()
+	nod4Id := uuid.Must(uuid.NewV4()).String()
+	srv4Id := uuid.Must(uuid.NewV4()).String()
 
 	sTree := New(TreeSpec{
 		Id:     rootID,

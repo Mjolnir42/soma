@@ -186,7 +186,7 @@ func (tk *TreeKeeper) Run() {
 		req := msg.Request{
 			Section: `rebuild`,
 			Action:  `rebuild`,
-			JobID:   uuid.NewV4(),
+			JobID:   uuid.Must(uuid.NewV4()),
 		}
 		tk.process(&req)
 		tk.buildDeploymentDetails()

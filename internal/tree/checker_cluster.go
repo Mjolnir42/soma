@@ -22,7 +22,7 @@ import (
 func (tec *Cluster) SetCheck(c Check) {
 	c.ID = c.GetItemID(tec.Type, tec.ID)
 	if uuid.Equal(c.ID, uuid.Nil) {
-		c.ID = uuid.NewV4()
+		c.ID = uuid.Must(uuid.NewV4())
 	}
 	// this check is the source check
 	c.InheritedFrom = tec.ID
@@ -44,7 +44,7 @@ func (tec *Cluster) setCheckInherited(c Check) {
 	f := c.Clone()
 	f.ID = f.GetItemID(tec.Type, tec.ID)
 	if uuid.Equal(f.ID, uuid.Nil) {
-		f.ID = uuid.NewV4()
+		f.ID = uuid.Must(uuid.NewV4())
 	}
 	// send original check downwards
 	c.ID = uuid.Nil

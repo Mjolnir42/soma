@@ -139,8 +139,8 @@ func TestCheckGetItem(t *testing.T) {
 	check := testSpawnCheck(false, false, false)
 	check.ID = uuid.UUID{}
 
-	itemID := uuid.NewV4()
-	objID := uuid.NewV4()
+	itemID := uuid.Must(uuid.NewV4())
+	objID := uuid.Must(uuid.NewV4())
 	check.Items = append(check.Items, CheckItem{
 		ObjectID: func() uuid.UUID {
 			ui, _ := uuid.FromString(objID.String())
@@ -188,7 +188,7 @@ func TestCheckInstanceAction(t *testing.T) {
 
 func testSpawnCheckInstance(chk Check) CheckInstance {
 	ci := CheckInstance{
-		InstanceID: uuid.NewV4(),
+		InstanceID: uuid.Must(uuid.NewV4()),
 		CheckID: func(id string) uuid.UUID {
 			f, _ := uuid.FromString(id)
 			return f
@@ -197,7 +197,7 @@ func testSpawnCheckInstance(chk Check) CheckInstance {
 			f, _ := uuid.FromString(id)
 			return f
 		}(chk.GetCheckConfigID()),
-		InstanceConfigID:    uuid.NewV4(),
+		InstanceConfigID:    uuid.Must(uuid.NewV4()),
 		ConstraintOncall:    ``,
 		ConstraintService:   map[string]string{},
 		ConstraintSystem:    map[string]string{},
@@ -238,22 +238,22 @@ func testSpawnCheckInstance(chk Check) CheckInstance {
 }
 
 func testSpawnCheck(inherited, inheritance, childrenOnly bool) Check {
-	id := uuid.NewV4()
+	id := uuid.Must(uuid.NewV4())
 	var idFrom uuid.UUID
 	if inherited {
-		idFrom = uuid.NewV4()
+		idFrom = uuid.Must(uuid.NewV4())
 	} else {
 		idFrom, _ = uuid.FromString(id.String())
 	}
 
 	return Check{
 		Id:            id,
-		SourceID:      uuid.NewV4(),
+		SourceID:      uuid.Must(uuid.NewV4()),
 		SourceType:    `sourceType`,
 		Inherited:     inherited,
 		InheritedFrom: idFrom,
-		CapabilityID:  uuid.NewV4(),
-		ConfigID:      uuid.NewV4(),
+		CapabilityID:  uuid.Must(uuid.NewV4()),
+		ConfigID:      uuid.Must(uuid.NewV4()),
 		Inheritance:   inheritance,
 		ChildrenOnly:  childrenOnly,
 		View:          `any`,
@@ -304,9 +304,9 @@ func testSpawnCheck(inherited, inheritance, childrenOnly bool) Check {
 		},
 		Items: []CheckItem{
 			{
-				ObjectID:   uuid.NewV4(),
+				ObjectID:   uuid.Must(uuid.NewV4()),
 				ObjectType: `objectType`,
-				ItemID:     uuid.NewV4(),
+				ItemID:     uuid.Must(uuid.NewV4()),
 			},
 		},
 	}

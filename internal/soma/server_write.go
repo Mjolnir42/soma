@@ -124,7 +124,7 @@ func (w *ServerWrite) add(q *msg.Request, mr *msg.Result) {
 		err error
 	)
 
-	q.Server.ID = uuid.NewV4().String()
+	q.Server.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = w.stmtAdd.Exec(
 		q.Server.ID,
 		q.Server.AssetID,

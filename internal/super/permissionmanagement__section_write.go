@@ -45,7 +45,7 @@ func (s *Supervisor) sectionAdd(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.SectionObj.ID = uuid.NewV4().String()
+	q.SectionObj.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = s.stmtSectionAdd.Exec(
 		q.SectionObj.ID,
 		q.SectionObj.Name,

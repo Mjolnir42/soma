@@ -113,7 +113,7 @@ func (k *Kex) GenerateNewKeypair() error {
 
 // GenerateNewRequestID generate a new UUIDv4 for this Kex
 func (k *Kex) GenerateNewRequestID() {
-	k.Request = uuid.NewV4()
+	k.Request = uuid.Must(uuid.NewV4())
 }
 
 // GenerateNewVector generates a new random Initialization

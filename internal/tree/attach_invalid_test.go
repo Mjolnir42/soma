@@ -24,10 +24,10 @@ func TestInvalidRepositoryAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -59,11 +59,11 @@ func TestInvalidBucketAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
-	clrID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
+	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -97,10 +97,10 @@ func TestInvalidGroupAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	grpID := uuid.NewV4().String()
-	clrID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	grpID := uuid.Must(uuid.NewV4()).String()
+	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -130,10 +130,10 @@ func TestInvalidClusterAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	clrID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -164,11 +164,11 @@ func TestInvalidNodeAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	nodeID := uuid.NewV4().String()
-	servID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	nodeID := uuid.Must(uuid.NewV4()).String()
+	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -217,9 +217,9 @@ func TestDoubleRepositoryAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -258,10 +258,10 @@ func TestDoubleBucketAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -314,11 +314,11 @@ func TestDoubleGroupAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	grpID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	grpID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -382,11 +382,11 @@ func TestDoubleClusterAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
-	clrID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
+	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -450,12 +450,12 @@ func TestDoubleNodeAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
-	nodeID := uuid.NewV4().String()
-	servID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
+	nodeID := uuid.Must(uuid.NewV4()).String()
+	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -522,8 +522,8 @@ func TestInvalidRepositoryDestroy(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -542,9 +542,9 @@ func TestInvalidBucketDestroy(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -565,8 +565,8 @@ func TestInvalidGroupDestroy(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	grpID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	grpID := uuid.Must(uuid.NewV4()).String()
 
 	// create group
 	NewGroup(GroupSpec{
@@ -583,8 +583,8 @@ func TestInvalidClusterDestroy(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	clrID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create cluster
 	NewCluster(ClusterSpec{
@@ -601,9 +601,9 @@ func TestInvalidNodeDestroy(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	nodeID := uuid.NewV4().String()
-	servID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	nodeID := uuid.Must(uuid.NewV4()).String()
+	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create new node
 	NewNode(NodeSpec{
@@ -625,8 +625,8 @@ func TestInvalidRepositoryDetach(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -645,9 +645,9 @@ func TestInvalidBucketDetach(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -668,8 +668,8 @@ func TestInvalidGroupDetach(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	grpID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	grpID := uuid.Must(uuid.NewV4()).String()
 
 	// create group
 	NewGroup(GroupSpec{
@@ -686,8 +686,8 @@ func TestInvalidClusterDetach(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	clrID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create cluster
 	NewCluster(ClusterSpec{
@@ -704,9 +704,9 @@ func TestInvalidNodeDetach(t *testing.T) {
 		}
 	}()
 
-	teamID := uuid.NewV4().String()
-	nodeID := uuid.NewV4().String()
-	servID := uuid.NewV4().String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	nodeID := uuid.Must(uuid.NewV4()).String()
+	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create new node
 	NewNode(NodeSpec{
@@ -730,10 +730,10 @@ func TestInvalidGroupReAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	grpID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	grpID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -763,10 +763,10 @@ func TestInvalidClusterReAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
-	clrID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
+	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{
@@ -797,11 +797,11 @@ func TestInvalidNodeReAttach(t *testing.T) {
 
 	actionC := make(chan *Action, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	nodeID := uuid.NewV4().String()
-	servID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	nodeID := uuid.Must(uuid.NewV4()).String()
+	servID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{

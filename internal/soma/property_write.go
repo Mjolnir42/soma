@@ -197,7 +197,7 @@ func (w *PropertyWrite) addCustom(q *msg.Request, mr *msg.Result) {
 		err error
 	)
 
-	q.Property.Custom.ID = uuid.NewV4().String()
+	q.Property.Custom.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = w.stmtAddCustom.Exec(
 		q.Property.Custom.ID,
 		q.Property.Custom.RepositoryID,

@@ -57,7 +57,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 		var supervisor handler.Handler
 
 		// generate and record the requestID
-		requestID := uuid.NewV4()
+		requestID := uuid.Must(uuid.NewV4())
 		ps = append(ps, httprouter.Param{
 			Key:   `RequestID`,
 			Value: requestID.String(),

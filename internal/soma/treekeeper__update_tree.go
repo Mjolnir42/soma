@@ -21,7 +21,7 @@ func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 	switch q.Action {
 	case `create_bucket`:
 		tree.NewBucket(tree.BucketSpec{
-			ID:          uuid.NewV4().String(),
+			ID:          uuid.Must(uuid.NewV4()).String(),
 			Name:        q.Bucket.Name,
 			Environment: q.Bucket.Environment,
 			Team:        tk.meta.teamID,
@@ -41,7 +41,7 @@ func (tk *TreeKeeper) treeGroup(q *msg.Request) {
 	switch q.Action {
 	case `create_group`:
 		tree.NewGroup(tree.GroupSpec{
-			ID:   uuid.NewV4().String(),
+			ID:   uuid.Must(uuid.NewV4()).String(),
 			Name: q.Group.Name,
 			Team: tk.meta.teamID,
 		}).Attach(tree.AttachRequest{
@@ -75,7 +75,7 @@ func (tk *TreeKeeper) treeCluster(q *msg.Request) {
 	switch q.Action {
 	case `create_cluster`:
 		tree.NewCluster(tree.ClusterSpec{
-			ID:   uuid.NewV4().String(),
+			ID:   uuid.Must(uuid.NewV4()).String(),
 			Name: q.Cluster.Name,
 			Team: tk.meta.teamID,
 		}).Attach(tree.AttachRequest{

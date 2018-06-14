@@ -18,12 +18,12 @@ func TestErrorChannelNode(t *testing.T) {
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
-	rootID := uuid.NewV4().String()
-	teamID := uuid.NewV4().String()
-	repoID := uuid.NewV4().String()
-	buckID := uuid.NewV4().String()
-	nodeID := uuid.NewV4().String()
-	servID := uuid.NewV4().String()
+	rootID := uuid.Must(uuid.NewV4()).String()
+	teamID := uuid.Must(uuid.NewV4()).String()
+	repoID := uuid.Must(uuid.NewV4()).String()
+	buckID := uuid.Must(uuid.NewV4()).String()
+	nodeID := uuid.Must(uuid.NewV4()).String()
+	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
 	sTree := New(TreeSpec{

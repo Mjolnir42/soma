@@ -99,7 +99,7 @@ func (s *Supervisor) rightGrantGlobal(q *msg.Request, mr *msg.Result) {
 		teamID.Valid = true
 	}
 
-	q.Grant.ID = uuid.NewV4().String()
+	q.Grant.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = s.stmtGrantAuthorizationGlobal.Exec(
 		q.Grant.ID,
 		adminID,
@@ -179,7 +179,7 @@ func (s *Supervisor) rightGrantRepository(q *msg.Request, mr *msg.Result) {
 		teamID.Valid = true
 	}
 
-	q.Grant.ID = uuid.NewV4().String()
+	q.Grant.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = s.stmtGrantAuthorizationRepository.Exec(
 		q.Grant.ID,
 		userID,
@@ -226,7 +226,7 @@ func (s *Supervisor) rightGrantTeam(q *msg.Request, mr *msg.Result) {
 		teamID.Valid = true
 	}
 
-	q.Grant.ID = uuid.NewV4().String()
+	q.Grant.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = s.stmtGrantAuthorizationTeam.Exec(
 		q.Grant.ID,
 		userID,
@@ -268,7 +268,7 @@ func (s *Supervisor) rightGrantMonitoring(q *msg.Request, mr *msg.Result) {
 		teamID.Valid = true
 	}
 
-	q.Grant.ID = uuid.NewV4().String()
+	q.Grant.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = s.stmtGrantAuthorizationMonitoring.Exec(
 		q.Grant.ID,
 		userID,

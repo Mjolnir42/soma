@@ -18,7 +18,7 @@ import "github.com/satori/go.uuid"
 func (ten *Node) SetCheck(c Check) {
 	c.ID = c.GetItemID(ten.Type, ten.ID)
 	if uuid.Equal(c.ID, uuid.Nil) {
-		c.ID = uuid.NewV4()
+		c.ID = uuid.Must(uuid.NewV4())
 	}
 	// this check is the source check
 	c.InheritedFrom = ten.ID
@@ -35,7 +35,7 @@ func (ten *Node) setCheckInherited(c Check) {
 	f := c.Clone()
 	f.ID = f.GetItemID(ten.Type, ten.ID)
 	if uuid.Equal(f.ID, uuid.Nil) {
-		f.ID = uuid.NewV4()
+		f.ID = uuid.Must(uuid.NewV4())
 	}
 	f.Items = nil
 	ten.addCheck(f)

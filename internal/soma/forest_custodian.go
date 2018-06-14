@@ -148,10 +148,10 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	q.Repository.ID = uuid.NewV4().String()
+	q.Repository.ID = uuid.Must(uuid.NewV4()).String()
 
 	sTree = tree.New(tree.Spec{
-		ID:     uuid.NewV4().String(),
+		ID:     uuid.Must(uuid.NewV4()).String(),
 		Name:   fmt.Sprintf("root_%s", q.Repository.Name),
 		Action: actionChan,
 		Log:    f.appLog,

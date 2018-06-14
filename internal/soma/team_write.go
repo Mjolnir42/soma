@@ -126,7 +126,7 @@ func (w *TeamWrite) add(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	q.Team.ID = uuid.NewV4().String()
+	q.Team.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = w.stmtAdd.Exec(
 		q.Team.ID,
 		q.Team.Name,

@@ -69,7 +69,7 @@ func (teg *Group) SetProperty(p Property) {
 	}
 	p.SetID(p.GetInstanceID(teg.Type, teg.ID, teg.log))
 	if p.Equal(uuid.Nil) {
-		p.SetID(uuid.NewV4())
+		p.SetID(uuid.Must(uuid.NewV4()))
 	}
 	// this property is the source instance
 	p.SetInheritedFrom(teg.ID)
@@ -95,7 +95,7 @@ func (teg *Group) setPropertyInherited(p Property) {
 	f := p.Clone()
 	f.SetID(f.GetInstanceID(teg.Type, teg.ID, teg.log))
 	if f.Equal(uuid.Nil) {
-		f.SetID(uuid.NewV4())
+		f.SetID(uuid.Must(uuid.NewV4()))
 	}
 	f.clearInstances()
 

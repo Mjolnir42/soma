@@ -117,7 +117,7 @@ func (w *OncallWrite) add(q *msg.Request, mr *msg.Result) {
 		err error
 	)
 
-	q.Oncall.ID = uuid.NewV4().String()
+	q.Oncall.ID = uuid.Must(uuid.NewV4()).String()
 	if res, err = w.stmtAdd.Exec(
 		q.Oncall.ID,
 		q.Oncall.Name,
