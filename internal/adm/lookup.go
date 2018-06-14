@@ -466,7 +466,7 @@ func userIDByUserName(user string) (string, error) {
 	req := proto.NewUserFilter()
 	req.Filter.User.UserName = user
 
-	res, err := fetchFilter(req, `/filter/users/`)
+	res, err := fetchFilter(req, `/search/user/`)
 	if err != nil {
 		goto abort
 	}

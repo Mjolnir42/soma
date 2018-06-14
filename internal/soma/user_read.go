@@ -20,15 +20,16 @@ import (
 
 // UserRead handles read requests for users
 type UserRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	stmtSync *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input      chan msg.Request
+	Shutdown   chan struct{}
+	conn       *sql.DB
+	stmtList   *sql.Stmt
+	stmtSearch *sql.Stmt
+	stmtShow   *sql.Stmt
+	stmtSync   *sql.Stmt
+	appLog     *logrus.Logger
+	reqLog     *logrus.Logger
+	errLog     *logrus.Logger
 }
 
 // newUserRead return a new UserRead handler with input buffer of length
@@ -57,9 +58,10 @@ func (r *UserRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ListUsers: r.stmtList,
-		stmt.ShowUsers: r.stmtShow,
-		stmt.SyncUsers: r.stmtSync,
+		stmt.ListUsers:   r.stmtList,
+		stmt.SearchUsers: r.stmtSearch,
+		stmt.ShowUsers:   r.stmtShow,
+		stmt.SyncUsers:   r.stmtSync,
 	} {
 		if prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`user`, err, stmt.Name(statement))
@@ -88,6 +90,8 @@ func (r *UserRead) process(q *msg.Request) {
 	switch q.Action {
 	case msg.ActionList:
 		r.list(q, &result)
+	case msg.ActionSearch:
+		r.search(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
 	case msg.ActionSync:
@@ -221,6 +225,42 @@ func (r *UserRead) sync(q *msg.Request, mr *msg.Result) {
 			MailAddress:    mailAddr,
 			IsDeleted:      isDeleted,
 			TeamID:         team,
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	mr.OK()
+}
+
+// search returns a specific user
+func (r *UserRead) search(q *msg.Request, mr *msg.Result) {
+	var (
+		userID, userName string
+		rows             *sql.Rows
+		err              error
+	)
+
+	if rows, err = r.stmtSearch.Query(
+		q.Search.User.UserName,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&userID,
+			&userName,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		mr.User = append(mr.User, proto.User{
+			ID:       userID,
+			UserName: userName,
 		})
 	}
 	if err = rows.Err(); err != nil {

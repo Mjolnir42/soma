@@ -12,6 +12,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 // ScopeSelectMonitoringList function
@@ -115,6 +116,49 @@ func (x *Rest) ScopeSelectJobWait(w http.ResponseWriter, r *http.Request,
 	}
 
 	x.JobWait(w, r, params)
+}
+
+// ScopeSelectUserShow function
+func (x *Rest) ScopeSelectUserShow(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionUserMgmt
+	request.Action = msg.ActionShow
+	request.User.ID = params.ByName(`userID`)
+	request.Flag.Unscoped = true
+
+	if x.isAuthorized(&request) {
+		x.UserMgmtShow(w, r, params)
+		return
+	}
+
+	x.UserShow(w, r, params)
+}
+
+// ScopeSelectUserSearch function
+func (x *Rest) ScopeSelectUserSearch(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+	defer panicCatcher(w)
+
+	cReq := proto.NewUserFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
+		return
+	}
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionUserMgmt
+	request.Action = msg.ActionSearch
+	request.Search.User.UserName = cReq.Filter.User.UserName
+	request.Flag.Unscoped = true
+
+	if x.isAuthorized(&request) {
+		x.UserMgmtSearch(w, r, params)
+		return
+	}
+
+	x.UserSearch(w, r, params)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

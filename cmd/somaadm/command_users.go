@@ -178,7 +178,7 @@ func cmdUserAdd(c *cli.Context) error {
 		req.User.IsSystem = false
 	}
 
-	return adm.Perform(`postbody`, `/users/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/user/`, `command`, req, c)
 }
 
 func cmdUserUpdate(c *cli.Context) error {
@@ -242,7 +242,7 @@ func cmdUserUpdate(c *cli.Context) error {
 			" boolean: %s, %s", opts[`deleted`][0], err.Error())
 	}
 
-	path := fmt.Sprintf("/users/%s", req.User.ID)
+	path := fmt.Sprintf("/user/%s", req.User.ID)
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -259,7 +259,7 @@ func cmdUserMarkDeleted(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/users/%s", userID)
+	path := fmt.Sprintf("/user/%s", userID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -282,7 +282,7 @@ func cmdUserPurgeDeleted(c *cli.Context) error {
 		},
 	}
 
-	path := fmt.Sprintf("/users/%s", userID)
+	path := fmt.Sprintf("/user/%s", userID)
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 
@@ -385,7 +385,7 @@ func cmdUserList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/users/`, `list`, nil, c)
+	return adm.Perform(`get`, `/user/`, `list`, nil, c)
 }
 
 func cmdUserSync(c *cli.Context) error {
@@ -393,7 +393,7 @@ func cmdUserSync(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/sync/users/`, `list`, nil, c)
+	return adm.Perform(`get`, `/sync/user/`, `list`, nil, c)
 }
 
 func cmdUserShow(c *cli.Context) error {
@@ -408,7 +408,7 @@ func cmdUserShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/users/%s", id)
+	path := fmt.Sprintf("/user/%s", id)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

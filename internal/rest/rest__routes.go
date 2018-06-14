@@ -79,8 +79,11 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/status/`, x.Verify(x.StatusList))
 	router.GET(`/sync/datacenter/`, x.Verify(x.DatacenterSync))
 	router.GET(`/sync/node/`, x.Verify(x.NodeMgmtSync))
+	router.GET(`/sync/user/`, x.Verify(x.UserMgmtSync))
 	router.GET(`/unit/:unit`, x.Verify(x.UnitShow))
 	router.GET(`/unit/`, x.Verify(x.UnitList))
+	router.GET(`/user/:user`, x.Verify(x.ScopeSelectUserShow))
+	router.GET(`/user/`, x.Verify(x.UserMgmtList))
 	router.GET(`/validity/:property`, x.Verify(x.ValidityShow))
 	router.GET(`/validity/`, x.Verify(x.ValidityList))
 	router.GET(`/view/:view`, x.Verify(x.ViewShow))
@@ -97,6 +100,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(`/search/monitoringsystem/`, x.Verify(x.ScopeSelectMonitoringSearch))
 	router.POST(`/search/oncall/`, x.Verify(x.OncallSearch))
 	router.POST(`/search/section/`, x.Verify(x.SectionSearch))
+	router.POST(`/search/user/`, x.Verify(x.ScopeSelectUserSearch))
 
 	if !x.conf.ReadOnly {
 		if !x.conf.Observer {
@@ -126,6 +130,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(`/tokens/self/active`, x.Verify(x.SupervisorTokenInvalidate))
 			router.DELETE(`/tokens/self/all`, x.Verify(x.SupervisorTokenInvalidateSelf))
 			router.DELETE(`/unit/:unit`, x.Verify(x.UnitRemove))
+			router.DELETE(`/user/:userID`, x.Verify(x.UserMgmtRemove))
 			router.DELETE(`/validity/:property`, x.Verify(x.ValidityRemove))
 			router.DELETE(`/view/:view`, x.Verify(x.ViewRemove))
 			router.PATCH(`/accounts/password/:kexID`, x.CheckShutdown(x.SupervisorPasswordChange))
@@ -157,6 +162,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.POST(`/state/`, x.Verify(x.StateAdd))
 			router.POST(`/status/`, x.Verify(x.StatusAdd))
 			router.POST(`/unit/`, x.Verify(x.UnitAdd))
+			router.POST(`/user/`, x.Verify(x.UserMgmtAdd))
 			router.POST(`/validity/`, x.Verify(x.ValidityAdd))
 			router.POST(`/view/`, x.Verify(x.ViewAdd))
 			router.PUT(`/accounts/activate/root/:kexID`, x.CheckShutdown(x.SupervisorActivateRoot))
@@ -169,6 +175,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PUT(`/node/:nodeID`, x.Verify(x.NodeMgmtUpdate))
 			router.PUT(`/state/:state`, x.Verify(x.StateRename))
 			router.PUT(`/tokens/request/:kexID`, x.CheckShutdown(x.SupervisorTokenRequest))
+			router.PUT(`/user/:userID`, x.Verify(x.UserMgmtUpdate))
 		}
 	}
 	return router

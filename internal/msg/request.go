@@ -92,15 +92,17 @@ type Filter struct {
 	Oncall     proto.Oncall
 	SectionObj proto.Section
 	Server     proto.Server
+	User       proto.User
 }
 
 type UpdateData struct {
 	Datacenter  proto.Datacenter
 	Entity      proto.Entity
 	Environment proto.Environment
-	State       proto.State
-	View        proto.View
 	Oncall      proto.Oncall
+	State       proto.State
+	User        proto.User
+	View        proto.View
 }
 
 type Flags struct {

@@ -50,9 +50,7 @@ const (
 	SectionServer                = `server`
 	SectionState                 = `state`
 	SectionStatus                = `status`
-	SectionTeamMgmt              = `team-mgmt`
 	SectionUnit                  = `unit`
-	SectionUserMgmt              = `user-mgmt`
 	SectionValidity              = `validity`
 	SectionView                  = `view`
 )
@@ -74,6 +72,14 @@ const (
 	SectionPermission  = `permission`
 	SectionRight       = `right`
 	SectionSection     = `section`
+)
+
+// Sections in category Identity are special global sections for actions
+// related to identity management
+const (
+	CategoryIdentity = `identity`
+	SectionTeamMgmt  = `team-mgmt`
+	SectionUserMgmt  = `user-mgmt`
 )
 
 // Sections in category repository are for actions with

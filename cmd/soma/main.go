@@ -265,11 +265,8 @@ func main() {
 	router.GET(`/servers/`, Check(BasicAuth(ServerList)))
 	router.GET(`/sync/servers/`, Check(BasicAuth(ServerSync)))
 	router.GET(`/sync/teams/`, Check(BasicAuth(TeamSync)))
-	router.GET(`/sync/users/`, Check(BasicAuth(UserSync)))
 	router.GET(`/teams/:team`, Check(BasicAuth(TeamShow)))
 	router.GET(`/teams/`, Check(BasicAuth(TeamList)))
-	router.GET(`/users/:user`, Check(BasicAuth(UserShow)))
-	router.GET(`/users/`, Check(BasicAuth(UserList)))
 	router.GET(`/workflow/summary`, Check(BasicAuth(WorkflowSummary)))
 	router.POST(`/filter/grant/`, Check(BasicAuth(RightSearch)))
 	router.POST(`/filter/groups/`, Check(BasicAuth(GroupList)))
@@ -282,7 +279,6 @@ func main() {
 	router.POST(`/filter/repository/`, Check(BasicAuth(RepositoryList)))
 	router.POST(`/filter/servers/`, Check(BasicAuth(ServerSearch)))
 	router.POST(`/filter/teams/`, Check(BasicAuth(TeamList)))
-	router.POST(`/filter/users/`, Check(BasicAuth(UserList)))
 	router.POST(`/filter/workflow/`, Check(BasicAuth(WorkflowList)))
 
 	if !SomaCfg.ReadOnly {
@@ -300,7 +296,6 @@ func main() {
 			router.DELETE(`/repository/:repository/property/:type/:source`, Check(BasicAuth(RepositoryRemoveProperty)))
 			router.DELETE(`/servers/:server`, Check(BasicAuth(ServerRemove)))
 			router.DELETE(`/teams/:team`, Check(BasicAuth(TeamRemove)))
-			router.DELETE(`/users/:user`, Check(BasicAuth(UserRemove)))
 			router.GET(`/deployments/id/:uuid`, Check(DeploymentDetailsInstance))
 			router.GET(`/deployments/monitoring/:uuid/:all`, Check(DeploymentDetailsMonitoring))
 			router.GET(`/deployments/monitoring/:uuid`, Check(DeploymentDetailsMonitoring))
@@ -325,11 +320,9 @@ func main() {
 			router.POST(`/servers/`, Check(BasicAuth(ServerAdd)))
 			router.POST(`/system/`, Check(BasicAuth(SystemOperation)))
 			router.POST(`/teams/`, Check(BasicAuth(TeamAdd)))
-			router.POST(`/users/`, Check(BasicAuth(UserAdd)))
 			router.PUT(`/nodes/:node/config`, Check(BasicAuth(NodeAssign)))
 			router.PUT(`/servers/:server`, Check(BasicAuth(ServerUpdate)))
 			router.PUT(`/teams/:team`, Check(BasicAuth(TeamUpdate)))
-			router.PUT(`/users/:user`, Check(BasicAuth(UserUpdate)))
 		}
 	}
 

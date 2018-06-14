@@ -146,13 +146,13 @@ func (w *UserWrite) update(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtUpdate.Exec(
-		q.User.UserName,
-		q.User.FirstName,
-		q.User.LastName,
-		q.User.EmployeeNumber,
-		q.User.MailAddress,
-		q.User.IsDeleted,
-		q.User.TeamID,
+		q.Update.User.UserName,
+		q.Update.User.FirstName,
+		q.Update.User.LastName,
+		q.Update.User.EmployeeNumber,
+		q.Update.User.MailAddress,
+		q.Update.User.IsDeleted,
+		q.Update.User.TeamID,
 		q.User.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)

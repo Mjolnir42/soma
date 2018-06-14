@@ -17,6 +17,12 @@ SELECT user_id,
        user_uid
 FROM   inventory.users;`
 
+	SearchUsers = `
+SELECT user_id,
+       user_uid
+FROM   inventory.users
+WHERE  user_uid = $1::varchar;`
+
 	ShowUsers = `
 SELECT user_id,
        user_uid,
@@ -97,6 +103,7 @@ AND    user_is_deleted;`
 
 func init() {
 	m[ListUsers] = `ListUsers`
+	m[SearchUsers] = `SearchUsers`
 	m[ShowUsers] = `ShowUsers`
 	m[SyncUsers] = `SyncUsers`
 	m[UserAdd] = `UserAdd`
