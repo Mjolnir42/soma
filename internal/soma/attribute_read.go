@@ -20,23 +20,25 @@ import (
 
 // AttributeRead handles read requests for attributes
 type AttributeRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newAttributeRead return a new AttributeRead handler with input
 // buffer of length
-func newAttributeRead(length int) (r *AttributeRead) {
-	r = &AttributeRead{}
+func newAttributeRead(length int) (string, *AttributeRead) {
+	r := &AttributeRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -54,7 +56,7 @@ func (r *AttributeRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionAttribute, action, `attribute_r`)
+		hmap.Request(msg.SectionAttribute, action, r.handlerName)
 	}
 }
 

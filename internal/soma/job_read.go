@@ -27,6 +27,7 @@ import (
 type JobRead struct {
 	Input                     chan msg.Request
 	Shutdown                  chan struct{}
+	handlerName               string
 	conn                      *sql.DB
 	stmtListAllOutstanding    *sql.Stmt
 	stmtListScopedOutstanding *sql.Stmt
@@ -39,11 +40,12 @@ type JobRead struct {
 
 // newJobRead return a new JobRead handler with input buffer of
 // length
-func newJobRead(length int) (r *JobRead) {
-	r = &JobRead{}
+func newJobRead(length int) (string, *JobRead) {
+	r := &JobRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -67,7 +69,7 @@ func (r *JobRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionShow,
 		msg.ActionSearchByList,
 	} {
-		hmap.Request(msg.SectionJob, action, `job_r`)
+		hmap.Request(msg.SectionJob, action, r.handlerName)
 	}
 }
 

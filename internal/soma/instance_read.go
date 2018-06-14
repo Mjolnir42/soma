@@ -25,6 +25,7 @@ import (
 type InstanceRead struct {
 	Input        chan msg.Request
 	Shutdown     chan struct{}
+	handlerName  string
 	conn         *sql.DB
 	stmtList     *sql.Stmt
 	stmtShow     *sql.Stmt
@@ -36,11 +37,12 @@ type InstanceRead struct {
 
 // newInstanceRead return a new InstanceRead handler with
 // input buffer of length
-func newInstanceRead(length int) (r *InstanceRead) {
-	r = &InstanceRead{}
+func newInstanceRead(length int) (string, *InstanceRead) {
+	r := &InstanceRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -60,7 +62,7 @@ func (r *InstanceRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionShow,
 		msg.ActionVersions,
 	} {
-		hmap.Request(msg.SectionInstance, action, `instance_r`)
+		hmap.Request(msg.SectionInstance, action, r.handlerName)
 	}
 }
 

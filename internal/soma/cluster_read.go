@@ -22,6 +22,7 @@ import (
 type ClusterRead struct {
 	Input           chan msg.Request
 	Shutdown        chan struct{}
+	handlerName     string
 	conn            *sql.DB
 	stmtList        *sql.Stmt
 	stmtShow        *sql.Stmt
@@ -37,11 +38,12 @@ type ClusterRead struct {
 
 // newClusterRead returns a new ClusterRead handler with input
 // buffer of length
-func newClusterRead(length int) (r *ClusterRead) {
-	r = &ClusterRead{}
+func newClusterRead(length int) (string, *ClusterRead) {
+	r := &ClusterRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -61,7 +63,7 @@ func (r *ClusterRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionSearch,
 		msg.ActionMemberList,
 	} {
-		hmap.Request(msg.SectionCluster, action, `cluster_r`)
+		hmap.Request(msg.SectionCluster, action, r.handlerName)
 	}
 }
 

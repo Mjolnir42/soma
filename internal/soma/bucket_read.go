@@ -22,6 +22,7 @@ import (
 type BucketRead struct {
 	Input           chan msg.Request
 	Shutdown        chan struct{}
+	handlerName     string
 	conn            *sql.DB
 	stmtList        *sql.Stmt
 	stmtShow        *sql.Stmt
@@ -36,11 +37,12 @@ type BucketRead struct {
 
 // newBucketRead returns a new BucketRead handler with input
 // buffer of length
-func newBucketRead(length int) (r *BucketRead) {
-	r = &BucketRead{}
+func newBucketRead(length int) (string, *BucketRead) {
+	r := &BucketRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -58,7 +60,7 @@ func (r *BucketRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionBucket, action, `bucket_r`)
+		hmap.Request(msg.SectionBucket, action, r.handlerName)
 	}
 }
 

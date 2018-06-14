@@ -22,6 +22,7 @@ import (
 type GroupRead struct {
 	Input                 chan msg.Request
 	Shutdown              chan struct{}
+	handlerName           string
 	conn                  *sql.DB
 	stmtList              *sql.Stmt
 	stmtShow              *sql.Stmt
@@ -39,11 +40,12 @@ type GroupRead struct {
 
 // newGroupRead returns a new GroupRead handler with input
 // buffer of length
-func newGroupRead(length int) (r *GroupRead) {
-	r = &GroupRead{}
+func newGroupRead(length int) (string, *GroupRead) {
+	r := &GroupRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -62,7 +64,7 @@ func (r *GroupRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionShow,
 		msg.ActionMemberList,
 	} {
-		hmap.Request(msg.SectionGroup, action, `group_r`)
+		hmap.Request(msg.SectionGroup, action, r.handlerName)
 	}
 }
 

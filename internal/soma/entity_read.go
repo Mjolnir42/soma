@@ -20,23 +20,25 @@ import (
 
 // EntityRead handles read requests for object entities
 type EntityRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newEntityRead return a new EntityRead handler with input
 // buffer of length
-func newEntityRead(length int) (r *EntityRead) {
-	r = &EntityRead{}
+func newEntityRead(length int) (string, *EntityRead) {
+	r := &EntityRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -54,7 +56,7 @@ func (r *EntityRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionEntity, action, `entity_r`)
+		hmap.Request(msg.SectionEntity, action, r.handlerName)
 	}
 }
 

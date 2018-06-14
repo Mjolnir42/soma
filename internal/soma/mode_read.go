@@ -20,22 +20,24 @@ import (
 
 // ModeRead handles read requests for modes
 type ModeRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newModeRead return a new ModeRead handler with input buffer of length
-func newModeRead(length int) (r *ModeRead) {
-	r = &ModeRead{}
+func newModeRead(length int) (string, *ModeRead) {
+	r := &ModeRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -53,7 +55,7 @@ func (r *ModeRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionMode, action, `mode_r`)
+		hmap.Request(msg.SectionMode, action, r.handlerName)
 	}
 }
 

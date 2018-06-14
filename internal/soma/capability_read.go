@@ -21,22 +21,24 @@ import (
 
 // CapabilityRead handles read requests for capabilities
 type CapabilityRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newCapabilityRead return a new CapabilityRead handler with input buffer of length
-func newCapabilityRead(length int) (r *CapabilityRead) {
-	r = &CapabilityRead{}
+func newCapabilityRead(length int) (string, *CapabilityRead) {
+	r := &CapabilityRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -54,7 +56,7 @@ func (r *CapabilityRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionShow,
 	} {
-		hmap.Request(msg.SectionCapability, action, `capability_r`)
+		hmap.Request(msg.SectionCapability, action, r.handlerName)
 	}
 }
 

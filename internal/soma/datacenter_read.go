@@ -20,23 +20,25 @@ import (
 
 // DatacenterRead handles read requests for datacenters
 type DatacenterRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newDatacenterRead return a new DatacenterRead handler with input
 // buffer of length
-func newDatacenterRead(length int) (r *DatacenterRead) {
-	r = &DatacenterRead{}
+func newDatacenterRead(length int) (string, *DatacenterRead) {
+	r := &DatacenterRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -55,7 +57,7 @@ func (r *DatacenterRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionShow,
 		msg.ActionSync,
 	} {
-		hmap.Request(msg.SectionDatacenter, action, `datacenter_r`)
+		hmap.Request(msg.SectionDatacenter, action, r.handlerName)
 	}
 }
 

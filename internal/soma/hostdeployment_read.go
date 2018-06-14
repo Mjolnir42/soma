@@ -24,6 +24,7 @@ import (
 type HostDeploymentRead struct {
 	Input                   chan msg.Request
 	Shutdown                chan struct{}
+	handlerName             string
 	conn                    *sql.DB
 	stmtInstancesForNode    *sql.Stmt
 	stmtLastInstanceVersion *sql.Stmt
@@ -34,11 +35,12 @@ type HostDeploymentRead struct {
 
 // newHostDeploymentRead return a new HostDeploymentRead handler
 // with input buffer of length
-func newHostDeploymentRead(length int) (r *HostDeploymentRead) {
-	r = &HostDeploymentRead{}
+func newHostDeploymentRead(length int) (string, *HostDeploymentRead) {
+	r := &HostDeploymentRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -56,7 +58,7 @@ func (r *HostDeploymentRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionGet,
 		msg.ActionAssemble,
 	} {
-		hmap.Request(msg.SectionHostDeployment, action, `hostdeployment_r`)
+		hmap.Request(msg.SectionHostDeployment, action, r.handlerName)
 	}
 }
 
