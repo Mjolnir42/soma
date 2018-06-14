@@ -30,8 +30,7 @@ func (x *Rest) StateList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`state_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -51,8 +50,7 @@ func (x *Rest) StateShow(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`state_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -78,8 +76,7 @@ func (x *Rest) StateAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`state_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -99,8 +96,7 @@ func (x *Rest) StateRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`state_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -127,8 +123,7 @@ func (x *Rest) StateRename(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`state_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }

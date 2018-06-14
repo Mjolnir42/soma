@@ -30,8 +30,7 @@ func (x *Rest) AttributeList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`attribute_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -53,8 +52,7 @@ func (x *Rest) AttributeShow(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`attribute_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -83,8 +81,7 @@ func (x *Rest) AttributeAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`attribute_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -106,8 +103,7 @@ func (x *Rest) AttributeRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`attribute_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }

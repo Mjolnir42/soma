@@ -30,8 +30,7 @@ func (x *Rest) MetricList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`metric_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -51,8 +50,7 @@ func (x *Rest) MetricShow(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`metric_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -78,8 +76,7 @@ func (x *Rest) MetricAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`metric_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -99,8 +96,7 @@ func (x *Rest) MetricRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`metric_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }

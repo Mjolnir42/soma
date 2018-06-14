@@ -30,8 +30,7 @@ func (x *Rest) PredicateList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`predicate_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -51,8 +50,7 @@ func (x *Rest) PredicateShow(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`predicate_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -78,8 +76,7 @@ func (x *Rest) PredicateAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`predicate_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -99,8 +96,7 @@ func (x *Rest) PredicateRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`predicate_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }

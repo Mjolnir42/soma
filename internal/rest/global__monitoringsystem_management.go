@@ -33,8 +33,7 @@ func (x *Rest) MonitoringMgmtAll(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`monitoring_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -66,8 +65,7 @@ func (x *Rest) MonitoringMgmtSearchAll(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`monitoring_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -103,8 +101,7 @@ func (x *Rest) MonitoringMgmtAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`monitoring_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -124,8 +121,7 @@ func (x *Rest) MonitoringMgmtRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`monitoring_w`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }

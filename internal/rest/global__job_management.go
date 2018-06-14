@@ -31,8 +31,7 @@ func (x *Rest) JobMgmtWait(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`job_block`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	<-request.Reply
 	dispatchNoContent(&w)
 }
@@ -52,8 +51,7 @@ func (x *Rest) JobMgmtList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	handler := x.handlerMap.Get(`job_r`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 

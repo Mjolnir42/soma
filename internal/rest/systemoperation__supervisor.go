@@ -52,8 +52,7 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 		},
 	}
 
-	handler := x.handlerMap.Get(`supervisor`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -75,8 +74,7 @@ func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
 	// authorization to invalidate the token is implicit from being
 	// able to use it for BasicAuth authentication
 
-	handler := x.handlerMap.Get(`supervisor`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -98,8 +96,7 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	// authorization to invalidate all tokens is implicit from being
 	// able to authenticate with this account
 
-	handler := x.handlerMap.Get(`supervisor`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -123,8 +120,7 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	handler := x.handlerMap.Get(`supervisor`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -147,8 +143,7 @@ func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	handler := x.handlerMap.Get(`supervisor`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(&w, &result)
 }
@@ -242,8 +237,7 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 		},
 	}
 
-	handler := x.handlerMap.Get(`supervisor`)
-	handler.Intake() <- request
+	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	sendMsgResult(w, &result)
 }
