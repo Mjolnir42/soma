@@ -12,6 +12,7 @@ import (
 	"database/sql"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 )
@@ -43,6 +44,17 @@ func (w *ValidityWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (w *ValidityWrite) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionAdd,
+		msg.ActionRemove,
+	} {
+		hmap.Request(msg.SectionValidity, action, `validity_w`)
+	}
 }
 
 // Intake exposes the Input channel as part of the handler interface

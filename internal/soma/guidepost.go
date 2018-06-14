@@ -14,6 +14,7 @@ import (
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -61,6 +62,25 @@ func (g *GuidePost) Register(c *sql.DB, l ...*logrus.Logger) {
 	g.appLog = l[0]
 	g.reqLog = l[1]
 	g.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (g *GuidePost) RegisterRequests(hmap *handler.Map) {
+	// XXX INCOMPLETE
+	for _, section := range []string{
+		msg.SectionRepository,
+		msg.SectionBucket,
+		msg.SectionGroup,
+		msg.SectionCluster,
+	} {
+		for _, action := range []string{
+			msg.ActionCreate,
+			msg.ActionDestroy,
+		} {
+			hmap.Request(section, action, `guidepost`)
+		}
+	}
 }
 
 // Intake exposes the Input channel as part of the handler interface

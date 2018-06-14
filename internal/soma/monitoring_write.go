@@ -12,6 +12,7 @@ import (
 	"database/sql"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	uuid "github.com/satori/go.uuid"
@@ -44,6 +45,17 @@ func (w *MonitoringWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (w *MonitoringWrite) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionAdd,
+		msg.ActionRemove,
+	} {
+		hmap.Request(msg.SectionMonitoringMgmt, action, `monitoring_w`)
+	}
 }
 
 // Intake exposes the Input channel as part of the handler interface
@@ -82,10 +94,10 @@ func (w *MonitoringWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionCreate:
-		w.create(q, &result)
-	case msg.ActionDelete:
-		w.delete(q, &result)
+	case msg.ActionAdd:
+		w.add(q, &result)
+	case msg.ActionRemove:
+		w.remove(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -93,8 +105,8 @@ func (w *MonitoringWrite) process(q *msg.Request) {
 	q.Reply <- result
 }
 
-// create adds a new monitoring system
-func (w *MonitoringWrite) create(q *msg.Request, mr *msg.Result) {
+// add inserts a new monitoring system
+func (w *MonitoringWrite) add(q *msg.Request, mr *msg.Result) {
 	var (
 		err      error
 		res      sql.Result
@@ -124,8 +136,8 @@ func (w *MonitoringWrite) create(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// delete removes a monitoring system
-func (w *MonitoringWrite) delete(q *msg.Request, mr *msg.Result) {
+// remove deletes a monitoring system
+func (w *MonitoringWrite) remove(q *msg.Request, mr *msg.Result) {
 	var (
 		err error
 		res sql.Result

@@ -16,6 +16,7 @@ import (
 	"github.com/client9/reopen"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/config"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/rest"
 	"github.com/mjolnir42/soma/internal/soma"
 	"github.com/mjolnir42/soma/internal/super"
@@ -66,7 +67,7 @@ func main() {
 		appLog, reqLog, errLog, auditLog            *log.Logger
 		lfhGlobal, lfhApp, lfhReq, lfhErr, lfhAudit *reopen.FileWriter
 		app                                         *soma.Soma
-		hm                                          soma.HandlerMap
+		hm                                          *handler.Map
 		lm                                          soma.LogHandleMap
 		rst                                         *rest.Rest
 	)
@@ -222,13 +223,13 @@ func main() {
 	connectToDatabase(appLog, errLog)
 	go pingDatabase(errLog)
 
-	hm = soma.HandlerMap{}
+	hm = handler.NewMap()
 	lm = soma.LogHandleMap{}
 
-	app = soma.New(&hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog, auditLog)
+	app = soma.New(hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog, auditLog)
 	app.Start()
 
-	rst = rest.New(super.IsAuthorized, &hm, &SomaCfg)
+	rst = rest.New(super.IsAuthorized, hm, &SomaCfg)
 
 	//XXX compilefix
 	router := httprouter.New()

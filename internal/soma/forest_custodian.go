@@ -13,6 +13,7 @@ import (
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/internal/tree"
@@ -54,6 +55,12 @@ func (f *ForestCustodian) Register(c *sql.DB, l ...*logrus.Logger) {
 	f.appLog = l[0]
 	f.reqLog = l[1]
 	f.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (f *ForestCustodian) RegisterRequests(hmap *handler.Map) {
+	hmap.Request(msg.SectionRepositoryMgmt, msg.ActionCreate, `forest_custodian`)
 }
 
 // Intake exposes the Input channel as part of the handler interface

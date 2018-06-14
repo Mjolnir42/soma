@@ -1,11 +1,11 @@
 /*-
- * Copyright (c) 2017, Jörg Pernfuß
+ * Copyright (c) 2017-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package handler // import "github.com/mjolnir42/soma/internal/handler"
 
 import (
 	"database/sql"
@@ -20,6 +20,7 @@ type Handler interface {
 	Run()
 	ShutdownNow()
 	Intake() chan msg.Request
+	RegisterRequests(*Map)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

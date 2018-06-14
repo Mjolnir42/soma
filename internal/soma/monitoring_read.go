@@ -12,6 +12,7 @@ import (
 	"database/sql"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -47,6 +48,20 @@ func (r *MonitoringRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (r *MonitoringRead) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionList,
+		msg.ActionAll,
+		msg.ActionShow,
+		msg.ActionSearch,
+		msg.ActionSearchAll,
+	} {
+		hmap.Request(msg.SectionMonitoring, action, `monitoring_r`)
+	}
 }
 
 // Run is the event loop for MonitoringRead

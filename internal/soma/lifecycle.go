@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -61,6 +62,12 @@ func (lc *LifeCycle) Register(c *sql.DB, l ...*logrus.Logger) {
 func (lc *LifeCycle) Intake() chan msg.Request {
 	c := make(chan msg.Request)
 	return c
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes. For LifeCycle this is a dummy method to fulfill the
+// handler.Handler interface
+func (lc *LifeCycle) RegisterRequests(hmap *handler.Map) {
 }
 
 // Run is the loop for LifeCycle

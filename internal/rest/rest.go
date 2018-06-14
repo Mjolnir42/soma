@@ -13,8 +13,8 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/config"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/soma"
 	metrics "github.com/rcrowley/go-metrics"
 	"github.com/satori/go.uuid"
 )
@@ -28,7 +28,7 @@ var Metrics = make(map[string]metrics.Registry)
 // Rest holds the required state for the REST interface
 type Rest struct {
 	isAuthorized func(*msg.Request) bool
-	handlerMap   *soma.HandlerMap
+	handlerMap   *handler.Map
 	conf         *config.Config
 	restricted   bool
 }
@@ -36,7 +36,7 @@ type Rest struct {
 // New returns a new REST interface
 func New(
 	authorizationFunction func(*msg.Request) bool,
-	appHandlerMap *soma.HandlerMap,
+	appHandlerMap *handler.Map,
 	conf *config.Config,
 ) *Rest {
 	x := Rest{}

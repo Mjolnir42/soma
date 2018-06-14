@@ -164,6 +164,7 @@ const (
 	ActionSuccess         = `success`
 	ActionSummary         = `summary`
 	ActionSync            = `sync`
+	ActionTree            = `tree`
 	ActionUnassign        = `unassign`
 	ActionUnmap           = `unmap`
 	ActionUpdate          = `update`

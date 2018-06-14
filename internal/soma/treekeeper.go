@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/internal/tree"
@@ -105,6 +106,12 @@ func (tk *TreeKeeper) Register(c *sql.DB, l ...*logrus.Logger) {
 	tk.appLog = l[0]
 	// TreeKeeper does not use the global request log
 	// TreeKeeper does not use the global error log
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes. It is implemented by TreeKeeper to fulfill the Handler
+// interface
+func (tk *TreeKeeper) RegisterRequests(hmap *handler.Map) {
 }
 
 // Intake exposes the Input channel as part of the handler interface

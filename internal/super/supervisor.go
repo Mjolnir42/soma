@@ -14,6 +14,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/config"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/perm"
 	"github.com/mjolnir42/soma/internal/stmt"
@@ -131,6 +132,44 @@ func (s *Supervisor) Register(c *sql.DB, l ...*logrus.Logger) {
 	s.appLog = l[0]
 	s.reqLog = l[1]
 	s.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (s *Supervisor) RegisterRequests(hmap *handler.Map) {
+	hmap.Request(msg.SectionSupervisor, msg.ActionKex, `supervisor`)
+	hmap.Request(msg.SectionSupervisor, msg.ActionAuthenticate, `supervisor`)
+	hmap.Request(msg.SectionSupervisor, msg.ActionToken, `supervisor`)
+	hmap.Request(msg.SectionSupervisor, msg.ActionActivate, `supervisor`)
+	hmap.Request(msg.SectionSupervisor, msg.ActionPassword, `supervisor`)
+	hmap.Request(msg.SectionSupervisor, msg.ActionAuthorize, `supervisor`)
+	hmap.Request(msg.SectionSupervisor, msg.ActionCacheUpdate, `supervisor`)
+	hmap.Request(msg.SectionSupervisor, msg.ActionGC, `supervisor`)
+	hmap.Request(msg.SectionCategory, msg.ActionList, `supervisor`)
+	hmap.Request(msg.SectionCategory, msg.ActionShow, `supervisor`)
+	hmap.Request(msg.SectionCategory, msg.ActionAdd, `supervisor`)
+	hmap.Request(msg.SectionCategory, msg.ActionRemove, `supervisor`)
+	hmap.Request(msg.SectionPermission, msg.ActionList, `supervisor`)
+	hmap.Request(msg.SectionPermission, msg.ActionSearchByName, `supervisor`)
+	hmap.Request(msg.SectionPermission, msg.ActionShow, `supervisor`)
+	hmap.Request(msg.SectionPermission, msg.ActionAdd, `supervisor`)
+	hmap.Request(msg.SectionPermission, msg.ActionRemove, `supervisor`)
+	hmap.Request(msg.SectionPermission, msg.ActionMap, `supervisor`)
+	hmap.Request(msg.SectionPermission, msg.ActionUnmap, `supervisor`)
+	hmap.Request(msg.SectionRight, msg.ActionGrant, `supervisor`)
+	hmap.Request(msg.SectionRight, msg.ActionRevoke, `supervisor`)
+	hmap.Request(msg.SectionRight, msg.ActionSearch, `supervisor`)
+	hmap.Request(msg.SectionSection, msg.ActionList, `supervisor`)
+	hmap.Request(msg.SectionSection, msg.ActionShow, `supervisor`)
+	hmap.Request(msg.SectionSection, msg.ActionSearch, `supervisor`)
+	hmap.Request(msg.SectionSection, msg.ActionAdd, `supervisor`)
+	hmap.Request(msg.SectionSection, msg.ActionRemove, `supervisor`)
+	hmap.Request(msg.SectionAction, msg.ActionList, `supervisor`)
+	hmap.Request(msg.SectionAction, msg.ActionShow, `supervisor`)
+	hmap.Request(msg.SectionAction, msg.ActionSearch, `supervisor`)
+	hmap.Request(msg.SectionAction, msg.ActionAdd, `supervisor`)
+	hmap.Request(msg.SectionAction, msg.ActionRemove, `supervisor`)
+	hmap.Request(msg.SectionSystemOperation, msg.ActionToken, `supervisor`)
 }
 
 // RegisterAuditLog initializes the audit log provided by the Soma app

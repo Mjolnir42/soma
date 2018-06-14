@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -54,6 +55,20 @@ func (w *DeploymentWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (w *DeploymentWrite) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionGet,
+		msg.ActionSuccess,
+		msg.ActionFailed,
+		msg.ActionList,
+		msg.ActionAll,
+	} {
+		hmap.Request(msg.SectionDeployment, action, `deployment_w`)
+	}
 }
 
 // Intake exposes the Input channel as part of the handler interface

@@ -14,11 +14,12 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/config"
+	"github.com/mjolnir42/soma/internal/handler"
 )
 
 // Soma application struct
 type Soma struct {
-	handlerMap   *HandlerMap
+	handlerMap   *handler.Map
 	logMap       *LogHandleMap
 	dbConnection *sql.DB
 	conf         *config.Config
@@ -30,7 +31,7 @@ type Soma struct {
 
 // New returns a new SOMA application
 func New(
-	appHandlerMap *HandlerMap,
+	appHandlerMap *handler.Map,
 	logHandleMap *LogHandleMap,
 	dbConnection *sql.DB,
 	conf *config.Config,

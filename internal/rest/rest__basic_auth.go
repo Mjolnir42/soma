@@ -40,8 +40,8 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/soma"
 	"github.com/satori/go.uuid"
 
 	"github.com/julienschmidt/httprouter"
@@ -54,7 +54,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
 		const basicAuthPrefix string = "Basic "
-		var supervisor soma.Handler
+		var supervisor handler.Handler
 
 		// generate and record the requestID
 		requestID := uuid.NewV4()

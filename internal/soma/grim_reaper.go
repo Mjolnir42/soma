@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
@@ -52,6 +53,16 @@ func (grim *GrimReaper) Register(c *sql.DB, l ...*logrus.Logger) {
 	grim.appLog = l[0]
 	grim.reqLog = l[1]
 	grim.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (grim *GrimReaper) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionShutdown,
+	} {
+		hmap.Request(msg.SectionSystemOperation, action, `grimreaper`)
+	}
 }
 
 // Intake exposes the Input channel as part of the handler interface

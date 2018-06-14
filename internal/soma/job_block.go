@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
@@ -57,6 +58,17 @@ func (j *JobBlock) Register(c *sql.DB, l ...*logrus.Logger) {
 	j.appLog = l[0]
 	j.reqLog = l[1]
 	j.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (j *JobBlock) RegisterRequests(hmap *handler.Map) {
+	for _, section := range []string{
+		msg.SectionJobMgmt,
+		msg.SectionJob,
+	} {
+		hmap.Request(section, msg.ActionWait, `job_block`)
+	}
 }
 
 // Intake exposes a dummy channel required to fulfull the Handler

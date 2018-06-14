@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -12,6 +12,7 @@ import (
 	"database/sql"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	uuid "github.com/satori/go.uuid"
@@ -46,6 +47,20 @@ func (w *ServerWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (w *ServerWrite) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionAdd,
+		msg.ActionRemove,
+		msg.ActionPurge,
+		msg.ActionUpdate,
+		msg.ActionInsertNullID,
+	} {
+		hmap.Request(msg.SectionServer, action, `server_w`)
+	}
 }
 
 // Intake exposes the Input channel as part of the handler interface
@@ -86,9 +101,9 @@ func (w *ServerWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionCreate:
+	case msg.ActionAdd:
 		w.add(q, &result)
-	case msg.ActionDelete:
+	case msg.ActionRemove:
 		w.remove(q, &result)
 	case msg.ActionPurge:
 		w.purge(q, &result)
