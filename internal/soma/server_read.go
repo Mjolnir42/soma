@@ -19,17 +19,16 @@ import (
 
 // ServerRead handles read requests for server
 type ServerRead struct {
-	Input               chan msg.Request
-	Shutdown            chan struct{}
-	conn                *sql.DB
-	stmtList            *sql.Stmt
-	stmtShow            *sql.Stmt
-	stmtSync            *sql.Stmt
-	stmtSearchByName    *sql.Stmt
-	stmtSearchByAssetID *sql.Stmt
-	appLog              *logrus.Logger
-	reqLog              *logrus.Logger
-	errLog              *logrus.Logger
+	Input      chan msg.Request
+	Shutdown   chan struct{}
+	conn       *sql.DB
+	stmtList   *sql.Stmt
+	stmtShow   *sql.Stmt
+	stmtSync   *sql.Stmt
+	stmtSearch *sql.Stmt
+	appLog     *logrus.Logger
+	reqLog     *logrus.Logger
+	errLog     *logrus.Logger
 }
 
 // newServerRead return a new ServerRead handler with input buffer of length
@@ -53,11 +52,10 @@ func (r *ServerRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ListServers:           r.stmtList,
-		stmt.ShowServers:           r.stmtShow,
-		stmt.SyncServers:           r.stmtSync,
-		stmt.SearchServerByName:    r.stmtSearchByName,
-		stmt.SearchServerByAssetID: r.stmtSearchByAssetID,
+		stmt.ListServers:  r.stmtList,
+		stmt.ShowServers:  r.stmtShow,
+		stmt.SyncServers:  r.stmtSync,
+		stmt.SearchServer: r.stmtSearch,
 	} {
 		if prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`servers`, err, stmt.Name(statement))
@@ -95,10 +93,8 @@ func (r *ServerRead) process(q *msg.Request) {
 		r.show(q, &result)
 	case msg.ActionSync:
 		r.sync(q, &result)
-	case msg.ActionSearchByName:
-		r.searchByName(q, &result)
-	case msg.ActionSearchByAsset:
-		r.searchByAssetID(q, &result)
+	case msg.ActionSearch:
+		r.search(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -229,45 +225,29 @@ func (r *ServerRead) sync(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// searchByName looks up a server's ID by name
-func (r *ServerRead) searchByName(q *msg.Request, mr *msg.Result) {
+// search looks up a server's ID by name or assetID
+func (r *ServerRead) search(q *msg.Request, mr *msg.Result) {
 	var (
 		err                  error
 		serverID, serverName string
 		serverAssetID        int
+		nullName             sql.NullString
+		nullAssetID          sql.NullInt64
 	)
 
-	if err = r.stmtSearchByName.QueryRow(
-		q.Search.Server.Name,
-	).Scan(
-		&serverID,
-		&serverName,
-		&serverAssetID,
-	); err == sql.ErrNoRows {
-		mr.NotFound(err, q.Section)
-		return
-	} else if err != nil {
-		mr.ServerError(err, q.Section)
-		return
+	if q.Search.Server.Name != `` {
+		nullName.String = q.Search.Server.Name
+		nullName.Valid = true
 	}
-	mr.Server = append(mr.Server, proto.Server{
-		ID:      serverID,
-		Name:    serverName,
-		AssetID: uint64(serverAssetID),
-	})
-	mr.OK()
-}
 
-// searchByAssetID looks up a server's ID by assetID
-func (r *ServerRead) searchByAssetID(q *msg.Request, mr *msg.Result) {
-	var (
-		err                  error
-		serverID, serverName string
-		serverAssetID        int
-	)
+	if q.Search.Server.AssetID != 0 {
+		nullAssetID.Int64 = int64(q.Search.Server.AssetID)
+		nullAssetID.Valid = true
+	}
 
-	if err = r.stmtSearchByAssetID.QueryRow(
-		q.Search.Server.AssetID,
+	if err = r.stmtSearch.QueryRow(
+		nullName,
+		nullAssetID,
 	).Scan(
 		&serverID,
 		&serverName,

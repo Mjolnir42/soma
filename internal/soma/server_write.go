@@ -202,12 +202,12 @@ func (w *ServerWrite) update(q *msg.Request, mr *msg.Result) {
 
 	if res, err = w.stmtUpdate.Exec(
 		q.Server.ID,
-		q.Server.AssetID,
-		q.Server.Datacenter,
-		q.Server.Location,
-		q.Server.Name,
-		q.Server.IsOnline,
-		q.Server.IsDeleted,
+		q.Update.Server.AssetID,
+		q.Update.Server.Datacenter,
+		q.Update.Server.Location,
+		q.Update.Server.Name,
+		q.Update.Server.IsOnline,
+		q.Update.Server.IsDeleted,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

@@ -100,6 +100,7 @@ type UpdateData struct {
 	Entity      proto.Entity
 	Environment proto.Environment
 	Oncall      proto.Oncall
+	Server      proto.Server
 	State       proto.State
 	User        proto.User
 	View        proto.View

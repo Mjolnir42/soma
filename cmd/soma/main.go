@@ -261,9 +261,6 @@ func main() {
 	router.GET(`/repository/:repository/tree/:tree`, Check(BasicAuth(OutputTree)))
 	router.GET(`/repository/:repository`, Check(BasicAuth(RepositoryShow)))
 	router.GET(`/repository/`, Check(BasicAuth(RepositoryList)))
-	router.GET(`/servers/:server`, Check(BasicAuth(ServerShow)))
-	router.GET(`/servers/`, Check(BasicAuth(ServerList)))
-	router.GET(`/sync/servers/`, Check(BasicAuth(ServerSync)))
 	router.GET(`/sync/teams/`, Check(BasicAuth(TeamSync)))
 	router.GET(`/teams/:team`, Check(BasicAuth(TeamShow)))
 	router.GET(`/teams/`, Check(BasicAuth(TeamList)))
@@ -277,7 +274,6 @@ func main() {
 	router.POST(`/filter/property/service/team/:team/`, Check(BasicAuth(PropertyList)))
 	router.POST(`/filter/property/system/`, Check(BasicAuth(PropertyList)))
 	router.POST(`/filter/repository/`, Check(BasicAuth(RepositoryList)))
-	router.POST(`/filter/servers/`, Check(BasicAuth(ServerSearch)))
 	router.POST(`/filter/teams/`, Check(BasicAuth(TeamList)))
 	router.POST(`/filter/workflow/`, Check(BasicAuth(WorkflowList)))
 
@@ -294,7 +290,6 @@ func main() {
 			router.DELETE(`/property/service/team/:team/:service`, Check(BasicAuth(PropertyRemove)))
 			router.DELETE(`/property/system/:system`, Check(BasicAuth(PropertyRemove)))
 			router.DELETE(`/repository/:repository/property/:type/:source`, Check(BasicAuth(RepositoryRemoveProperty)))
-			router.DELETE(`/servers/:server`, Check(BasicAuth(ServerRemove)))
 			router.DELETE(`/teams/:team`, Check(BasicAuth(TeamRemove)))
 			router.GET(`/deployments/id/:uuid`, Check(DeploymentDetailsInstance))
 			router.GET(`/deployments/monitoring/:uuid/:all`, Check(DeploymentDetailsMonitoring))
@@ -316,12 +311,9 @@ func main() {
 			router.POST(`/property/system/`, Check(BasicAuth(PropertyAdd)))
 			router.POST(`/repository/:repository/property/:type/`, Check(BasicAuth(RepositoryAddProperty)))
 			router.POST(`/repository/`, Check(BasicAuth(RepositoryCreate)))
-			router.POST(`/servers/:server`, Check(BasicAuth(ServerAddNull)))
-			router.POST(`/servers/`, Check(BasicAuth(ServerAdd)))
 			router.POST(`/system/`, Check(BasicAuth(SystemOperation)))
 			router.POST(`/teams/`, Check(BasicAuth(TeamAdd)))
 			router.PUT(`/nodes/:node/config`, Check(BasicAuth(NodeAssign)))
-			router.PUT(`/servers/:server`, Check(BasicAuth(ServerUpdate)))
 			router.PUT(`/teams/:team`, Check(BasicAuth(TeamUpdate)))
 		}
 	}

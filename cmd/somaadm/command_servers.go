@@ -106,7 +106,7 @@ func cmdServerCreate(c *cli.Context) error {
 		req.Server.IsOnline = true
 	}
 
-	return adm.Perform(`postbody`, `/servers/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/server/`, `command`, req, c)
 }
 
 func cmdServerMarkAsDeleted(c *cli.Context) error {
@@ -118,7 +118,7 @@ func cmdServerMarkAsDeleted(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/servers/%s", sid)
+	path := fmt.Sprintf("/server/%s", sid)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -171,7 +171,7 @@ func cmdServerUpdate(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/servers/%s", c.Args().First())
+	path := fmt.Sprintf("/server/%s", c.Args().First())
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -180,7 +180,7 @@ func cmdServerList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/servers/`, `list`, nil, c)
+	return adm.Perform(`get`, `/server/`, `list`, nil, c)
 }
 
 func cmdServerSync(c *cli.Context) error {
@@ -188,7 +188,7 @@ func cmdServerSync(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/sync/servers/`, `list`, nil, c)
+	return adm.Perform(`get`, `/sync/server/`, `list`, nil, c)
 }
 
 func cmdServerShow(c *cli.Context) error {
@@ -200,7 +200,7 @@ func cmdServerShow(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/servers/%s", serverID)
+	path := fmt.Sprintf("/server/%s", serverID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -220,7 +220,7 @@ func cmdServerNull(c *cli.Context) error {
 	req.Server.ID = "00000000-0000-0000-0000-000000000000"
 	req.Server.Datacenter = opts["datacenter"][0]
 
-	return adm.Perform(`postbody`, `/servers/null`, `command`, req, c)
+	return adm.Perform(`postbody`, `/server/null`, `command`, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

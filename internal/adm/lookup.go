@@ -741,7 +741,7 @@ func serverIDByName(s string) (string, error) {
 	req := proto.NewServerFilter()
 	req.Filter.Server.Name = s
 
-	res, err := fetchFilter(req, `/filter/servers/`)
+	res, err := fetchFilter(req, `/search/server/`)
 	if err != nil {
 		goto abort
 	}
@@ -778,7 +778,7 @@ func serverIDByAsset(s string, aid uint64) (string, error) {
 	req := proto.NewServerFilter()
 	req.Filter.Server.AssetID = aid
 
-	res, err := fetchFilter(req, `/filter/servers/`)
+	res, err := fetchFilter(req, `/search/server/`)
 	if err != nil {
 		goto abort
 	}

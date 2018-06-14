@@ -155,7 +155,6 @@ const (
 	ActionRevokeTokens    = `revoke-tokens`
 	ActionSearch          = `search`
 	ActionSearchAll       = `search/all`
-	ActionSearchByAsset   = `search/asset`
 	ActionSearchByList    = `search/list`
 	ActionSearchByName    = `search/name`
 	ActionSet             = `set`
