@@ -1,12 +1,12 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -20,27 +20,29 @@ import (
 
 // UserWrite handles write requests for views
 type UserWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	stmtPurge  *sql.Stmt
-	stmtUpdate *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
-	soma       *Soma
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	stmtPurge   *sql.Stmt
+	stmtUpdate  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
+	soma        *Soma
 }
 
 // newUserWrite return a new UserWrite handler with input buffer of
 // length
-func newUserWrite(length int, s *Soma) (w *UserWrite) {
-	w = &UserWrite{}
+func newUserWrite(length int, s *Soma) (string, *UserWrite) {
+	w := &UserWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
 	w.soma = s
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -60,7 +62,7 @@ func (w *UserWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionPurge,
 		msg.ActionUpdate,
 	} {
-		hmap.Request(msg.SectionUserMgmt, action, `user_w`)
+		hmap.Request(msg.SectionUserMgmt, action, w.handlerName)
 	}
 }
 

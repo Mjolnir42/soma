@@ -1,12 +1,12 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -19,23 +19,25 @@ import (
 
 // ProviderWrite handles write requests for providers
 type ProviderWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newProviderWrite return a new ProviderWrite handler with input
 // buffer of length
-func newProviderWrite(length int) (w *ProviderWrite) {
-	w = &ProviderWrite{}
+func newProviderWrite(length int) (string, *ProviderWrite) {
+	w := &ProviderWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -53,7 +55,7 @@ func (w *ProviderWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionAdd,
 		msg.ActionRemove,
 	} {
-		hmap.Request(msg.SectionProvider, action, `provider_w`)
+		hmap.Request(msg.SectionProvider, action, w.handlerName)
 	}
 }
 

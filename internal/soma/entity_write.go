@@ -1,12 +1,12 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2015-2016, Jörg Pernfuß
+ * Copyright (c) 2015-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -19,24 +19,26 @@ import (
 
 // EntityWrite handles write requests for object entities
 type EntityWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	stmtRename *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	stmtRename  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newEntityWrite return a new EntityWrite handler with
 // input buffer of length
-func newEntityWrite(length int) (w *EntityWrite) {
-	w = &EntityWrite{}
+func newEntityWrite(length int) (string, *EntityWrite) {
+	w := &EntityWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -55,7 +57,7 @@ func (w *EntityWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionRemove,
 		msg.ActionRename,
 	} {
-		hmap.Request(msg.SectionEntity, action, `entity_w`)
+		hmap.Request(msg.SectionEntity, action, w.handlerName)
 	}
 }
 

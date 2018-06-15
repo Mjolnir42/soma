@@ -1,12 +1,12 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -23,6 +23,7 @@ import (
 type CapabilityWrite struct {
 	Input                chan msg.Request
 	Shutdown             chan struct{}
+	handlerName          string
 	conn                 *sql.DB
 	stmtAdd              *sql.Stmt
 	stmtRemove           *sql.Stmt
@@ -36,11 +37,12 @@ type CapabilityWrite struct {
 
 // newCapabilityWrite return a new CapabilityWrite handler with
 // input buffer of length
-func newCapabilityWrite(length int) (w *CapabilityWrite) {
-	w = &CapabilityWrite{}
+func newCapabilityWrite(length int) (string, *CapabilityWrite) {
+	w := &CapabilityWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -58,7 +60,7 @@ func (w *CapabilityWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionAdd,
 		msg.ActionRemove,
 	} {
-		hmap.Request(msg.SectionCapability, action, `capability_w`)
+		hmap.Request(msg.SectionCapability, action, w.handlerName)
 	}
 }
 

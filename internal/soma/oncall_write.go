@@ -1,12 +1,12 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -21,24 +21,26 @@ import (
 
 // OncallWrite handles write requests for oncall
 type OncallWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtUpdate *sql.Stmt
-	stmtRemove *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtUpdate  *sql.Stmt
+	stmtRemove  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newOncallWrite return a new OncallWrite handler with input buffer of
 // length
-func newOncallWrite(length int) (w *OncallWrite) {
-	w = &OncallWrite{}
+func newOncallWrite(length int) (string, *OncallWrite) {
+	w := &OncallWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -57,7 +59,7 @@ func (w *OncallWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionRemove,
 		msg.ActionUpdate,
 	} {
-		hmap.Request(msg.SectionOncall, action, `oncall_w`)
+		hmap.Request(msg.SectionOncall, action, w.handlerName)
 	}
 }
 

@@ -1,12 +1,12 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2015-2017, Jörg Pernfuß
+ * Copyright (c) 2015-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -19,24 +19,26 @@ import (
 
 // StateWrite handles write requests for object states
 type StateWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtCreate *sql.Stmt
-	stmtDelete *sql.Stmt
-	stmtRename *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtCreate  *sql.Stmt
+	stmtDelete  *sql.Stmt
+	stmtRename  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newStateWrite return a new StateWrite handler with input buffer of
 // length
-func newStateWrite(length int) (w *StateWrite) {
-	w = &StateWrite{}
+func newStateWrite(length int) (string, *StateWrite) {
+	w := &StateWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -55,7 +57,7 @@ func (w *StateWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionRemove,
 		msg.ActionRename,
 	} {
-		hmap.Request(msg.SectionState, action, `state_w`)
+		hmap.Request(msg.SectionState, action, w.handlerName)
 	}
 }
 

@@ -1,12 +1,12 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -20,26 +20,28 @@ import (
 
 // TeamWrite handles write requests for views
 type TeamWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	stmtUpdate *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
-	soma       *Soma
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	stmtUpdate  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
+	soma        *Soma
 }
 
 // newTeamWrite return a new TeamWrite handler with input buffer of
 // length
-func newTeamWrite(length int, s *Soma) (w *TeamWrite) {
-	w = &TeamWrite{}
+func newTeamWrite(length int, s *Soma) (string, *TeamWrite) {
+	w := &TeamWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
 	w.soma = s
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -58,7 +60,7 @@ func (w *TeamWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionRemove,
 		msg.ActionUpdate,
 	} {
-		hmap.Request(msg.SectionTeam, action, `team_w`)
+		hmap.Request(msg.SectionTeam, action, w.handlerName)
 	}
 }
 

@@ -1,11 +1,11 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -25,6 +25,7 @@ import (
 type DeploymentWrite struct {
 	Input                    chan msg.Request
 	Shutdown                 chan struct{}
+	handlerName              string
 	conn                     *sql.DB
 	stmtGet                  *sql.Stmt
 	stmtSetStatusUpdate      *sql.Stmt
@@ -42,11 +43,12 @@ type DeploymentWrite struct {
 
 // newDeploymentWrite return a new DeploymentWrite handler with
 // input buffer of length
-func newDeploymentWrite(length int) (w *DeploymentWrite) {
-	w = &DeploymentWrite{}
+func newDeploymentWrite(length int) (string, *DeploymentWrite) {
+	w := &DeploymentWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -67,7 +69,7 @@ func (w *DeploymentWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionAll,
 	} {
-		hmap.Request(msg.SectionDeployment, action, `deployment_w`)
+		hmap.Request(msg.SectionDeployment, action, w.handlerName)
 	}
 }
 

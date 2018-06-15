@@ -1,12 +1,12 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -24,6 +24,7 @@ import (
 type PropertyWrite struct {
 	Input                  chan msg.Request
 	Shutdown               chan struct{}
+	handlerName            string
 	conn                   *sql.DB
 	stmtAddCustom          *sql.Stmt
 	stmtAddNative          *sql.Stmt
@@ -46,11 +47,12 @@ type PropertyWrite struct {
 
 // newPropertyWrite return a new PropertyWrite handler with input
 // buffer of length
-func newPropertyWrite(length int) (w *PropertyWrite) {
-	w = &PropertyWrite{}
+func newPropertyWrite(length int) (string, *PropertyWrite) {
+	w := &PropertyWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -74,7 +76,7 @@ func (w *PropertyWrite) RegisterRequests(hmap *handler.Map) {
 			msg.ActionCreate,
 			msg.ActionDelete,
 		} {
-			hmap.Request(section, action, `property_w`)
+			hmap.Request(section, action, w.handlerName)
 		}
 	}
 }

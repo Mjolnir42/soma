@@ -1,12 +1,12 @@
 /*-
- * Copyright (c) 2015-2017, Jörg Pernfuß
+ * Copyright (c) 2015-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -19,24 +19,26 @@ import (
 
 // DatacenterWrite handles write requests for datacenters
 type DatacenterWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	stmtRename *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	stmtRename  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newDatacenterWrite return a new DatacenterWrite handler with input
 // buffer of length
-func newDatacenterWrite(length int) (w *DatacenterWrite) {
-	w = &DatacenterWrite{}
+func newDatacenterWrite(length int) (string, *DatacenterWrite) {
+	w := &DatacenterWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -55,7 +57,7 @@ func (w *DatacenterWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionRemove,
 		msg.ActionRename,
 	} {
-		hmap.Request(msg.SectionDatacenter, action, `datacenter_w`)
+		hmap.Request(msg.SectionDatacenter, action, w.handlerName)
 	}
 }
 

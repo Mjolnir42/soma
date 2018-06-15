@@ -1,11 +1,11 @@
 /*-
- * Copyright (c) 2017, Jörg Pernfuß
+ * Copyright (c) 2017-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import "github.com/mjolnir42/soma/internal/super"
 
@@ -51,8 +51,8 @@ func (s *Soma) Start() {
 	s.handlerMap.Add(newUnitRead(s.conf.QueueLen))
 	s.handlerMap.Add(newUserRead(s.conf.QueueLen))
 	s.handlerMap.Add(newValidityRead(s.conf.QueueLen))
-	s.handlerMap.Add(`view_r`, newViewRead(s.conf.QueueLen))
-	s.handlerMap.Add(`workflow_r`, newWorkflowRead(s.conf.QueueLen))
+	s.handlerMap.Add(newViewRead(s.conf.QueueLen))
+	s.handlerMap.Add(newWorkflowRead(s.conf.QueueLen))
 
 	if !s.conf.ReadOnly {
 		s.handlerMap.Add(`forest_custodian`, newForestCustodian(s.conf.QueueLen, s))
@@ -60,26 +60,26 @@ func (s *Soma) Start() {
 		s.handlerMap.Add(`lifecycle`, newLifeCycle(s))
 
 		if !s.conf.Observer {
-			s.handlerMap.Add(`attribute_w`, newAttributeWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`capability_w`, newCapabilityWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`datacenter_w`, newDatacenterWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`deployment_w`, newDeploymentWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`entity_w`, newEntityWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`environment_w`, newEnvironmentWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newAttributeWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newCapabilityWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newDatacenterWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newDeploymentWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newEntityWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newEnvironmentWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`job_block`, newJobBlock(s.conf.QueueLen))
-			s.handlerMap.Add(`mode_w`, newModeWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`monitoring_w`, newMonitoringWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`node_w`, newNodeWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`oncall_w`, newOncallWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`predicate_w`, newPredicateWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`property_w`, newPropertyWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`provider_w`, newProviderWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`server_w`, newServerWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`state_w`, newStateWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`status_w`, newStatusWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`team_w`, newTeamWrite(s.conf.QueueLen, s))
-			s.handlerMap.Add(`unit_w`, newUnitWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`user_w`, newUserWrite(s.conf.QueueLen, s))
+			s.handlerMap.Add(newModeWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newMonitoringWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newNodeWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newOncallWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newPredicateWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newPropertyWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newProviderWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newServerWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newStateWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newStatusWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newTeamWrite(s.conf.QueueLen, s))
+			s.handlerMap.Add(newUnitWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newUserWrite(s.conf.QueueLen, s))
 			s.handlerMap.Add(`validity_w`, newValidityWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`view_w`, newViewWrite(s.conf.QueueLen))
 			s.handlerMap.Add(`workflow_w`, newWorkflowWrite(s.conf.QueueLen))

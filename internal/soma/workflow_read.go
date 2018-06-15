@@ -1,12 +1,12 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -25,6 +25,7 @@ import (
 type WorkflowRead struct {
 	Input       chan msg.Request
 	Shutdown    chan struct{}
+	handlerName string
 	conn        *sql.DB
 	stmtSummary *sql.Stmt
 	stmtList    *sql.Stmt
@@ -35,11 +36,12 @@ type WorkflowRead struct {
 
 // newWorkflowRead return a new WorkflowRead handler with input buffer
 // of length
-func newWorkflowRead(length int) (r *WorkflowRead) {
-	r = &WorkflowRead{}
+func newWorkflowRead(length int) (string, *WorkflowRead) {
+	r := &WorkflowRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -57,7 +59,7 @@ func (r *WorkflowRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionSummary,
 		msg.ActionList,
 	} {
-		hmap.Request(msg.SectionWorkflow, action, `workflow_r`)
+		hmap.Request(msg.SectionWorkflow, action, r.handlerName)
 	}
 }
 

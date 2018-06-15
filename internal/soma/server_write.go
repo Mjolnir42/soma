@@ -6,7 +6,7 @@
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -20,25 +20,27 @@ import (
 
 // ServerWrite handles write requests for servers
 type ServerWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	stmtPurge  *sql.Stmt
-	stmtUpdate *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	stmtPurge   *sql.Stmt
+	stmtUpdate  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newServerWrite return a new ServerWrite handler with input buffer of
 // length
-func newServerWrite(length int) (w *ServerWrite) {
-	w = &ServerWrite{}
+func newServerWrite(length int) (string, *ServerWrite) {
+	w := &ServerWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -59,7 +61,7 @@ func (w *ServerWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionUpdate,
 		msg.ActionInsertNullID,
 	} {
-		hmap.Request(msg.SectionServer, action, `server_w`)
+		hmap.Request(msg.SectionServer, action, w.handlerName)
 	}
 }
 

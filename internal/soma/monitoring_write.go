@@ -1,12 +1,12 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -20,23 +20,25 @@ import (
 
 // MonitoringWrite handles write requests for monitoring systems
 type MonitoringWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtCreate *sql.Stmt
-	stmtDelete *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtCreate  *sql.Stmt
+	stmtDelete  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newMonitoringWrite return a new MonitoringWrite handler with
 // input buffer of length
-func newMonitoringWrite(length int) (w *MonitoringWrite) {
-	w = &MonitoringWrite{}
+func newMonitoringWrite(length int) (string, *MonitoringWrite) {
+	w := &MonitoringWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -54,7 +56,7 @@ func (w *MonitoringWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionAdd,
 		msg.ActionRemove,
 	} {
-		hmap.Request(msg.SectionMonitoringMgmt, action, `monitoring_w`)
+		hmap.Request(msg.SectionMonitoringMgmt, action, w.handlerName)
 	}
 }
 
