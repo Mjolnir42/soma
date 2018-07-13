@@ -24,8 +24,31 @@ WHERE  NOT sci.deleted
 GROUP  BY scic.status;`
 
 	// WorkflowList returns information about check instance
-	// configurations in a specific workflow state
+	// configurations
 	WorkflowList = `
+SELECT sci.check_instance_id,
+       sc.check_id,
+       sc.repository_id,
+       sc.configuration_id,
+       scic.check_instance_config_id,
+       scic.version,
+       scic.status,
+       scic.created,
+       scic.activated_at,
+       scic.deprovisioned_at,
+       scic.status_last_updated_at,
+       scic.notified_at,
+	   (sc.object_id = sc.source_object_id)::boolean
+FROM   soma.check_instances sci
+JOIN   soma.checks sc
+  ON   sci.check_id = sc.check_id
+JOIN   soma.check_instance_configurations scic
+  ON   sci.check_instance_id = scic.check_instance_id
+WHERE  NOT sci.deleted;`
+
+	// WorkflowSearch returns information about check instance
+	// configurations in a specific workflow state
+	WorkflowSearch = `
 SELECT sci.check_instance_id,
        sc.check_id,
        sc.repository_id,
@@ -81,6 +104,7 @@ WHERE  check_instance_config_id = $1::uuid;`
 func init() {
 	m[WorkflowList] = `WorkflowList`
 	m[WorkflowRetry] = `WorkflowRetry`
+	m[WorkflowSearch] = `WorkflowSearch`
 	m[WorkflowSet] = `WorkflowSet`
 	m[WorkflowSummary] = `WorkflowSummary`
 	m[WorkflowUpdateAvailable] = `WorkflowUpdateAvailable`

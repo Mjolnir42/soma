@@ -30,8 +30,13 @@ func registerWorkflow(app cli.App) *cli.App {
 					},
 					{
 						Name:   `list`,
-						Usage:  `List instances in a specific workflow state`,
+						Usage:  `List instances in a all workflow states`,
 						Action: runtime(cmdWorkflowList),
+					},
+					{
+						Name:   `search`,
+						Usage:  `Search for instances in a specific workflow state`,
+						Action: runtime(cmdWorkflowSearch),
 					},
 					{
 						Name:   `retry`,
@@ -65,6 +70,14 @@ func cmdWorkflowSummary(c *cli.Context) error {
 }
 
 func cmdWorkflowList(c *cli.Context) error {
+	if err := adm.VerifyNoArgument(c); err != nil {
+		return err
+	}
+
+	return adm.Perform(`get`, `/workflow/`, `list`, nil, c)
+}
+
+func cmdWorkflowSearch(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -75,7 +88,7 @@ func cmdWorkflowList(c *cli.Context) error {
 	req := proto.NewWorkflowFilter()
 	req.Filter.Workflow.Status = c.Args().First()
 
-	return adm.Perform(`postbody`, `/filter/workflow/`, `list`, req, c)
+	return adm.Perform(`postbody`, `/search/workflow/`, `list`, req, c)
 }
 
 func cmdWorkflowRetry(c *cli.Context) error {
@@ -122,7 +135,7 @@ func cmdWorkflowSet(c *cli.Context) error {
 	req.Workflow.Status = opts[`status`][0]
 	req.Workflow.NextStatus = opts[`next`][0]
 
-	path := fmt.Sprintf("/workflow/instanceconfig/%s",
+	path := fmt.Sprintf("/workflow/set/%s",
 		c.Args().First())
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }

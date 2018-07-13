@@ -261,7 +261,6 @@ func main() {
 	router.GET(`/sync/teams/`, Check(BasicAuth(TeamSync)))
 	router.GET(`/teams/:team`, Check(BasicAuth(TeamShow)))
 	router.GET(`/teams/`, Check(BasicAuth(TeamList)))
-	router.GET(`/workflow/summary`, Check(BasicAuth(WorkflowSummary)))
 	router.POST(`/filter/grant/`, Check(BasicAuth(RightSearch)))
 	router.POST(`/filter/groups/`, Check(BasicAuth(GroupList)))
 	router.POST(`/filter/nodes/`, Check(BasicAuth(NodeList)))
@@ -272,7 +271,6 @@ func main() {
 	router.POST(`/filter/property/system/`, Check(BasicAuth(PropertyList)))
 	router.POST(`/filter/repository/`, Check(BasicAuth(RepositoryList)))
 	router.POST(`/filter/teams/`, Check(BasicAuth(TeamList)))
-	router.POST(`/filter/workflow/`, Check(BasicAuth(WorkflowList)))
 
 	if !SomaCfg.ReadOnly {
 
@@ -293,8 +291,6 @@ func main() {
 			router.GET(`/deployments/monitoring/:uuid`, Check(DeploymentDetailsMonitoring))
 			router.PATCH(`/category/:category/permissions/:permission`, Check(BasicAuth(PermissionEdit)))
 			router.PATCH(`/deployments/id/:uuid/:result`, Check(DeploymentDetailsUpdate))
-			router.PATCH(`/workflow/instanceconfig/:instanceconfig`, Check(BasicAuth(WorkflowSet)))
-			router.PATCH(`/workflow/retry`, Check(BasicAuth(WorkflowRetry)))
 			router.POST(`/category/:category/permissions/:permission/grant/`, Check(BasicAuth(RightGrant)))
 			router.POST(`/category/:category/permissions/`, Check(BasicAuth(PermissionAdd)))
 			router.POST(`/groups/:group/members/`, Check(BasicAuth(GroupAddMember)))

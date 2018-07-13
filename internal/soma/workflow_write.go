@@ -73,7 +73,7 @@ func (w *WorkflowWrite) Run() {
 		stmt.WorkflowSet:             w.stmtSet,
 	} {
 		if prepStmt, err = w.conn.Prepare(statement); err != nil {
-			w.errLog.Fatal(`workflow_r`, err, stmt.Name(statement))
+			w.errLog.Fatal(`workflow_w`, err, stmt.Name(statement))
 		}
 		defer prepStmt.Close()
 	}

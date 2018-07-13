@@ -96,6 +96,8 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/validity/`, x.Verify(x.ValidityList))
 	router.GET(`/view/:view`, x.Verify(x.ViewShow))
 	router.GET(`/view/`, x.Verify(x.ViewList))
+	router.GET(`/workflow/`, x.Verify(x.WorkflowList))
+	router.GET(`/workflow/summary`, x.Verify(x.WorkflowSummary))
 	router.HEAD(`/authenticate/validate`, x.Verify(x.SupervisorValidate))
 	router.POST(`/filter/actions/`, x.Verify(x.ActionSearch))
 	router.POST(`/hostdeployment/:monitoringID/:assetID`, x.CheckShutdown(x.HostDeploymentAssemble))
@@ -110,6 +112,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(`/search/section/`, x.Verify(x.SectionSearch))
 	router.POST(`/search/server/`, x.Verify(x.ServerSearch))
 	router.POST(`/search/user/`, x.Verify(x.ScopeSelectUserSearch))
+	router.POST(`/search/workflow/`, x.Verify(x.WorkflowSearch))
 
 	if !x.conf.ReadOnly {
 		if !x.conf.Observer {
@@ -146,6 +149,8 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PATCH(`/accounts/password/:kexID`, x.CheckShutdown(x.SupervisorPasswordChange))
 			router.PATCH(`/oncall/:oncall`, x.Verify(x.OncallUpdate))
 			router.PATCH(`/view/:view`, x.Verify(x.ViewRename))
+			router.PATCH(`/workflow/retry`, x.Verify(x.WorkflowRetry))
+			router.PATCH(`/workflow/set/:instanceconfigID`, x.Verify(x.WorkflowSet))
 			router.POST(`/attribute/`, x.Verify(x.AttributeAdd))
 			router.POST(`/bucket/:bucket/property/:type/`, x.Verify(x.BucketPropertyCreate))
 			router.POST(`/bucket/`, x.Verify(x.BucketCreate))

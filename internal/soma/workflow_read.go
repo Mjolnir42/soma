@@ -29,6 +29,7 @@ type WorkflowRead struct {
 	conn        *sql.DB
 	stmtSummary *sql.Stmt
 	stmtList    *sql.Stmt
+	stmtSearch  *sql.Stmt
 	appLog      *logrus.Logger
 	reqLog      *logrus.Logger
 	errLog      *logrus.Logger
@@ -75,6 +76,7 @@ func (r *WorkflowRead) Run() {
 	for statement, prepStmt := range map[string]*sql.Stmt{
 		stmt.WorkflowSummary: r.stmtSummary,
 		stmt.WorkflowList:    r.stmtList,
+		stmt.WorkflowSearch:  r.stmtSearch,
 	} {
 		if prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`workflow_r`, err, stmt.Name(statement))
@@ -105,6 +107,8 @@ func (r *WorkflowRead) process(q *msg.Request) {
 		r.summary(q, &result)
 	case msg.ActionList:
 		r.list(q, &result)
+	case msg.ActionSearch:
+		r.search(q, &result)
 	default:
 		result.UnknownRequest(q)
 		return
@@ -113,8 +117,7 @@ func (r *WorkflowRead) process(q *msg.Request) {
 	q.Reply <- result
 }
 
-// list returns information on all deployments in a specific
-// workflow status
+// list returns information on all deployments
 func (r *WorkflowRead) list(q *msg.Request, mr *msg.Result) {
 	var (
 		err                                           error
@@ -132,7 +135,90 @@ func (r *WorkflowRead) list(q *msg.Request, mr *msg.Result) {
 		Instances: &[]proto.Instance{},
 	}
 
-	if rows, err = r.stmtList.Query(
+	if rows, err = r.stmtList.Query(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	for rows.Next() {
+		if err = rows.Scan(
+			&instanceID,
+			&checkID,
+			&repoID,
+			&configID,
+			&instanceConfigID,
+			&version,
+			&status,
+			&created,
+			&activatedNull,
+			&deprovisionedNull,
+			&updatedNull,
+			&notifiedNull,
+			&isInherited,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		instance := proto.Instance{
+			ID:               instanceID,
+			CheckID:          checkID,
+			RepositoryID:     repoID,
+			ConfigID:         configID,
+			InstanceConfigID: instanceConfigID,
+			Version:          uint64(version),
+			CurrentStatus:    status,
+			IsInherited:      isInherited,
+			Info: &proto.InstanceVersionInfo{
+				CreatedAt: created.UTC().Format(msg.RFC3339Milli),
+			},
+		}
+		if activatedNull.Valid {
+			instance.Info.ActivatedAt = activatedNull.
+				Time.UTC().Format(msg.RFC3339Milli)
+		}
+		if deprovisionedNull.Valid {
+			instance.Info.DeprovisionedAt = deprovisionedNull.
+				Time.UTC().Format(msg.RFC3339Milli)
+		}
+		if updatedNull.Valid {
+			instance.Info.StatusLastUpdatedAt = updatedNull.
+				Time.UTC().Format(msg.RFC3339Milli)
+		}
+		if notifiedNull.Valid {
+			instance.Info.NotifiedAt = notifiedNull.
+				Time.UTC().Format(msg.RFC3339Milli)
+		}
+		*workflow.Instances = append(*workflow.Instances,
+			instance)
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	mr.Workflow = append(mr.Workflow, workflow)
+	mr.OK()
+}
+
+// search returns information on all deployments in a specific
+// workflow status
+func (r *WorkflowRead) search(q *msg.Request, mr *msg.Result) {
+	var (
+		err                                           error
+		status, instanceID, checkID, repoID, configID string
+		instanceConfigID                              string
+		version                                       int64
+		rows                                          *sql.Rows
+		activatedNull, deprovisionedNull              pq.NullTime
+		updatedNull, notifiedNull                     pq.NullTime
+		created                                       time.Time
+		isInherited                                   bool
+	)
+
+	workflow := proto.Workflow{
+		Instances: &[]proto.Instance{},
+	}
+
+	if rows, err = r.stmtSearch.Query(
 		q.Workflow.Status,
 	); err != nil {
 		mr.ServerError(err, q.Section)
