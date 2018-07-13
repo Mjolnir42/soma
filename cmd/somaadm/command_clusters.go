@@ -303,7 +303,7 @@ func cmdClusterTree(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/clusters/%s/tree/tree", clusterID)
+	path := fmt.Sprintf("/cluster/%s/tree", clusterID)
 	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 

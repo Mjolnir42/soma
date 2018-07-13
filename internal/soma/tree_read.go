@@ -145,6 +145,17 @@ func (r *TreeRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)
 	msgRequest(r.reqLog, q)
 
+	switch q.Action {
+	case msg.ActionTree:
+		r.tree(q, &result)
+	default:
+		result.UnknownRequest(q)
+	}
+	q.Reply <- result
+}
+
+// tree returns the requested tree
+func (r *TreeRead) tree(q *msg.Request, mr *msg.Result) {
 	var err error
 	tree := proto.Tree{
 		ID:   q.Tree.ID,
@@ -163,24 +174,21 @@ func (r *TreeRead) process(q *msg.Request) {
 	case msg.EntityNode:
 		tree.Node, err = r.node(tree.ID, 0)
 	default:
-		result.UnknownRequest(q)
-		goto skip
+		mr.UnknownRequest(q)
+		return
 	}
 	if err == sql.ErrNoRows {
-		result.NotFound(
+		mr.NotFound(
 			fmt.Errorf(`Tree starting point not found`),
 			q.Section,
 		)
-		goto skip
+		return
 	} else if err != nil {
-		result.ServerError(err, q.Section)
-		goto skip
+		mr.ServerError(err, q.Section)
+		return
 	}
-	result.Tree = tree
-	result.OK()
-
-skip:
-	q.Reply <- result
+	mr.Tree = tree
+	mr.OK()
 }
 
 // repository returns the tree below a specifc repository

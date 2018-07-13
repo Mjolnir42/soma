@@ -236,14 +236,11 @@ func main() {
 
 	router.HEAD(`/`, Check(Ping))
 
-	router.GET(`/buckets/:bucket/tree/:tree`, Check(BasicAuth(OutputTree)))
 	router.GET(`/category/:category/permissions/:permission`, Check(BasicAuth(PermissionShow)))
 	router.GET(`/category/:category/permissions/`, Check(BasicAuth(PermissionList)))
-	router.GET(`/cluster/:clusterID/tree/:tree`, Check(BasicAuth(OutputTree)))
 	//TODO router.GET(`/category/:category/permissions/:permission/grant/`)
 	//TODO router.GET(`/category/:category/permissions/:permission/grant/:grant`)
 	router.GET(`/groups/:group/members/`, Check(BasicAuth(GroupListMember)))
-	router.GET(`/groups/:group/tree/:tree`, Check(BasicAuth(OutputTree)))
 	router.GET(`/groups/:group`, Check(BasicAuth(GroupShow)))
 	router.GET(`/groups/`, Check(BasicAuth(GroupList)))
 	router.GET(`/nodes/:node/config`, Check(BasicAuth(NodeShowConfig)))
@@ -259,7 +256,6 @@ func main() {
 	router.GET(`/property/service/team/:team/`, Check(BasicAuth(PropertyList)))
 	router.GET(`/property/system/:system`, Check(BasicAuth(PropertyShow)))
 	router.GET(`/property/system/`, Check(BasicAuth(PropertyList)))
-	router.GET(`/repository/:repository/tree/:tree`, Check(BasicAuth(OutputTree)))
 	router.GET(`/repository/:repository`, Check(BasicAuth(RepositoryShow)))
 	router.GET(`/repository/`, Check(BasicAuth(RepositoryList)))
 	router.GET(`/sync/teams/`, Check(BasicAuth(TeamSync)))

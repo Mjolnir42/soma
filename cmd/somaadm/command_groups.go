@@ -348,7 +348,7 @@ func cmdGroupTree(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/groups/%s/tree/tree", groupID)
+	path := fmt.Sprintf("/group/%s/tree", groupID)
 	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 

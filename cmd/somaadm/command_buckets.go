@@ -383,7 +383,7 @@ func cmdBucketTree(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/bucket/%s/tree/tree", bucketID)
+	path := fmt.Sprintf("/bucket/%s/tree", bucketID)
 	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 

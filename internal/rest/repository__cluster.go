@@ -97,6 +97,29 @@ func (x *Rest) ClusterShow(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
+// ClusterTree function
+func (x *Rest) ClusterTree(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionTree
+	request.Tree = proto.Tree{
+		ID:   params.ByName(`clusterID`),
+		Type: msg.EntityCluster,
+	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
+}
+
 // ClusterCreate function
 func (x *Rest) ClusterCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

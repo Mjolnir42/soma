@@ -364,7 +364,7 @@ func cmdRepositoryTree(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/repository/%s/tree/tree", id)
+	path := fmt.Sprintf("/repository/%s/tree", id)
 	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 

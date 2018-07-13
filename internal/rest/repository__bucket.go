@@ -98,6 +98,29 @@ func (x *Rest) BucketShow(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
+// BucketTree function
+func (x *Rest) BucketTree(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionBucket
+	request.Action = msg.ActionTree
+	request.Tree = proto.Tree{
+		ID:   params.ByName(`bucketID`),
+		Type: msg.EntityBucket,
+	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
+}
+
 // BucketCreate function
 func (x *Rest) BucketCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
