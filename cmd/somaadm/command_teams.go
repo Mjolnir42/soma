@@ -92,7 +92,7 @@ func cmdTeamAdd(c *cli.Context) error {
 		}
 	}
 
-	return adm.Perform(`postbody`, `/teams/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/team/`, `command`, req, c)
 }
 
 func cmdTeamUpdate(c *cli.Context) error {
@@ -120,7 +120,7 @@ func cmdTeamUpdate(c *cli.Context) error {
 				" be boolean")
 		}
 	}
-	path := fmt.Sprintf("/teams/%s", teamid)
+	path := fmt.Sprintf("/team/%s", teamid)
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -133,7 +133,7 @@ func cmdTeamDel(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/teams/%s", id)
+	path := fmt.Sprintf("/team/%s", id)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
@@ -153,7 +153,7 @@ func cmdTeamRename(c *cli.Context) error {
 	req := proto.NewTeamRequest()
 	req.Team.Name = opts["to"][0]
 
-	path := fmt.Sprintf("/teams/%s", id)
+	path := fmt.Sprintf("/team/%s", id)
 	return adm.Perform(`patchbody`, path, `command`, nil, c)
 }
 
@@ -166,7 +166,7 @@ func cmdTeamList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/teams/`, `list`, nil, c)
+	return adm.Perform(`get`, `/team/`, `list`, nil, c)
 }
 
 func cmdTeamSync(c *cli.Context) error {
@@ -174,7 +174,7 @@ func cmdTeamSync(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/sync/teams/`, `list`, nil, c)
+	return adm.Perform(`get`, `/sync/team/`, `list`, nil, c)
 }
 
 func cmdTeamShow(c *cli.Context) error {
@@ -187,7 +187,7 @@ func cmdTeamShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/teams/%s", id)
+	path := fmt.Sprintf("/team/%s", id)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 

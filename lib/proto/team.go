@@ -17,8 +17,29 @@ type Team struct {
 	Details  *TeamDetails `json:"details,omitempty"`
 }
 
+func (t *Team) Clone() Team {
+	clone := Team{
+		ID:       t.ID,
+		Name:     t.Name,
+		LdapID:   t.LdapID,
+		IsSystem: t.IsSystem,
+	}
+	if t.Details != nil {
+		clone.Details = t.Details.Clone()
+	}
+	return clone
+}
+
 type TeamDetails struct {
-	DetailsCreation
+	Creation *DetailsCreation `json:"creation,omitempty"`
+}
+
+func (t *TeamDetails) Clone() *TeamDetails {
+	clone := &TeamDetails{}
+	if t.Creation != nil {
+		clone.Creation = t.Creation.Clone()
+	}
+	return clone
 }
 
 type TeamFilter struct {
@@ -27,8 +48,8 @@ type TeamFilter struct {
 	IsSystem bool   `json:"isSystem,omitempty"`
 }
 
-func (p *Team) DeepCompare(a *Team) bool {
-	if p.ID != a.ID || p.Name != a.Name || p.LdapID != a.LdapID || p.IsSystem != a.IsSystem {
+func (t *Team) DeepCompare(a *Team) bool {
+	if t.ID != a.ID || t.Name != a.Name || t.LdapID != a.LdapID || t.IsSystem != a.IsSystem {
 		return false
 	}
 	return true

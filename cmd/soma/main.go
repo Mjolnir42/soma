@@ -258,9 +258,6 @@ func main() {
 	router.GET(`/property/system/`, Check(BasicAuth(PropertyList)))
 	router.GET(`/repository/:repository`, Check(BasicAuth(RepositoryShow)))
 	router.GET(`/repository/`, Check(BasicAuth(RepositoryList)))
-	router.GET(`/sync/teams/`, Check(BasicAuth(TeamSync)))
-	router.GET(`/teams/:team`, Check(BasicAuth(TeamShow)))
-	router.GET(`/teams/`, Check(BasicAuth(TeamList)))
 	router.POST(`/filter/grant/`, Check(BasicAuth(RightSearch)))
 	router.POST(`/filter/groups/`, Check(BasicAuth(GroupList)))
 	router.POST(`/filter/nodes/`, Check(BasicAuth(NodeList)))
@@ -270,7 +267,6 @@ func main() {
 	router.POST(`/filter/property/service/team/:team/`, Check(BasicAuth(PropertyList)))
 	router.POST(`/filter/property/system/`, Check(BasicAuth(PropertyList)))
 	router.POST(`/filter/repository/`, Check(BasicAuth(RepositoryList)))
-	router.POST(`/filter/teams/`, Check(BasicAuth(TeamList)))
 
 	if !SomaCfg.ReadOnly {
 
@@ -285,7 +281,6 @@ func main() {
 			router.DELETE(`/property/service/team/:team/:service`, Check(BasicAuth(PropertyRemove)))
 			router.DELETE(`/property/system/:system`, Check(BasicAuth(PropertyRemove)))
 			router.DELETE(`/repository/:repository/property/:type/:source`, Check(BasicAuth(RepositoryRemoveProperty)))
-			router.DELETE(`/teams/:team`, Check(BasicAuth(TeamRemove)))
 			router.GET(`/deployments/id/:uuid`, Check(DeploymentDetailsInstance))
 			router.GET(`/deployments/monitoring/:uuid/:all`, Check(DeploymentDetailsMonitoring))
 			router.GET(`/deployments/monitoring/:uuid`, Check(DeploymentDetailsMonitoring))
@@ -304,9 +299,7 @@ func main() {
 			router.POST(`/property/system/`, Check(BasicAuth(PropertyAdd)))
 			router.POST(`/repository/:repository/property/:type/`, Check(BasicAuth(RepositoryAddProperty)))
 			router.POST(`/repository/`, Check(BasicAuth(RepositoryCreate)))
-			router.POST(`/teams/`, Check(BasicAuth(TeamAdd)))
 			router.PUT(`/nodes/:node/config`, Check(BasicAuth(NodeAssign)))
-			router.PUT(`/teams/:team`, Check(BasicAuth(TeamUpdate)))
 		}
 	}
 
