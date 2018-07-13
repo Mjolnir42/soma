@@ -413,7 +413,7 @@ func oncallIDByName(oncall string) (string, error) {
 	req := proto.NewOncallFilter()
 	req.Filter.Oncall = &proto.OncallFilter{Name: oncall}
 
-	res, err := fetchFilter(req, `/filter/oncall/`)
+	res, err := fetchFilter(req, `/search/oncall/`)
 	if err != nil {
 		goto abort
 	}
@@ -711,7 +711,7 @@ func clusterIDByName(cluster, bucketID string) (string, error) {
 	req.Filter.Cluster.Name = cluster
 	req.Filter.Cluster.BucketID = bucketID
 
-	res, err := fetchFilter(req, `/filter/clusters/`)
+	res, err := fetchFilter(req, `/search/clusters/`)
 	if err != nil {
 		goto abort
 	}
