@@ -40,7 +40,7 @@ func (x *Rest) CapabilitySearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewCapabilityRequest()
+	cReq := proto.NewCapabilityFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
 		dispatchBadRequest(&w, err)
 		return
