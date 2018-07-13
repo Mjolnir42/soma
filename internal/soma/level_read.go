@@ -12,6 +12,7 @@ import (
 	"database/sql"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -19,24 +20,26 @@ import (
 
 // LevelRead handles read requests for alert levels
 type LevelRead struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtList   *sql.Stmt
-	stmtSearch *sql.Stmt
-	stmtShow   *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtSearch  *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newLevelRead return a new LevelRead handler with input buffer of
 // length
-func newLevelRead(length int) (r *LevelRead) {
-	r = &LevelRead{}
+func newLevelRead(length int) (string, *LevelRead) {
+	r := &LevelRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -45,6 +48,23 @@ func (r *LevelRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (r *LevelRead) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionList,
+		msg.ActionSearch,
+		msg.ActionShow,
+	} {
+		hmap.Request(msg.SectionLevel, action, r.handlerName)
+	}
+}
+
+// Intake exposes the Input channel as part of the handler interface
+func (r *LevelRead) Intake() chan msg.Request {
+	return r.Input
 }
 
 // PriorityIntake aliases Intake as part of the handler interface

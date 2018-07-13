@@ -12,29 +12,32 @@ import (
 	"database/sql"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 )
 
 // LevelWrite handles write requests for alert levels
 type LevelWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newLevelWrite return a new LevelWrite handler with input buffer of
 // length
-func newLevelWrite(length int) (w *LevelWrite) {
-	w = &LevelWrite{}
+func newLevelWrite(length int) (string, *LevelWrite) {
+	w := &LevelWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -43,6 +46,22 @@ func (w *LevelWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.appLog = l[0]
 	w.reqLog = l[1]
 	w.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (w *LevelWrite) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionAdd,
+		msg.ActionRemove,
+	} {
+		hmap.Request(msg.SectionLevel, action, w.handlerName)
+	}
+}
+
+// Intake exposes the Input channel as part of the handler interface
+func (w *LevelWrite) Intake() chan msg.Request {
+	return w.Input
 }
 
 // PriorityIntake aliases Intake as part of the handler interface
@@ -81,7 +100,7 @@ func (w *LevelWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionCreate:
+	case msg.ActionAdd:
 		w.add(q, &result)
 	case msg.ActionRemove:
 		w.remove(q, &result)

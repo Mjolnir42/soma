@@ -12,6 +12,7 @@ import (
 	"database/sql"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -19,23 +20,25 @@ import (
 
 // MetricRead handles read requests for metrics
 type MetricRead struct {
-	Input    chan msg.Request
-	Shutdown chan struct{}
-	conn     *sql.DB
-	stmtList *sql.Stmt
-	stmtShow *sql.Stmt
-	appLog   *logrus.Logger
-	reqLog   *logrus.Logger
-	errLog   *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtList    *sql.Stmt
+	stmtShow    *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newMetricRead return a new MetricRead handler with input buffer of
 // length
-func newMetricRead(length int) (r *MetricRead) {
-	r = &MetricRead{}
+func newMetricRead(length int) (string, *MetricRead) {
+	r := &MetricRead{}
+	r.handlerName = generateHandlerName() + `_r`
 	r.Input = make(chan msg.Request, length)
 	r.Shutdown = make(chan struct{})
-	return
+	return r.handlerName, r
 }
 
 // Register initializes resources provided by the Soma app
@@ -44,6 +47,22 @@ func (r *MetricRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.appLog = l[0]
 	r.reqLog = l[1]
 	r.errLog = l[2]
+}
+
+// RegisterRequests links the handler inside the handlermap to the requests
+// it processes
+func (r *MetricRead) RegisterRequests(hmap *handler.Map) {
+	for _, action := range []string{
+		msg.ActionList,
+		msg.ActionShow,
+	} {
+		hmap.Request(msg.SectionMetric, action, r.handlerName)
+	}
+}
+
+// Intake exposes the Input channel as part of the handler interface
+func (r *MetricRead) Intake() chan msg.Request {
+	return r.Input
 }
 
 // PriorityIntake aliases Intake as part of the handler interface
