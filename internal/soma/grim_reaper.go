@@ -70,6 +70,11 @@ func (grim *GrimReaper) Intake() chan msg.Request {
 	return grim.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (grim *GrimReaper) PriorityIntake() chan msg.Request {
+	return grim.Intake()
+}
+
 // Run is the event loop for GrimReaper
 func (grim *GrimReaper) Run() {
 	// defer calls stack in LIFO order

@@ -72,6 +72,11 @@ func (r *ClusterRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *ClusterRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for ClusterRead
 func (r *ClusterRead) Run() {
 	var err error

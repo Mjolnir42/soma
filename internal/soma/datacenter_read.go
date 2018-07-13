@@ -66,6 +66,11 @@ func (r *DatacenterRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *DatacenterRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for DatacenterRead
 func (r *DatacenterRead) Run() {
 	var err error

@@ -20,6 +20,7 @@ type Handler interface {
 	Run()
 	ShutdownNow()
 	Intake() chan msg.Request
+	PriorityIntake() chan msg.Request
 	RegisterRequests(*Map)
 }
 

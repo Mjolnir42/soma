@@ -69,6 +69,11 @@ func (w *TeamWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *TeamWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for TeamWrite
 func (w *TeamWrite) Run() {
 	var err error

@@ -69,6 +69,11 @@ func (w *NodeWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *NodeWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for NodeWrite
 func (w *NodeWrite) Run() {
 	var err error

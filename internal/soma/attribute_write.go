@@ -64,6 +64,11 @@ func (w *AttributeWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *AttributeWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for AttributeWrite
 func (w *AttributeWrite) Run() {
 	var err error

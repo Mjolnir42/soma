@@ -64,6 +64,11 @@ func (w *ModeWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *ModeWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for ModeWrite
 func (w *ModeWrite) Run() {
 	var err error

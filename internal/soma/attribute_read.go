@@ -65,6 +65,11 @@ func (r *AttributeRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *AttributeRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for AttributeRead
 func (r *AttributeRead) Run() {
 	var err error

@@ -64,6 +64,11 @@ func (w *ViewWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *ViewWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for ViewWrite
 func (w *ViewWrite) Run() {
 	var err error

@@ -69,6 +69,11 @@ func (r *BucketRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *BucketRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for BucketRead
 func (r *BucketRead) Run() {
 	var err error

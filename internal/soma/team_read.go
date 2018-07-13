@@ -67,6 +67,11 @@ func (r *TeamRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *TeamRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for TeamRead
 func (r *TeamRead) Run() {
 	var err error

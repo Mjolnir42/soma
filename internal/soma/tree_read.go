@@ -101,6 +101,11 @@ func (r *TreeRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *TreeRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for TreeRead
 func (r *TreeRead) Run() {
 	var err error

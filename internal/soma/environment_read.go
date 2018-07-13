@@ -65,6 +65,11 @@ func (r *EnvironmentRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *EnvironmentRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for EnvironmentRead
 func (r *EnvironmentRead) Run() {
 	var err error

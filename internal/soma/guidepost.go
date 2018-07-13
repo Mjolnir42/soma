@@ -89,6 +89,12 @@ func (g *GuidePost) Intake() chan msg.Request {
 	return g.Input
 }
 
+// PriorityIntake exposes a secondary input channel as part of the handler
+// interface, used for system requests
+func (g *GuidePost) PriorityIntake() chan msg.Request {
+	return g.System
+}
+
 // Run is the event loop for GuidePost
 func (g *GuidePost) Run() {
 	var err error

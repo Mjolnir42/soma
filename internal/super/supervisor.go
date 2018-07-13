@@ -183,6 +183,11 @@ func (s *Supervisor) Intake() chan msg.Request {
 	return s.Input
 }
 
+// PriorityIntake exposes the Input channel as part of the handler interface
+func (s *Supervisor) PriorityIntake() chan msg.Request {
+	return s.Input
+}
+
 // Run is the event loop for Supervisor
 func (s *Supervisor) Run() {
 	var err error

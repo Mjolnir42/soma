@@ -65,6 +65,11 @@ func (r *EntityRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *EntityRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for EntityRead
 func (r *EntityRead) Run() {
 	var err error

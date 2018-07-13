@@ -77,6 +77,11 @@ func (j *JobBlock) Intake() chan msg.Request {
 	return j.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (j *JobBlock) PriorityIntake() chan msg.Request {
+	return j.Intake()
+}
+
 // Run is the event loop for JobBlock
 func (j *JobBlock) Run() {
 	tock := time.Tick(1 * time.Minute)

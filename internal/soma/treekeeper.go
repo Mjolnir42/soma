@@ -119,6 +119,11 @@ func (tk *TreeKeeper) Intake() chan msg.Request {
 	return tk.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (tk *TreeKeeper) PriorityIntake() chan msg.Request {
+	return tk.Intake()
+}
+
 // Run is the method a treeKeeper executes in its background
 // go-routine. It checks and handles the input channels and reacts
 // appropriately.

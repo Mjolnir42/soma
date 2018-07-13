@@ -45,6 +45,11 @@ func (w *LevelWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 	w.errLog = l[2]
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *LevelWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for LevelWrite
 func (w *LevelWrite) Run() {
 	var err error

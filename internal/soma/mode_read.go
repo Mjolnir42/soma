@@ -64,6 +64,11 @@ func (r *ModeRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *ModeRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for ModeRead
 func (r *ModeRead) Run() {
 	var err error

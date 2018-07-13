@@ -86,6 +86,11 @@ func (w *PropertyWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *PropertyWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for PropertyWrite
 func (w *PropertyWrite) Run() {
 	var err error

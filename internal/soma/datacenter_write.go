@@ -66,6 +66,11 @@ func (w *DatacenterWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *DatacenterWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for DatacenterWrite
 func (w *DatacenterWrite) Run() {
 	var err error

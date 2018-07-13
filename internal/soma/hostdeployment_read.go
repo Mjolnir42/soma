@@ -67,6 +67,11 @@ func (r *HostDeploymentRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *HostDeploymentRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for HostDeploymentRead
 func (r *HostDeploymentRead) Run() {
 	var err error

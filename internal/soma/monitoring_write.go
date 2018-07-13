@@ -65,6 +65,11 @@ func (w *MonitoringWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *MonitoringWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for MonitoringWrite
 func (w *MonitoringWrite) Run() {
 	var err error

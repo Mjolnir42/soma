@@ -64,6 +64,11 @@ func (r *UnitRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *UnitRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for UnitRead
 func (r *UnitRead) Run() {
 	var err error

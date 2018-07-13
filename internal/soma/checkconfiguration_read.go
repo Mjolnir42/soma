@@ -78,6 +78,11 @@ func (r *CheckConfigurationRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *CheckConfigurationRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for CheckConfigurationRead
 func (r *CheckConfigurationRead) Run() {
 	var err error

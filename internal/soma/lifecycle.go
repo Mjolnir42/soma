@@ -64,6 +64,11 @@ func (lc *LifeCycle) Intake() chan msg.Request {
 	return c
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (lc *LifeCycle) PriorityIntake() chan msg.Request {
+	return lc.Intake()
+}
+
 // RegisterRequests links the handler inside the handlermap to the requests
 // it processes. For LifeCycle this is a dummy method to fulfill the
 // handler.Handler interface

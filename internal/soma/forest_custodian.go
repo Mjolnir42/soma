@@ -68,6 +68,11 @@ func (f *ForestCustodian) Intake() chan msg.Request {
 	return f.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (f *ForestCustodian) PriorityIntake() chan msg.Request {
+	return f.Intake()
+}
+
 // Run is the event loop for ForestCustodian
 func (f *ForestCustodian) Run() {
 	var err error

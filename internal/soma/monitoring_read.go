@@ -101,6 +101,11 @@ func (r *MonitoringRead) Intake() chan msg.Request {
 	return r.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *MonitoringRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // process is the request dispatcher
 func (r *MonitoringRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)

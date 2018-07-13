@@ -69,6 +69,11 @@ func (w *CapabilityWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *CapabilityWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for CapabilityWrite
 func (w *CapabilityWrite) Run() {
 	var err error

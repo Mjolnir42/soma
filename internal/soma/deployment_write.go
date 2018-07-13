@@ -78,6 +78,11 @@ func (w *DeploymentWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *DeploymentWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for DeploymentWrite
 func (w *DeploymentWrite) Run() {
 	var err error

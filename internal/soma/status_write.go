@@ -64,6 +64,11 @@ func (w *StatusWrite) Intake() chan msg.Request {
 	return w.Input
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (w *StatusWrite) PriorityIntake() chan msg.Request {
+	return w.Intake()
+}
+
 // Run is the event loop for StatusWrite
 func (w *StatusWrite) Run() {
 	var err error

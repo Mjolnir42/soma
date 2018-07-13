@@ -46,6 +46,11 @@ func (r *MetricRead) Register(c *sql.DB, l ...*logrus.Logger) {
 	r.errLog = l[2]
 }
 
+// PriorityIntake aliases Intake as part of the handler interface
+func (r *MetricRead) PriorityIntake() chan msg.Request {
+	return r.Intake()
+}
+
 // Run is the event loop for MetricRead
 func (r *MetricRead) Run() {
 	var err error
