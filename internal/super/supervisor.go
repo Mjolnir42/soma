@@ -169,7 +169,8 @@ func (s *Supervisor) RegisterRequests(hmap *handler.Map) {
 	hmap.Request(msg.SectionAction, msg.ActionSearch, `supervisor`)
 	hmap.Request(msg.SectionAction, msg.ActionAdd, `supervisor`)
 	hmap.Request(msg.SectionAction, msg.ActionRemove, `supervisor`)
-	hmap.Request(msg.SectionSystemOperation, msg.ActionToken, `supervisor`)
+	hmap.Request(msg.SectionSystem, msg.ActionToken, `supervisor`)
+	hmap.Request(msg.SectionSystem, msg.ActionRevokeTokens, `supervisor`)
 }
 
 // RegisterAuditLog initializes the audit log provided by the Soma app
@@ -313,7 +314,7 @@ func (s *Supervisor) process(q *msg.Request) {
 		s.section(q)
 	case msg.SectionAction:
 		s.action(q)
-	case msg.SectionSystemOperation:
+	case msg.SectionSystem:
 		s.token(q)
 	}
 }

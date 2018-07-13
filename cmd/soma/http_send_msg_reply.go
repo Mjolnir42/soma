@@ -103,8 +103,8 @@ func SendMsgResult(w *http.ResponseWriter, r *msg.Result) {
 			result = proto.NewJobResult()
 			*result.Jobs = append(*result.Jobs, r.Job...)
 		default:
-			result = proto.NewSystemOperationResult()
-			*result.SystemOperations = append(*result.SystemOperations, r.System...)
+			result = proto.NewSystemResult()
+			*result.Systems = append(*result.Systems, r.System...)
 		}
 	case `instance`:
 		result = proto.NewInstanceResult()

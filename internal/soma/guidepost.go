@@ -81,6 +81,7 @@ func (g *GuidePost) RegisterRequests(hmap *handler.Map) {
 			hmap.Request(section, action, `guidepost`)
 		}
 	}
+	hmap.Request(msg.SectionSystem, msg.ActionRepoStop, `guidepost`)
 }
 
 // Intake exposes the Input channel as part of the handler interface
@@ -244,7 +245,7 @@ func (g *GuidePost) sysprocess(q *msg.Request) {
 		handler                  *TreeKeeper
 	)
 	result := msg.FromRequest(q)
-	result.System = []proto.SystemOperation{q.System}
+	result.System = []proto.System{q.System}
 
 	switch q.System.Request {
 	case msg.ActionRepoStop:

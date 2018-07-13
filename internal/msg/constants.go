@@ -58,9 +58,9 @@ const (
 // Sections in category operation are special global sections
 // for actions to run the SOMA system
 const (
-	CategoryOperation      = `operation`
-	SectionSystemOperation = `system-operation`
-	SectionWorkflow        = `workflow`
+	CategoryOperation = `operation`
+	SectionSystem     = `system`
+	SectionWorkflow   = `workflow`
 )
 
 // Sections in category permission are special global sections

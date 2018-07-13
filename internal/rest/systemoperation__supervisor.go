@@ -101,53 +101,6 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	sendMsgResult(&w, &result)
 }
 
-// SupervisorTokenInvalidateAccount is the rest endpoint for admins
-// to invalidate all current access tokens for another user
-func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer panicCatcher(w)
-
-	request := newRequest(r, params)
-	request.Section = msg.SectionSystemOperation
-	request.Action = msg.ActionRevokeTokens
-	request.Super = &msg.Supervisor{
-		Task:            msg.TaskInvalidateAccount,
-		RevokeTokensFor: params.ByName(`account`),
-	}
-
-	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
-		return
-	}
-
-	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
-	sendMsgResult(&w, &result)
-}
-
-// SupervisorTokenInvalidateGlobal is the rest endpoint for admins
-// to invalidate all current access tokens
-func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer panicCatcher(w)
-
-	request := newRequest(r, params)
-	request.Section = msg.SectionSystemOperation
-	request.Action = msg.ActionRevokeTokens
-	request.Super = &msg.Supervisor{
-		Task: msg.TaskInvalidateGlobal,
-	}
-
-	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
-		return
-	}
-
-	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
-	sendMsgResult(&w, &result)
-}
-
 // SupervisorTokenRequest is the encrypted endpoint used to
 // request a password token
 func (x *Rest) SupervisorTokenRequest(w http.ResponseWriter, r *http.Request,

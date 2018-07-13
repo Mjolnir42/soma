@@ -63,7 +63,7 @@ type Request struct {
 	Server      proto.Server
 	State       proto.State
 	Status      proto.Status
-	System      proto.SystemOperation
+	System      proto.System
 	Team        proto.Team
 	Tree        proto.Tree
 	Unit        proto.Unit

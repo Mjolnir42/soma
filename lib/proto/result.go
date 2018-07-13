@@ -85,7 +85,7 @@ type Result struct {
 	Servers          *[]Server          `json:"servers,omitempty"`
 	States           *[]State           `json:"states,omitempty"`
 	Status           *[]Status          `json:"status,omitempty"`
-	SystemOperations *[]SystemOperation `json:"systemOperation,omitempty"`
+	Systems          *[]System          `json:"system,omitempty"`
 	Teams            *[]Team            `json:"teams,omitempty"`
 	Tree             *Tree              `json:"tree,omitempty"`
 	Units            *[]Unit            `json:"units,omitempty"`

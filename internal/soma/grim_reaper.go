@@ -61,7 +61,7 @@ func (grim *GrimReaper) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionShutdown,
 	} {
-		hmap.Request(msg.SectionSystemOperation, action, `grimreaper`)
+		hmap.Request(msg.SectionSystem, action, `grimreaper`)
 	}
 }
 
@@ -86,7 +86,7 @@ runloop:
 			lock.Lock()
 			go func() {
 				req := msg.Request{
-					Section: msg.SectionSystemOperation,
+					Section: msg.SectionSystem,
 					Action:  msg.ActionShutdown,
 				}
 				req.Reply = make(chan msg.Result, 2)

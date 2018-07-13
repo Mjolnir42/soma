@@ -9,23 +9,23 @@
 
 package proto
 
-type SystemOperation struct {
+type System struct {
 	Request      string `json:"request,omitempty"`
 	RepositoryID string `json:"repositoryId,omitempty"`
 	RebuildLevel string `json:"rebuildLevel,omitempty"`
 }
 
-func NewSystemOperationRequest() Request {
+func NewSystemRequest() Request {
 	return Request{
-		Flags:           &Flags{},
-		SystemOperation: &SystemOperation{},
+		Flags:  &Flags{},
+		System: &System{},
 	}
 }
 
-func NewSystemOperationResult() Result {
+func NewSystemResult() Result {
 	return Result{
-		Errors:           &[]string{},
-		SystemOperations: &[]SystemOperation{},
+		Errors:  &[]string{},
+		Systems: &[]System{},
 	}
 }
 

@@ -304,7 +304,6 @@ func main() {
 			router.POST(`/property/system/`, Check(BasicAuth(PropertyAdd)))
 			router.POST(`/repository/:repository/property/:type/`, Check(BasicAuth(RepositoryAddProperty)))
 			router.POST(`/repository/`, Check(BasicAuth(RepositoryCreate)))
-			router.POST(`/system/`, Check(BasicAuth(SystemOperation)))
 			router.POST(`/teams/`, Check(BasicAuth(TeamAdd)))
 			router.PUT(`/nodes/:node/config`, Check(BasicAuth(NodeAssign)))
 			router.PUT(`/teams/:team`, Check(BasicAuth(TeamUpdate)))

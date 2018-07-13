@@ -178,6 +178,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.POST(`/server/`, x.Verify(x.ServerAdd))
 			router.POST(`/state/`, x.Verify(x.StateAdd))
 			router.POST(`/status/`, x.Verify(x.StatusAdd))
+			router.POST(`/system/`, x.Verify(x.SystemOperation))
 			router.POST(`/unit/`, x.Verify(x.UnitAdd))
 			router.POST(`/user/`, x.Verify(x.UserMgmtAdd))
 			router.POST(`/validity/`, x.Verify(x.ValidityAdd))

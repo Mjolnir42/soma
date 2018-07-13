@@ -243,8 +243,8 @@ func cmdOpsRepoStop(c *cli.Context) error {
 		return err
 	}
 
-	req := proto.NewSystemOperationRequest()
-	req.SystemOperation.Request = `repository_stop`
+	req := proto.NewSystemRequest()
+	req.System.Request = `stop-repository`
 
 	return cmdOpsRepo(c, req)
 }
@@ -254,8 +254,8 @@ func cmdOpsRepoRestart(c *cli.Context) error {
 		return err
 	}
 
-	req := proto.NewSystemOperationRequest()
-	req.SystemOperation.Request = `repository_restart`
+	req := proto.NewSystemRequest()
+	req.System.Request = `restart-repository`
 
 	return cmdOpsRepo(c, req)
 }
@@ -278,9 +278,9 @@ func cmdOpsRepoRebuild(c *cli.Context) error {
 		return fmt.Errorf(`Only rebuild levels 'checks' and 'instances' are supported`)
 	}
 
-	req := proto.NewSystemOperationRequest()
-	req.SystemOperation.Request = `repository_rebuild`
-	req.SystemOperation.RebuildLevel = opts[`level`][0]
+	req := proto.NewSystemRequest()
+	req.System.Request = `rebuild-repository`
+	req.System.RebuildLevel = opts[`level`][0]
 
 	return cmdOpsRepo(c, req)
 }
@@ -292,7 +292,7 @@ func cmdOpsRepo(c *cli.Context, req proto.Request) error {
 	if err != nil {
 		return err
 	}
-	req.SystemOperation.RepositoryID = repoID
+	req.System.RepositoryID = repoID
 
 	return adm.Perform(`postbody`, `/system/`, `command`, req, c)
 }
@@ -302,8 +302,8 @@ func cmdOpsShutdown(c *cli.Context) error {
 		return err
 	}
 
-	req := proto.NewSystemOperationRequest()
-	req.SystemOperation.Request = `shutdown`
+	req := proto.NewSystemRequest()
+	req.System.Request = `shutdown`
 
 	return adm.Perform(`postbody`, `/system/`, `command`, req, c)
 }
