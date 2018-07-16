@@ -29,36 +29,10 @@ func registerRepository(app cli.App) *cli.App {
 						Action: runtime(cmdRepositoryDestroy),
 					},
 					{
-						Name:   "restore",
-						Usage:  "Restore a repository marked as deleted",
-						Action: runtime(cmdRepositoryRestore),
-					},
-					{
-						Name:   "purge",
-						Usage:  "Remove an unreferenced deleted repository",
-						Action: runtime(cmdRepositoryPurge),
-					},
-					{
-						Name:   "clear",
-						Usage:  "Clear all check instances for this repository",
-						Action: runtime(cmdRepositoryClear),
-					},
-					{
 						Name:         "rename",
 						Usage:        "Rename an existing repository",
 						Action:       runtime(cmdRepositoryRename),
 						BashComplete: cmpl.To,
-					},
-					{
-						Name:         "repossess",
-						Usage:        "Change the owner of a repository",
-						Action:       runtime(cmdRepositoryRepossess),
-						BashComplete: cmpl.To,
-					},
-					{
-						Name:   "activate",
-						Usage:  "Activate a cloned repository",
-						Action: runtime(cmdRepositoryActivate),
 					},
 					{
 						Name:   "list",
@@ -195,63 +169,6 @@ func cmdRepositoryDestroy(c *cli.Context) error {
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
-func cmdRepositoryRestore(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-	path := fmt.Sprintf("/repository/%s", id)
-
-	req := proto.Request{
-		Flags: &proto.Flags{
-			Restore: true,
-		},
-	}
-
-	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
-func cmdRepositoryPurge(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-	path := fmt.Sprintf("/repository/%s", id)
-
-	req := proto.Request{
-		Flags: &proto.Flags{
-			Purge: true,
-		},
-	}
-
-	return adm.Perform(`deletebody`, path, `command`, req, c)
-}
-
-func cmdRepositoryClear(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-	path := fmt.Sprintf("/repository/%s", id)
-
-	req := proto.Request{
-		Flags: &proto.Flags{
-			Clear: true,
-		},
-	}
-
-	return adm.Perform(`putbody`, path, `command`, req, c)
-}
-
 func cmdRepositoryRename(c *cli.Context) error {
 	opts := map[string][]string{}
 	if err := adm.ParseVariadicArguments(
@@ -271,52 +188,6 @@ func cmdRepositoryRename(c *cli.Context) error {
 	var req proto.Request
 	req.Repository = &proto.Repository{}
 	req.Repository.Name = opts[`to`][0]
-
-	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
-func cmdRepositoryRepossess(c *cli.Context) error {
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		[]string{`to`},
-		[]string{`to`},
-		c.Args().Tail()); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-	teamID, err := adm.LookupTeamID(opts[`team`][0])
-	if err != nil {
-		return err
-	}
-	path := fmt.Sprintf("/repository/%s", id)
-
-	var req proto.Request
-	req.Repository = &proto.Repository{}
-	req.Repository.TeamID = teamID
-
-	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
-func cmdRepositoryActivate(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-	path := fmt.Sprintf("/repository/%s", id)
-
-	req := proto.Request{
-		Flags: &proto.Flags{
-			Activate: true,
-		},
-	}
 
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
