@@ -21,6 +21,7 @@ type Repository struct {
 }
 
 type RepositoryFilter struct {
+	ID        string `json:"ID,omitempty"`
 	Name      string `json:"name,omitempty"`
 	TeamID    string `json:"teamId,omitempty"`
 	IsDeleted bool   `json:"isDeleted,omitempty"`
