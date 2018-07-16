@@ -957,7 +957,7 @@ func actionIDByName(action, section string) (string, error) {
 	req.Filter.Action.Name = action
 	req.Filter.Action.SectionID = section
 
-	res, err := fetchFilter(req, `/filter/actions/`)
+	res, err := fetchFilter(req, `/search/action/`)
 	if err != nil {
 		goto abort
 	}
@@ -1068,7 +1068,7 @@ func checkConfigIDByName(check, repo string) (string, string, error) {
 	req.Filter.CheckConfig.Name = check
 
 	res, err := fetchFilter(req, fmt.Sprintf(
-		"/filter/checks/%s/", repo))
+		"/search/checkconfig/%s/", repo))
 	if err != nil {
 		goto abort
 	}
