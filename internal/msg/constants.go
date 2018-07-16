@@ -85,15 +85,15 @@ const (
 // Sections in category repository are for actions with
 // a per-repository scope
 const (
-	CategoryRepository    = `repository`
-	SectionBucket         = `bucket`
-	SectionCheckConfig    = `check-config`
-	SectionCluster        = `cluster`
-	SectionGroup          = `group`
-	SectionInstance       = `instance`
-	SectionNodeConfig     = `node-config`
-	SectionPropertyCustom = `property-custom`
-	SectionRepository     = `repository`
+	CategoryRepository      = `repository`
+	SectionBucket           = `bucket`
+	SectionCheckConfig      = `check-config`
+	SectionCluster          = `cluster`
+	SectionGroup            = `group`
+	SectionInstance         = `instance`
+	SectionNodeConfig       = `node-config`
+	SectionPropertyCustom   = `property-custom`
+	SectionRepositoryConfig = `repository-config`
 )
 
 // Sections in category team are for actions with a per-team
@@ -102,6 +102,7 @@ const (
 	CategoryTeam               = `team`
 	SectionNode                = `node`
 	SectionPropertyServiceTeam = `property-service-team`
+	SectionRepository          = `repository`
 )
 
 // Sections in category monitoring are for actions with a
