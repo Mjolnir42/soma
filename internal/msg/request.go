@@ -86,10 +86,12 @@ func New(r *http.Request, params httprouter.Params) Request {
 
 type Filter struct {
 	IsDetailed bool
+	Bucket     proto.Bucket
 	Job        proto.JobFilter
 	Level      proto.Level
 	Monitoring proto.Monitoring
 	Oncall     proto.Oncall
+	Repository proto.Repository
 	SectionObj proto.Section
 	Server     proto.Server
 	Team       proto.Team
