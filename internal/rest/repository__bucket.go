@@ -41,7 +41,7 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewBucketRequest()
+	cReq := proto.NewBucketFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
 		dispatchBadRequest(&w, err)
 		return
@@ -56,6 +56,8 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionList
+	request.Search.Bucket.ID = cReq.Filter.Bucket.ID
+	request.Search.Bucket.Name = cReq.Filter.Bucket.Name
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
