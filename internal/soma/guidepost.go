@@ -69,7 +69,6 @@ func (g *GuidePost) Register(c *sql.DB, l ...*logrus.Logger) {
 func (g *GuidePost) RegisterRequests(hmap *handler.Map) {
 	// XXX INCOMPLETE
 	for _, section := range []string{
-		msg.SectionRepository,
 		msg.SectionBucket,
 		msg.SectionGroup,
 		msg.SectionCluster,
@@ -81,7 +80,19 @@ func (g *GuidePost) RegisterRequests(hmap *handler.Map) {
 			hmap.Request(section, action, `guidepost`)
 		}
 	}
-	hmap.Request(msg.SectionSystem, msg.ActionRepoStop, `guidepost`)
+
+	for _, request := range []struct {
+		Section string
+		Action  string
+	}{
+		{Section: msg.SectionSystem, Action: msg.ActionRepoStop},
+		{Section: msg.SectionRepositoryMgmt, Action: msg.ActionRename},
+		{Section: msg.SectionRepository, Action: msg.ActionDestroy},
+		{Section: msg.SectionRepositoryConfig, Action: msg.ActionPropertyCreate},
+		{Section: msg.SectionRepositoryConfig, Action: msg.ActionPropertyDestroy},
+	} {
+		hmap.Request(request.Section, request.Action, `guidepost`)
+	}
 }
 
 // Intake exposes the Input channel as part of the handler interface

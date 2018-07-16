@@ -59,6 +59,12 @@ func (r *RepositoryRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
 		msg.ActionShow,
+		msg.ActionSearch,
+	} {
+		hmap.Request(msg.SectionRepositoryConfig, action, r.handlerName)
+	}
+	for _, action := range []string{
+		msg.ActionAudit,
 	} {
 		hmap.Request(msg.SectionRepository, action, r.handlerName)
 	}

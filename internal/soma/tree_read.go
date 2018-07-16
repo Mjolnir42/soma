@@ -86,7 +86,7 @@ func (r *TreeRead) Register(c *sql.DB, l ...*logrus.Logger) {
 // it processes
 func (r *TreeRead) RegisterRequests(hmap *handler.Map) {
 	for _, section := range []string{
-		msg.SectionRepository,
+		msg.SectionRepositoryConfig,
 		msg.SectionBucket,
 		msg.SectionGroup,
 		msg.SectionCluster,
