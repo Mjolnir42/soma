@@ -600,7 +600,7 @@ func repoIDByName(repo string) (string, error) {
 	req := proto.NewRepositoryFilter()
 	req.Filter.Repository.Name = repo
 
-	res, err := fetchFilter(req, `/filter/repository/`)
+	res, err := fetchFilter(req, `/search/repository/`)
 	if err != nil {
 		goto abort
 	}

@@ -34,29 +34,6 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-// RepositoryTree function
-func (x *Rest) RepositoryTree(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer panicCatcher(w)
-
-	request := newRequest(r, params)
-	request.Section = msg.SectionRepository
-	request.Action = msg.ActionTree
-	request.Tree = proto.Tree{
-		ID:   params.ByName(`repositoryID`),
-		Type: msg.EntityRepository,
-	}
-
-	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
-		return
-	}
-
-	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
-	sendMsgResult(&w, &result)
-}
-
 // GroupTree function
 func (x *Rest) GroupTree(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

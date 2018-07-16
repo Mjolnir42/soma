@@ -24,9 +24,9 @@ func registerRepository(app cli.App) *cli.App {
 						BashComplete: cmpl.Team,
 					},
 					{
-						Name:   "delete",
-						Usage:  "Mark an existing repository as deleted",
-						Action: runtime(cmdRepositoryDelete),
+						Name:   "destroy",
+						Usage:  "Destroy an existing repository",
+						Action: runtime(cmdRepositoryDestroy),
 					},
 					{
 						Name:   "restore",
@@ -182,7 +182,7 @@ func cmdRepositoryCreate(c *cli.Context) error {
 	return adm.Perform(`postbody`, `/repository/`, `command`, req, c)
 }
 
-func cmdRepositoryDelete(c *cli.Context) error {
+func cmdRepositoryDestroy(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
