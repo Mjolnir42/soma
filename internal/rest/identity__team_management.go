@@ -57,6 +57,8 @@ func (x *Rest) TeamMgmtSearch(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionSearch
+	request.Search.Team.Name = cReq.Filter.Team.Name
+	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

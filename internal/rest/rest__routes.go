@@ -89,7 +89,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/sync/server/`, x.Verify(x.ServerSync))
 	router.GET(`/sync/team/`, x.Verify(x.TeamMgmtSync))
 	router.GET(`/sync/user/`, x.Verify(x.UserMgmtSync))
-	router.GET(`/team/:teamID`, x.Verify(x.TeamMgmtShow))
+	router.GET(`/team/:teamID`, x.Verify(x.ScopeSelectTeamShow))
 	router.GET(`/team/`, x.Verify(x.TeamMgmtList))
 	router.GET(`/unit/:unit`, x.Verify(x.UnitShow))
 	router.GET(`/unit/`, x.Verify(x.UnitList))
@@ -114,7 +114,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(`/search/oncall/`, x.Verify(x.OncallSearch))
 	router.POST(`/search/section/`, x.Verify(x.SectionSearch))
 	router.POST(`/search/server/`, x.Verify(x.ServerSearch))
-	router.POST(`/search/team/`, x.Verify(x.TeamMgmtSearch))
+	router.POST(`/search/team/`, x.Verify(x.ScopeSelectTeamSearch))
 	router.POST(`/search/user/`, x.Verify(x.ScopeSelectUserSearch))
 	router.POST(`/search/workflow/`, x.Verify(x.WorkflowSearch))
 

@@ -161,4 +161,47 @@ func (x *Rest) ScopeSelectUserSearch(w http.ResponseWriter,
 	x.UserSearch(w, r, params)
 }
 
+// ScopeSelectTeamShow function
+func (x *Rest) ScopeSelectTeamShow(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionTeamMgmt
+	request.Action = msg.ActionShow
+	request.Team.ID = params.ByName(`teamID`)
+	request.Flag.Unscoped = true
+
+	if x.isAuthorized(&request) {
+		x.TeamMgmtShow(w, r, params)
+		return
+	}
+
+	x.TeamShow(w, r, params)
+}
+
+// ScopeSelectTeamSearch function
+func (x *Rest) ScopeSelectTeamSearch(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+	defer panicCatcher(w)
+
+	cReq := proto.NewTeamFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
+		return
+	}
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionTeamMgmt
+	request.Action = msg.ActionSearch
+	request.Search.Team.Name = cReq.Filter.Team.Name
+	request.Flag.Unscoped = true
+
+	if x.isAuthorized(&request) {
+		x.TeamMgmtSearch(w, r, params)
+		return
+	}
+
+	x.TeamSearch(w, r, params)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
