@@ -92,6 +92,7 @@ type Filter struct {
 	Oncall     proto.Oncall
 	SectionObj proto.Section
 	Server     proto.Server
+	Team       proto.Team
 	User       proto.User
 }
 
