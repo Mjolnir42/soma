@@ -1,13 +1,13 @@
 /*-
- * Copyright (c) 2015-2016, 1&1 Internet SE
- * Copyright (c) 2015-2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2015-2018, 1&1 Internet SE
+ * Copyright (c) 2015-2018, Jörg Pernfuß <code.jpe@gmail.com>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
 type Repository struct {
 	ID         string      `json:"id,omitempty"`
@@ -18,6 +18,18 @@ type Repository struct {
 	Members    *[]Bucket   `json:"members,omitempty"`
 	Details    *Details    `json:"details,omitempty"`
 	Properties *[]Property `json:"properties,omitempty"`
+}
+
+// Clone function
+func (r *Repository) Clone() Repository {
+	clone := Repository{
+		ID:        r.ID,
+		Name:      r.Name,
+		TeamID:    r.TeamID,
+		IsDeleted: r.IsDeleted,
+		IsActive:  r.IsActive,
+	}
+	return clone
 }
 
 type RepositoryFilter struct {
