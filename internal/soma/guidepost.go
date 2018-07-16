@@ -76,6 +76,8 @@ func (g *GuidePost) RegisterRequests(hmap *handler.Map) {
 		for _, action := range []string{
 			msg.ActionCreate,
 			msg.ActionDestroy,
+			msg.ActionPropertyCreate,
+			msg.ActionPropertyDestroy,
 		} {
 			hmap.Request(section, action, `guidepost`)
 		}
