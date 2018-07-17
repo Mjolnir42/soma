@@ -224,7 +224,7 @@ func cmdNodeAdd(c *cli.Context) error {
 		return nil
 	}
 
-	return adm.Perform(`postbody`, `/nodes/`, `command`, req, c)
+	return adm.Perform(`postbody`, `/node/`, `command`, req, c)
 }
 
 func cmdNodeUpdate(c *cli.Context) error {
@@ -272,7 +272,7 @@ func cmdNodeUpdate(c *cli.Context) error {
 		opts[`team`][0]); err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/nodes/%s", req.Node.ID)
+	path := fmt.Sprintf("/node/%s", req.Node.ID)
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -284,7 +284,7 @@ func cmdNodeDel(c *cli.Context) (err error) {
 	if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 		return err
 	}
-	path = fmt.Sprintf("/nodes/%s", id)
+	path = fmt.Sprintf("/node/%s", id)
 
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
@@ -298,7 +298,7 @@ func cmdNodePurge(c *cli.Context) (err error) {
 		if err = adm.VerifyNoArgument(c); err != nil {
 			return err
 		}
-		path = "/nodes/"
+		path = "/node/"
 	} else {
 		if err = adm.VerifySingleArgument(c); err != nil {
 			return err
@@ -306,7 +306,7 @@ func cmdNodePurge(c *cli.Context) (err error) {
 		if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 			return err
 		}
-		path = fmt.Sprintf("/nodes/%s", id)
+		path = fmt.Sprintf("/node/%s", id)
 	}
 
 	req = proto.Request{
@@ -327,7 +327,7 @@ func cmdNodeRestore(c *cli.Context) (err error) {
 		if err = adm.VerifyNoArgument(c); err != nil {
 			return err
 		}
-		path = "/nodes/"
+		path = "/node/"
 	} else {
 		if err = adm.VerifySingleArgument(c); err != nil {
 			return err
@@ -335,7 +335,7 @@ func cmdNodeRestore(c *cli.Context) (err error) {
 		if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 			return err
 		}
-		path = fmt.Sprintf("/nodes/%s", id)
+		path = fmt.Sprintf("/node/%s", id)
 	}
 
 	req = proto.Request{
@@ -361,7 +361,7 @@ func cmdNodeRename(c *cli.Context) (err error) {
 	if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 		return err
 	}
-	path = fmt.Sprintf("/nodes/%s", id)
+	path = fmt.Sprintf("/node/%s", id)
 
 	req := proto.NewNodeRequest()
 	req.Node.Name = opts[`to`][0]
@@ -389,7 +389,7 @@ func cmdNodeRepo(c *cli.Context) error {
 			return err
 		}
 	}
-	path := fmt.Sprintf("/nodes/%s", id)
+	path := fmt.Sprintf("/node/%s", id)
 
 	req := proto.Request{}
 	req.Node = &proto.Node{}
@@ -420,7 +420,7 @@ func cmdNodeMove(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/nodes/%s", id)
+	path := fmt.Sprintf("/node/%s", id)
 
 	req := proto.Request{}
 	req.Node = &proto.Node{}
@@ -437,7 +437,7 @@ func cmdNodeOnline(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/nodes/%s", id)
+	path := fmt.Sprintf("/node/%s", id)
 
 	req := proto.Request{}
 	req.Node = &proto.Node{}
@@ -454,7 +454,7 @@ func cmdNodeOffline(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/nodes/%s", id)
+	path := fmt.Sprintf("/node/%s", id)
 
 	req := proto.Request{}
 	req.Node = &proto.Node{}
@@ -510,7 +510,7 @@ func cmdNodeAssign(c *cli.Context) error {
 	req.Node.Config.RepositoryID = repoID
 	req.Node.Config.BucketID = bucketID
 
-	path := fmt.Sprintf("/nodes/%s/config", nodeID)
+	path := fmt.Sprintf("/node/%s/config", nodeID)
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
@@ -519,7 +519,7 @@ func cmdNodeList(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/nodes/`, `list`, nil, c)
+	return adm.Perform(`get`, `/node/`, `list`, nil, c)
 }
 
 func cmdNodeShow(c *cli.Context) error {
@@ -531,7 +531,7 @@ func cmdNodeShow(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/nodes/%s", id)
+	path := fmt.Sprintf("/node/%s", id)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -540,7 +540,7 @@ func cmdNodeSync(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`get`, `/sync/nodes/`, `list`, nil, c)
+	return adm.Perform(`get`, `/sync/node/`, `list`, nil, c)
 }
 
 func cmdNodeConfig(c *cli.Context) error {
@@ -552,7 +552,7 @@ func cmdNodeConfig(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/nodes/%s/config", id)
+	path := fmt.Sprintf("/node/%s/config", id)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
@@ -631,8 +631,8 @@ func cmdNodePropertyDelete(c *cli.Context, pType string) error {
 	req.Node.ID = nodeID
 	req.Node.Config = config
 
-	path := fmt.Sprintf("/nodes/%s/property/%s/%s",
-		nodeID, pType, sourceID)
+	path := fmt.Sprintf("/repository/%s/bucket/%s/node/%s/property/%s/%s",
+		config.RepositoryID, config.BucketID, nodeID, pType, sourceID)
 	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 

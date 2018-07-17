@@ -121,17 +121,21 @@ func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	request := newRequest(r, params)
+	request.Section = msg.SectionNodeMgmt
 	action := msg.ActionRemove
 	if cReq.Flags.Purge {
 		action = msg.ActionPurge
+		switch params.ByName(`nodeID`) {
+		case ``:
+			request.Flag.Unscoped = true
+		default:
+			request.Node.ID = params.ByName(`nodeID`)
+		}
+	} else {
+		request.Node.ID = params.ByName(`nodeID`)
 	}
-
-	request := newRequest(r, params)
-	request.Section = msg.SectionNodeMgmt
 	request.Action = action
-	request.Node = proto.Node{
-		ID: params.ByName(`nodeID`),
-	}
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

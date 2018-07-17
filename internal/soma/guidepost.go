@@ -92,6 +92,10 @@ func (g *GuidePost) RegisterRequests(hmap *handler.Map) {
 		{Section: msg.SectionRepository, Action: msg.ActionDestroy},
 		{Section: msg.SectionRepositoryConfig, Action: msg.ActionPropertyCreate},
 		{Section: msg.SectionRepositoryConfig, Action: msg.ActionPropertyDestroy},
+		{Section: msg.SectionNodeConfig, Action: msg.ActionAssign},
+		{Section: msg.SectionNodeConfig, Action: msg.ActionUnassign},
+		{Section: msg.SectionNodeConfig, Action: msg.ActionPropertyCreate},
+		{Section: msg.SectionNodeConfig, Action: msg.ActionPropertyDestroy},
 	} {
 		hmap.Request(request.Section, request.Action, `guidepost`)
 	}

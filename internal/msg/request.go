@@ -90,6 +90,7 @@ type Filter struct {
 	Job        proto.JobFilter
 	Level      proto.Level
 	Monitoring proto.Monitoring
+	Node       proto.Node
 	Oncall     proto.Oncall
 	Repository proto.Repository
 	SectionObj proto.Section
