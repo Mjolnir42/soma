@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -41,7 +41,7 @@ func (x *Rest) ClusterSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewClusterRequest()
+	cReq := proto.NewClusterFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
 		dispatchBadRequest(&w, err)
 		return
@@ -134,7 +134,7 @@ func (x *Rest) ClusterCreate(w http.ResponseWriter, r *http.Request,
 	nameLen := utf8.RuneCountInString(cReq.Cluster.Name)
 	if nameLen < 4 || nameLen > 256 {
 		dispatchBadRequest(&w,
-			fmt.Errorf(`Illegal cluster name length (4 < x <= 256)`))
+			fmt.Errorf(`Illegal cluster name length (4 <= x <= 256)`))
 		return
 	}
 
@@ -229,7 +229,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 	case params.ByName(`propertyType`) != (*cReq.Cluster.Properties)[0].Type:
 		dispatchBadRequest(&w, fmt.Errorf(
 			"Mismatched property types: %s, %s",
-			params.ByName("type"),
+			params.ByName(`propertyType`),
 			(*cReq.Cluster.Properties)[0].Type,
 		))
 		return
@@ -242,7 +242,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
-	request.Action = msg.ActionCreate
+	request.Action = msg.ActionPropertyCreate
 	request.Cluster = cReq.Cluster.Clone()
 
 	if !x.isAuthorized(&request) {
