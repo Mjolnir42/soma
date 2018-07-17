@@ -87,6 +87,7 @@ func New(r *http.Request, params httprouter.Params) Request {
 type Filter struct {
 	IsDetailed bool
 	Bucket     proto.Bucket
+	Group      proto.Group
 	Job        proto.JobFilter
 	Level      proto.Level
 	Monitoring proto.Monitoring

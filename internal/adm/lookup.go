@@ -680,11 +680,27 @@ abort:
 
 //
 func groupIDByName(group, bucketID string) (string, error) {
+	var (
+		res                       *proto.Result
+		err                       error
+		repositoryID, requestPath string
+	)
+
 	req := proto.NewGroupFilter()
 	req.Filter.Group.Name = group
 	req.Filter.Group.BucketID = bucketID
 
-	res, err := fetchFilter(req, `/filter/groups/`)
+	repositoryID, err = repoIDByBucketID(bucketID)
+	if err != nil {
+		goto abort
+	}
+
+	requestPath = fmt.Sprintf("/search/repository/%s/bucket/%s/group/",
+		repositoryID,
+		bucketID,
+	)
+
+	res, err = fetchFilter(req, requestPath)
 	if err != nil {
 		goto abort
 	}

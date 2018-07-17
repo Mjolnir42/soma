@@ -26,35 +26,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package rest // import "github.com/mjolnir42/soma/internal/rest"
 
-import (
-	"net/http"
-
-	"github.com/julienschmidt/httprouter"
-	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/proto"
-)
-
-// GroupTree function
-func (x *Rest) GroupTree(w http.ResponseWriter, r *http.Request,
-	params httprouter.Params) {
-	defer panicCatcher(w)
-
-	request := newRequest(r, params)
-	request.Section = msg.SectionGroup
-	request.Action = msg.ActionTree
-	request.Tree = proto.Tree{
-		ID:   params.ByName(`repositoryID`),
-		Type: msg.EntityGroup,
-	}
-
-	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
-		return
-	}
-
-	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
-	sendMsgResult(&w, &result)
-}
-
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

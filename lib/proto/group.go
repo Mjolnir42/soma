@@ -22,18 +22,57 @@ type Group struct {
 	Properties     *[]Property `json:"properties,omitempty"`
 }
 
+func (g *Group) Clone() Group {
+	clone := Group{
+		ID:          g.ID,
+		Name:        g.Name,
+		BucketID:    g.BucketID,
+		ObjectState: g.ObjectState,
+		TeamID:      g.TeamID,
+	}
+	if g.Details != nil {
+		clone.Details = g.Details.Clone()
+	}
+	if g.MemberGroups != nil {
+		*clone.MemberGroups = make([]Group, len(*g.MemberGroups))
+		for i := range *g.MemberGroups {
+			(*clone.MemberGroups)[i] = (*g.MemberGroups)[i].Clone()
+		}
+	}
+	if g.MemberClusters != nil {
+		*clone.MemberClusters = make([]Cluster, len(*g.MemberClusters))
+		for i := range *g.MemberClusters {
+			(*clone.MemberClusters)[i] = (*g.MemberClusters)[i].Clone()
+		}
+	}
+	if g.MemberNodes != nil {
+		*clone.MemberNodes = make([]Node, len(*g.MemberNodes))
+		for i := range *g.MemberNodes {
+			(*clone.MemberNodes)[i] = (*g.MemberNodes)[i].Clone()
+		}
+	}
+	if g.Properties != nil {
+		*clone.Properties = make([]Property, len(*g.Properties))
+		for i := range *g.Properties {
+			(*clone.Properties)[i] = (*g.Properties)[i].Clone()
+		}
+	}
+	return clone
+}
+
 type GroupFilter struct {
-	Name     string `json:"name,omitempty"`
-	BucketID string `json:"bucketId,omitempty"`
+	Name         string `json:"name,omitempty"`
+	BucketID     string `json:"bucketId,omitempty"`
+	RepositoryID string `json:"repositoryID,omitempty"`
 }
 
 //
-func (p *Group) DeepCompare(a *Group) bool {
+func (g *Group) DeepCompare(a *Group) bool {
 	if a == nil {
 		return false
 	}
-	if p.ID != a.ID || p.Name != a.Name || p.BucketID != a.BucketID ||
-		p.ObjectState != a.ObjectState || p.TeamID != a.TeamID {
+	if g.ID != a.ID || g.Name != a.Name || g.BucketID != a.BucketID ||
+		g.ObjectState != a.ObjectState || g.TeamID != a.TeamID {
 		return false
 	}
 	return true
