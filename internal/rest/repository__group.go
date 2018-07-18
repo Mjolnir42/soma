@@ -74,6 +74,7 @@ func (x *Rest) GroupSearch(w http.ResponseWriter, r *http.Request,
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 
+	// XXX BUG filter in SQL statement
 	filtered := []proto.Group{}
 	for _, i := range result.Group {
 		if i.Name == cReq.Filter.Group.Name && cReq.Filter.Group.BucketID == params.ByName(`bucketID`) {

@@ -212,7 +212,7 @@ func cmdGroupCreate(c *cli.Context) error {
 		return err
 	}
 
-	if resp, err := adm.PostReqBody(req, "/groups/"); err != nil {
+	if resp, err := adm.PostReqBody(req, "/group/"); err != nil {
 		return err
 	} else {
 		return adm.FormatOut(c, resp, ``)

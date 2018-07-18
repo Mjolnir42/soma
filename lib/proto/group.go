@@ -12,6 +12,7 @@ package proto
 type Group struct {
 	ID             string      `json:"id,omitempty"`
 	Name           string      `json:"name,omitempty"`
+	RepositoryID   string      `json:"repositoryId,omitempty"`
 	BucketID       string      `json:"bucketId,omitempty"`
 	ObjectState    string      `json:"objectState,omitempty"`
 	TeamID         string      `json:"teamId,omitempty"`
@@ -24,11 +25,12 @@ type Group struct {
 
 func (g *Group) Clone() Group {
 	clone := Group{
-		ID:          g.ID,
-		Name:        g.Name,
-		BucketID:    g.BucketID,
-		ObjectState: g.ObjectState,
-		TeamID:      g.TeamID,
+		ID:           g.ID,
+		Name:         g.Name,
+		RepositoryID: g.RepositoryID,
+		BucketID:     g.BucketID,
+		ObjectState:  g.ObjectState,
+		TeamID:       g.TeamID,
 	}
 	if g.Details != nil {
 		clone.Details = g.Details.Clone()
