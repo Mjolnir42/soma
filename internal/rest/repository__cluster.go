@@ -25,6 +25,8 @@ func (x *Rest) ClusterList(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionList
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -55,6 +57,9 @@ func (x *Rest) ClusterSearch(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionSearch
+	request.Search.Cluster.Name = cReq.Filter.Cluster.Name
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -64,10 +69,11 @@ func (x *Rest) ClusterSearch(w http.ResponseWriter, r *http.Request,
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 
+	// XXX BUG filter in SQL statement
 	filtered := []proto.Cluster{}
 	for _, i := range result.Cluster {
 		if i.Name == cReq.Filter.Cluster.Name &&
-			i.BucketID == cReq.Filter.Cluster.BucketID {
+			i.BucketID == params.ByName(`bucketID`) {
 			filtered = append(filtered, i)
 		}
 	}
@@ -83,9 +89,9 @@ func (x *Rest) ClusterShow(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionShow
-	request.Cluster = proto.Cluster{
-		ID: params.ByName(`clusterID`),
-	}
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Cluster.ID = params.ByName(`clusterID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -105,10 +111,11 @@ func (x *Rest) ClusterTree(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionTree
-	request.Tree = proto.Tree{
-		ID:   params.ByName(`clusterID`),
-		Type: msg.EntityCluster,
-	}
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Cluster.ID = params.ByName(`clusterID`)
+	request.Tree.ID = params.ByName(`clusterID`)
+	request.Tree.Type = msg.EntityCluster
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -141,7 +148,31 @@ func (x *Rest) ClusterCreate(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionCreate
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
+}
+
+// ClusterDestroy function
+func (x *Rest) ClusterDestroy(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionDestroy
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Cluster.ID = params.ByName(`clusterID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -161,9 +192,9 @@ func (x *Rest) ClusterMemberList(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionMemberList
-	request.Cluster = proto.Cluster{
-		ID: params.ByName(`clusterID`),
-	}
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Cluster.ID = params.ByName(`clusterID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -189,7 +220,42 @@ func (x *Rest) ClusterMemberAssign(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionMemberAssign
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
+	request.Cluster.ID = params.ByName(`clusterID`)
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
+}
+
+// ClusterMemberUnassign function
+func (x *Rest) ClusterMemberUnassign(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionMemberUnassign
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Cluster.ID = params.ByName(`clusterID`)
+
+	switch params.ByName(`memberType`) {
+	case msg.EntityNode:
+		request.Cluster.Members = &[]proto.Node{
+			proto.Node{ID: params.ByName(`memberID`)},
+		}
+	default:
+		dispatchBadRequest(&w, nil)
+		return
+	}
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -243,7 +309,10 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionPropertyCreate
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
+	request.Cluster.ID = params.ByName(`clusterID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -284,8 +353,12 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionPropertyDestroy
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = proto.Cluster{
-		ID: params.ByName(`clusterID`),
+		ID:           params.ByName(`clusterID`),
+		RepositoryID: params.ByName(`repositoryID`),
+		BucketID:     params.ByName(`bucketID`),
 		Properties: &[]proto.Property{
 			proto.Property{
 				Type:             params.ByName(`propertyType`),
@@ -294,6 +367,44 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 			},
 		},
 	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
+}
+
+// ClusterRename function
+func (x *Rest) ClusterRename(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	cReq := proto.NewClusterRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
+		return
+	}
+
+	nameLen := utf8.RuneCountInString(cReq.Cluster.Name)
+	if nameLen < 4 || nameLen > 256 {
+		dispatchBadRequest(&w,
+			fmt.Errorf(`Illegal cluster name length (4 <= x <= 256)`))
+		return
+	}
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionRename
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Cluster.ID = params.ByName(`clusterID`)
+	request.Cluster.RepositoryID = params.ByName(`repositoryID`)
+	request.Cluster.BucketID = params.ByName(`bucketID`)
+	request.Update.Cluster.Name = cReq.Cluster.Name
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

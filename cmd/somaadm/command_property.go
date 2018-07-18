@@ -669,10 +669,10 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	}
 
 	var (
-		objectID, object, repoID, bucketID string
-		config                             *proto.NodeConfig
-		req                                proto.Request
-		err                                error
+		objectID, repoID, bucketID string
+		config                     *proto.NodeConfig
+		req                        proto.Request
+		err                        error
 	)
 	// id lookup
 	switch oType {
@@ -813,11 +813,13 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	case `cluster`:
 		req = proto.NewClusterRequest()
 		req.Cluster.ID = objectID
+		req.Cluster.RepositoryID = repoID
 		req.Cluster.BucketID = bucketID
 		req.Cluster.Properties = &[]proto.Property{prop}
 	case `group`:
 		req = proto.NewGroupRequest()
 		req.Group.ID = objectID
+		req.Group.RepositoryID = repoID
 		req.Group.BucketID = bucketID
 		req.Group.Properties = &[]proto.Property{prop}
 	case `bucket`:
@@ -830,14 +832,18 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		req.Repository.Properties = &[]proto.Property{prop}
 	}
 
-	// request dispatch
+	var path string
 	switch oType {
+	case `cluster`, `group`, `node`:
+		path = fmt.Sprintf("/repository/%s/bucket/%s/%s/%s/property/%s/",
+			repoID, bucketID, oType, objectID, pType)
+	case `bucket`:
+		path = fmt.Sprintf("/repository/%s/%s/%s/property/%s/",
+			repoID, oType, objectID, pType)
 	case `repository`:
-		object = oType
-	default:
-		object = oType + `s`
+		path = fmt.Sprintf("/%s/%s/property/%s/",
+			oType, objectID, pType)
 	}
-	path := fmt.Sprintf("/%s/%s/property/%s/", object, objectID, pType)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 

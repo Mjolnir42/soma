@@ -14,19 +14,19 @@ func registerClusters(app cli.App) *cli.App {
 		[]cli.Command{
 			// clusters
 			{
-				Name:  "clusters",
+				Name:  "cluster",
 				Usage: "SUBCOMMANDS for clusters",
 				Subcommands: []cli.Command{
 					{
 						Name:         "create",
-						Usage:        "Create a new cluster",
+						Usage:        "Create a new cluster in a bucket",
 						Action:       runtime(cmdClusterCreate),
 						BashComplete: cmpl.In,
 					},
 					{
-						Name:         "delete",
-						Usage:        "Delete a cluster",
-						Action:       runtime(cmdClusterDelete),
+						Name:         "destroy",
+						Usage:        "Destroy a cluster in a bucket",
+						Action:       runtime(cmdClusterDestroy),
 						BashComplete: cmpl.In,
 					},
 					{
@@ -36,9 +36,10 @@ func registerClusters(app cli.App) *cli.App {
 						BashComplete: cmpl.InTo,
 					},
 					{
-						Name:   "list",
-						Usage:  "List all clusters",
-						Action: runtime(cmdClusterList),
+						Name:         "list",
+						Usage:        "List all clusters in a bucket",
+						Action:       runtime(cmdClusterList),
+						BashComplete: cmpl.In,
 					},
 					{
 						Name:         "show",
@@ -53,19 +54,19 @@ func registerClusters(app cli.App) *cli.App {
 						BashComplete: cmpl.In,
 					},
 					{
-						Name:  "members",
+						Name:  "member",
 						Usage: "SUBCOMMANDS for cluster members",
 						Subcommands: []cli.Command{
 							{
-								Name:         "add",
-								Usage:        "Add a node to a cluster",
-								Action:       runtime(cmdClusterMemberAdd),
+								Name:         "assign",
+								Usage:        "Assign a node to a cluster",
+								Action:       runtime(cmdClusterMemberAssign),
 								BashComplete: cmpl.InTo,
 							},
 							{
-								Name:         "delete",
-								Usage:        "Delete a node from a cluster",
-								Action:       runtime(cmdClusterMemberDelete),
+								Name:         "unassign",
+								Usage:        "Unassign a node from a cluster",
+								Action:       runtime(cmdClusterMemberUnassign),
 								BashComplete: cmpl.InFrom,
 							},
 							{
@@ -149,8 +150,103 @@ func registerClusters(app cli.App) *cli.App {
 	return &app
 }
 
+func cmdClusterList(c *cli.Context) error {
+	uniqKeys := []string{`in`}
+	opts := map[string][]string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		[]string{},
+		uniqKeys,
+		uniqKeys,
+		c.Args().Tail()); err != nil {
+		return err
+	}
+
+	var (
+		err                    error
+		repositoryID, bucketID string
+	)
+	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/",
+		repositoryID, bucketID)
+	return adm.Perform(`get`, path, `list`, nil, c)
+}
+
+func cmdClusterShow(c *cli.Context) error {
+	uniqKeys := []string{`in`}
+	opts := map[string][]string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		[]string{},
+		uniqKeys,
+		uniqKeys,
+		c.Args().Tail()); err != nil {
+		return err
+	}
+
+	var (
+		err                               error
+		repositoryID, bucketID, clusterID string
+	)
+	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+		return err
+	}
+	if clusterID, err = adm.LookupClusterID(c.Args().First(),
+		bucketID); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s",
+		repositoryID, bucketID, clusterID)
+	return adm.Perform(`get`, path, `show`, nil, c)
+}
+
+func cmdClusterTree(c *cli.Context) error {
+	uniqKeys := []string{`in`}
+	opts := map[string][]string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		[]string{},
+		uniqKeys,
+		uniqKeys,
+		c.Args().Tail()); err != nil {
+		return err
+	}
+
+	var (
+		err                               error
+		repositoryID, bucketID, clusterID string
+	)
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
+		return err
+	}
+	if clusterID, err = adm.LookupClusterID(c.Args().First(),
+		bucketID); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/tree",
+		repositoryID, bucketID, clusterID)
+	return adm.Perform(`get`, path, `tree`, nil, c)
+}
+
 func cmdClusterCreate(c *cli.Context) error {
-	uniqKeys := []string{"in"}
+	uniqKeys := []string{`in`}
 	opts := map[string][]string{}
 
 	if err := adm.ParseVariadicArguments(opts,
@@ -161,14 +257,18 @@ func cmdClusterCreate(c *cli.Context) error {
 		return err
 	}
 
-	bucketID, err := adm.LookupBucketID(opts["in"][0])
+	bucketID, err := adm.LookupBucketID(opts[`in`][0])
+	if err != nil {
+		return err
+	}
+	repositoryID, err := adm.LookupRepoID(bucketID)
 	if err != nil {
 		return err
 	}
 
-	var req proto.Request
-	req.Cluster = &proto.Cluster{}
+	req := proto.NewClusterRequest()
 	req.Cluster.Name = c.Args().First()
+	req.Cluster.RepositoryID = repositoryID
 	req.Cluster.BucketID = bucketID
 
 	if err := adm.ValidateRuneCountRange(
@@ -176,185 +276,12 @@ func cmdClusterCreate(c *cli.Context) error {
 		return err
 	}
 
-	return adm.Perform(`postbody`, `/clusters/`, `command`, req, c)
-}
-
-func cmdClusterDelete(c *cli.Context) error {
-	uniqKeys := []string{"in"}
-	opts := map[string][]string{}
-
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-
-	var (
-		err                 error
-		bucketID, clusterID string
-	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if clusterID, err = adm.LookupClusterID(c.Args().First(),
-		bucketID); err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/clusters/%s", clusterID)
-	return adm.Perform(`delete`, path, `command`, nil, c)
-}
-
-func cmdClusterRename(c *cli.Context) error {
-	uniqKeys := []string{"to", "in"}
-	opts := map[string][]string{}
-
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-
-	var (
-		err                 error
-		bucketID, clusterID string
-		req                 proto.Request
-	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if clusterID, err = adm.LookupClusterID(c.Args().First(),
-		bucketID); err != nil {
-		return err
-	}
-
-	req.Cluster = &proto.Cluster{}
-	req.Cluster.Name = opts["to"][0]
-
-	path := fmt.Sprintf("/clusters/%s", clusterID)
-	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
-func cmdClusterList(c *cli.Context) error {
-	if err := adm.VerifyNoArgument(c); err != nil {
-		return err
-	}
-
-	return adm.Perform(`get`, `/clusters/`, `list`, nil, c)
-}
-
-func cmdClusterShow(c *cli.Context) error {
-	uniqKeys := []string{"in"}
-	opts := map[string][]string{}
-
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-
-	var (
-		err                 error
-		bucketID, clusterID string
-	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if clusterID, err = adm.LookupClusterID(c.Args().First(),
-		bucketID); err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/clusters/%s", clusterID)
-	return adm.Perform(`get`, path, `show`, nil, c)
-}
-
-func cmdClusterTree(c *cli.Context) error {
-	uniqKeys := []string{"in"}
-	opts := map[string][]string{}
-
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-
-	var (
-		err                 error
-		bucketID, clusterID string
-	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if clusterID, err = adm.LookupClusterID(c.Args().First(),
-		bucketID); err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/cluster/%s/tree", clusterID)
-	return adm.Perform(`get`, path, `tree`, nil, c)
-}
-
-func cmdClusterMemberAdd(c *cli.Context) error {
-	uniqKeys := []string{"to", "in"}
-	opts := map[string][]string{}
-
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-	var (
-		err                         error
-		nodeID, bucketID, clusterID string
-	)
-	if nodeID, err = adm.LookupNodeID(c.Args().First()); err != nil {
-		return err
-	}
-	//TODO: get bucketID via node
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if clusterID, err = adm.LookupClusterID(opts["to"][0],
-		bucketID); err != nil {
-		return err
-	}
-
-	req := proto.Request{}
-	conf := proto.NodeConfig{
-		BucketID: bucketID,
-	}
-	node := proto.Node{
-		ID:     nodeID,
-		Config: &conf,
-	}
-	req.Cluster = &proto.Cluster{
-		ID:       clusterID,
-		BucketID: bucketID,
-	}
-	*req.Cluster.Members = append(*req.Cluster.Members, node)
-
-	path := fmt.Sprintf("/clusters/%s/members/", clusterID)
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/", repositoryID, bucketID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
-func cmdClusterMemberDelete(c *cli.Context) error {
-	uniqKeys := []string{"from", "in"}
+func cmdClusterDestroy(c *cli.Context) error {
+	uniqKeys := []string{`in`}
 	opts := map[string][]string{}
 
 	if err := adm.ParseVariadicArguments(
@@ -367,28 +294,27 @@ func cmdClusterMemberDelete(c *cli.Context) error {
 	}
 
 	var (
-		err                         error
-		nodeID, bucketID, clusterID string
+		err                               error
+		repositoryID, bucketID, clusterID string
 	)
-	if nodeID, err = adm.LookupNodeID(c.Args().First()); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	//TODO: get bucketID via node
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
 		return err
 	}
-	if clusterID, err = adm.LookupClusterID(opts["from"][0],
+	if clusterID, err = adm.LookupClusterID(c.Args().First(),
 		bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/clusters/%s/members/%s", clusterID,
-		nodeID)
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s",
+		repositoryID, bucketID, clusterID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
 func cmdClusterMemberList(c *cli.Context) error {
-	uniqKeys := []string{"in"}
+	uniqKeys := []string{`in`}
 	opts := map[string][]string{}
 
 	if err := adm.ParseVariadicArguments(
@@ -401,10 +327,13 @@ func cmdClusterMemberList(c *cli.Context) error {
 	}
 
 	var (
-		err                 error
-		bucketID, clusterID string
+		err                               error
+		repositoryID, bucketID, clusterID string
 	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
 		return err
 	}
 	if clusterID, err = adm.LookupClusterID(c.Args().First(),
@@ -412,8 +341,107 @@ func cmdClusterMemberList(c *cli.Context) error {
 		return err
 	}
 
-	path := fmt.Sprintf("/clusters/%s/members/", clusterID)
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/member/",
+		repositoryID, bucketID, clusterID)
 	return adm.Perform(`get`, path, `list`, nil, c)
+}
+
+func cmdClusterMemberAssign(c *cli.Context) error {
+	uniqKeys := []string{`to`, `in`}
+	opts := map[string][]string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		[]string{},
+		uniqKeys,
+		uniqKeys,
+		c.Args().Tail()); err != nil {
+		return err
+	}
+	var (
+		err                                       error
+		nodeConfig                                *proto.NodeConfig
+		nodeID, repositoryID, bucketID, clusterID string
+	)
+	if nodeID, err = adm.LookupNodeID(c.Args().First()); err != nil {
+		return err
+	}
+	if nodeConfig, err = adm.LookupNodeConfig(nodeID); err != nil {
+		return err
+	}
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+		return err
+	}
+	if repositoryID != nodeConfig.RepositoryID || bucketID != nodeConfig.BucketID {
+		return fmt.Errorf(`Mismatching Repository or Bucket IDs`)
+	}
+	if clusterID, err = adm.LookupClusterID(opts[`to`][0],
+		bucketID); err != nil {
+		return err
+	}
+
+	req := proto.NewClusterRequest()
+	node := proto.Node{
+		ID:     nodeID,
+		Config: nodeConfig,
+	}
+	req.Cluster = &proto.Cluster{
+		ID:           clusterID,
+		RepositoryID: repositoryID,
+		BucketID:     bucketID,
+		Members:      &[]proto.Node{},
+	}
+	*req.Cluster.Members = append(*req.Cluster.Members, node)
+
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/member/",
+		repositoryID, bucketID, clusterID)
+	return adm.Perform(`postbody`, path, `command`, req, c)
+}
+
+func cmdClusterMemberUnassign(c *cli.Context) error {
+	uniqKeys := []string{`from`, `in`}
+	opts := map[string][]string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		[]string{},
+		uniqKeys,
+		uniqKeys,
+		c.Args().Tail()); err != nil {
+		return err
+	}
+
+	var (
+		err                                       error
+		nodeConfig                                *proto.NodeConfig
+		nodeID, repositoryID, bucketID, clusterID string
+	)
+	if nodeID, err = adm.LookupNodeID(c.Args().First()); err != nil {
+		return err
+	}
+	if nodeConfig, err = adm.LookupNodeConfig(nodeID); err != nil {
+		return err
+	}
+	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+		return err
+	}
+	if repositoryID != nodeConfig.RepositoryID || bucketID != nodeConfig.BucketID {
+		return fmt.Errorf(`Mismatching Repository or Bucket IDs`)
+	}
+	if clusterID, err = adm.LookupClusterID(opts[`from`][0],
+		bucketID); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/member/%s/%s",
+		repositoryID, bucketID, clusterID, `node`, nodeID)
+	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
 func cmdClusterSystemPropertyAdd(c *cli.Context) error {
@@ -466,10 +494,13 @@ func cmdClusterPropertyDelete(c *cli.Context, pType string) error {
 		return err
 	}
 	var (
-		err                           error
-		bucketID, clusterID, sourceID string
+		err                                         error
+		repositoryID, bucketID, clusterID, sourceID string
 	)
 	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
 		return err
 	}
 	if clusterID, err = adm.LookupClusterID(opts[`from`][0],
@@ -492,9 +523,46 @@ func cmdClusterPropertyDelete(c *cli.Context, pType string) error {
 	req.Cluster.ID = clusterID
 	req.Cluster.BucketID = bucketID
 
-	path := fmt.Sprintf("/clusters/%s/property/%s/%s",
-		clusterID, pType, sourceID)
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/property/%s/%s",
+		repositoryID, bucketID, clusterID, pType, sourceID)
 	return adm.Perform(`deletebody`, path, `command`, req, c)
+}
+
+func cmdClusterRename(c *cli.Context) error {
+	uniqKeys := []string{`to`, `in`}
+	opts := map[string][]string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		[]string{},
+		uniqKeys,
+		uniqKeys,
+		c.Args().Tail()); err != nil {
+		return err
+	}
+
+	var (
+		err                               error
+		repositoryID, bucketID, clusterID string
+		req                               proto.Request
+	)
+	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+		return err
+	}
+	if clusterID, err = adm.LookupClusterID(c.Args().First(),
+		bucketID); err != nil {
+		return err
+	}
+
+	req.Cluster = &proto.Cluster{}
+	req.Cluster.Name = opts[`to`][0]
+
+	path := fmt.Sprintf("/repository/:repositoryID/bucket/:bucketID/cluster/:clusterID",
+		repositoryID, bucketID, clusterID)
+	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

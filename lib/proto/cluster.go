@@ -10,23 +10,25 @@
 package proto
 
 type Cluster struct {
-	ID          string      `json:"ID,omitempty"`
-	Name        string      `json:"name,omitempty"`
-	BucketID    string      `json:"bucketID,omitempty"`
-	ObjectState string      `json:"objectState,omitempty"`
-	TeamID      string      `json:"teamID,omitempty"`
-	Members     *[]Node     `json:"members,omitempty"`
-	Details     *Details    `json:"details,omitempty"`
-	Properties  *[]Property `json:"properties,omitempty"`
+	ID           string      `json:"ID,omitempty"`
+	Name         string      `json:"name,omitempty"`
+	RepositoryID string      `json:"repositoryId,omitempty"`
+	BucketID     string      `json:"bucketID,omitempty"`
+	ObjectState  string      `json:"objectState,omitempty"`
+	TeamID       string      `json:"teamID,omitempty"`
+	Members      *[]Node     `json:"members,omitempty"`
+	Details      *Details    `json:"details,omitempty"`
+	Properties   *[]Property `json:"properties,omitempty"`
 }
 
 func (c *Cluster) Clone() Cluster {
 	clone := Cluster{
-		ID:          c.ID,
-		Name:        c.Name,
-		BucketID:    c.BucketID,
-		ObjectState: c.ObjectState,
-		TeamID:      c.TeamID,
+		ID:           c.ID,
+		Name:         c.Name,
+		RepositoryID: c.RepositoryID,
+		BucketID:     c.BucketID,
+		ObjectState:  c.ObjectState,
+		TeamID:       c.TeamID,
 	}
 	if c.Details != nil {
 		clone.Details = c.Details.Clone()

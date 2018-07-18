@@ -87,6 +87,7 @@ func New(r *http.Request, params httprouter.Params) Request {
 type Filter struct {
 	IsDetailed bool
 	Bucket     proto.Bucket
+	Cluster    proto.Cluster
 	Group      proto.Group
 	Job        proto.JobFilter
 	Level      proto.Level
@@ -101,6 +102,7 @@ type Filter struct {
 }
 
 type UpdateData struct {
+	Cluster     proto.Cluster
 	Datacenter  proto.Datacenter
 	Entity      proto.Entity
 	Environment proto.Environment
