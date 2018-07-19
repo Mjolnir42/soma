@@ -98,6 +98,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	SomaCfg.Version = somaVersion
 
 	// Open logfiles
 	if lfhGlobal, err = reopen.NewFileWriter(
@@ -233,8 +234,6 @@ func main() {
 
 	//XXX compilefix
 	router := httprouter.New()
-
-	router.HEAD(`/`, Check(Ping))
 
 	router.GET(`/category/:category/permissions/:permission`, Check(BasicAuth(PermissionShow)))
 	router.GET(`/category/:category/permissions/`, Check(BasicAuth(PermissionList)))

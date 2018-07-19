@@ -38,6 +38,7 @@ type Config struct {
 	InstanceName  string     `json:"instance.name"`
 	LogPath       string     `json:"log.path"`
 	QueueLen      int        `json:"handler.queue.length,string"`
+	Version       string     `json:"version"`
 	Database      DbConfig   `json:"database"`
 	Daemon        Daemon     `json:"daemon"`
 	Auth          AuthConfig `json:"authentication"`

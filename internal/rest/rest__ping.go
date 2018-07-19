@@ -1,4 +1,11 @@
-package main
+/*-
+ * Copyright (c) 2016, Jörg Pernfuß
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package rest // import "github.com/mjolnir42/soma/internal/rest"
 
 import (
 	"net/http"
@@ -8,18 +15,18 @@ import (
 
 // Ping is the function for HEAD requests on the base API that
 // reports facts about the running application
-func Ping(w http.ResponseWriter, _ *http.Request,
+func (x *Rest) Ping(w http.ResponseWriter, _ *http.Request,
 	_ httprouter.Params) {
-	defer PanicCatcher(w)
+	defer panicCatcher(w)
 
 	w.Header().Set(`X-Powered-By`, `SOMA Configuration System`)
-	w.Header().Set(`X-Version`, somaVersion)
+	w.Header().Set(`X-Version`, x.conf.Version)
 	switch {
-	case SomaCfg.Observer == true:
+	case x.conf.Observer == true:
 		w.Header().Set(`X-SOMA-Mode`, `Observer`)
-	case SomaCfg.ReadOnly == true:
+	case x.conf.ReadOnly == true:
 		w.Header().Set(`X-SOMA-Mode`, `ReadOnly`)
-	case SomaCfg.ReadOnly == false:
+	case x.conf.ReadOnly == false:
 		w.Header().Set(`X-SOMA-Mode`, `Master`)
 	}
 	w.WriteHeader(http.StatusNoContent)

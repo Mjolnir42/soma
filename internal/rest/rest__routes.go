@@ -15,6 +15,8 @@ import (
 func (x *Rest) setupRouter() *httprouter.Router {
 	router := httprouter.New()
 
+	router.HEAD(`/`, x.CheckShutdown(x.Ping))
+
 	router.GET(`/attribute/:attribute`, x.Verify(x.AttributeShow))
 	router.GET(`/attribute/`, x.Verify(x.AttributeList))
 	router.GET(`/capability/:capabilityID`, x.Verify(x.CapabilityShow))
