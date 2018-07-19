@@ -262,7 +262,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
-// GroupMemberUnassign
+// GroupMemberUnassign function
 func (x *Rest) GroupMemberUnassign(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
@@ -325,13 +325,7 @@ func (x *Rest) GroupPropertyCreate(w http.ResponseWriter, r *http.Request,
 			"Expected property count 1, actual count: %d",
 			len(*cReq.Group.Properties)))
 		return
-	case params.ByName(`propertyType`) != (*cReq.Group.Properties)[0].Type:
-		dispatchBadRequest(&w, fmt.Errorf(
-			"Mismatched property types: %s, %s",
-			params.ByName(`propertyType`),
-			(*cReq.Group.Properties)[0].Type))
-		return
-	case (params.ByName(`propertyType`) == `service`) && (*cReq.Group.Properties)[0].Service.Name == ``:
+	case (*cReq.Group.Properties)[0].Type == `service` && (*cReq.Group.Properties)[0].Service.Name == ``:
 		dispatchBadRequest(&w, fmt.Errorf(
 			`Empty service name is invalid`))
 		return

@@ -292,14 +292,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 			len(*cReq.Cluster.Properties),
 		))
 		return
-	case params.ByName(`propertyType`) != (*cReq.Cluster.Properties)[0].Type:
-		dispatchBadRequest(&w, fmt.Errorf(
-			"Mismatched property types: %s, %s",
-			params.ByName(`propertyType`),
-			(*cReq.Cluster.Properties)[0].Type,
-		))
-		return
-	case (params.ByName(`propertyType`) == `service`) && (*cReq.Cluster.Properties)[0].Service.Name == ``:
+	case (*cReq.Cluster.Properties)[0].Type == `service` && (*cReq.Cluster.Properties)[0].Service.Name == ``:
 		dispatchBadRequest(&w, fmt.Errorf(
 			`Invalid empty service name`,
 		))

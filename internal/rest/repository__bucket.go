@@ -163,6 +163,30 @@ func (x *Rest) BucketCreate(w http.ResponseWriter, r *http.Request,
 	sendMsgResult(&w, &result)
 }
 
+// BucketDestroy function
+func (x *Rest) BucketDestroy(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	// TODO
+}
+
+// BucketMemberList function
+func (x *Rest) BucketMemberList(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	// TODO
+}
+
+// BucketMemberAssign function
+func (x *Rest) BucketMemberAssign(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	// TODO
+}
+
+// BucketMemberUnassign function
+func (x *Rest) BucketMemberUnassign(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	// TODO
+}
+
 // BucketPropertyCreate function
 func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
@@ -175,7 +199,7 @@ func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 	}
 
 	switch {
-	case params.ByName(`bucket`) != cReq.Bucket.ID:
+	case params.ByName(`bucketID`) != cReq.Bucket.ID:
 		dispatchBadRequest(&w,
 			fmt.Errorf("Mismatched bucket ids: %s, %s",
 				params.ByName(`bucket`),
@@ -186,13 +210,7 @@ func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 			fmt.Errorf("Expected property count 1, actual count: %d",
 				len(*cReq.Bucket.Properties)))
 		return
-	case params.ByName(`type`) != (*cReq.Bucket.Properties)[0].Type:
-		dispatchBadRequest(&w,
-			fmt.Errorf("Mismatched property types: %s, %s",
-				params.ByName(`type`),
-				(*cReq.Bucket.Properties)[0].Type))
-		return
-	case (params.ByName(`type`) == `service`) && (*cReq.Bucket.Properties)[0].Service.Name == ``:
+	case (*cReq.Bucket.Properties)[0].Type == `service` && (*cReq.Bucket.Properties)[0].Service.Name == ``:
 		dispatchBadRequest(&w,
 			fmt.Errorf(`Empty service name is invalid`))
 		return
@@ -225,9 +243,9 @@ func (x *Rest) BucketPropertyDestroy(w http.ResponseWriter, r *http.Request,
 		ID: params.ByName(`bucket`),
 		Properties: &[]proto.Property{
 			proto.Property{
-				Type:             params.ByName(`type`),
-				BucketID:         params.ByName(`bucket`),
-				SourceInstanceID: params.ByName(`source`),
+				Type:             params.ByName(`propertyType`),
+				BucketID:         params.ByName(`bucketID`),
+				SourceInstanceID: params.ByName(`sourceID`),
 			},
 		},
 	}

@@ -406,7 +406,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 
 	// q.Action == `rebuild` will fall through switch
 	switch q.Action {
-	// XXX CONVERT to msg.Request.Section / msg.Request.Action
+	// XXX BUG CONVERT to msg.Request.Section / msg.Request.Action
 
 	//
 	// TREE MANIPULATION REQUESTS

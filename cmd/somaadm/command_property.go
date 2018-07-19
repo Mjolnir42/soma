@@ -835,14 +835,14 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	var path string
 	switch oType {
 	case `cluster`, `group`, `node`:
-		path = fmt.Sprintf("/repository/%s/bucket/%s/%s/%s/property/%s/",
-			repoID, bucketID, oType, objectID, pType)
+		path = fmt.Sprintf("/repository/%s/bucket/%s/%s/%s/property/",
+			repoID, bucketID, oType, objectID)
 	case `bucket`:
-		path = fmt.Sprintf("/repository/%s/%s/%s/property/%s/",
-			repoID, oType, objectID, pType)
+		path = fmt.Sprintf("/repository/%s/%s/%s/property/",
+			repoID, oType, objectID)
 	case `repository`:
-		path = fmt.Sprintf("/%s/%s/property/%s/",
-			oType, objectID, pType)
+		path = fmt.Sprintf("/%s/%s/property/",
+			oType, objectID)
 	}
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }

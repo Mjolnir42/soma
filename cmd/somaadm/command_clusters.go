@@ -170,7 +170,7 @@ func cmdClusterList(c *cli.Context) error {
 	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 
@@ -199,7 +199,7 @@ func cmdClusterShow(c *cli.Context) error {
 	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 	if clusterID, err = adm.LookupClusterID(c.Args().First(),
@@ -236,7 +236,7 @@ func cmdClusterTree(c *cli.Context) error {
 		bucketID); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 
@@ -261,7 +261,7 @@ func cmdClusterCreate(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	repositoryID, err := adm.LookupRepoID(bucketID)
+	repositoryID, err := adm.LookupRepoByBucket(bucketID)
 	if err != nil {
 		return err
 	}
@@ -300,7 +300,7 @@ func cmdClusterDestroy(c *cli.Context) error {
 	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 	if clusterID, err = adm.LookupClusterID(c.Args().First(),
@@ -333,7 +333,7 @@ func cmdClusterMemberList(c *cli.Context) error {
 	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 	if clusterID, err = adm.LookupClusterID(c.Args().First(),
@@ -372,7 +372,7 @@ func cmdClusterMemberAssign(c *cli.Context) error {
 	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 	if repositoryID != nodeConfig.RepositoryID || bucketID != nodeConfig.BucketID {
@@ -428,7 +428,7 @@ func cmdClusterMemberUnassign(c *cli.Context) error {
 	if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 	if repositoryID != nodeConfig.RepositoryID || bucketID != nodeConfig.BucketID {
@@ -500,7 +500,7 @@ func cmdClusterPropertyDelete(c *cli.Context, pType string) error {
 	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 	if clusterID, err = adm.LookupClusterID(opts[`from`][0],
@@ -549,7 +549,7 @@ func cmdClusterRename(c *cli.Context) error {
 	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
 		return err
 	}
-	if repositoryID, err = adm.LookupRepoID(bucketID); err != nil {
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 	if clusterID, err = adm.LookupClusterID(c.Args().First(),
@@ -560,7 +560,7 @@ func cmdClusterRename(c *cli.Context) error {
 	req.Cluster = &proto.Cluster{}
 	req.Cluster.Name = opts[`to`][0]
 
-	path := fmt.Sprintf("/repository/:repositoryID/bucket/:bucketID/cluster/:clusterID",
+	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s",
 		repositoryID, bucketID, clusterID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }

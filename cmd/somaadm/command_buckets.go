@@ -15,7 +15,7 @@ func registerBuckets(app cli.App) *cli.App {
 		[]cli.Command{
 			// buckets
 			{
-				Name:  "buckets",
+				Name:  "bucket",
 				Usage: "SUBCOMMANDS for buckets",
 				Subcommands: []cli.Command{
 					{
@@ -25,34 +25,10 @@ func registerBuckets(app cli.App) *cli.App {
 						BashComplete: cmpl.BucketCreate,
 					},
 					{
-						Name:         "delete",
+						Name:         "destroy",
 						Usage:        "Mark an existing bucket as deleted",
-						Action:       runtime(cmdBucketDelete),
-						BashComplete: cmpl.Repository,
-					},
-					{
-						Name:         "restore",
-						Usage:        "Restore a bucket marked as deleted",
-						Action:       runtime(cmdBucketRestore),
-						BashComplete: cmpl.Repository,
-					},
-					{
-						Name:         "purge",
-						Usage:        "Remove a deleted bucket",
-						Action:       runtime(cmdBucketPurge),
-						BashComplete: cmpl.Repository,
-					},
-					{
-						Name:         "freeze",
-						Usage:        "Freeze a bucket",
-						Action:       runtime(cmdBucketFreeze),
-						BashComplete: cmpl.Repository,
-					},
-					{
-						Name:         "thaw",
-						Usage:        "Thaw a frozen bucket",
-						Action:       runtime(cmdBucketThaw),
-						BashComplete: cmpl.Repository,
+						Action:       runtime(cmdBucketDestroy),
+						BashComplete: cmpl.In,
 					},
 					{
 						Name:         "rename",
@@ -61,9 +37,10 @@ func registerBuckets(app cli.App) *cli.App {
 						BashComplete: cmpl.BucketRename,
 					},
 					{
-						Name:   "list",
-						Usage:  "List existing buckets",
-						Action: runtime(cmdBucketList),
+						Name:         "list",
+						Usage:        "List existing buckets",
+						Action:       runtime(cmdBucketList),
+						BashComplete: cmpl.In,
 					},
 					{
 						Name:   "show",
@@ -116,8 +93,8 @@ func registerBuckets(app cli.App) *cli.App {
 								},
 							},
 							{
-								Name:  `delete`,
-								Usage: `SUBCOMMANDS for property delete`,
+								Name:  `destroy`,
+								Usage: `SUBCOMMANDS for property destroy`,
 								Subcommands: []cli.Command{
 									{
 										Name:         `system`,
@@ -154,238 +131,213 @@ func registerBuckets(app cli.App) *cli.App {
 	return &app
 }
 
-func cmdBucketCreate(c *cli.Context) error {
-	uniqKeys := []string{`repository`, `environment`}
-	opts := map[string][]string{}
+func cmdBucketList(c *cli.Context) error {
+	var err error
+	var repositoryID, path string
 
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail(),
-	); err != nil {
+	if err = adm.VerifyNoArgument(c); err != nil {
+		path = `/bucket/`
+	} else {
+		uniqKeys := []string{`in`}
+		opts := map[string][]string{}
+
+		if err = adm.ParseVariadicArguments(
+			opts,
+			[]string{},
+			uniqKeys,
+			uniqKeys,
+			c.Args().Tail()); err != nil {
+			return err
+		}
+
+		if repositoryID, err = adm.LookupRepoByBucket(opts[`in`][0]); err != nil {
+			return err
+		}
+
+		path = fmt.Sprintf("/repository/%s/bucket/", repositoryID)
+	}
+
+	return adm.Perform(`get`, path, `list`, nil, c)
+}
+
+func cmdBucketShow(c *cli.Context) error {
+	var err error
+	var repositoryID, bucketID string
+
+	if err = adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+	if bucketID, err = adm.LookupBucketID(c.Args().First()); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 
-	repoID, err := adm.LookupRepoID(opts[`repository`][0])
-	if err != nil {
+	path := fmt.Sprintf("/repository/%s/bucket/%s",
+		repositoryID, bucketID)
+	return adm.Perform(`get`, path, `show`, nil, c)
+}
+
+func cmdBucketTree(c *cli.Context) error {
+	var err error
+	var repositoryID, bucketID string
+
+	if err = adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+	if bucketID, err = adm.LookupBucketID(c.Args().First()); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/repository/%s/bucket/%s/tree",
+		repositoryID, bucketID)
+	return adm.Perform(`get`, path, `tree`, nil, c)
+}
+
+func cmdBucketCreate(c *cli.Context) error {
+	var err error
+	var repositoryID string
+
+	if err = adm.ValidateRuneCountRange(c.Args().First(), 4, 512); err != nil {
+		return err
+	}
+
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`in`, `environment`}
+	mandatoryOptions := []string{`in`, `environment`}
+
+	if err = adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail()); err != nil {
+		return err
+	}
+
+	if repositoryID, err = adm.LookupRepoID(opts[`in`][0]); err != nil {
 		return err
 	}
 
 	// fetch list of environments from SOMA to check if a valid
 	// environment was requested
-	if err := adm.ValidateEnvironment(
-		opts["environment"][0]); err != nil {
+	if err = adm.ValidateEnvironment(opts[`environment`][0]); err != nil {
 		return err
 	}
 
-	req := proto.Request{
-		Bucket: &proto.Bucket{
-			Name:         c.Args().First(),
-			RepositoryID: repoID,
-			Environment:  opts["environment"][0],
-		},
-	}
+	req := proto.NewBucketRequest()
+	req.Bucket.Name = c.Args().First()
+	req.Bucket.RepositoryID = repositoryID
+	req.Bucket.Environment = opts[`environment`][0]
 
-	if err := adm.ValidateRuneCountRange(req.Bucket.Name,
-		4, 512); err != nil {
-		return err
-	}
-
-	return adm.Perform(`postbody`, `/bucket/`, `command`, req, c)
+	path := fmt.Sprintf("/repository/%s/bucket/", repositoryID)
+	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
-func cmdBucketDelete(c *cli.Context) error {
+func cmdBucketDestroy(c *cli.Context) error {
+	var err error
+	var repositoryID, constrolID, bucketID string
+
 	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`in`}
+	mandatoryOptions := []string{}
+
+	if err = adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		[]string{`repository`},
-		[]string{`repository`},
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail()); err != nil {
 		return err
 	}
-	buckID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
+	if bucketID, err = adm.LookupBucketID(c.Args().First()); err != nil {
 		return err
 	}
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
+		return err
+	}
+	if _, ok := opts[`in`]; ok {
+		if controlID, err = adm.LookupRepoID(opts[`in`][0]); err != nil {
+			return err
+		} else if controlID != repositoryID {
+			return fmt.Errorf("bucket %s is not in repository %s", c.Args().First(), opts[`in`][0])
+		}
+	}
 
-	path := fmt.Sprintf("/bucket/%s", buckID)
+	path := fmt.Sprintf("/repository/%s/bucket/%s", repositoryID, bucketID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
-func cmdBucketRestore(c *cli.Context) error {
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		[]string{`repository`},
-		[]string{`repository`},
-		c.Args().Tail()); err != nil {
-		return err
-	}
-	buckID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
-		return err
-	}
-
-	req := proto.Request{
-		Flags: &proto.Flags{
-			Restore: true,
-		},
-	}
-
-	path := fmt.Sprintf("/bucket/%s", buckID)
-	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
-func cmdBucketPurge(c *cli.Context) error {
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		[]string{`repository`},
-		[]string{`repository`},
-		c.Args().Tail()); err != nil {
-		return err
-	}
-	buckID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
-		return err
-	}
-	req := proto.Request{
-		Flags: &proto.Flags{
-			Purge: true,
-		},
-	}
-
-	path := fmt.Sprintf("/bucket/%s", buckID)
-	return adm.Perform(`deletebody`, path, `command`, req, c)
-}
-
-func cmdBucketFreeze(c *cli.Context) error {
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		[]string{`repository`},
-		[]string{`repository`},
-		c.Args().Tail()); err != nil {
-		return err
-	}
-	buckID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
-		return err
-	}
-
-	req := proto.Request{
-		Flags: &proto.Flags{
-			Freeze: true,
-		},
-	}
-
-	path := fmt.Sprintf("/bucket/%s", buckID)
-	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
-func cmdBucketThaw(c *cli.Context) error {
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		[]string{`repository`},
-		[]string{`repository`},
-		c.Args().Tail()); err != nil {
-		return err
-	}
-	buckID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
-		return err
-	}
-
-	req := proto.Request{
-		Flags: &proto.Flags{
-			Thaw: true,
-		},
-	}
-
-	path := fmt.Sprintf("/bucket/%s", buckID)
-	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
 func cmdBucketRename(c *cli.Context) error {
+	var err error
+	var repositoryID, controlID, bucketID string
+
 	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`in`, `to`}
+	mandatoryOptions := []string{`to`}
+
+	if err = adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		[]string{`repository`, `to`},
-		[]string{`repository`, `to`},
-		c.Args().Tail(),
-	); err != nil {
-		return err
-	}
-	buckID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail()); err != nil {
 		return err
 	}
 
-	req := proto.Request{
-		Bucket: &proto.Bucket{
-			Name: opts[`to`][0],
-		},
+	if err = adm.ValidateRuneCountRange(opts[`to`][0], 4, 512); err != nil {
+		return err
+	}
+	if bucketID, err = adm.LookupBucketID(c.Args().First()); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
+		return err
+	}
+	if _, ok := opts[`in`]; ok {
+		if controlID, err = adm.LookupRepoID(opts[`in`][0]); err != nil {
+			return err
+		} else if controlID != repositoryID {
+			return fmt.Errorf("bucket %s is not in repository %s", c.Args().First(), opts[`in`][0])
+		}
 	}
 
-	path := fmt.Sprintf("/bucket/%s", buckID)
+	req := proto.NewBucketRequest()
+	req.Bucket.ID = bucketID
+	req.Bucket.RepositoryID = repositoryID
+	req.Bucket.Name = opts[`to`][0]
+
+	path := fmt.Sprintf("/repository/%s/bucket/%s", repositoryID, bucketID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
-func cmdBucketList(c *cli.Context) error {
-	if err := adm.VerifyNoArgument(c); err != nil {
-		return err
-	}
-
-	return adm.Perform(`get`, `/bucket/`, `list`, nil, c)
-}
-
-func cmdBucketShow(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	bucketID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/bucket/%s", bucketID)
-	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
 func cmdBucketInstance(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
+	var err error
+	var repositoryID, bucketID string
+
+	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
-	bucketID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
+	if bucketID, err = adm.LookupBucketID(c.Args().First()); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/bucket/%s/instance/", bucketID)
+	path := fmt.Sprintf("/repository/%s/bucket/%s/instance/",
+		repositoryID, bucketID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
-func cmdBucketTree(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	bucketID, err := adm.LookupBucketID(c.Args().First())
-	if err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/bucket/%s/tree", bucketID)
-	return adm.Perform(`get`, path, `tree`, nil, c)
-}
+///
 
 func cmdBucketSystemPropertyAdd(c *cli.Context) error {
 	return cmdBucketPropertyAdd(c, `system`)
