@@ -130,8 +130,8 @@ func (s *Supervisor) permissionSearch(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = s.stmtPermissionSearch.Query(
-		q.Permission.Name,
-		q.Permission.Category,
+		q.Search.Permission.Name,
+		q.Search.Permission.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

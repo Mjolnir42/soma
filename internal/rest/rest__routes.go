@@ -111,6 +111,8 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(rtNodeInstanceID, x.Verify(x.InstanceShow))
 	router.GET(rtNodeInstanceVersions, x.Verify(x.InstanceVersions))
 	router.GET(rtNodeTree, x.Verify(x.NodeTree))
+	router.GET(rtPermission, x.Verify(x.PermissionList))
+	router.GET(rtPermissionID, x.Verify(x.PermissionShow))
 	router.GET(rtSyncNode, x.Verify(x.NodeMgmtSync))
 	router.HEAD(`/authenticate/validate`, x.Verify(x.SupervisorValidate))
 	router.POST(`/hostdeployment/:monitoringID/:assetID`, x.CheckShutdown(x.HostDeploymentAssemble))
@@ -131,6 +133,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(rtSearchCluster, x.Verify(x.ClusterSearch))
 	router.POST(rtSearchGroup, x.Verify(x.GroupList))
 	router.POST(rtSearchNode, x.Verify(x.NodeSearch))
+	router.POST(rtSearchPermission, x.Verify(x.PermissionSearch))
 
 	if !x.conf.ReadOnly {
 		if !x.conf.Observer {
@@ -177,6 +180,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(rtNodeID, x.Verify(x.NodeMgmtRemove))
 			router.DELETE(rtNodePropertyID, x.Verify(x.NodeConfigPropertyDestroy))
 			router.DELETE(rtNodeUnassign, x.Verify(x.NodeConfigUnassign))
+			router.DELETE(rtPermissionID, x.Verify(x.PermissionRemove))
 			router.GET(rtRepositoryAudit, x.BasicAuth(x.RepositoryAudit))
 			router.PATCH(`/accounts/password/:kexID`, x.CheckShutdown(x.SupervisorPasswordChange))
 			router.PATCH(`/oncall/:oncall`, x.Verify(x.OncallUpdate))
@@ -184,6 +188,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PATCH(`/workflow/retry`, x.Verify(x.WorkflowRetry))
 			router.PATCH(`/workflow/set/:instanceconfigID`, x.Verify(x.WorkflowSet))
 			router.PATCH(rtClusterID, x.Verify(x.ClusterRename))
+			router.PATCH(rtPermissionID, x.Verify(x.PermissionEdit))
 			router.POST(`/attribute/`, x.Verify(x.AttributeAdd))
 			router.POST(`/capability/`, x.Verify(x.CapabilityAdd))
 			router.POST(`/category/`, x.Verify(x.CategoryAdd))
@@ -224,6 +229,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.POST(rtGroupProperty, x.Verify(x.GroupPropertyCreate))
 			router.POST(rtNode, x.Verify(x.NodeMgmtAdd))
 			router.POST(rtNodeProperty, x.Verify(x.NodeConfigPropertyCreate))
+			router.POST(rtPermission, x.Verify(x.PermissionAdd))
 			router.PUT(`/accounts/activate/root/:kexID`, x.CheckShutdown(x.SupervisorActivateRoot))
 			router.PUT(`/accounts/activate/user/:kexID`, x.CheckShutdown(x.SupervisorActivateUser))
 			router.PUT(`/accounts/password/:kexID`, x.CheckShutdown(x.SupervisorPasswordReset))

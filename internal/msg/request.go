@@ -94,6 +94,7 @@ type Filter struct {
 	Monitoring proto.Monitoring
 	Node       proto.Node
 	Oncall     proto.Oncall
+	Permission proto.Permission
 	Repository proto.Repository
 	SectionObj proto.Section
 	Server     proto.Server
