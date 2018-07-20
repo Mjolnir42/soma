@@ -71,6 +71,14 @@ type Supervisor struct {
 	stmtSearchAuthorizationRepository *sql.Stmt
 	stmtSearchAuthorizationTeam       *sql.Stmt
 	stmtSearchAuthorizationMonitoring *sql.Stmt
+	stmtShowAuthorizationGlobal       *sql.Stmt
+	stmtShowAuthorizationRepository   *sql.Stmt
+	stmtShowAuthorizationTeam         *sql.Stmt
+	stmtShowAuthorizationMonitoring   *sql.Stmt
+	stmtListAuthorizationGlobal       *sql.Stmt
+	stmtListAuthorizationRepository   *sql.Stmt
+	stmtListAuthorizationTeam         *sql.Stmt
+	stmtListAuthorizationMonitoring   *sql.Stmt
 	stmtPermissionList                *sql.Stmt
 	stmtPermissionSearch              *sql.Stmt
 	stmtPermissionMapEntry            *sql.Stmt
@@ -156,6 +164,8 @@ func (s *Supervisor) RegisterRequests(hmap *handler.Map) {
 	hmap.Request(msg.SectionPermission, msg.ActionRemove, `supervisor`)
 	hmap.Request(msg.SectionPermission, msg.ActionMap, `supervisor`)
 	hmap.Request(msg.SectionPermission, msg.ActionUnmap, `supervisor`)
+	hmap.Request(msg.SectionRight, msg.ActionList, `supervisor`)
+	hmap.Request(msg.SectionRight, msg.ActionShow, `supervisor`)
 	hmap.Request(msg.SectionRight, msg.ActionGrant, `supervisor`)
 	hmap.Request(msg.SectionRight, msg.ActionRevoke, `supervisor`)
 	hmap.Request(msg.SectionRight, msg.ActionSearch, `supervisor`)
@@ -224,6 +234,14 @@ func (s *Supervisor) Run() {
 		stmt.SearchRepositoryAuthorization: s.stmtSearchAuthorizationRepository,
 		stmt.SearchTeamAuthorization:       s.stmtSearchAuthorizationTeam,
 		stmt.SearchMonitoringAuthorization: s.stmtSearchAuthorizationMonitoring,
+		stmt.ListGlobalAuthorization:       s.stmtListAuthorizationGlobal,
+		stmt.ListRepositoryAuthorization:   s.stmtListAuthorizationRepository,
+		stmt.ListTeamAuthorization:         s.stmtListAuthorizationTeam,
+		stmt.ListMonitoringAuthorization:   s.stmtListAuthorizationMonitoring,
+		stmt.ShowGlobalAuthorization:       s.stmtShowAuthorizationGlobal,
+		stmt.ShowRepositoryAuthorization:   s.stmtShowAuthorizationRepository,
+		stmt.ShowTeamAuthorization:         s.stmtShowAuthorizationTeam,
+		stmt.ShowMonitoringAuthorization:   s.stmtShowAuthorizationMonitoring,
 	} {
 		if prepStmt, err = s.conn.Prepare(statement); err != nil {
 			s.errLog.Fatal(`supervisor`, err, stmt.Name(statement))

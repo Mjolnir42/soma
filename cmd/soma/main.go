@@ -235,8 +235,6 @@ func main() {
 	//XXX compilefix
 	router := httprouter.New()
 
-	//TODO router.GET(`/category/:category/permissions/:permission/grant/`)
-	//TODO router.GET(`/category/:category/permissions/:permission/grant/:grant`)
 	router.GET(`/property/custom/:repository/:custom`, Check(BasicAuth(PropertyShow)))
 	router.GET(`/property/custom/:repository/`, Check(BasicAuth(PropertyList)))
 	router.GET(`/property/native/:native`, Check(BasicAuth(PropertyShow)))
@@ -247,7 +245,6 @@ func main() {
 	router.GET(`/property/service/team/:team/`, Check(BasicAuth(PropertyList)))
 	router.GET(`/property/system/:system`, Check(BasicAuth(PropertyShow)))
 	router.GET(`/property/system/`, Check(BasicAuth(PropertyList)))
-	router.POST(`/filter/grant/`, Check(BasicAuth(RightSearch)))
 	router.POST(`/filter/property/custom/:repository/`, Check(BasicAuth(PropertyList)))
 	router.POST(`/filter/property/service/global/`, Check(BasicAuth(PropertyList)))
 	router.POST(`/filter/property/service/team/:team/`, Check(BasicAuth(PropertyList)))
@@ -256,7 +253,6 @@ func main() {
 	if !SomaCfg.ReadOnly {
 
 		if !SomaCfg.Observer {
-			router.DELETE(`/category/:category/permissions/:permission/grant/:grant`, Check(BasicAuth(RightRevoke)))
 			router.DELETE(`/property/custom/:repository/:custom`, Check(BasicAuth(PropertyRemove)))
 			router.DELETE(`/property/native/:native`, Check(BasicAuth(PropertyRemove)))
 			router.DELETE(`/property/service/global/:service`, Check(BasicAuth(PropertyRemove)))
@@ -266,7 +262,6 @@ func main() {
 			router.GET(`/deployments/monitoring/:uuid/:all`, Check(DeploymentDetailsMonitoring))
 			router.GET(`/deployments/monitoring/:uuid`, Check(DeploymentDetailsMonitoring))
 			router.PATCH(`/deployments/id/:uuid/:result`, Check(DeploymentDetailsUpdate))
-			router.POST(`/category/:category/permissions/:permission/grant/`, Check(BasicAuth(RightGrant)))
 			router.POST(`/property/custom/:repository/`, Check(BasicAuth(PropertyAdd)))
 			router.POST(`/property/native/`, Check(BasicAuth(PropertyAdd)))
 			router.POST(`/property/service/global/`, Check(BasicAuth(PropertyAdd)))

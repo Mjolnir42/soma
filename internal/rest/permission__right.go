@@ -1,4 +1,11 @@
-package main
+/*-
+ * Copyright (c) 2016-2018, Jörg Pernfuß
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package rest // import "github.com/mjolnir42/soma/internal/rest"
 
 import (
 	"fmt"
@@ -6,132 +13,136 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-// RightSearch function
-func RightSearch(w http.ResponseWriter, r *http.Request,
+// RightList function
+func (x *Rest) RightList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
-	defer PanicCatcher(w)
+	defer panicCatcher(w)
 
-	if !fixIsAuthorized(&msg.Authorization{
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Section:    `right`,
-		Action:     `search`,
-	}) {
-		DispatchForbidden(&w, nil)
+	request := msg.New(r, params)
+	request.Section = msg.SectionRight
+	request.Action = msg.ActionList
+	request.Grant.Category = params.ByName(`category`)
+	request.Grant.PermissionID = params.ByName(`permissionID`)
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
 		return
 	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
+}
+
+// RightShow function
+func (x *Rest) RightShow(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionRight
+	request.Action = msg.ActionShow
+	request.Grant.Category = params.ByName(`category`)
+	request.Grant.ID = params.ByName(`grantID`)
+	request.Grant.PermissionID = params.ByName(`permissionID`)
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
+}
+
+// RightSearch function
+func (x *Rest) RightSearch(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
 
 	crq := proto.NewGrantFilter()
-	if err := DecodeJSONBody(r, &crq); err != nil {
-		DispatchBadRequest(&w, err)
+	if err := decodeJSONBody(r, &crq); err != nil {
+		dispatchBadRequest(&w, err)
 		return
 	}
 
-	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*super.Supervisor)
-	mr := msg.Request{
-		Section:    `right`,
-		Action:     `search`,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Grant: proto.Grant{
-			RecipientType: crq.Filter.Grant.RecipientType,
-			RecipientID:   crq.Filter.Grant.RecipientID,
-			PermissionID:  crq.Filter.Grant.PermissionID,
-			Category:      crq.Filter.Grant.Category,
-			ObjectType:    crq.Filter.Grant.ObjectType,
-			ObjectID:      crq.Filter.Grant.ObjectID,
-		},
+	request := newRequest(r, params)
+	request.Section = msg.SectionRight
+	request.Action = msg.ActionSearch
+	request.Search.Grant.RecipientType = crq.Filter.Grant.RecipientType
+	request.Search.Grant.RecipientID = crq.Filter.Grant.RecipientID
+	request.Search.Grant.PermissionID = crq.Filter.Grant.PermissionID
+	request.Search.Grant.Category = crq.Filter.Grant.Category
+	request.Search.Grant.ObjectType = crq.Filter.Grant.ObjectType
+	request.Search.Grant.ObjectID = crq.Filter.Grant.ObjectID
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
 	}
 
-	handler.Input <- mr
-	result := <-returnChannel
-	SendMsgResult(&w, &result)
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
 }
 
 // RightGrant function
-func RightGrant(w http.ResponseWriter, r *http.Request,
+func (x *Rest) RightGrant(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
-	defer PanicCatcher(w)
+	defer panicCatcher(w)
 
-	cReq := proto.Request{}
-	err := DecodeJSONBody(r, &cReq)
-	if err != nil {
-		DispatchBadRequest(&w, err)
+	cReq := proto.NewGrantRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
 		return
 	}
 
 	if cReq.Grant.Category != params.ByName(`category`) ||
-		cReq.Grant.PermissionID != params.ByName(`permission`) {
-		DispatchBadRequest(&w,
-			fmt.Errorf(`Category/PermissionId mismatch`))
+		cReq.Grant.PermissionID != params.ByName(`permissionID`) {
+		dispatchBadRequest(&w, fmt.Errorf(
+			`Category/PermissionId mismatch`))
 		return
 	}
 
-	if !fixIsAuthorized(&msg.Authorization{
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Section:    `right`,
-		Action:     `grant`,
-		Grant:      cReq.Grant,
-	}) {
-		DispatchForbidden(&w, nil)
+	request := msg.New(r, params)
+	request.Section = msg.SectionRight
+	request.Action = msg.ActionGrant
+	request.Grant = cReq.Grant.Clone()
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
 		return
 	}
 
-	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*super.Supervisor)
-	handler.Input <- msg.Request{
-		Section:    `right`,
-		Action:     `grant`,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Grant:      *cReq.Grant,
-	}
-	result := <-returnChannel
-	SendMsgResult(&w, &result)
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
 }
 
 // RightRevoke function
-func RightRevoke(w http.ResponseWriter, r *http.Request,
+func (x *Rest) RightRevoke(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
-	defer PanicCatcher(w)
+	defer panicCatcher(w)
 
-	grant := proto.Grant{
-		ID:           params.ByName(`grant`),
-		Category:     params.ByName(`category`),
-		PermissionID: params.ByName(`permission`),
-	}
+	request := msg.New(r, params)
+	request.Section = msg.SectionRight
+	request.Action = msg.ActionRevoke
+	request.Grant.ID = params.ByName(`grantID`)
+	request.Grant.Category = params.ByName(`category`)
+	request.Grant.PermissionID = params.ByName(`permissionID`)
 
-	if !fixIsAuthorized(&msg.Authorization{
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		Section:    `right`,
-		Action:     `revoke`,
-		Grant:      &grant,
-	}) {
-		DispatchForbidden(&w, nil)
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
 		return
 	}
 
-	returnChannel := make(chan msg.Result)
-	handler := handlerMap[`supervisor`].(*super.Supervisor)
-	handler.Input <- msg.Request{
-		Section:    `right`,
-		Action:     `revoke`,
-		Reply:      returnChannel,
-		RemoteAddr: extractAddress(r.RemoteAddr),
-		AuthUser:   params.ByName(`AuthenticatedUser`),
-		Grant:      grant,
-	}
-	result := <-returnChannel
-	SendMsgResult(&w, &result)
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	sendMsgResult(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

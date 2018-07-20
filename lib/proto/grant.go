@@ -20,6 +20,22 @@ type Grant struct {
 	Details       *DetailsCreation `json:"details,omitempty"`
 }
 
+func (g *Grant) Clone() Grant {
+	clone := Grant{
+		ID:            g.ID,
+		RecipientType: g.RecipientType,
+		RecipientID:   g.RecipientID,
+		PermissionID:  g.PermissionID,
+		Category:      g.Category,
+		ObjectType:    g.ObjectType,
+		ObjectID:      g.ObjectID,
+	}
+	if g.Details != nil {
+		clone.Details = g.Details.Clone()
+	}
+	return clone
+}
+
 type GrantFilter struct {
 	RecipientType string `json:"recipientType"`
 	RecipientID   string `json:"recipientId"`

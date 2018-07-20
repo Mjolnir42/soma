@@ -88,6 +88,7 @@ type Filter struct {
 	IsDetailed bool
 	Bucket     proto.Bucket
 	Cluster    proto.Cluster
+	Grant      proto.Grant
 	Group      proto.Group
 	Job        proto.JobFilter
 	Level      proto.Level

@@ -139,6 +139,110 @@ WHERE  permission_id = $1::uuid
         OR user_id  = $3::uuid
 		OR tool_id  = $3::uuid);`
 
+	ListGlobalAuthorization = `
+SELECT grant_id,
+       admin_id,
+       user_id,
+       tool_id,
+       organizational_team_id
+FROM   soma.authorizations_global
+WHERE  permission_id = $1::uuid
+  AND  category = $2::uuid;`
+
+	ListRepositoryAuthorization = `
+SELECT grant_id,
+       admin_id,
+       user_id,
+       tool_id,
+       organizational_team_id,
+       object_type,
+       repository_id,
+       bucket_id,
+       group_id,
+       cluster_id,
+       node_id
+FROM   soma.authorizations_repository
+WHERE  permission_id = $1::uuid
+  AND  category = $2::uuid;`
+
+	ListMonitoringAuthorization = `
+SELECT grant_id
+       user_id
+       tool_id
+       organizational_team_id
+       monitoring_id
+FROM   soma.authorizations_monitoring
+WHERE  permission_id = $1::uuid
+  AND  category = $2::uuid;`
+
+	ListTeamAuthorization = `
+SELECT grant_id,
+       user_id,
+       tool_id,
+       organizational_team_id,
+       authorized_team_id
+FROM   soma.authorizations_team
+WHERE  permission_id = $1::uuid
+  AND  category = $2::uuid;`
+
+	ShowGlobalAuthorization = `
+SELECT grant_id,
+       admin_id,
+       user_id,
+       tool_id,
+       organizational_team_id,
+       created_by,
+       created_at
+FROM   soma.authorizations_global
+WHERE  grant_id = $1::uuid
+  AND  permission_id = $2::uuid
+  AND  category = $3::uuid;`
+
+	ShowRepositoryAuthorization = `
+SELECT grant_id,
+       admin_id,
+       user_id,
+       tool_id,
+       organizational_team_id,
+       object_type,
+       repository_id,
+       bucket_id,
+       group_id,
+       cluster_id,
+       node_id,
+       created_by,
+       created_at
+FROM   soma.authorizations_repository
+WHERE  grant_id = $1::uuid
+  AND  permission_id = $2::uuid
+  AND  category = $3::uuid;`
+
+	ShowMonitoringAuthorization = `
+SELECT grant_id,
+       user_id,
+       tool_id,
+       organizational_team_id,
+       monitoring_id,
+       created_by,
+       created_at
+FROM   soma.authorizations_monitoring
+WHERE  grant_id = $1::uuid
+  AND  permission_id = $2::uuid
+  AND  category = $3::uuid;`
+
+	ShowTeamAuthorization = `
+SELECT grant_id,
+       user_id,
+       tool_id,
+       organizational_team_id,
+       authorized_team_id,
+       created_by,
+       created_at
+FROM   soma.authorizations_team
+WHERE  grant_id = $1::uuid
+  AND  permission_id = $2::uuid
+  AND  category = $3::uuid;`
+
 	SearchGlobalAuthorization = `
 SELECT grant_id
 FROM   soma.authorizations_global
@@ -210,6 +314,10 @@ func init() {
 	m[GrantRemoveSystem] = `GrantRemoveSystem`
 	m[GrantRepositoryAuthorization] = `GrantRepositoryAuthorization`
 	m[GrantTeamAuthorization] = `GrantTeamAuthorization`
+	m[ListGlobalAuthorization] = `ListGlobalAuthorization`
+	m[ListMonitoringAuthorization] = `ShowMonitoringAuthorization`
+	m[ListRepositoryAuthorization] = `ShowRepositoryAuthorization`
+	m[ListTeamAuthorization] = `ShowTeamAuthorization`
 	m[RevokeGlobalAuthorization] = `RevokeGlobalAuthorization`
 	m[RevokeMonitoringAuthorization] = `RevokeMonitoringAuthorization`
 	m[RevokeRepositoryAuthorization] = `RevokeRepositoryAuthorization`
@@ -218,6 +326,10 @@ func init() {
 	m[SearchMonitoringAuthorization] = `SearchMonitoringAuthorization`
 	m[SearchRepositoryAuthorization] = `SearchRepositoryAuthorization`
 	m[SearchTeamAuthorization] = `SearchTeamAuthorization`
+	m[ShowGlobalAuthorization] = `ShowGlobalAuthorization`
+	m[ShowMonitoringAuthorization] = `ShowMonitoringAuthorization`
+	m[ShowRepositoryAuthorization] = `ShowRepositoryAuthorization`
+	m[ShowTeamAuthorization] = `ShowTeamAuthorization`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

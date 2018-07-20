@@ -16,11 +16,59 @@ import (
 
 func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 	switch q.Action {
-	case msg.ActionSearch:
+	case msg.ActionList:
 		switch q.Grant.Category {
 		case msg.CategorySystem,
 			msg.CategoryGlobal,
 			msg.CategoryGrantGlobal,
+			msg.CategoryIdentity,
+			msg.CategoryGrantIdentity,
+			msg.CategorySelf,
+			msg.CategoryGrantSelf,
+			msg.CategoryPermission,
+			msg.CategoryGrantPermission,
+			msg.CategoryOperation,
+			msg.CategoryGrantOperation:
+			s.rightListGlobal(q, mr)
+		case msg.CategoryRepository,
+			msg.CategoryGrantRepository,
+			msg.CategoryTeam,
+			msg.CategoryGrantTeam,
+			msg.CategoryMonitoring,
+			msg.CategoryGrantMonitoring:
+			s.rightListScoped(q, mr)
+		}
+	case msg.ActionShow:
+		switch q.Grant.Category {
+		case msg.CategorySystem,
+			msg.CategoryGlobal,
+			msg.CategoryGrantGlobal,
+			msg.CategoryIdentity,
+			msg.CategoryGrantIdentity,
+			msg.CategorySelf,
+			msg.CategoryGrantSelf,
+			msg.CategoryPermission,
+			msg.CategoryGrantPermission,
+			msg.CategoryOperation,
+			msg.CategoryGrantOperation:
+			s.rightShowGlobal(q, mr)
+		case msg.CategoryRepository,
+			msg.CategoryGrantRepository,
+			msg.CategoryTeam,
+			msg.CategoryGrantTeam,
+			msg.CategoryMonitoring,
+			msg.CategoryGrantMonitoring:
+			s.rightShowScoped(q, mr)
+		}
+	case msg.ActionSearch:
+		switch q.Search.Grant.Category {
+		case msg.CategorySystem,
+			msg.CategoryGlobal,
+			msg.CategoryGrantGlobal,
+			msg.CategoryIdentity,
+			msg.CategoryGrantIdentity,
+			msg.CategorySelf,
+			msg.CategoryGrantSelf,
 			msg.CategoryPermission,
 			msg.CategoryGrantPermission,
 			msg.CategoryOperation,
@@ -37,6 +85,66 @@ func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 	}
 }
 
+func (s *Supervisor) rightListGlobal(q *msg.Request, mr *msg.Result) {
+	var (
+		err                             error
+		rows                            *sql.Rows
+		grantID                         string
+		adminID, userID, toolID, teamID sql.NullString
+	)
+
+	if rows, err = s.stmtListAuthorizationGlobal.Query(
+		q.Search.Grant.PermissionID,
+		q.Search.Grant.Category,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&grantID,
+			&adminID,
+			&userID,
+			&toolID,
+			&teamID,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+			return
+		}
+		grant := proto.Grant{
+			ID:           grantID,
+			PermissionID: q.Search.Grant.PermissionID,
+			Category:     q.Search.Grant.Category,
+		}
+		switch {
+		case adminID.Valid:
+			grant.RecipientID = adminID.String
+			grant.RecipientType = msg.SubjectAdmin
+		case userID.Valid:
+			grant.RecipientID = userID.String
+			grant.RecipientType = msg.SubjectUser
+		case toolID.Valid:
+			grant.RecipientID = toolID.String
+			grant.RecipientType = msg.SubjectTool
+		case teamID.Valid:
+			grant.RecipientID = teamID.String
+			grant.RecipientType = msg.SubjectTeam
+		}
+		mr.Grant = append(mr.Grant, grant)
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
+	}
+	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
+}
+
 func (s *Supervisor) rightSearchGlobal(q *msg.Request, mr *msg.Result) {
 	var (
 		err     error
@@ -44,10 +152,10 @@ func (s *Supervisor) rightSearchGlobal(q *msg.Request, mr *msg.Result) {
 	)
 
 	if err = s.stmtSearchAuthorizationGlobal.QueryRow(
-		q.Grant.PermissionID,
-		q.Grant.Category,
-		q.Grant.RecipientID,
-		q.Grant.RecipientType,
+		q.Search.Grant.PermissionID,
+		q.Search.Grant.Category,
+		q.Search.Grant.RecipientID,
+		q.Search.Grant.RecipientType,
 	).Scan(
 		&grantID,
 	); err == sql.ErrNoRows {
@@ -89,12 +197,12 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
 		scope = s.stmtSearchAuthorizationMonitoring
 	}
 	if err = scope.QueryRow(
-		q.Grant.PermissionID,
-		q.Grant.Category,
-		q.Grant.RecipientID,
-		q.Grant.RecipientType,
-		q.Grant.ObjectType,
-		q.Grant.ObjectID,
+		q.Search.Grant.PermissionID,
+		q.Search.Grant.Category,
+		q.Search.Grant.RecipientID,
+		q.Search.Grant.RecipientType,
+		q.Search.Grant.ObjectType,
+		q.Search.Grant.ObjectID,
 	).Scan(
 		&grantID,
 	); err == sql.ErrNoRows {

@@ -62,12 +62,15 @@ const (
 	rtNodeTree                   = `/repository/:repositoryID/bucket/:bucketID/node/:nodeID/tree`
 	rtPermission                 = `/category/:category/permission/`
 	rtPermissionID               = `/category/:category/permission/:permissionID`
+	rtRight                      = `/category/:category/permission/:permissionID/grant/`
+	rtRightID                    = `/category/:category/permission/:permissionID/grant/:grantID`
 	rtSearchRepository           = `/search/repository/`
 	rtSearchBucket               = `/search/bucket/`
 	rtSearchGroup                = `/search/repository/:repositoryID/bucket/:bucketID/group/`
 	rtSearchCluster              = `/search/repository/:repositoryID/bucket/:bucketID/cluster/`
 	rtSearchNode                 = `/search/node/`
 	rtSearchPermission           = `/search/permission/`
+	rtSearchRight                = `/search/right/`
 	rtSyncNode                   = `/sync/node/`
 )
 

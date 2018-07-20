@@ -113,6 +113,8 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(rtRepositoryInstanceID, x.Verify(x.InstanceShow))
 	router.GET(rtRepositoryInstanceVersions, x.Verify(x.InstanceVersions))
 	router.GET(rtRepositoryTree, x.Verify(x.RepositoryConfigTree))
+	router.GET(rtRight, x.Verify(x.RightList))
+	router.GET(rtRightID, x.Verify(x.RightShow))
 	router.GET(rtSyncNode, x.Verify(x.NodeMgmtSync))
 	router.HEAD(`/authenticate/validate`, x.Verify(x.SupervisorValidate))
 	router.POST(`/hostdeployment/:monitoringID/:assetID`, x.CheckShutdown(x.HostDeploymentAssemble))
@@ -134,6 +136,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(rtSearchNode, x.Verify(x.NodeSearch))
 	router.POST(rtSearchPermission, x.Verify(x.PermissionSearch))
 	router.POST(rtSearchRepository, x.Verify(x.RepositoryConfigSearch))
+	router.POST(rtSearchRight, x.Verify(x.RightSearch))
 
 	if !x.conf.ReadOnly {
 		if !x.conf.Observer {
@@ -181,6 +184,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(rtPermissionID, x.Verify(x.PermissionRemove))
 			router.DELETE(rtRepositoryID, x.BasicAuth(x.RepositoryDestroy))
 			router.DELETE(rtRepositoryPropertyID, x.BasicAuth(x.RepositoryConfigPropertyDestroy))
+			router.DELETE(rtRightID, x.Verify(x.RightRevoke))
 			router.GET(rtRepositoryAudit, x.BasicAuth(x.RepositoryAudit))
 			router.PATCH(`/accounts/password/:kexID`, x.CheckShutdown(x.SupervisorPasswordChange))
 			router.PATCH(`/oncall/:oncall`, x.Verify(x.OncallUpdate))
@@ -230,6 +234,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.POST(rtPermission, x.Verify(x.PermissionAdd))
 			router.POST(rtRepository, x.BasicAuth(x.RepositoryMgmtCreate))
 			router.POST(rtRepositoryProperty, x.BasicAuth(x.RepositoryConfigPropertyCreate))
+			router.POST(rtRight, x.Verify(x.RightGrant))
 			router.PUT(`/accounts/activate/root/:kexID`, x.CheckShutdown(x.SupervisorActivateRoot))
 			router.PUT(`/accounts/activate/user/:kexID`, x.CheckShutdown(x.SupervisorActivateUser))
 			router.PUT(`/accounts/password/:kexID`, x.CheckShutdown(x.SupervisorPasswordReset))
