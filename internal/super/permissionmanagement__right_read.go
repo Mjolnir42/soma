@@ -145,6 +145,18 @@ func (s *Supervisor) rightListGlobal(q *msg.Request, mr *msg.Result) {
 	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
+func (s *Supervisor) rightListScoped(q *msg.Request, mr *msg.Result) {
+	// XXX BUG TODO
+}
+
+func (s *Supervisor) rightShowGlobal(q *msg.Request, mr *msg.Result) {
+	// XXX BUG TODO
+}
+
+func (s *Supervisor) rightShowScoped(q *msg.Request, mr *msg.Result) {
+	// XXX BUG TODO
+}
+
 func (s *Supervisor) rightSearchGlobal(q *msg.Request, mr *msg.Result) {
 	var (
 		err     error
