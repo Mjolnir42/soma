@@ -308,7 +308,6 @@ FROM   soma.authorizations_global;`
 )
 
 func init() {
-	m[LoadGlobalOrSystemUserGrants] = `LoadGlobalOrSystemUserGrants`
 	m[GrantGlobalAuthorization] = `GrantGlobalAuthorization`
 	m[GrantMonitoringAuthorization] = `GrantMonitoringAuthorization`
 	m[GrantRemoveSystem] = `GrantRemoveSystem`
@@ -318,6 +317,7 @@ func init() {
 	m[ListMonitoringAuthorization] = `ShowMonitoringAuthorization`
 	m[ListRepositoryAuthorization] = `ShowRepositoryAuthorization`
 	m[ListTeamAuthorization] = `ShowTeamAuthorization`
+	m[LoadGlobalOrSystemUserGrants] = `LoadGlobalOrSystemUserGrants`
 	m[RevokeGlobalAuthorization] = `RevokeGlobalAuthorization`
 	m[RevokeMonitoringAuthorization] = `RevokeMonitoringAuthorization`
 	m[RevokeRepositoryAuthorization] = `RevokeRepositoryAuthorization`
