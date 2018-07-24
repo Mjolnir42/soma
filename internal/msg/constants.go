@@ -17,6 +17,8 @@ const (
 // to grant the permission
 const (
 	CategoryGrantGlobal     = `global:grant`
+	CategoryGrantIdentity   = `identity:grant`
+	CategoryGrantSelf       = `self:grant`
 	CategoryGrantOperation  = `operation:grant`
 	CategoryGrantPermission = `permission:grant`
 	CategoryGrantRepository = `repository:grant`
@@ -55,6 +57,23 @@ const (
 	SectionView                  = `view`
 )
 
+// Sections in category Identity are special global sections for actions
+// related to identity management
+const (
+	CategoryIdentity = `identity`
+	SectionTeamMgmt  = `team-mgmt`
+	SectionUserMgmt  = `user-mgmt`
+)
+
+// Sections in category self are for actions with a per-user
+// scope
+const (
+	CategorySelf = `self`
+	SectionJob   = `job`
+	SectionTeam  = `team`
+	SectionUser  = `user`
+)
+
 // Sections in category operation are special global sections
 // for actions to run the SOMA system
 const (
@@ -72,14 +91,6 @@ const (
 	SectionPermission  = `permission`
 	SectionRight       = `right`
 	SectionSection     = `section`
-)
-
-// Sections in category Identity are special global sections for actions
-// related to identity management
-const (
-	CategoryIdentity = `identity`
-	SectionTeamMgmt  = `team-mgmt`
-	SectionUserMgmt  = `user-mgmt`
 )
 
 // Sections in category repository are for actions with
@@ -112,15 +123,6 @@ const (
 	SectionCapability  = `capability`
 	SectionDeployment  = `deployment`
 	SectionMonitoring  = `monitoringsystem`
-)
-
-// Sections in category self are for actions with a per-user
-// scope
-const (
-	CategorySelf = `self`
-	SectionJob   = `job`
-	SectionTeam  = `team`
-	SectionUser  = `user`
 )
 
 // Actions for the various permission sections
