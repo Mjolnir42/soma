@@ -241,7 +241,7 @@ func cmdBucketCreate(c *cli.Context) error {
 
 func cmdBucketDestroy(c *cli.Context) error {
 	var err error
-	var repositoryID, constrolID, bucketID string
+	var repositoryID, controlID, bucketID string
 
 	opts := map[string][]string{}
 	multipleAllowed := []string{}
