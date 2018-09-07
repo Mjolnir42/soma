@@ -138,6 +138,7 @@ const (
 	ActionDelete          = `delete`
 	ActionDestroy         = `destroy`
 	ActionFailed          = `failed`
+	ActionFilter          = `filter`
 	ActionGet             = `get`
 	ActionGrant           = `grant`
 	ActionInsertNullID    = `insert-null`
@@ -146,6 +147,7 @@ const (
 	ActionMemberAssign    = `member-assign`
 	ActionMemberList      = `member-list`
 	ActionMemberUnassign  = `member-unassign`
+	ActionPending         = `pending`
 	ActionPropertyCreate  = `property-create`
 	ActionPropertyDestroy = `property-destroy`
 	ActionPurge           = `purge`

@@ -81,6 +81,13 @@ const (
 	rtSearchRight                = `/search/right/`
 	rtSearchServiceProperty      = `/search/team/:teamID/property-mgmt/:propertyType/`
 	rtSyncNode                   = `/sync/node/`
+	rtDeployment                 = `/monitoringsystem/:monitoringID/deployment/`
+	rtDeploymentID               = `/monitoringsystem/:monitoringID/deployment/id/:deploymentID`
+	rtDeploymentIDAction         = `/monitoringsystem/:monitoringID/deployment/id/:deploymentID/:action`
+	rtDeploymentState            = `/monitoringsystem/:monitoringID/deployment/state/`
+	rtDeploymentStateID          = `/monitoringsystem/:monitoringID/deployment/state/:state`
+	rtAliasDeploymentID          = `/deployment/id/:deploymentID`
+	rtAliasDeploymentIDAction    = `/deployment/id/:deploymentID/:action`
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

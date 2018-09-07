@@ -63,11 +63,11 @@ func (w *DeploymentWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 // it processes
 func (w *DeploymentWrite) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
-		msg.ActionGet,
+		msg.ActionShow,
 		msg.ActionSuccess,
 		msg.ActionFailed,
 		msg.ActionList,
-		msg.ActionAll,
+		msg.ActionPending,
 	} {
 		hmap.Request(msg.SectionDeployment, action, w.handlerName)
 	}
@@ -121,25 +121,25 @@ func (w *DeploymentWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionGet:
-		w.get(q, &result)
+	case msg.ActionShow:
+		w.show(q, &result)
 	case msg.ActionSuccess:
 		w.success(q, &result)
 	case msg.ActionFailed:
 		w.failed(q, &result)
+	case msg.ActionPending:
+		w.pending(q, &result)
 	case msg.ActionList:
-		w.listPending(q, &result)
-	case msg.ActionAll:
-		w.listAll(q, &result)
+		w.list(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
 	q.Reply <- result
 }
 
-// get retrieves a single deployment, adds the correct current task to
+// show retrieves a single deployment, adds the correct current task to
 // the stored deployment and advances the deployment workflow as required
-func (w *DeploymentWrite) get(q *msg.Request, mr *msg.Result) {
+func (w *DeploymentWrite) show(q *msg.Request, mr *msg.Result) {
 	var (
 		instanceConfigID, status, nextStatus                      string
 		newCurrentStatus, details, newNextStatus, deprovisionTask string
@@ -388,9 +388,9 @@ func (w *DeploymentWrite) failed(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// listPending returns all deployment IDs for a monitoring system that have
+// pending returns all deployment IDs for a monitoring system that have
 // a pending update that has not yet been fetched
-func (w *DeploymentWrite) listPending(q *msg.Request, mr *msg.Result) {
+func (w *DeploymentWrite) pending(q *msg.Request, mr *msg.Result) {
 	var (
 		instanceID string
 		err        error
@@ -427,8 +427,8 @@ func (w *DeploymentWrite) listPending(q *msg.Request, mr *msg.Result) {
 	mr.OK()
 }
 
-// listAll returns all deployment IDs for a monitoring system
-func (w *DeploymentWrite) listAll(q *msg.Request, mr *msg.Result) {
+// list returns all deployment IDs for a monitoring system
+func (w *DeploymentWrite) list(q *msg.Request, mr *msg.Result) {
 	var (
 		instanceID string
 		err        error

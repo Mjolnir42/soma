@@ -234,13 +234,8 @@ func main() {
 
 	//XXX compilefix
 	router := httprouter.New()
-
 	if !SomaCfg.ReadOnly {
 		if !SomaCfg.Observer {
-			router.GET(`/deployments/id/:uuid`, Check(DeploymentDetailsInstance))
-			router.GET(`/deployments/monitoring/:uuid/:all`, Check(DeploymentDetailsMonitoring))
-			router.GET(`/deployments/monitoring/:uuid`, Check(DeploymentDetailsMonitoring))
-			router.PATCH(`/deployments/id/:uuid/:result`, Check(DeploymentDetailsUpdate))
 		}
 	}
 
