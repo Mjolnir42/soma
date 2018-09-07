@@ -436,7 +436,7 @@ func (w *DeploymentWrite) list(q *msg.Request, mr *msg.Result) {
 	)
 
 	if all, err = w.stmtAll.Query(
-		q.Deployment.ID,
+		q.Monitoring.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
