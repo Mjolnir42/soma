@@ -185,34 +185,4 @@ func NewResult() Result {
 	}
 }
 
-// Legacy interface
-func (r *Result) ErrorMark(err error, imp bool, found bool,
-	length int, jobid, jobtype string) bool {
-
-	if found && err != nil {
-		r.NotFoundErr(err)
-		return true
-	}
-
-	if r.Error(err) {
-		return true
-	}
-	if imp {
-		r.NotImplemented()
-		return true
-	}
-	if found || length == 0 {
-		r.NotFound()
-		return true
-	}
-	if jobid != "" {
-		r.JobID = jobid
-		r.JobType = jobtype
-		r.Accepted()
-		return true
-	}
-	r.OK()
-	return false
-}
-
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
