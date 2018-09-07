@@ -32,7 +32,7 @@ func (x *Rest) ProviderList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // ProviderShow function
@@ -52,7 +52,7 @@ func (x *Rest) ProviderShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // ProviderAdd function
@@ -78,7 +78,7 @@ func (x *Rest) ProviderAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // ProviderRemove function
@@ -98,7 +98,7 @@ func (x *Rest) ProviderRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

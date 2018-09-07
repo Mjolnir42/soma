@@ -19,9 +19,9 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-// sendMsgResult is the output function for all requests that did not
+// send is the output function for all requests that did not
 // fail input validation and got processes by the application.
-func sendMsgResult(w *http.ResponseWriter, r *msg.Result) {
+func send(w *http.ResponseWriter, r *msg.Result) {
 	var (
 		bjson  []byte
 		err    error

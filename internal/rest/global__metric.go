@@ -32,7 +32,7 @@ func (x *Rest) MetricList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // MetricShow function
@@ -52,7 +52,7 @@ func (x *Rest) MetricShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // MetricAdd function
@@ -78,7 +78,7 @@ func (x *Rest) MetricAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // MetricRemove function
@@ -98,7 +98,7 @@ func (x *Rest) MetricRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

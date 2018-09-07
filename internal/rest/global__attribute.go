@@ -32,7 +32,7 @@ func (x *Rest) AttributeList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // AttributeShow function
@@ -54,7 +54,7 @@ func (x *Rest) AttributeShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // AttributeAdd function
@@ -83,7 +83,7 @@ func (x *Rest) AttributeAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // AttributeRemove function
@@ -105,7 +105,7 @@ func (x *Rest) AttributeRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

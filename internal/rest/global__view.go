@@ -34,7 +34,7 @@ func (x *Rest) ViewList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // ViewShow function
@@ -56,7 +56,7 @@ func (x *Rest) ViewShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // ViewAdd function
@@ -88,7 +88,7 @@ func (x *Rest) ViewAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // ViewRemove function
@@ -110,7 +110,7 @@ func (x *Rest) ViewRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // ViewRename function
@@ -146,7 +146,7 @@ func (x *Rest) ViewRename(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

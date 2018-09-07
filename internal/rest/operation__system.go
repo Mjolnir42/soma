@@ -50,7 +50,7 @@ func (x *Rest) SystemOperation(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).PriorityIntake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // SupervisorTokenInvalidateGlobal is the rest endpoint for admins
@@ -73,7 +73,7 @@ func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Re
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // SupervisorTokenInvalidateAccount is the rest endpoint for admins
@@ -97,7 +97,7 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

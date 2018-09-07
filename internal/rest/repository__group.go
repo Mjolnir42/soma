@@ -35,7 +35,7 @@ func (x *Rest) GroupList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupSearch function
@@ -82,7 +82,7 @@ func (x *Rest) GroupSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Group = filtered
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupShow function
@@ -104,7 +104,7 @@ func (x *Rest) GroupShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupTree function
@@ -128,7 +128,7 @@ func (x *Rest) GroupTree(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupCreate function
@@ -162,7 +162,7 @@ func (x *Rest) GroupCreate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupDestroy function
@@ -184,7 +184,7 @@ func (x *Rest) GroupDestroy(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupMemberList function
@@ -206,7 +206,7 @@ func (x *Rest) GroupMemberList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupMemberAssign function
@@ -259,7 +259,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupMemberUnassign function
@@ -299,7 +299,7 @@ func (x *Rest) GroupMemberUnassign(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupPropertyCreate function
@@ -343,7 +343,7 @@ func (x *Rest) GroupPropertyCreate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // GroupPropertyDestroy function
@@ -390,7 +390,7 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

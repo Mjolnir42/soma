@@ -32,7 +32,7 @@ func (x *Rest) NodeList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // NodeSearch function
@@ -67,7 +67,7 @@ func (x *Rest) NodeSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Node = filtered
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // NodeShow function
@@ -87,7 +87,7 @@ func (x *Rest) NodeShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // NodeShowConfig function
@@ -107,7 +107,7 @@ func (x *Rest) NodeShowConfig(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // NodeTree function
@@ -130,7 +130,7 @@ func (x *Rest) NodeTree(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

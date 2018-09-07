@@ -61,7 +61,7 @@ func (x *Rest) PropertyMgmtList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // PropertyMgmtShow function
@@ -113,7 +113,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // PropertyMgmtSearch function
@@ -239,7 +239,7 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Property = filtered
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // PropertyMgmtAdd function
@@ -311,7 +311,7 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // PropertyMgmtRemove function
@@ -356,7 +356,7 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

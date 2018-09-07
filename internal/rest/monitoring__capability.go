@@ -32,7 +32,7 @@ func (x *Rest) CapabilityList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // CapabilitySearch function
@@ -82,7 +82,7 @@ func (x *Rest) CapabilitySearch(w http.ResponseWriter, r *http.Request,
 		result.Capability[i].Metric = ``
 		result.Capability[i].View = ``
 	}
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // CapabilityShow function
@@ -104,7 +104,7 @@ func (x *Rest) CapabilityShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // CapabilityAdd function
@@ -130,7 +130,7 @@ func (x *Rest) CapabilityAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // CapabilityRemove function
@@ -152,7 +152,7 @@ func (x *Rest) CapabilityRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	sendMsgResult(&w, &result)
+	send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
