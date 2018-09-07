@@ -235,38 +235,12 @@ func main() {
 	//XXX compilefix
 	router := httprouter.New()
 
-	router.GET(`/property/custom/:repository/:custom`, Check(BasicAuth(PropertyShow)))
-	router.GET(`/property/custom/:repository/`, Check(BasicAuth(PropertyList)))
-	router.GET(`/property/native/:native`, Check(BasicAuth(PropertyShow)))
-	router.GET(`/property/native/`, Check(BasicAuth(PropertyList)))
-	router.GET(`/property/service/global/:service`, Check(BasicAuth(PropertyShow)))
-	router.GET(`/property/service/global/`, Check(BasicAuth(PropertyList)))
-	router.GET(`/property/service/team/:team/:service`, Check(BasicAuth(PropertyShow)))
-	router.GET(`/property/service/team/:team/`, Check(BasicAuth(PropertyList)))
-	router.GET(`/property/system/:system`, Check(BasicAuth(PropertyShow)))
-	router.GET(`/property/system/`, Check(BasicAuth(PropertyList)))
-	router.POST(`/filter/property/custom/:repository/`, Check(BasicAuth(PropertyList)))
-	router.POST(`/filter/property/service/global/`, Check(BasicAuth(PropertyList)))
-	router.POST(`/filter/property/service/team/:team/`, Check(BasicAuth(PropertyList)))
-	router.POST(`/filter/property/system/`, Check(BasicAuth(PropertyList)))
-
 	if !SomaCfg.ReadOnly {
-
 		if !SomaCfg.Observer {
-			router.DELETE(`/property/custom/:repository/:custom`, Check(BasicAuth(PropertyRemove)))
-			router.DELETE(`/property/native/:native`, Check(BasicAuth(PropertyRemove)))
-			router.DELETE(`/property/service/global/:service`, Check(BasicAuth(PropertyRemove)))
-			router.DELETE(`/property/service/team/:team/:service`, Check(BasicAuth(PropertyRemove)))
-			router.DELETE(`/property/system/:system`, Check(BasicAuth(PropertyRemove)))
 			router.GET(`/deployments/id/:uuid`, Check(DeploymentDetailsInstance))
 			router.GET(`/deployments/monitoring/:uuid/:all`, Check(DeploymentDetailsMonitoring))
 			router.GET(`/deployments/monitoring/:uuid`, Check(DeploymentDetailsMonitoring))
 			router.PATCH(`/deployments/id/:uuid/:result`, Check(DeploymentDetailsUpdate))
-			router.POST(`/property/custom/:repository/`, Check(BasicAuth(PropertyAdd)))
-			router.POST(`/property/native/`, Check(BasicAuth(PropertyAdd)))
-			router.POST(`/property/service/global/`, Check(BasicAuth(PropertyAdd)))
-			router.POST(`/property/service/team/:team/`, Check(BasicAuth(PropertyAdd)))
-			router.POST(`/property/system/`, Check(BasicAuth(PropertyAdd)))
 		}
 	}
 

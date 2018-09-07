@@ -62,10 +62,11 @@ func (r *PropertyRead) Register(c *sql.DB, l ...*logrus.Logger) {
 // it processes
 func (r *PropertyRead) RegisterRequests(hmap *handler.Map) {
 	for _, section := range []string{
-		// XXX INCOMPLETE
-		msg.SectionPropertySystem,
-		msg.SectionPropertyNative,
 		msg.SectionPropertyCustom,
+		msg.SectionPropertyNative,
+		msg.SectionPropertyService,
+		msg.SectionPropertySystem,
+		msg.SectionPropertyTemplate,
 	} {
 		for _, action := range []string{
 			msg.ActionList,
@@ -131,6 +132,9 @@ func (r *PropertyRead) process(q *msg.Request) {
 		r.list(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
+	case msg.ActionSearch:
+		// XXX BUG handle correctly
+		r.list(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -140,15 +144,15 @@ func (r *PropertyRead) process(q *msg.Request) {
 // list returns all properties
 func (r *PropertyRead) list(q *msg.Request, mr *msg.Result) {
 	switch q.Property.Type {
-	case `custom`:
+	case msg.PropertyCustom:
 		r.listCustom(q, mr)
-	case `native`:
+	case msg.PropertyNative:
 		r.listNative(q, mr)
-	case `service`:
+	case msg.PropertyService:
 		r.listService(q, mr)
-	case `system`:
+	case msg.PropertySystem:
 		r.listSystem(q, mr)
-	case `template`:
+	case msg.PropertyTemplate:
 		r.listTemplate(q, mr)
 	default:
 		mr.NotImplemented(fmt.Errorf("Unknown property type: %s",
@@ -330,15 +334,15 @@ func (r *PropertyRead) listTemplate(q *msg.Request, mr *msg.Result) {
 // show returns details about a specific property
 func (r *PropertyRead) show(q *msg.Request, mr *msg.Result) {
 	switch q.Property.Type {
-	case `custom`:
+	case msg.PropertyCustom:
 		r.showCustom(q, mr)
-	case `native`:
+	case msg.PropertyNative:
 		r.showNative(q, mr)
-	case `service`:
+	case msg.PropertyService:
 		r.showService(q, mr)
-	case `system`:
+	case msg.PropertySystem:
 		r.showSystem(q, mr)
-	case `template`:
+	case msg.PropertyTemplate:
 		r.showTemplate(q, mr)
 	default:
 		mr.NotImplemented(fmt.Errorf("Unknown property type: %s",

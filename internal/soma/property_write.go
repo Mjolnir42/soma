@@ -73,8 +73,8 @@ func (w *PropertyWrite) RegisterRequests(hmap *handler.Map) {
 		msg.SectionPropertyCustom,
 	} {
 		for _, action := range []string{
-			msg.ActionCreate,
-			msg.ActionDelete,
+			msg.ActionAdd,
+			msg.ActionRemove,
 		} {
 			hmap.Request(section, action, w.handlerName)
 		}
@@ -134,9 +134,9 @@ func (w *PropertyWrite) process(q *msg.Request) {
 	msgRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionCreate:
+	case msg.ActionAdd:
 		w.add(q, &result)
-	case msg.ActionDelete:
+	case msg.ActionRemove:
 		w.remove(q, &result)
 	default:
 		result.UnknownRequest(q)

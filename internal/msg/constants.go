@@ -29,32 +29,33 @@ const (
 // Sections in category global are for actions with a global
 // scope
 const (
-	CategoryGlobal               = `global`
-	SectionAttribute             = `attribute`
-	SectionDatacenter            = `datacenter`
-	SectionEntity                = `entity`
-	SectionEnvironment           = `environment`
-	SectionHostDeployment        = `hostdeployment`
-	SectionInstanceMgmt          = `instance-mgmt`
-	SectionJobMgmt               = `job-mgmt`
-	SectionLevel                 = `level`
-	SectionMetric                = `metric`
-	SectionMode                  = `mode`
-	SectionMonitoringMgmt        = `monitoringsystem-mgmt`
-	SectionNodeMgmt              = `node-mgmt`
-	SectionOncall                = `oncall`
-	SectionPredicate             = `predicate`
-	SectionPropertyNative        = `property-native`
-	SectionPropertyServiceGlobal = `property-service-global`
-	SectionPropertySystem        = `property-system`
-	SectionProvider              = `provider`
-	SectionRepositoryMgmt        = `repository-mgmt`
-	SectionServer                = `server`
-	SectionState                 = `state`
-	SectionStatus                = `status`
-	SectionUnit                  = `unit`
-	SectionValidity              = `validity`
-	SectionView                  = `view`
+	CategoryGlobal          = `global`
+	SectionAttribute        = `attribute`
+	SectionDatacenter       = `datacenter`
+	SectionEntity           = `entity`
+	SectionEnvironment      = `environment`
+	SectionHostDeployment   = `hostdeployment`
+	SectionInstanceMgmt     = `instance-mgmt`
+	SectionJobMgmt          = `job-mgmt`
+	SectionLevel            = `level`
+	SectionMetric           = `metric`
+	SectionMode             = `mode`
+	SectionMonitoringMgmt   = `monitoringsystem-mgmt`
+	SectionNodeMgmt         = `node-mgmt`
+	SectionOncall           = `oncall`
+	SectionPredicate        = `predicate`
+	SectionPropertyMgmt     = `property-mgmt`
+	SectionPropertyNative   = `property-native`
+	SectionPropertySystem   = `property-system`
+	SectionPropertyTemplate = `property-template`
+	SectionProvider         = `provider`
+	SectionRepositoryMgmt   = `repository-mgmt`
+	SectionServer           = `server`
+	SectionState            = `state`
+	SectionStatus           = `status`
+	SectionUnit             = `unit`
+	SectionValidity         = `validity`
+	SectionView             = `view`
 )
 
 // Sections in category Identity are special global sections for actions
@@ -110,10 +111,10 @@ const (
 // Sections in category team are for actions with a per-team
 // scope
 const (
-	CategoryTeam               = `team`
-	SectionNode                = `node`
-	SectionPropertyServiceTeam = `property-service-team`
-	SectionRepository          = `repository`
+	CategoryTeam           = `team`
+	SectionNode            = `node`
+	SectionPropertyService = `property-service`
+	SectionRepository      = `repository`
 )
 
 // Sections in category monitoring are for actions with a
@@ -216,6 +217,15 @@ const (
 	SubjectUser  = `user`
 	SubjectTool  = `tool`
 	SubjectTeam  = `team`
+)
+
+// Property types
+const (
+	PropertyCustom   = `custom`
+	PropertyNative   = `native`
+	PropertyService  = `service`
+	PropertySystem   = `system`
+	PropertyTemplate = `template`
 )
 
 const (

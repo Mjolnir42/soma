@@ -18,6 +18,8 @@ const (
 	rtRepositoryMemberID         = `/repository/:repositoryID/member/:memberType/:memberID`
 	rtRepositoryProperty         = `/repository/:repositoryID/property/`
 	rtRepositoryPropertyID       = `/repository/:repositoryID/property/:propertyType/:sourceID`
+	rtRepositoryPropertyMgmt     = `/repository/:repositoryID/property-mgmt/:propertyType/`
+	rtRepositoryPropertyMgmtID   = `/repository/:repositoryID/property-mgmt/:propertyType/:propertyID`
 	rtRepositoryTree             = `/repository/:repositoryID/tree`
 	rtGlobalBucket               = `/bucket/`
 	rtBucket                     = `/repository/:repositoryID/bucket/`
@@ -64,13 +66,20 @@ const (
 	rtPermissionID               = `/category/:category/permission/:permissionID`
 	rtRight                      = `/category/:category/permission/:permissionID/grant/`
 	rtRightID                    = `/category/:category/permission/:permissionID/grant/:grantID`
+	rtPropertyMgmt               = `/property-mgmt/:propertyType/`
+	rtPropertyMgmtID             = `/property-mgmt/:propertyType/:propertyID`
+	rtTeamPropertyMgmt           = `/team/:teamID/property-mgmt/:propertyType/`
+	rtTeamPropertyMgmtID         = `/team/:teamID/property-mgmt/:propertyType/:propertyID`
 	rtSearchRepository           = `/search/repository/`
 	rtSearchBucket               = `/search/bucket/`
 	rtSearchGroup                = `/search/repository/:repositoryID/bucket/:bucketID/group/`
 	rtSearchCluster              = `/search/repository/:repositoryID/bucket/:bucketID/cluster/`
+	rtSearchCustomProperty       = `/search/repository/:repositoryID/property-mgmt/:propertyType/`
 	rtSearchNode                 = `/search/node/`
 	rtSearchPermission           = `/search/permission/`
+	rtSearchGLobalProperty       = `/search/property-mgmt/:propertyType/`
 	rtSearchRight                = `/search/right/`
+	rtSearchServiceProperty      = `/search/team/:teamID/property-mgmt/:propertyType/`
 	rtSyncNode                   = `/sync/node/`
 )
 
