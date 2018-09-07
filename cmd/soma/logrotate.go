@@ -13,10 +13,12 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
+	uuid "github.com/satori/go.uuid"
 )
 
-func logrotate(sigChan chan os.Signal) {
+func logrotate(sigChan chan os.Signal, handlerMap *handler.Map) {
 	for {
 		select {
 		case <-sigChan:
@@ -31,15 +33,16 @@ func logrotate(sigChan chan os.Signal) {
 					log.Printf("Error rotating logfile %s: %s\n", name, err)
 					log.Println(`Shutting down system`)
 
-					returnChannel := make(chan msg.Result)
-					handler := handlerMap[`grimReaper`].(*grimReaper)
-					handler.system <- msg.Request{
-						Section:    `runtime`,
-						Action:     `shutdown`,
-						Reply:      returnChannel,
+					returnChannel := make(chan msg.Result, 1)
+					request := msg.Request{
+						ID:         uuid.Must(uuid.FromString(`e0000000-e000-4000-e000-e00000000000`)),
 						RemoteAddr: `::1`,
 						AuthUser:   `root`,
+						Reply:      returnChannel,
+						Section:    msg.SectionSystem,
+						Action:     msg.ActionShutdown,
 					}
+					handlerMap.MustLookup(&request).PriorityIntake() <- request
 					<-returnChannel
 					break fileloop
 				}

@@ -144,10 +144,12 @@ func main() {
 	auditLog.Out = lfhAudit
 	logFileMap[`audit`] = lfhAudit
 
+	hm = handler.NewMap()
+
 	// signal handler will reopen all logfiles on USR2
 	sigChanLogRotate := make(chan os.Signal, 1)
 	signal.Notify(sigChanLogRotate, syscall.SIGUSR2)
-	go logrotate(sigChanLogRotate)
+	go logrotate(sigChanLogRotate, hm)
 
 	// print selected runtime mode
 	if SomaCfg.ReadOnly {
@@ -223,7 +225,6 @@ func main() {
 	connectToDatabase(appLog, errLog)
 	go pingDatabase(errLog)
 
-	hm = handler.NewMap()
 	lm = soma.LogHandleMap{}
 
 	app = soma.New(hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog, auditLog)
