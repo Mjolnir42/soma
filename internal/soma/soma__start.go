@@ -84,9 +84,9 @@ func (s *Soma) Start() {
 			s.handlerMap.Add(newTeamWrite(s.conf.QueueLen, s))
 			s.handlerMap.Add(newUnitWrite(s.conf.QueueLen))
 			s.handlerMap.Add(newUserWrite(s.conf.QueueLen, s))
-			s.handlerMap.Add(`validity_w`, newValidityWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`view_w`, newViewWrite(s.conf.QueueLen))
-			s.handlerMap.Add(`workflow_w`, newWorkflowWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newValidityWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newViewWrite(s.conf.QueueLen))
+			s.handlerMap.Add(newWorkflowWrite(s.conf.QueueLen))
 		}
 	}
 

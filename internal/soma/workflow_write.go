@@ -21,6 +21,7 @@ import (
 type WorkflowWrite struct {
 	Input                      chan msg.Request
 	Shutdown                   chan struct{}
+	handlerName                string
 	conn                       *sql.DB
 	stmtRetryDeployment        *sql.Stmt
 	stmtTriggerAvailableUpdate *sql.Stmt
@@ -32,11 +33,12 @@ type WorkflowWrite struct {
 
 // newWorkflowWrite return a new WorkflowWrite handler with
 // input buffer of length
-func newWorkflowWrite(length int) (w *WorkflowWrite) {
-	w = &WorkflowWrite{}
+func newWorkflowWrite(length int) (string, *WorkflowWrite) {
+	w := &WorkflowWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -54,7 +56,7 @@ func (w *WorkflowWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionRetry,
 		msg.ActionSet,
 	} {
-		hmap.Request(msg.SectionWorkflow, action, `workflow_w`)
+		hmap.Request(msg.SectionWorkflow, action, w.handlerName)
 	}
 }
 

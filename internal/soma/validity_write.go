@@ -19,23 +19,25 @@ import (
 
 // ValidityWrite handles write requests for validity definitions
 type ValidityWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newValidityWrite returns a new ValidityWrite handler with input
 // buffer of length
-func newValidityWrite(length int) (w *ValidityWrite) {
-	w = &ValidityWrite{}
+func newValidityWrite(length int) (string, *ValidityWrite) {
+	w := &ValidityWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -53,7 +55,7 @@ func (w *ValidityWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionAdd,
 		msg.ActionRemove,
 	} {
-		hmap.Request(msg.SectionValidity, action, `validity_w`)
+		hmap.Request(msg.SectionValidity, action, w.handlerName)
 	}
 }
 

@@ -19,24 +19,26 @@ import (
 
 // ViewWrite handles write requests for views
 type ViewWrite struct {
-	Input      chan msg.Request
-	Shutdown   chan struct{}
-	conn       *sql.DB
-	stmtAdd    *sql.Stmt
-	stmtRemove *sql.Stmt
-	stmtRename *sql.Stmt
-	appLog     *logrus.Logger
-	reqLog     *logrus.Logger
-	errLog     *logrus.Logger
+	Input       chan msg.Request
+	Shutdown    chan struct{}
+	handlerName string
+	conn        *sql.DB
+	stmtAdd     *sql.Stmt
+	stmtRemove  *sql.Stmt
+	stmtRename  *sql.Stmt
+	appLog      *logrus.Logger
+	reqLog      *logrus.Logger
+	errLog      *logrus.Logger
 }
 
 // newViewWrite return a new ViewWrite handler with input buffer of
 // length
-func newViewWrite(length int) (w *ViewWrite) {
-	w = &ViewWrite{}
+func newViewWrite(length int) (string, *ViewWrite) {
+	w := &ViewWrite{}
+	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
-	return
+	return w.handlerName, w
 }
 
 // Register initializes resources provided by the Soma app
@@ -55,7 +57,7 @@ func (w *ViewWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionRemove,
 		msg.ActionRename,
 	} {
-		hmap.Request(msg.SectionView, action, `view_w`)
+		hmap.Request(msg.SectionView, action, w.handlerName)
 	}
 }
 
