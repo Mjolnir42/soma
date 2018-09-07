@@ -93,39 +93,6 @@ func connectToDatabase(appLog, errLog *log.Logger) {
 	}
 }
 
-func newDatabaseConnection() (*sql.DB, error) {
-	driver := "postgres"
-
-	connect := fmt.Sprintf("dbname='%s' user='%s' password='%s' host='%s' port='%s' sslmode='%s' connect_timeout='%s'",
-		SomaCfg.Database.Name,
-		SomaCfg.Database.User,
-		SomaCfg.Database.Pass,
-		SomaCfg.Database.Host,
-		SomaCfg.Database.Port,
-		SomaCfg.Database.TLSMode,
-		SomaCfg.Database.Timeout,
-	)
-
-	dbcon, err := sql.Open(driver, connect)
-	if err != nil {
-		return nil, err
-	}
-	if err = conn.Ping(); err != nil {
-		return nil, err
-	}
-	if _, err = conn.Exec(stmt.DatabaseTimezone); err != nil {
-		return nil, err
-	}
-	if _, err = conn.Exec(stmt.DatabaseIsolationLevel); err != nil {
-		log.Fatal(err)
-	}
-	dbcon.SetMaxIdleConns(1)
-	dbcon.SetMaxOpenConns(5)
-	dbcon.SetConnMaxLifetime(12 * time.Hour)
-	log.Print("Connected new secondary pool to database")
-	return dbcon, nil
-}
-
 func pingDatabase(errLog *log.Logger) {
 	ticker := time.NewTicker(time.Second).C
 

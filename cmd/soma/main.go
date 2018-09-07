@@ -26,32 +26,14 @@ import (
 var (
 	// main database connection pool
 	conn *sql.DB
-	// lookup table for go routine input channels
-	handlerMap = make(map[string]interface{})
 	// config file runtime configuration
 	SomaCfg config.Config
-	// Orderly shutdown of the system has been called. GrimReaper is active
-	ShutdownInProgress = false
 	// lookup table of logfile handles for logrotate reopen
 	logFileMap = make(map[string]*reopen.FileWriter)
 	// Global metrics registry
 	Metrics = make(map[string]metrics.Registry)
 	// version string set at compile time
 	somaVersion string
-)
-
-const (
-	// Format string for millisecond precision RFC3339
-	rfc3339Milli string = "2006-01-02T15:04:05.000Z07:00"
-)
-
-// Logging format strings
-const (
-	LogStrReq = `Subsystem=%s, Request=%s, User=%s, Addr=%s`
-	LogStrSRq = `Section=%s, Action=%s, User=%s, Addr=%s`
-	LogStrArg = `Subsystem=%s, Request=%s, User=%s, Addr=%s, Arg=%s`
-	LogStrOK  = `Section=%s, Action=%s, InternalCode=%d, ExternalCode=%d`
-	LogStrErr = `Section=%s, Action=%s, InternalCode=%d, Error=%s`
 )
 
 func init() {
