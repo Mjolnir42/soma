@@ -14,7 +14,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/asaskevich/govalidator"
 	"github.com/client9/reopen"
-	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/rest"
@@ -231,13 +230,6 @@ func main() {
 	app.Start()
 
 	rst = rest.New(super.IsAuthorized, hm, &SomaCfg)
-
-	//XXX compilefix
-	router := httprouter.New()
-	if !SomaCfg.ReadOnly {
-		if !SomaCfg.Observer {
-		}
-	}
 
 	go rst.Run()
 

@@ -43,68 +43,6 @@ func DecodeJSONBody(r *http.Request, s interface{}) error {
 	return err
 }
 
-func ResultLength(r *somaResult, t ErrorMarker) int {
-	switch t.(type) {
-	case *proto.Result:
-		switch {
-		case r.Datacenters != nil:
-			return len(r.Datacenters)
-		case r.Levels != nil:
-			return len(r.Levels)
-		case r.Predicates != nil:
-			return len(r.Predicates)
-		case r.Status != nil:
-			return len(r.Status)
-		case r.Oncall != nil:
-			return len(r.Oncall)
-		case r.Teams != nil:
-			return len(r.Teams)
-		case r.Nodes != nil:
-			return len(r.Nodes)
-		case r.Views != nil:
-			return len(r.Views)
-		case r.Servers != nil:
-			return len(r.Servers)
-		case r.Units != nil:
-			return len(r.Units)
-		case r.Providers != nil:
-			return len(r.Providers)
-		case r.Metrics != nil:
-			return len(r.Metrics)
-		case r.Modes != nil:
-			return len(r.Modes)
-		case r.Users != nil:
-			return len(r.Users)
-		case r.Capabilities != nil:
-			return len(r.Capabilities)
-		case r.Properties != nil:
-			return len(r.Properties)
-		case r.Repositories != nil:
-			return len(r.Repositories)
-		case r.Buckets != nil:
-			return len(r.Buckets)
-		case r.Groups != nil:
-			return len(r.Groups)
-		case r.Clusters != nil:
-			return len(r.Clusters)
-		case r.CheckConfigs != nil:
-			return len(r.CheckConfigs)
-		case r.Validity != nil:
-			return len(r.Validity)
-		case r.HostDeployments != nil:
-			if len(r.Deployments) > len(r.HostDeployments) {
-				return len(r.Deployments)
-			}
-			return len(r.HostDeployments)
-		case r.Deployments != nil:
-			return len(r.Deployments)
-		}
-	default:
-		return 0
-	}
-	return 0
-}
-
 func DispatchBadRequest(w *http.ResponseWriter, err error) {
 	if err != nil {
 		http.Error(*w, err.Error(), http.StatusBadRequest)
