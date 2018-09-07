@@ -61,6 +61,9 @@ func (f *ForestCustodian) Register(c *sql.DB, l ...*logrus.Logger) {
 // it processes
 func (f *ForestCustodian) RegisterRequests(hmap *handler.Map) {
 	hmap.Request(msg.SectionRepositoryMgmt, msg.ActionCreate, `forest_custodian`)
+	hmap.Request(msg.SectionSystem, msg.ActionRepoRebuild, `forest_custodian`)
+	hmap.Request(msg.SectionSystem, msg.ActionRepoRestart, `forest_custodian`)
+	hmap.Request(msg.SectionSystem, msg.ActionRepoStop, `forest_custodian`)
 }
 
 // Intake exposes the Input channel as part of the handler interface
