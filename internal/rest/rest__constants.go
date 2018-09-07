@@ -13,7 +13,7 @@ const (
 	rtRepositoryAudit            = `/repository/:repositoryID/audit`
 	rtRepositoryInstance         = `/repository/:repositoryID/instance/`
 	rtRepositoryInstanceID       = `/repository/:repositoryID/instance/:instanceID`
-	rtRepositoryInstanceVersions = `/repository/:repositoryID/:instanceID/versions`
+	rtRepositoryInstanceVersions = `/repository/:repositoryID/instance/:instanceID/versions`
 	rtRepositoryMember           = `/repository/:repositoryID/member/`
 	rtRepositoryMemberID         = `/repository/:repositoryID/member/:memberType/:memberID`
 	rtRepositoryProperty         = `/repository/:repositoryID/property/`
