@@ -61,7 +61,7 @@ func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Re
 
 	request := newRequest(r, params)
 	request.Section = msg.SectionSystem
-	request.Action = msg.ActionRevokeTokens
+	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
 		Task: msg.TaskInvalidateGlobal,
 	}
@@ -84,7 +84,7 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 
 	request := newRequest(r, params)
 	request.Section = msg.SectionSystem
-	request.Action = msg.ActionRevokeTokens
+	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
 		Task:            msg.TaskInvalidateAccount,
 		RevokeTokensFor: params.ByName(`account`),

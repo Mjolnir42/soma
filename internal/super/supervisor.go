@@ -180,7 +180,6 @@ func (s *Supervisor) RegisterRequests(hmap *handler.Map) {
 	hmap.Request(msg.SectionAction, msg.ActionAdd, `supervisor`)
 	hmap.Request(msg.SectionAction, msg.ActionRemove, `supervisor`)
 	hmap.Request(msg.SectionSystem, msg.ActionToken, `supervisor`)
-	hmap.Request(msg.SectionSystem, msg.ActionRevokeTokens, `supervisor`)
 }
 
 // RegisterAuditLog initializes the audit log provided by the Soma app

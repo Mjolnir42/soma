@@ -87,7 +87,7 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 
 	request := newRequest(r, params)
 	request.Section = msg.SectionSupervisor
-	request.Action = msg.ActionRevokeTokens
+	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
 		Task:            msg.TaskInvalidateAccount,
 		RevokeTokensFor: params.ByName(`AuthenticatedUser`),
