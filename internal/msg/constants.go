@@ -150,6 +150,7 @@ const (
 	ActionPending         = `pending`
 	ActionPropertyCreate  = `property-create`
 	ActionPropertyDestroy = `property-destroy`
+	ActionPropertyUpdate  = `property-update`
 	ActionPurge           = `purge`
 	ActionRemove          = `remove`
 	ActionRename          = `rename`
