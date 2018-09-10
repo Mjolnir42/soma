@@ -17,27 +17,27 @@ import (
 
 func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 	switch q.Section {
-	case `check`:
+	case msg.SectionCheckConfig:
 		if nf, err := g.validateCheckObjectInBucket(q); err != nil {
 			return nf, err
 		}
-	case `node`:
+	case msg.SectionNodeConfig:
 		if nf, err := g.validateNodeConfig(q); err != nil {
 			return nf, err
 		}
 		fallthrough
-	case `cluster`, `group`:
+	case msg.SectionCluster, msg.SectionGroup:
 		if nf, err := g.validateCorrectBucket(q); err != nil {
 			return nf, err
 		}
-	case `bucket`:
+	case msg.SectionBucket:
 		if nf, err := g.validateBucketInRepository(
 			q.Bucket.RepositoryID,
 			q.Bucket.ID,
 		); err != nil {
 			return nf, err
 		}
-	case `repository`:
+	case msg.SectionRepositoryConfig:
 		// since repository ids are the routing information,
 		// it is unnecessary to check that the object is where the
 		// routing would point to
@@ -46,72 +46,52 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 	}
 
 	switch q.Action {
-	case
-		`add_node_to_cluster`,
-		`add_node_to_group`,
-		`add_cluster_to_group`,
-		`add_group_to_group`:
+	case msg.ActionMemberAssign:
 		return g.validateObjectMatch(q)
-	case
-		`add_check_to_bucket`,
-		`add_check_to_cluster`,
-		`add_check_to_group`,
-		`add_check_to_node`,
-		`add_check_to_repository`:
-		return g.validateCheckThresholds(q)
-	case
-		`create_bucket`:
-		return g.validateBucketName(q)
-	case
-		`add_custom_property_to_bucket`,
-		`add_custom_property_to_cluster`,
-		`add_custom_property_to_group`,
-		`add_custom_property_to_node`,
-		`add_custom_property_to_repository`,
-		`add_oncall_property_to_bucket`,
-		`add_oncall_property_to_cluster`,
-		`add_oncall_property_to_group`,
-		`add_oncall_property_to_node`,
-		`add_oncall_property_to_repository`,
-		`add_service_property_to_bucket`,
-		`add_service_property_to_cluster`,
-		`add_service_property_to_group`,
-		`add_service_property_to_node`,
-		`add_service_property_to_repository`,
-		`add_system_property_to_bucket`,
-		`add_system_property_to_cluster`,
-		`add_system_property_to_group`,
-		`add_system_property_to_node`,
-		`add_system_property_to_repository`,
-		`assign_node`,
-		`create_cluster`,
-		`create_group`,
-		`delete_custom_property_from_bucket`,
-		`delete_custom_property_from_cluster`,
-		`delete_custom_property_from_group`,
-		`delete_custom_property_from_node`,
-		`delete_custom_property_from_repository`,
-		`delete_oncall_property_from_bucket`,
-		`delete_oncall_property_from_cluster`,
-		`delete_oncall_property_from_group`,
-		`delete_oncall_property_from_node`,
-		`delete_oncall_property_from_repository`,
-		`delete_service_property_from_bucket`,
-		`delete_service_property_from_cluster`,
-		`delete_service_property_from_group`,
-		`delete_service_property_from_node`,
-		`delete_service_property_from_repository`,
-		`delete_system_property_from_bucket`,
-		`delete_system_property_from_cluster`,
-		`delete_system_property_from_group`,
-		`delete_system_property_from_node`,
-		`delete_system_property_from_repository`,
-		`remove_check`:
-		// actions are accepted, but require no further validation
-		return false, nil
-	default:
-		return false, fmt.Errorf("Unimplemented GuidePost/%s", q.Action)
 	}
+
+	switch q.Section {
+	case msg.SectionCheckConfig:
+		switch q.Action {
+		case msg.ActionCreate:
+			return g.validateCheckThresholds(q)
+		}
+	case msg.SectionBucket:
+		switch q.Action {
+		case msg.ActionCreate:
+			return g.validateBucketName(q)
+		}
+	}
+
+	// listed actions are accepted, but require no further validation
+	switch q.Action {
+	case msg.ActionPropertyCreate, msg.ActionPropertyDestroy:
+		switch q.Section {
+		case
+			msg.SectionRepositoryConfig,
+			msg.SectionBucket,
+			msg.SectionGroup,
+			msg.SectionCluster,
+			msg.SectionNodeConfig:
+			return false, nil
+		}
+	case msg.ActionAssign:
+		switch q.Section {
+		case msg.SectionNodeConfig:
+			return false, nil
+		}
+	case msg.ActionCreate:
+		switch q.Section {
+		case msg.SectionGroup, msg.SectionCluster:
+			return false, nil
+		}
+	case msg.ActionDestroy:
+		switch q.Section {
+		case msg.SectionCheckConfig:
+			return false, nil
+		}
+	}
+	return false, fmt.Errorf("Unimplemented guidepost/%s::%s", q.Section, q.Action)
 }
 
 func (g *GuidePost) validateObjectMatch(q *msg.Request) (bool, error) {
@@ -121,21 +101,39 @@ func (g *GuidePost) validateObjectMatch(q *msg.Request) (bool, error) {
 	)
 
 	switch q.Action {
-	case `add_node_to_cluster`:
-		nodeID = (*q.Cluster.Members)[0].ID
-		clusterID = q.Cluster.ID
-	case `add_node_to_group`:
-		nodeID = (*q.Group.MemberNodes)[0].ID
-		groupID = q.Group.ID
-	case `add_cluster_to_group`:
-		clusterID = (*q.Group.MemberClusters)[0].ID
-		groupID = q.Group.ID
-	case `add_group_to_group`:
-		childGroupID = (*q.Group.MemberGroups)[0].ID
-		groupID = q.Group.ID
+	case msg.ActionMemberAssign:
+		switch q.Section {
+		case msg.SectionCluster:
+			switch q.TargetEntity {
+			case msg.EntityNode:
+				nodeID = (*q.Cluster.Members)[0].ID
+				clusterID = q.Cluster.ID
+			default:
+				return false, fmt.Errorf("Incorrect validation attempted for %s::%s(%s)",
+					q.Section, q.Action, q.TargetEntity)
+			}
+		case msg.SectionGroup:
+			switch q.TargetEntity {
+			case msg.EntityNode:
+				nodeID = (*q.Group.MemberNodes)[0].ID
+				groupID = q.Group.ID
+			case msg.EntityCluster:
+				clusterID = (*q.Group.MemberClusters)[0].ID
+				groupID = q.Group.ID
+			case msg.EntityGroup:
+				childGroupID = (*q.Group.MemberGroups)[0].ID
+				groupID = q.Group.ID
+			default:
+				return false, fmt.Errorf("Incorrect validation attempted for %s::%s(%s)",
+					q.Section, q.Action, q.TargetEntity)
+			}
+		default:
+			return false, fmt.Errorf("Incorrect validation attempted for %s::%s(%s)",
+				q.Section, q.Action, q.TargetEntity)
+		}
 	default:
-		return false, fmt.Errorf("Incorrect validation attempted for %s",
-			q.Action)
+		return false, fmt.Errorf("Incorrect validation attempted for %s::%s(%s)",
+			q.Section, q.Action, q.TargetEntity)
 	}
 
 	if nodeID != `` {
@@ -179,34 +177,37 @@ func (g *GuidePost) validateObjectMatch(q *msg.Request) (bool, error) {
 		}
 	}
 
-	switch q.Action {
-	case `add_node_to_cluster`:
+	if q.Section == msg.SectionCluster && q.Action == msg.ActionMemberAssign && q.TargetEntity == msg.EntityNode {
 		if valNodeBId != valClusterBId {
 			return false, fmt.Errorf(
 				"Node and Cluster are in different buckets (%s/%s)",
 				valNodeBId, valClusterBId,
 			)
 		}
-	case `add_node_to_group`:
-		if valNodeBId != valGroupBId {
-			return false, fmt.Errorf(
-				"Node and Group are in different buckets (%s/%s)",
-				valNodeBId, valGroupBId,
-			)
-		}
-	case `add_cluster_to_group`:
-		if valClusterBId != valGroupBId {
-			return false, fmt.Errorf(
-				"Cluster and Group are in different buckets (%s/%s)",
-				valClusterBId, valGroupBId,
-			)
-		}
-	case `add_group_to_group`:
-		if valChGroupBId != valGroupBId {
-			return false, fmt.Errorf(
-				"Groups are in different buckets (%s/%s)",
-				valGroupBId, valChGroupBId,
-			)
+	}
+	if q.Section == msg.SectionGroup && q.Action == msg.ActionMemberAssign {
+		switch q.TargetEntity {
+		case msg.EntityNode:
+			if valNodeBId != valGroupBId {
+				return false, fmt.Errorf(
+					"Node and Group are in different buckets (%s/%s)",
+					valNodeBId, valGroupBId,
+				)
+			}
+		case msg.EntityCluster:
+			if valClusterBId != valGroupBId {
+				return false, fmt.Errorf(
+					"Cluster and Group are in different buckets (%s/%s)",
+					valClusterBId, valGroupBId,
+				)
+			}
+		case msg.EntityGroup:
+			if valChGroupBId != valGroupBId {
+				return false, fmt.Errorf(
+					"Groups are in different buckets (%s/%s)",
+					valGroupBId, valChGroupBId,
+				)
+			}
 		}
 	}
 	return false, nil
@@ -214,28 +215,40 @@ func (g *GuidePost) validateObjectMatch(q *msg.Request) (bool, error) {
 
 // Verify that an object is assigned to the specified bucket.
 func (g *GuidePost) validateCorrectBucket(q *msg.Request) (bool, error) {
-	switch q.Action {
-	case `assign_node`:
-		return g.validateNodeUnassigned(q)
-	case `create_cluster`, `create_group`:
-		return false, nil
+	switch q.Section {
+	case msg.SectionCluster:
+		switch q.Action {
+		case msg.ActionCreate:
+			return false, nil
+		}
+	case msg.SectionGroup:
+		switch q.Action {
+		case msg.ActionCreate:
+			return false, nil
+		}
+	case msg.SectionNodeConfig:
+		switch q.Action {
+		case msg.ActionAssign:
+			return g.validateNodeUnassigned(q)
+		}
 	}
+
 	var bid string
 	var err error
 	switch q.Section {
-	case `node`:
+	case msg.SectionNodeConfig:
 		err = g.stmtBucketForNodeID.QueryRow(
 			q.Node.ID,
 		).Scan(
 			&bid,
 		)
-	case `cluster`:
+	case msg.SectionCluster:
 		err = g.stmtBucketForClusterID.QueryRow(
 			q.Cluster.ID,
 		).Scan(
 			&bid,
 		)
-	case `group`:
+	case msg.SectionGroup:
 		err = g.stmtBucketForGroupID.QueryRow(
 			q.Group.ID,
 		).Scan(
@@ -250,18 +263,19 @@ func (g *GuidePost) validateCorrectBucket(q *msg.Request) (bool, error) {
 		}
 		return false, err
 	}
+
 	switch q.Section {
-	case `node`:
+	case msg.SectionNodeConfig:
 		if bid != q.Node.Config.BucketID {
 			return false, fmt.Errorf("Node assigned to different bucket %s",
 				bid)
 		}
-	case `cluster`:
+	case msg.SectionCluster:
 		if bid != q.Cluster.BucketID {
 			return false, fmt.Errorf("Cluster in different bucket %s",
 				bid)
 		}
-	case `group`:
+	case msg.SectionGroup:
 		if bid != q.Group.BucketID {
 			return false, fmt.Errorf("Group in different bucket %s",
 				bid)
@@ -303,7 +317,7 @@ func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (bool, error) {
 	var err error
 	var bid string
 	switch q.CheckConfig.ObjectType {
-	case `repository`:
+	case msg.EntityRepository:
 		if q.CheckConfig.RepositoryID !=
 			q.CheckConfig.ObjectID {
 			return false, fmt.Errorf("Conflicting repository ids: %s, %s",
@@ -312,17 +326,17 @@ func (g *GuidePost) validateCheckObjectInBucket(q *msg.Request) (bool, error) {
 			)
 		}
 		return false, nil
-	case `bucket`:
+	case msg.EntityBucket:
 		bid = q.CheckConfig.ObjectID
-	case `group`:
+	case msg.EntityGroup:
 		err = g.stmtBucketForGroupID.QueryRow(
 			q.CheckConfig.ObjectID,
 		).Scan(&bid)
-	case `cluster`:
+	case msg.EntityCluster:
 		err = g.stmtBucketForClusterID.QueryRow(
 			q.CheckConfig.ObjectID,
 		).Scan(&bid)
-	case `node`:
+	case msg.EntityNode:
 		err = g.stmtBucketForNodeID.QueryRow(
 			q.CheckConfig.ObjectID,
 		).Scan(&bid)

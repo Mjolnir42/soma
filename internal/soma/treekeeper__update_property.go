@@ -38,19 +38,19 @@ func (tk *TreeKeeper) convProperty(task string, q *msg.Request) (
 	var id string
 
 	switch q.Section {
-	case `node`:
+	case msg.SectionNodeConfig:
 		id = q.Node.ID
 		prop = tk.pTT(task, (*q.Node.Properties)[0])
-	case `cluster`:
+	case msg.SectionCluster:
 		id = q.Cluster.ID
 		prop = tk.pTT(task, (*q.Cluster.Properties)[0])
-	case `group`:
+	case msg.SectionGroup:
 		id = q.Group.ID
 		prop = tk.pTT(task, (*q.Group.Properties)[0])
-	case `bucket`:
+	case msg.SectionBucket:
 		id = q.Bucket.ID
 		prop = tk.pTT(task, (*q.Bucket.Properties)[0])
-	case `repository`:
+	case msg.SectionRepositoryConfig:
 		id = q.Repository.ID
 		prop = tk.pTT(task, (*q.Repository.Properties)[0])
 	}
@@ -59,7 +59,7 @@ func (tk *TreeKeeper) convProperty(task string, q *msg.Request) (
 
 func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 	switch pp.Type {
-	case `custom`:
+	case msg.PropertyCustom:
 		customID, _ := uuid.FromString(pp.Custom.ID)
 		switch task {
 		case `add`:
@@ -82,7 +82,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Value:    pp.Custom.Value,
 			}
 		}
-	case `oncall`:
+	case msg.PropertyOncall:
 		oncallID, _ := uuid.FromString(pp.Oncall.ID)
 		switch task {
 		case `add`:
@@ -105,7 +105,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Number:   pp.Oncall.Number,
 			}
 		}
-	case `service`:
+	case msg.PropertyService:
 		switch task {
 		case `add`:
 			return &tree.PropertyService{
@@ -124,7 +124,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Service:  pp.Service.Name,
 			}
 		}
-	case `system`:
+	case msg.PropertySystem:
 		switch task {
 		case `add`:
 			return &tree.PropertySystem{

@@ -66,75 +66,64 @@ func (g *GuidePost) extractRouting(q *msg.Request) (string, string, bool, error)
 
 // Extract embedded IDs that can be used for routing
 func (g *GuidePost) extractID(q *msg.Request) (string, string) {
-	switch q.Action {
-	case
-		`add_system_property_to_repository`,
-		`add_custom_property_to_repository`,
-		`add_oncall_property_to_repository`,
-		`add_service_property_to_repository`,
-		`delete_system_property_from_repository`,
-		`delete_custom_property_from_repository`,
-		`delete_oncall_property_from_repository`,
-		`delete_service_property_from_repository`:
-		return q.Repository.ID, ``
-	case
-		`create_bucket`:
-		return q.Bucket.RepositoryID, ``
-	case
-		`add_system_property_to_bucket`,
-		`add_custom_property_to_bucket`,
-		`add_oncall_property_to_bucket`,
-		`add_service_property_to_bucket`,
-		`delete_system_property_from_bucket`,
-		`delete_custom_property_from_bucket`,
-		`delete_oncall_property_from_bucket`,
-		`delete_service_property_from_bucket`:
-		return ``, q.Bucket.ID
-	case
-		`add_group_to_group`,
-		`add_cluster_to_group`,
-		`add_node_to_group`,
-		`create_group`,
-		`add_system_property_to_group`,
-		`add_custom_property_to_group`,
-		`add_oncall_property_to_group`,
-		`add_service_property_to_group`,
-		`delete_system_property_from_group`,
-		`delete_custom_property_from_group`,
-		`delete_oncall_property_from_group`,
-		`delete_service_property_from_group`:
-		return ``, q.Group.BucketID
-	case
-		`add_node_to_cluster`,
-		`create_cluster`,
-		`add_system_property_to_cluster`,
-		`add_custom_property_to_cluster`,
-		`add_oncall_property_to_cluster`,
-		`add_service_property_to_cluster`,
-		`delete_system_property_from_cluster`,
-		`delete_custom_property_from_cluster`,
-		`delete_oncall_property_from_cluster`,
-		`delete_service_property_from_cluster`:
-		return ``, q.Cluster.BucketID
-	case
-		`add_check_to_repository`,
-		`add_check_to_bucket`,
-		`add_check_to_group`,
-		`add_check_to_cluster`,
-		`add_check_to_node`,
-		`remove_check`:
-		return q.CheckConfig.RepositoryID, ``
-	case
-		`assign_node`,
-		`add_system_property_to_node`,
-		`add_custom_property_to_node`,
-		`add_oncall_property_to_node`,
-		`add_service_property_to_node`,
-		`delete_system_property_from_node`,
-		`delete_custom_property_from_node`,
-		`delete_oncall_property_from_node`,
-		`delete_service_property_from_node`:
+	switch q.Section {
+	case msg.SectionNodeConfig:
+		switch q.Action {
+		case msg.ActionAssign:
+		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyDestroy:
+		default:
+			return ``, ``
+		}
 		return q.Node.Config.RepositoryID, q.Node.Config.BucketID
+	case msg.SectionCheckConfig:
+		switch q.Action {
+		case msg.ActionCreate:
+		case msg.ActionDestroy:
+		default:
+			return ``, ``
+		}
+		return q.CheckConfig.RepositoryID, ``
+	case msg.SectionCluster:
+		switch q.Action {
+		case msg.ActionCreate:
+		case msg.ActionMemberAssign:
+		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyDestroy:
+		default:
+			return ``, ``
+		}
+		return ``, q.Cluster.BucketID
+	case msg.SectionGroup:
+		switch q.Action {
+		case msg.ActionCreate:
+		case msg.ActionMemberAssign:
+		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyDestroy:
+		default:
+			return ``, ``
+		}
+		return ``, q.Group.BucketID
+	case msg.SectionBucket:
+		switch q.Action {
+		case msg.ActionCreate:
+			return q.Bucket.RepositoryID, ``
+		}
+		switch q.Action {
+		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyDestroy:
+		default:
+			return ``, ``
+		}
+		return ``, q.Bucket.ID
+	case msg.SectionRepositoryConfig:
+		switch q.Action {
+		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyDestroy:
+		default:
+			return ``, ``
+		}
+		return q.Repository.ID, ``
 	}
 	return ``, ``
 }

@@ -22,16 +22,15 @@ import (
 //
 func (g *GuidePost) fillReqData(q *msg.Request) (bool, error) {
 	switch {
-	case strings.Contains(q.Action, "add_service_property_to_"):
+	case q.Action == msg.ActionPropertyCreate && q.Property.Type == `service`:
 		return g.fillServiceAttributes(q)
-	case q.Action == `assign_node`:
+	case q.Section == msg.SectionNodeConfig && q.Action == msg.ActionAssign:
 		return g.fillNode(q)
-	case q.Action == `remove_check`:
+	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionDestroy:
 		return g.fillCheckDeleteInfo(q)
-	case strings.HasPrefix(q.Action, `delete_`) &&
-		strings.Contains(q.Action, `_property_from_`):
+	case q.Action == msg.ActionPropertyDestroy:
 		return g.fillPropertyDeleteInfo(q)
-	case strings.HasPrefix(q.Action, `add_check_to_`):
+	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionCreate:
 		return g.fillCheckConfigID(q)
 	default:
 		return false, nil
@@ -87,7 +86,7 @@ func (g *GuidePost) fillServiceAttributes(q *msg.Request) (bool, error) {
 	attrs := []proto.ServiceAttribute{}
 
 	switch q.Section {
-	case msg.SectionRepository:
+	case msg.SectionRepositoryConfig:
 		svName = (*q.Repository.Properties)[0].Service.Name
 		svTeam = (*q.Repository.Properties)[0].Service.TeamID
 	case msg.SectionBucket:
@@ -99,7 +98,7 @@ func (g *GuidePost) fillServiceAttributes(q *msg.Request) (bool, error) {
 	case msg.SectionCluster:
 		svName = (*q.Cluster.Properties)[0].Service.Name
 		svTeam = (*q.Cluster.Properties)[0].Service.TeamID
-	case msg.SectionNode:
+	case msg.SectionNodeConfig:
 		svName = (*q.Node.Properties)[0].Service.Name
 		svTeam = (*q.Node.Properties)[0].Service.TeamID
 	}
@@ -145,7 +144,7 @@ abort:
 	}
 	// not aborted: set the loaded attributes
 	switch q.Section {
-	case msg.SectionRepository:
+	case msg.SectionRepositoryConfig:
 		(*q.Repository.Properties)[0].Service.Attributes = attrs
 	case msg.SectionBucket:
 		(*q.Bucket.Properties)[0].Service.Attributes = attrs
@@ -153,7 +152,7 @@ abort:
 		(*q.Group.Properties)[0].Service.Attributes = attrs
 	case msg.SectionCluster:
 		(*q.Cluster.Properties)[0].Service.Attributes = attrs
-	case msg.SectionNode:
+	case msg.SectionNodeConfig:
 		(*q.Node.Properties)[0].Service.Attributes = attrs
 	}
 	return false, nil
@@ -182,7 +181,6 @@ func (g *GuidePost) fillCheckDeleteInfo(q *msg.Request) (bool, error) {
 	q.CheckConfig.ObjectID = delObjID
 	q.CheckConfig.ObjectType = delObjTyp
 	q.CheckConfig.ExternalID = delSrcChkID
-	q.Action = fmt.Sprintf("remove_check_from_%s", delObjTyp)
 	return false, nil
 }
 
@@ -197,47 +195,62 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 	)
 
 	// select SQL statement
-	switch q.Action {
-	case `delete_system_property_from_repository`:
-		queryStmt = stmt.RepoSystemPropertyForDelete
-	case `delete_custom_property_from_repository`:
-		queryStmt = stmt.RepoCustomPropertyForDelete
-	case `delete_service_property_from_repository`:
-		queryStmt = stmt.RepoServicePropertyForDelete
-	case `delete_oncall_property_from_repository`:
-		queryStmt = stmt.RepoOncallPropertyForDelete
-	case `delete_system_property_from_bucket`:
-		queryStmt = stmt.BucketSystemPropertyForDelete
-	case `delete_custom_property_from_bucket`:
-		queryStmt = stmt.BucketCustomPropertyForDelete
-	case `delete_service_property_from_bucket`:
-		queryStmt = stmt.BucketServicePropertyForDelete
-	case `delete_oncall_property_from_bucket`:
-		queryStmt = stmt.BucketOncallPropertyForDelete
-	case `delete_system_property_from_group`:
-		queryStmt = stmt.GroupSystemPropertyForDelete
-	case `delete_custom_property_from_group`:
-		queryStmt = stmt.GroupCustomPropertyForDelete
-	case `delete_service_property_from_group`:
-		queryStmt = stmt.GroupServicePropertyForDelete
-	case `delete_oncall_property_from_group`:
-		queryStmt = stmt.GroupOncallPropertyForDelete
-	case `delete_system_property_from_cluster`:
-		queryStmt = stmt.ClusterSystemPropertyForDelete
-	case `delete_custom_property_from_cluster`:
-		queryStmt = stmt.ClusterCustomPropertyForDelete
-	case `delete_service_property_from_cluster`:
-		queryStmt = stmt.ClusterServicePropertyForDelete
-	case `delete_oncall_property_from_cluster`:
-		queryStmt = stmt.ClusterOncallPropertyForDelete
-	case `delete_system_property_from_node`:
-		queryStmt = stmt.NodeSystemPropertyForDelete
-	case `delete_custom_property_from_node`:
-		queryStmt = stmt.NodeCustomPropertyForDelete
-	case `delete_service_property_from_node`:
-		queryStmt = stmt.NodeServicePropertyForDelete
-	case `delete_oncall_property_from_node`:
-		queryStmt = stmt.NodeOncallPropertyForDelete
+	switch q.Section {
+	case msg.SectionRepositoryConfig:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			queryStmt = stmt.RepoSystemPropertyForDelete
+		case msg.PropertyCustom:
+			queryStmt = stmt.RepoCustomPropertyForDelete
+		case msg.PropertyService:
+			queryStmt = stmt.RepoServicePropertyForDelete
+		case msg.PropertyOncall:
+			queryStmt = stmt.RepoOncallPropertyForDelete
+		}
+	case msg.SectionBucket:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			queryStmt = stmt.BucketSystemPropertyForDelete
+		case msg.PropertyCustom:
+			queryStmt = stmt.BucketCustomPropertyForDelete
+		case msg.PropertyService:
+			queryStmt = stmt.BucketServicePropertyForDelete
+		case msg.PropertyOncall:
+			queryStmt = stmt.BucketOncallPropertyForDelete
+		}
+	case msg.SectionGroup:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			queryStmt = stmt.GroupSystemPropertyForDelete
+		case msg.PropertyCustom:
+			queryStmt = stmt.GroupCustomPropertyForDelete
+		case msg.PropertyService:
+			queryStmt = stmt.GroupServicePropertyForDelete
+		case msg.PropertyOncall:
+			queryStmt = stmt.GroupOncallPropertyForDelete
+		}
+	case msg.SectionCluster:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			queryStmt = stmt.ClusterSystemPropertyForDelete
+		case msg.PropertyCustom:
+			queryStmt = stmt.ClusterCustomPropertyForDelete
+		case msg.PropertyService:
+			queryStmt = stmt.ClusterServicePropertyForDelete
+		case msg.PropertyOncall:
+			queryStmt = stmt.ClusterOncallPropertyForDelete
+		}
+	case msg.SectionNodeConfig:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			queryStmt = stmt.NodeSystemPropertyForDelete
+		case msg.PropertyCustom:
+			queryStmt = stmt.NodeCustomPropertyForDelete
+		case msg.PropertyService:
+			queryStmt = stmt.NodeServicePropertyForDelete
+		case msg.PropertyOncall:
+			queryStmt = stmt.NodeOncallPropertyForDelete
+		}
 	}
 
 	// execute and scan
@@ -258,19 +271,17 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 		row = g.conn.QueryRow(queryStmt,
 			(*q.Node.Properties)[0].SourceInstanceID)
 	}
-	switch {
-	case strings.HasPrefix(q.Action, `delete_system_`):
+	switch q.Property.Type {
+	case msg.PropertySystem:
 		err = row.Scan(&view, &sysProp, &value)
-
-	case strings.HasPrefix(q.Action, `delete_custom_`):
+	case msg.PropertyCustom:
 		err = row.Scan(&view, &cstID, &value, &cstProp)
-
-	case strings.HasPrefix(q.Action, `delete_service_`):
+	case msg.PropertyService:
 		err = row.Scan(&view, &svcProp)
-
-	case strings.HasPrefix(q.Action, `delete_oncall_`):
+	case msg.PropertyOncall:
 		err = row.Scan(&view, &oncID, &oncName, &oncNumber)
 	}
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return true, fmt.Errorf(
@@ -287,23 +298,23 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 		pSvc *proto.PropertyService
 		pOnc *proto.PropertyOncall
 	)
-	switch {
-	case strings.HasPrefix(q.Action, `delete_system_`):
+	switch q.Property.Type {
+	case msg.PropertySystem:
 		pSys = &proto.PropertySystem{
 			Name:  sysProp,
 			Value: value,
 		}
-	case strings.HasPrefix(q.Action, `delete_custom_`):
+	case msg.PropertyCustom:
 		pCst = &proto.PropertyCustom{
 			ID:    cstID,
 			Name:  cstProp,
 			Value: value,
 		}
-	case strings.HasPrefix(q.Action, `delete_service_`):
+	case msg.PropertyService:
 		pSvc = &proto.PropertyService{
 			Name: svcProp,
 		}
-	case strings.HasPrefix(q.Action, `delete_oncall_`):
+	case msg.PropertyOncall:
 		num := strconv.Itoa(oncNumber)
 		pOnc = &proto.PropertyOncall{
 			ID:     oncID,
@@ -313,65 +324,76 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 	}
 
 	// assemble and set results: view
-	switch {
-	case strings.HasSuffix(q.Action, `_repository`):
+	switch q.Section {
+	case msg.SectionRepositoryConfig:
 		(*q.Repository.Properties)[0].View = view
-	case strings.HasSuffix(q.Action, `_bucket`):
+	case msg.SectionBucket:
 		(*q.Bucket.Properties)[0].View = view
-	case strings.HasSuffix(q.Action, `_group`):
+	case msg.SectionGroup:
 		(*q.Group.Properties)[0].View = view
-	case strings.HasSuffix(q.Action, `_cluster`):
+	case msg.SectionCluster:
 		(*q.Cluster.Properties)[0].View = view
-	case strings.HasSuffix(q.Action, `_node`):
+	case msg.SectionNodeConfig:
 		(*q.Node.Properties)[0].View = view
 	}
 
 	// final assembly step
-	switch q.Action {
-	case `delete_system_property_from_repository`:
-		(*q.Repository.Properties)[0].System = pSys
-	case `delete_custom_property_from_repository`:
-		(*q.Repository.Properties)[0].Custom = pCst
-	case `delete_service_property_from_repository`:
-		(*q.Repository.Properties)[0].Service = pSvc
-	case `delete_oncall_property_from_repository`:
-		(*q.Repository.Properties)[0].Oncall = pOnc
-
-	case `delete_system_property_from_bucket`:
-		(*q.Bucket.Properties)[0].System = pSys
-	case `delete_custom_property_from_bucket`:
-		(*q.Bucket.Properties)[0].Custom = pCst
-	case `delete_service_property_from_bucket`:
-		(*q.Bucket.Properties)[0].Service = pSvc
-	case `delete_oncall_property_from_bucket`:
-		(*q.Bucket.Properties)[0].Oncall = pOnc
-
-	case `delete_system_property_from_group`:
-		(*q.Group.Properties)[0].System = pSys
-	case `delete_custom_property_from_group`:
-		(*q.Group.Properties)[0].Custom = pCst
-	case `delete_service_property_from_group`:
-		(*q.Group.Properties)[0].Service = pSvc
-	case `delete_oncall_property_from_group`:
-		(*q.Group.Properties)[0].Oncall = pOnc
-
-	case `delete_system_property_from_cluster`:
-		(*q.Cluster.Properties)[0].System = pSys
-	case `delete_custom_property_from_cluster`:
-		(*q.Cluster.Properties)[0].Custom = pCst
-	case `delete_service_property_from_cluster`:
-		(*q.Cluster.Properties)[0].Service = pSvc
-	case `delete_oncall_property_from_cluster`:
-		(*q.Cluster.Properties)[0].Oncall = pOnc
-
-	case `delete_system_property_from_node`:
-		(*q.Node.Properties)[0].System = pSys
-	case `delete_custom_property_from_node`:
-		(*q.Node.Properties)[0].Custom = pCst
-	case `delete_service_property_from_node`:
-		(*q.Node.Properties)[0].Service = pSvc
-	case `delete_oncall_property_from_node`:
-		(*q.Node.Properties)[0].Oncall = pOnc
+	switch q.Section {
+	case msg.SectionRepositoryConfig:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			(*q.Repository.Properties)[0].System = pSys
+		case msg.PropertyCustom:
+			(*q.Repository.Properties)[0].Custom = pCst
+		case msg.PropertyService:
+			(*q.Repository.Properties)[0].Service = pSvc
+		case msg.PropertyOncall:
+			(*q.Repository.Properties)[0].Oncall = pOnc
+		}
+	case msg.SectionBucket:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			(*q.Bucket.Properties)[0].System = pSys
+		case msg.PropertyCustom:
+			(*q.Bucket.Properties)[0].Custom = pCst
+		case msg.PropertyService:
+			(*q.Bucket.Properties)[0].Service = pSvc
+		case msg.PropertyOncall:
+			(*q.Bucket.Properties)[0].Oncall = pOnc
+		}
+	case msg.SectionGroup:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			(*q.Group.Properties)[0].System = pSys
+		case msg.PropertyCustom:
+			(*q.Group.Properties)[0].Custom = pCst
+		case msg.PropertyService:
+			(*q.Group.Properties)[0].Service = pSvc
+		case msg.PropertyOncall:
+			(*q.Group.Properties)[0].Oncall = pOnc
+		}
+	case msg.SectionCluster:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			(*q.Cluster.Properties)[0].System = pSys
+		case msg.PropertyCustom:
+			(*q.Cluster.Properties)[0].Custom = pCst
+		case msg.PropertyService:
+			(*q.Cluster.Properties)[0].Service = pSvc
+		case msg.PropertyOncall:
+			(*q.Cluster.Properties)[0].Oncall = pOnc
+		}
+	case msg.SectionNodeConfig:
+		switch q.Property.Type {
+		case msg.PropertySystem:
+			(*q.Node.Properties)[0].System = pSys
+		case msg.PropertyCustom:
+			(*q.Node.Properties)[0].Custom = pCst
+		case msg.PropertyService:
+			(*q.Node.Properties)[0].Service = pSvc
+		case msg.PropertyOncall:
+			(*q.Node.Properties)[0].Oncall = pOnc
+		}
 	}
 	return false, err
 }

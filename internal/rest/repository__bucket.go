@@ -220,6 +220,7 @@ func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionPropertyCreate
 	request.Bucket = cReq.Bucket.Clone()
+	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -239,6 +240,7 @@ func (x *Rest) BucketPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionPropertyDestroy
+	request.Property.Type = params.ByName(`propertyType`)
 	request.Bucket = proto.Bucket{
 		ID: params.ByName(`bucket`),
 		Properties: &[]proto.Property{

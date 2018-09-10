@@ -200,15 +200,18 @@ func (g *GuidePost) process(q *msg.Request) {
 
 	// store job in database
 	q.JobID = uuid.Must(uuid.NewV4())
-	g.appLog.Infof("Saving job %s (%s/%s) for %s",
-		q.JobID.String(), q.Section, q.Action,
+	g.appLog.Infof("Saving job %s (%s::%s) for %s",
+		q.JobID.String(),
+		q.Section,
+		q.Action,
 		q.AuthUser)
+
 	j, _ = json.Marshal(q)
 	if res, err = g.stmtJobSave.Exec(
 		q.JobID.String(),
 		`queued`,
 		`pending`,
-		q.Action,
+		fmt.Sprintf("%s::%s", q.Section, q.Action),
 		repoID,
 		q.AuthUser,
 		string(j),

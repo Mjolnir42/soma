@@ -15,7 +15,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -112,6 +111,9 @@ func (tk *TreeKeeper) Register(c *sql.DB, l ...*logrus.Logger) {
 // it processes. It is implemented by TreeKeeper to fulfill the Handler
 // interface
 func (tk *TreeKeeper) RegisterRequests(hmap *handler.Map) {
+	// GuidePost registers requests handled by TreeKeeper, persists
+	// these asynchronous jobs and forwards them into TreeKeeper's
+	// intake queue
 }
 
 // Intake exposes the Input channel as part of the handler interface
@@ -405,102 +407,45 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 	tk.tree.Begin()
 
 	// q.Action == `rebuild` will fall through switch
-	switch q.Action {
-	// XXX BUG CONVERT to msg.Request.Section / msg.Request.Action
-
-	//
-	// TREE MANIPULATION REQUESTS
-	case
-		`create_bucket`:
-		tk.treeBucket(q)
-
-	case
-		`create_group`,
-		`delete_group`,
-		`reset_group_to_bucket`,
-		`add_group_to_group`:
-		tk.treeGroup(q)
-
-	case
-		`create_cluster`,
-		`delete_cluster`,
-		`reset_cluster_to_bucket`,
-		`add_cluster_to_group`:
-		tk.treeCluster(q)
-
-	case
-		"assign_node",
-		"delete_node",
-		"reset_node_to_bucket",
-		"add_node_to_group",
-		"add_node_to_cluster":
-		tk.treeNode(q)
-
-	//
-	// PROPERTY MANIPULATION REQUESTS
-	case
-		`add_system_property_to_repository`,
-		`add_system_property_to_bucket`,
-		`add_system_property_to_group`,
-		`add_system_property_to_cluster`,
-		`add_system_property_to_node`,
-		`add_service_property_to_repository`,
-		`add_service_property_to_bucket`,
-		`add_service_property_to_group`,
-		`add_service_property_to_cluster`,
-		`add_service_property_to_node`,
-		`add_oncall_property_to_repository`,
-		`add_oncall_property_to_bucket`,
-		`add_oncall_property_to_group`,
-		`add_oncall_property_to_cluster`,
-		`add_oncall_property_to_node`,
-		`add_custom_property_to_repository`,
-		`add_custom_property_to_bucket`,
-		`add_custom_property_to_group`,
-		`add_custom_property_to_cluster`,
-		`add_custom_property_to_node`:
+	switch {
+	// property requests
+	case q.Action == msg.ActionPropertyCreate:
 		tk.addProperty(q)
-
-	case
-		`delete_system_property_from_repository`,
-		`delete_system_property_from_bucket`,
-		`delete_system_property_from_group`,
-		`delete_system_property_from_cluster`,
-		`delete_system_property_from_node`,
-		`delete_service_property_from_repository`,
-		`delete_service_property_from_bucket`,
-		`delete_service_property_from_group`,
-		`delete_service_property_from_cluster`,
-		`delete_service_property_from_node`,
-		`delete_oncall_property_from_repository`,
-		`delete_oncall_property_from_bucket`,
-		`delete_oncall_property_from_group`,
-		`delete_oncall_property_from_cluster`,
-		`delete_oncall_property_from_node`,
-		`delete_custom_property_from_repository`,
-		`delete_custom_property_from_bucket`,
-		`delete_custom_property_from_group`,
-		`delete_custom_property_from_cluster`,
-		`delete_custom_property_from_node`:
+	case q.Action == msg.ActionPropertyDestroy:
 		tk.rmProperty(q)
-
-	//
-	// CHECK MANIPULATION REQUESTS
-	case
-		`add_check_to_repository`,
-		`add_check_to_bucket`,
-		`add_check_to_group`,
-		`add_check_to_cluster`,
-		`add_check_to_node`:
+		// check requests
+	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionCreate:
 		err = tk.addCheck(&q.CheckConfig)
-
-	case
-		`remove_check_from_repository`,
-		`remove_check_from_bucket`,
-		`remove_check_from_group`,
-		`remove_check_from_cluster`,
-		`remove_check_from_node`:
+	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionDestroy:
 		err = tk.rmCheck(&q.CheckConfig)
+	// tree object: membership requests
+	case q.Action == msg.ActionMemberAssign && q.TargetEntity == msg.EntityNode:
+		tk.treeNode(q)
+	case q.Action == msg.ActionMemberUnassign && q.TargetEntity == msg.EntityNode:
+		tk.treeNode(q)
+	case q.Action == msg.ActionMemberAssign && q.TargetEntity == msg.EntityCluster:
+		tk.treeCluster(q)
+	case q.Action == msg.ActionMemberUnassign && q.TargetEntity == msg.EntityCluster:
+		tk.treeCluster(q)
+	case q.Action == msg.ActionMemberAssign && q.TargetEntity == msg.EntityGroup:
+		tk.treeGroup(q)
+	case q.Action == msg.ActionMemberUnassign && q.TargetEntity == msg.EntityGroup:
+		tk.treeGroup(q)
+	// tree object: create/destroy requests
+	case q.Section == msg.SectionNodeConfig && q.Action == msg.ActionAssign:
+		tk.treeNode(q)
+	case q.Section == msg.SectionNodeConfig && q.Action == msg.ActionUnassign:
+		tk.treeNode(q)
+	case q.Section == msg.SectionCluster && q.Action == msg.ActionCreate:
+		tk.treeCluster(q)
+	case q.Section == msg.SectionCluster && q.Action == msg.ActionDestroy:
+		tk.treeCluster(q)
+	case q.Section == msg.SectionGroup && q.Action == msg.ActionCreate:
+		tk.treeGroup(q)
+	case q.Section == msg.SectionGroup && q.Action == msg.ActionDestroy:
+		tk.treeGroup(q)
+	case q.Section == msg.SectionBucket && q.Action == msg.ActionCreate:
+		tk.treeBucket(q)
 	}
 
 	// check if we accumulated an error in one of the switch cases
@@ -525,7 +470,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 
 	// save the check configuration as part of the transaction before
 	// processing the action channel
-	if strings.Contains(q.Action, "add_check_to_") {
+	if q.Section == msg.SectionCheckConfig && q.Action == msg.ActionCreate {
 		if err = tk.txCheckConfig(q.CheckConfig,
 			stm); err != nil {
 			goto bailout
@@ -533,7 +478,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 	}
 
 	// mark the check configuration as deleted
-	if strings.HasPrefix(q.Action, `remove_check_from_`) {
+	if q.Section == msg.SectionCheckConfig && q.Action == msg.ActionDestroy {
 		if _, err = tx.Exec(
 			stmt.TxMarkCheckConfigDeleted,
 			q.CheckConfig.ID,

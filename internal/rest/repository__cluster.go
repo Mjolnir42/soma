@@ -250,6 +250,7 @@ func (x *Rest) ClusterMemberUnassign(w http.ResponseWriter, r *http.Request,
 
 	switch params.ByName(`memberType`) {
 	case msg.EntityNode:
+		request.TargetEntity = msg.EntityNode
 		request.Cluster.Members = &[]proto.Node{
 			proto.Node{ID: params.ByName(`memberID`)},
 		}
@@ -307,6 +308,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
 	request.Cluster.ID = params.ByName(`clusterID`)
+	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -349,6 +351,7 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionPropertyDestroy
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Property.Type = params.ByName(`propertyType`)
 	request.Cluster = proto.Cluster{
 		ID:           params.ByName(`clusterID`),
 		RepositoryID: params.ByName(`repositoryID`),

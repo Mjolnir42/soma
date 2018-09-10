@@ -279,14 +279,17 @@ func (x *Rest) GroupMemberUnassign(w http.ResponseWriter, r *http.Request,
 
 	switch params.ByName(`memberType`) {
 	case msg.EntityGroup:
+		request.TargetEntity = msg.EntityGroup
 		request.Group.MemberGroups = &[]proto.Group{
 			proto.Group{ID: params.ByName(`memberID`)},
 		}
 	case msg.EntityCluster:
+		request.TargetEntity = msg.EntityCluster
 		request.Group.MemberClusters = &[]proto.Cluster{
 			proto.Cluster{ID: params.ByName(`memberID`)},
 		}
 	case msg.EntityNode:
+		request.TargetEntity = msg.EntityNode
 		request.Group.MemberNodes = &[]proto.Node{
 			proto.Node{ID: params.ByName(`memberID`)},
 		}
@@ -338,6 +341,7 @@ func (x *Rest) GroupPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionPropertyCreate
 	request.Group = cReq.Group.Clone()
+	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -378,6 +382,7 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionPropertyDestroy
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Property.Type = params.ByName(`propertyType`)
 	request.Group.ID = params.ByName(`groupID`)
 	request.Group.Properties = &[]proto.Property{proto.Property{
 		Type:             params.ByName(`propertyType`),

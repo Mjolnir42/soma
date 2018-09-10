@@ -116,6 +116,7 @@ func (x *Rest) NodeConfigPropertyCreate(w http.ResponseWriter,
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Node.ID = params.ByName(`nodeID`)
+	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -163,6 +164,7 @@ func (x *Rest) NodeConfigPropertyDestroy(w http.ResponseWriter,
 	request.Action = msg.ActionPropertyDestroy
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Property.Type = params.ByName(`propertyType`)
 	request.Node.ID = params.ByName(`nodeID`)
 	request.Node.Config = &proto.NodeConfig{
 		RepositoryID: request.Repository.ID,

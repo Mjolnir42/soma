@@ -15,11 +15,9 @@ import (
 )
 
 func (tk *TreeKeeper) treeBucket(q *msg.Request) {
-	//XXX BUG convert to section/action model
 	//XXX BUG validate bucket request
 	//XXX BUG generate Bucket.UUID in Guidepost
-	switch q.Action {
-	case `create_bucket`:
+	if q.Section == msg.SectionBucket && q.Action == msg.ActionCreate {
 		tree.NewBucket(tree.BucketSpec{
 			ID:          uuid.Must(uuid.NewV4()).String(),
 			Name:        q.Bucket.Name,
@@ -30,7 +28,7 @@ func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 			Repository:  q.Bucket.RepositoryID,
 		}).Attach(tree.AttachRequest{
 			Root:       tk.tree,
-			ParentType: `repository`,
+			ParentType: msg.EntityRepository,
 			ParentID:   tk.meta.repoID,
 			ParentName: tk.meta.repoName,
 		})
@@ -38,117 +36,158 @@ func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 }
 
 func (tk *TreeKeeper) treeGroup(q *msg.Request) {
-	switch q.Action {
-	case `create_group`:
-		tree.NewGroup(tree.GroupSpec{
-			ID:   uuid.Must(uuid.NewV4()).String(),
-			Name: q.Group.Name,
-			Team: tk.meta.teamID,
-		}).Attach(tree.AttachRequest{
-			Root:       tk.tree,
-			ParentType: `bucket`,
-			ParentID:   q.Group.BucketID,
-		})
-	case `delete_group`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `group`,
-			ElementID:   q.Group.ID,
-		}, true).(tree.BucketAttacher).Destroy()
-	case `reset_group_to_bucket`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `group`,
-			ElementID:   q.Group.ID,
-		}, true).(tree.BucketAttacher).Detach()
-	case `add_group_to_group`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `group`,
-			ElementID:   (*q.Group.MemberGroups)[0].ID,
-		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
-			Root:       tk.tree,
-			ParentType: `group`,
-			ParentID:   q.Group.ID,
-		})
+	if q.Section == msg.SectionGroup {
+		switch q.Action {
+		case msg.ActionCreate:
+			tree.NewGroup(tree.GroupSpec{
+				ID:   uuid.Must(uuid.NewV4()).String(),
+				Name: q.Group.Name,
+				Team: tk.meta.teamID,
+			}).Attach(tree.AttachRequest{
+				Root:       tk.tree,
+				ParentType: msg.EntityBucket,
+				ParentID:   q.Group.BucketID,
+			})
+		case msg.ActionDestroy:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityGroup,
+				ElementID:   q.Group.ID,
+			}, true).(tree.BucketAttacher).Destroy()
+		}
+	}
+
+	if q.Action == msg.ActionMemberUnassign && q.TargetEntity == msg.EntityGroup {
+		switch q.Section {
+		case msg.SectionGroup:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityGroup,
+				ElementID:   (*q.Group.MemberGroups)[0].ID,
+			}, true).(tree.BucketAttacher).Detach()
+		}
+	}
+
+	if q.Action == msg.ActionMemberAssign && q.TargetEntity == msg.EntityGroup {
+		switch q.Section {
+		case msg.SectionGroup:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityGroup,
+				ElementID:   (*q.Group.MemberGroups)[0].ID,
+			}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
+				Root:       tk.tree,
+				ParentType: msg.EntityGroup,
+				ParentID:   q.Group.ID,
+			})
+		}
 	}
 }
 
 func (tk *TreeKeeper) treeCluster(q *msg.Request) {
-	switch q.Action {
-	case `create_cluster`:
-		tree.NewCluster(tree.ClusterSpec{
-			ID:   uuid.Must(uuid.NewV4()).String(),
-			Name: q.Cluster.Name,
-			Team: tk.meta.teamID,
-		}).Attach(tree.AttachRequest{
-			Root:       tk.tree,
-			ParentType: `bucket`,
-			ParentID:   q.Cluster.BucketID,
-		})
-	case `delete_cluster`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `cluster`,
-			ElementID:   q.Cluster.ID,
-		}, true).(tree.BucketAttacher).Destroy()
-	case `reset_cluster_to_bucket`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `cluster`,
-			ElementID:   q.Cluster.ID,
-		}, true).(tree.BucketAttacher).Detach()
-	case `add_cluster_to_group`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `cluster`,
-			ElementID:   (*q.Group.MemberClusters)[0].ID,
-		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
-			Root:       tk.tree,
-			ParentType: `group`,
-			ParentID:   q.Group.ID,
-		})
+	if q.Section == msg.SectionCluster {
+		switch q.Action {
+		case msg.ActionCreate:
+			tree.NewCluster(tree.ClusterSpec{
+				ID:   uuid.Must(uuid.NewV4()).String(),
+				Name: q.Cluster.Name,
+				Team: tk.meta.teamID,
+			}).Attach(tree.AttachRequest{
+				Root:       tk.tree,
+				ParentType: msg.EntityBucket,
+				ParentID:   q.Cluster.BucketID,
+			})
+		case msg.ActionDestroy:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityCluster,
+				ElementID:   q.Cluster.ID,
+			}, true).(tree.BucketAttacher).Destroy()
+		}
+	}
+
+	if q.Action == msg.ActionMemberUnassign && q.TargetEntity == msg.EntityCluster {
+		switch q.Section {
+		case msg.SectionGroup:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityCluster,
+				ElementID:   (*q.Group.MemberClusters)[0].ID,
+			}, true).(tree.BucketAttacher).Detach()
+		}
+	}
+
+	if q.Action == msg.ActionMemberAssign && q.TargetEntity == msg.EntityCluster {
+		switch q.Section {
+		case msg.SectionGroup:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityCluster,
+				ElementID:   (*q.Group.MemberClusters)[0].ID,
+			}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
+				Root:       tk.tree,
+				ParentType: msg.EntityGroup,
+				ParentID:   q.Group.ID,
+			})
+		}
 	}
 }
 
 func (tk *TreeKeeper) treeNode(q *msg.Request) {
-	switch q.Action {
-	case `assign_node`:
-		tree.NewNode(tree.NodeSpec{
-			ID:       q.Node.ID,
-			AssetID:  q.Node.AssetID,
-			Name:     q.Node.Name,
-			Team:     q.Node.TeamID,
-			ServerID: q.Node.ServerID,
-			Online:   q.Node.IsOnline,
-			Deleted:  q.Node.IsDeleted,
-		}).Attach(tree.AttachRequest{
-			Root:       tk.tree,
-			ParentType: `bucket`,
-			ParentID:   q.Node.Config.BucketID,
-		})
-	case `delete_node`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `node`,
-			ElementID:   q.Node.ID,
-		}, true).(tree.BucketAttacher).Destroy()
-	case `reset_node_to_bucket`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `node`,
-			ElementID:   q.Node.ID,
-		}, true).(tree.BucketAttacher).Detach()
-	case `add_node_to_group`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `node`,
-			ElementID:   (*q.Group.MemberNodes)[0].ID,
-		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
-			Root:       tk.tree,
-			ParentType: `group`,
-			ParentID:   q.Group.ID,
-		})
-	case `add_node_to_cluster`:
-		tk.tree.Find(tree.FindRequest{
-			ElementType: `node`,
-			ElementID:   (*q.Cluster.Members)[0].ID,
-		}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
-			Root:       tk.tree,
-			ParentType: `cluster`,
-			ParentID:   q.Cluster.ID,
-		})
+	if q.Section == msg.SectionNodeConfig {
+		switch q.Action {
+		case msg.ActionAssign:
+			tree.NewNode(tree.NodeSpec{
+				ID:       q.Node.ID,
+				AssetID:  q.Node.AssetID,
+				Name:     q.Node.Name,
+				Team:     q.Node.TeamID,
+				ServerID: q.Node.ServerID,
+				Online:   q.Node.IsOnline,
+				Deleted:  q.Node.IsDeleted,
+			}).Attach(tree.AttachRequest{
+				Root:       tk.tree,
+				ParentType: msg.EntityBucket,
+				ParentID:   q.Node.Config.BucketID,
+			})
+		case msg.ActionUnassign:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityNode,
+				ElementID:   q.Node.ID,
+			}, true).(tree.BucketAttacher).Destroy()
+		}
+	}
+
+	if q.Action == msg.ActionMemberUnassign && q.TargetEntity == msg.EntityNode {
+		switch q.Section {
+		case msg.SectionCluster:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityNode,
+				ElementID:   (*q.Cluster.Members)[0].ID,
+			}, true).(tree.BucketAttacher).Detach()
+		case msg.SectionGroup:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityNode,
+				ElementID:   (*q.Group.MemberNodes)[0].ID,
+			}, true).(tree.BucketAttacher).Detach()
+		}
+	}
+
+	if q.Action == msg.ActionMemberAssign && q.TargetEntity == msg.EntityNode {
+		switch q.Section {
+		case msg.SectionGroup:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityNode,
+				ElementID:   (*q.Group.MemberNodes)[0].ID,
+			}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
+				Root:       tk.tree,
+				ParentType: msg.EntityGroup,
+				ParentID:   q.Group.ID,
+			})
+		case msg.SectionCluster:
+			tk.tree.Find(tree.FindRequest{
+				ElementType: msg.EntityNode,
+				ElementID:   (*q.Cluster.Members)[0].ID,
+			}, true).(tree.BucketAttacher).ReAttach(tree.AttachRequest{
+				Root:       tk.tree,
+				ParentType: msg.EntityCluster,
+				ParentID:   q.Cluster.ID,
+			})
+		}
 	}
 }
 

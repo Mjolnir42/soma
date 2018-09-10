@@ -9,6 +9,7 @@
 package soma
 
 import (
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
 	"github.com/mjolnir42/soma/lib/proto"
 	"github.com/satori/go.uuid"
@@ -71,22 +72,22 @@ func (tk *TreeKeeper) convertCheck(conf *proto.CheckConfig) (*tree.Check, error)
 			Type: constr.ConstraintType,
 		}
 		switch constr.ConstraintType {
-		case "native":
+		case msg.ConstraintNative:
 			ncon.Key = constr.Native.Name
 			ncon.Value = constr.Native.Value
-		case "oncall":
+		case msg.ConstraintOncall:
 			ncon.Key = "OncallId"
 			ncon.Value = constr.Oncall.ID
-		case "custom":
+		case msg.ConstraintCustom:
 			ncon.Key = constr.Custom.ID
 			ncon.Value = constr.Custom.Value
-		case "system":
+		case msg.ConstraintSystem:
 			ncon.Key = constr.System.Name
 			ncon.Value = constr.System.Value
-		case "service":
+		case msg.ConstraintService:
 			ncon.Key = "name"
 			ncon.Value = constr.Service.Name
-		case "attribute":
+		case msg.ConstraintAttribute:
 			ncon.Key = constr.Attribute.Name
 			ncon.Value = constr.Attribute.Value
 		}

@@ -147,6 +147,7 @@ func (x *Rest) RepositoryConfigPropertyCreate(w http.ResponseWriter, r *http.Req
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionPropertyCreate
 	request.Repository = cReq.Repository.Clone()
+	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -166,6 +167,7 @@ func (x *Rest) RepositoryConfigPropertyDestroy(w http.ResponseWriter, r *http.Re
 	request := newRequest(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionPropertyDestroy
+	request.Property.Type = params.ByName(`propertyType`)
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Repository.Properties = &[]proto.Property{
 		proto.Property{
