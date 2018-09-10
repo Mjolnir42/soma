@@ -18,7 +18,7 @@ import (
 func (tk *TreeKeeper) addProperty(q *msg.Request) {
 	prop, id := tk.convProperty(`add`, q)
 	tk.tree.Find(tree.FindRequest{
-		ElementType: q.Section,
+		ElementType: q.TargetEntity,
 		ElementID:   id,
 	}, true).(tree.Propertier).SetProperty(prop)
 }
@@ -26,7 +26,7 @@ func (tk *TreeKeeper) addProperty(q *msg.Request) {
 func (tk *TreeKeeper) rmProperty(q *msg.Request) {
 	prop, id := tk.convProperty(`rm`, q)
 	tk.tree.Find(tree.FindRequest{
-		ElementType: q.Section,
+		ElementType: q.TargetEntity,
 		ElementID:   id,
 	}, true).(tree.Propertier).DeleteProperty(prop)
 }

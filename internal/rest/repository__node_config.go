@@ -112,6 +112,7 @@ func (x *Rest) NodeConfigPropertyCreate(w http.ResponseWriter,
 	request := newRequest(r, params)
 	request.Section = msg.SectionNodeConfig
 	request.Action = msg.ActionPropertyCreate
+	request.TargetEntity = msg.EntityNode
 	request.Node = cReq.Node.Clone()
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
@@ -162,6 +163,7 @@ func (x *Rest) NodeConfigPropertyDestroy(w http.ResponseWriter,
 	request := newRequest(r, params)
 	request.Section = msg.SectionNodeConfig
 	request.Action = msg.ActionPropertyDestroy
+	request.TargetEntity = msg.EntityNode
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Property.Type = params.ByName(`propertyType`)

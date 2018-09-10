@@ -219,6 +219,7 @@ func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionPropertyCreate
+	request.TargetEntity = msg.EntityBucket
 	request.Bucket = cReq.Bucket.Clone()
 	request.Property.Type = params.ByName(`propertyType`)
 
@@ -240,6 +241,7 @@ func (x *Rest) BucketPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionPropertyDestroy
+	request.TargetEntity = msg.EntityBucket
 	request.Property.Type = params.ByName(`propertyType`)
 	request.Bucket = proto.Bucket{
 		ID: params.ByName(`bucket`),

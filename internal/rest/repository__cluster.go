@@ -304,6 +304,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionPropertyCreate
+	request.TargetEntity = msg.EntityCluster
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
@@ -349,6 +350,7 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionPropertyDestroy
+	request.TargetEntity = msg.EntityCluster
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Property.Type = params.ByName(`propertyType`)

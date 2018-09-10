@@ -340,6 +340,7 @@ func (x *Rest) GroupPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionPropertyCreate
+	request.TargetEntity = msg.EntityGroup
 	request.Group = cReq.Group.Clone()
 	request.Property.Type = params.ByName(`propertyType`)
 
@@ -380,6 +381,7 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request := newRequest(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionPropertyDestroy
+	request.TargetEntity = msg.EntityGroup
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Property.Type = params.ByName(`propertyType`)
