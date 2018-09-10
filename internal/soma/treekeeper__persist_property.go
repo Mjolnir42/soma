@@ -23,8 +23,8 @@ func (tk *TreeKeeper) txProperty(a *tree.Action,
 		return tk.txPropertyNew(a, stm)
 	case tree.ActionPropertyDelete:
 		return tk.txPropertyDelete(a, stm)
-	case tree.ActionPropertyUpdate: // XXX BUG
-		return fmt.Errorf(`TreeKeeper: MISSING TX HANDLER FOR tree.ActionPropertyUpdate`)
+	case tree.ActionPropertyUpdate:
+		return tk.txPropertyUpdate(a, stm)
 	default:
 		return fmt.Errorf("Illegal property action: %s", a.Action)
 	}
@@ -278,6 +278,14 @@ func (tk *TreeKeeper) txPropertyDelete(a *tree.Action,
 		a.Property.InstanceID,
 	)
 	return err
+}
+
+//
+// PROPERTY UPDATE
+func (tk *TreeKeeper) txPropertyUpdate(a *tree.Action,
+	stm map[string]*sql.Stmt) error {
+	// XXX TODO BUG
+	return fmt.Errorf(`Not implemented: tk.txPropertyUpdate()`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

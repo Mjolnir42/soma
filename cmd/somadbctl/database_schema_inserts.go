@@ -139,6 +139,7 @@ INSERT INTO soma.job_types (
 ) VALUES
             ( 'bucket::property-create' ),
             ( 'bucket::property-destroy' ),
+            ( 'bucket::property-update' ),
             ( 'bucket::create' ),
             ( 'check-config::create' ),
             ( 'check-config::destroy' ),
@@ -147,17 +148,21 @@ INSERT INTO soma.job_types (
             ( 'group::member-assign' ),
             ( 'group::property-create' ),
             ( 'group::property-destroy ),
+            ( 'group::property-update ),
             ( 'cluster::create' ),
             ( 'cluster::destroy' ),
             ( 'cluster::property-create' ),
             ( 'cluster::property-destroy' ),
+            ( 'cluster::property-update' ),
             ( 'cluster::member-assign' ),
             ( 'node-config::assign' ),
             ( 'node-config::unassign' ),
             ( 'node-config::property-create' ),
             ( 'node-config::property-destroy' ),
+            ( 'node-config::property-update' ),
             ( 'repository-config::property-create' ),
-            ( 'repository-config::property-destroy' )
+            ( 'repository-config::property-destroy' ),
+            ( 'repository-config::property-update' )
 ;`
 	queries[idx] = "insertJobTypes"
 	idx++

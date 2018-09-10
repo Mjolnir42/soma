@@ -189,4 +189,57 @@ func (x *Rest) RepositoryConfigPropertyDestroy(w http.ResponseWriter, r *http.Re
 	send(&w, &result)
 }
 
+// RepositoryConfigPropertyUpdate function
+func (x *Rest) RepositoryConfigPropertyUpdate(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	cReq := proto.NewRepositoryRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
+		return
+	}
+
+	switch {
+	case params.ByName(`repositoryID`) != cReq.Repository.ID:
+		dispatchBadRequest(&w, fmt.Errorf("Mismatched repository ids: %s, %s",
+			params.ByName(`repositoryID`), cReq.Repository.ID))
+		return
+	case len(*cReq.Repository.Properties) != 1:
+		dispatchBadRequest(&w, fmt.Errorf("Expected property count 1, actual count: %d",
+			len(*cReq.Repository.Properties)))
+		return
+	case params.ByName(`propertyType`) != (*cReq.Repository.Properties)[0].Type:
+		dispatchBadRequest(&w, fmt.Errorf("Mismatched property types: %s, %s",
+			params.ByName(`propertyType`), (*cReq.Repository.Properties)[0].Type))
+		return
+	case (params.ByName(`propertyType`) == `service`) && (*cReq.Repository.Properties)[0].Service.Name == ``:
+		dispatchBadRequest(&w, fmt.Errorf(`Invalid service name: empty string`))
+		return
+	}
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionRepositoryConfig
+	request.Action = msg.ActionPropertyUpdate
+	request.Repository = cReq.Repository.Clone()
+	request.TargetEntity = msg.EntityRepository
+	request.Property.Type = params.ByName(`propertyType`)
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Update.Property = (*cReq.Repository.Properties)[0].Clone()
+	request.Update.Property.InstanceID = params.ByName(`sourceInstanceID`)
+	request.Update.Property.SourceInstanceID = params.ByName(`sourceInstanceID`)
+	request.Update.Property.Type = params.ByName(`propertyType`)
+	request.Update.Property.RepositoryID = params.ByName(`repositoryID`)
+	request.Repository.Properties = nil
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	send(&w, &result)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

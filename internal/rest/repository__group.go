@@ -403,4 +403,12 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	send(&w, &result)
 }
 
+// GroupPropertyUpdate function
+func (x *Rest) GroupPropertyUpdate(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	// XXX BUG TODO
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

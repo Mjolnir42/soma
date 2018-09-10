@@ -31,6 +31,14 @@ func (tk *TreeKeeper) rmProperty(q *msg.Request) {
 	}, true).(tree.Propertier).DeleteProperty(prop)
 }
 
+func (tk *TreeKeeper) updateProperty(q *msg.Request) {
+	prop, id := tk.convProperty(`update`, q)
+	tk.tree.Find(tree.FindRequest{
+		ElementType: q.TargetEntity,
+		ElementID:   id,
+	}, true).(tree.Propertier).UpdateProperty(prop)
+}
+
 func (tk *TreeKeeper) convProperty(task string, q *msg.Request) (
 	tree.Property, string) {
 
@@ -81,6 +89,18 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Key:      pp.Custom.Name,
 				Value:    pp.Custom.Value,
 			}
+		case `update`:
+			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
+			return &tree.PropertyCustom{
+				ID:           srcUUID,
+				SourceID:     srcUUID,
+				CustomID:     customID,
+				Inheritance:  pp.Inheritance,
+				ChildrenOnly: pp.ChildrenOnly,
+				View:         pp.View,
+				Key:          pp.Custom.Name,
+				Value:        pp.Custom.Value,
+			}
 		}
 	case msg.PropertyOncall:
 		oncallID, _ := uuid.FromString(pp.Oncall.ID)
@@ -104,6 +124,18 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Name:     pp.Oncall.Name,
 				Number:   pp.Oncall.Number,
 			}
+		case `update`:
+			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
+			return &tree.PropertyOncall{
+				ID:           srcUUID,
+				SourceID:     srcUUID,
+				OncallID:     oncallID,
+				Inheritance:  pp.Inheritance,
+				ChildrenOnly: pp.ChildrenOnly,
+				View:         pp.View,
+				Name:         pp.Oncall.Name,
+				Number:       pp.Oncall.Number,
+			}
 		}
 	case msg.PropertyService:
 		switch task {
@@ -122,6 +154,17 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				SourceID: srcUUID,
 				View:     pp.View,
 				Service:  pp.Service.Name,
+			}
+		case `update`:
+			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
+			return &tree.PropertyService{
+				ID:           srcUUID,
+				SourceID:     srcUUID,
+				Inheritance:  pp.Inheritance,
+				ChildrenOnly: pp.ChildrenOnly,
+				View:         pp.View,
+				Service:      pp.Service.Name,
+				Attributes:   pp.Service.Attributes,
 			}
 		}
 	case msg.PropertySystem:
@@ -142,6 +185,17 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				View:     pp.View,
 				Key:      pp.System.Name,
 				Value:    pp.System.Value,
+			}
+		case `update`:
+			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
+			return &tree.PropertySystem{
+				ID:           srcUUID,
+				SourceID:     srcUUID,
+				Inheritance:  pp.Inheritance,
+				ChildrenOnly: pp.ChildrenOnly,
+				View:         pp.View,
+				Key:          pp.System.Name,
+				Value:        pp.System.Value,
 			}
 		}
 	}

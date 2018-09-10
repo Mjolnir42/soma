@@ -413,7 +413,9 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		tk.addProperty(q)
 	case q.Action == msg.ActionPropertyDestroy:
 		tk.rmProperty(q)
-		// check requests
+	case q.Action == msg.ActionPropertyUpdate:
+		tk.updateProperty(q)
+	// check requests
 	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionCreate:
 		err = tk.addCheck(&q.CheckConfig)
 	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionDestroy:

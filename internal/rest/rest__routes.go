@@ -269,8 +269,13 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PUT(`/team/:teamID`, x.Verify(x.TeamMgmtUpdate))
 			router.PUT(`/tokens/request/:kexID`, x.CheckShutdown(x.SupervisorTokenRequest))
 			router.PUT(`/user/:userID`, x.Verify(x.UserMgmtUpdate))
+			router.PUT(rtBucketPropertyID, x.Verify(x.BucketPropertyUpdate))
+			router.PUT(rtClusterPropertyID, x.Verify(x.ClusterPropertyUpdate))
+			router.PUT(rtGroupPropertyID, x.Verify(x.GroupPropertyUpdate))
 			router.PUT(rtNodeConfig, x.Verify(x.NodeConfigAssign))
 			router.PUT(rtNodeID, x.Verify(x.NodeMgmtUpdate))
+			router.PUT(rtNodePropertyID, x.Verify(x.NodeConfigPropertyUpdate))
+			router.PUT(rtRepositoryPropertyID, x.Verify(x.RepositoryConfigPropertyUpdate))
 		}
 	}
 	return router

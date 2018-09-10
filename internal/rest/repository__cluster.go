@@ -377,6 +377,14 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	send(&w, &result)
 }
 
+// ClusterPropertyUpdate function
+func (x *Rest) ClusterPropertyUpdate(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	// XXX BUG TODO
+}
+
 // ClusterRename function
 func (x *Rest) ClusterRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
