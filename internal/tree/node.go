@@ -265,7 +265,7 @@ func (ten *Node) export() proto.Node {
 
 func (ten *Node) actionUpdate() {
 	ten.Action <- &Action{
-		Action: "update",
+		Action: ActionUpdate,
 		Type:   ten.Type,
 		Node:   ten.export(),
 	}
@@ -273,7 +273,7 @@ func (ten *Node) actionUpdate() {
 
 func (ten *Node) actionDelete() {
 	ten.Action <- &Action{
-		Action: "delete",
+		Action: ActionDelete,
 		Type:   ten.Type,
 		Node:   ten.export(),
 	}
@@ -281,17 +281,17 @@ func (ten *Node) actionDelete() {
 
 //
 func (ten *Node) actionPropertyNew(a Action) {
-	a.Action = `property_new`
+	a.Action = ActionPropertyNew
 	ten.actionProperty(a)
 }
 
 func (ten *Node) actionPropertyUpdate(a Action) {
-	a.Action = `property_update`
+	a.Action = ActionPropertyUpdate
 	ten.actionProperty(a)
 }
 
 func (ten *Node) actionPropertyDelete(a Action) {
-	a.Action = `property_delete`
+	a.Action = ActionPropertyDelete
 	ten.actionProperty(a)
 }
 
@@ -315,13 +315,13 @@ func (ten *Node) actionProperty(a Action) {
 func (ten *Node) actionCheckNew(a Action) {
 	a.Check.RepositoryID = ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
 	a.Check.BucketID = ten.Parent.(Bucketeer).GetBucket().(Builder).GetID()
-	ten.actionDispatch("check_new", a)
+	ten.actionDispatch(ActionCheckNew, a)
 }
 
 func (ten *Node) actionCheckRemoved(a Action) {
 	a.Check.RepositoryID = ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
 	a.Check.BucketID = ten.Parent.(Bucketeer).GetBucket().(Builder).GetID()
-	ten.actionDispatch(`check_removed`, a)
+	ten.actionDispatch(ActionCheckRemoved, a)
 }
 
 func (ten *Node) setupCheckAction(c Check) Action {
@@ -329,15 +329,15 @@ func (ten *Node) setupCheckAction(c Check) Action {
 }
 
 func (ten *Node) actionCheckInstanceCreate(a Action) {
-	ten.actionDispatch("check_instance_create", a)
+	ten.actionDispatch(ActionCheckInstanceCreate, a)
 }
 
 func (ten *Node) actionCheckInstanceUpdate(a Action) {
-	ten.actionDispatch("check_instance_update", a)
+	ten.actionDispatch(ActionCheckInstanceUpdate, a)
 }
 
 func (ten *Node) actionCheckInstanceDelete(a Action) {
-	ten.actionDispatch("check_instance_delete", a)
+	ten.actionDispatch(ActionCheckInstanceDelete, a)
 }
 
 func (ten *Node) actionDispatch(action string, a Action) {

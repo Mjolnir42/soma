@@ -523,38 +523,55 @@ actionloop:
 		if tk.status.requiresRebuild {
 			if tk.status.rebuildLevel == `instances` {
 				switch a.Action {
-				case `check_new`, `check_removed`:
+				case
+					tree.ActionCheckNew,
+					tree.ActionCheckRemoved:
 					// ignore only in instance-rebuild mode
 					continue actionloop
 				}
 			}
 			switch a.Action {
-			case `property_new`, `property_delete`,
-				`create`, `update`, `delete`,
-				`node_assignment`,
-				`member_new`, `member_removed`:
+			case
+				tree.ActionCreate,
+				tree.ActionDelete,
+				tree.ActionMemberNew,
+				tree.ActionMemberRemoved,
+				tree.ActionNodeAssignment,
+				tree.ActionPropertyDelete,
+				tree.ActionPropertyNew,
+				tree.ActionUpdate:
 				// ignore in all rebuild modes
 				continue actionloop
 			}
 		}
 
 		switch a.Action {
-		case `property_new`, `property_delete`:
+		case
+			tree.ActionPropertyDelete,
+			tree.ActionPropertyNew:
 			if err = tk.txProperty(a, stm); err != nil {
 				break actionloop
 			}
-		case `check_new`, `check_removed`:
+		case
+			tree.ActionCheckNew,
+			tree.ActionCheckRemoved:
 			if err = tk.txCheck(a, stm); err != nil {
 				break actionloop
 			}
-		case `check_instance_create`,
-			`check_instance_update`,
-			`check_instance_delete`:
+		case
+			tree.ActionCheckInstanceCreate,
+			tree.ActionCheckInstanceDelete,
+			tree.ActionCheckInstanceUpdate:
 			if err = tk.txCheckInstance(a, stm); err != nil {
 				break actionloop
 			}
-		case `create`, `update`, `delete`, `node_assignment`,
-			`member_new`, `member_removed`:
+		case
+			tree.ActionCreate,
+			tree.ActionDelete,
+			tree.ActionMemberNew,
+			tree.ActionMemberRemoved,
+			tree.ActionNodeAssignment,
+			tree.ActionUpdate:
 			if err = tk.txTree(a, stm, q.AuthUser); err != nil {
 				break actionloop
 			}

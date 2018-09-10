@@ -88,7 +88,7 @@ func (tef *Fault) setAction(c chan *Action) {
 
 	if tef.Action != nil {
 		tef.Action <- &Action{
-			Action: "create",
+			Action: ActionCreate,
 			Type:   "fault",
 			//Id:     tef.ID.String(),
 			//Name:   tef.Name,

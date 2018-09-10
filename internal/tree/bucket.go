@@ -288,7 +288,7 @@ func (teb *Bucket) export() proto.Bucket {
 
 func (teb *Bucket) actionCreate() {
 	teb.Action <- &Action{
-		Action: "create",
+		Action: ActionCreate,
 		Type:   teb.Type,
 		Bucket: teb.export(),
 	}
@@ -296,7 +296,7 @@ func (teb *Bucket) actionCreate() {
 
 func (teb *Bucket) actionUpdate() {
 	teb.Action <- &Action{
-		Action: "update",
+		Action: ActionUpdate,
 		Type:   teb.Type,
 		Bucket: teb.export(),
 	}
@@ -304,14 +304,14 @@ func (teb *Bucket) actionUpdate() {
 
 func (teb *Bucket) actionDelete() {
 	teb.Action <- &Action{
-		Action: "delete",
+		Action: ActionDelete,
 		Type:   teb.Type,
 		Bucket: teb.export(),
 	}
 }
 
 func (teb *Bucket) actionAssignNode(a Action) {
-	a.Action = "node_assignment"
+	a.Action = ActionNodeAssignment
 	a.Type = teb.Type
 	a.Bucket = teb.export()
 
@@ -320,17 +320,17 @@ func (teb *Bucket) actionAssignNode(a Action) {
 
 //
 func (teb *Bucket) actionPropertyNew(a Action) {
-	a.Action = "property_new"
+	a.Action = ActionPropertyNew
 	teb.actionProperty(a)
 }
 
 func (teb *Bucket) actionPropertyUpdate(a Action) {
-	a.Action = `property_update`
+	a.Action = ActionPropertyUpdate
 	teb.actionProperty(a)
 }
 
 func (teb *Bucket) actionPropertyDelete(a Action) {
-	a.Action = `property_delete`
+	a.Action = ActionPropertyDelete
 	teb.actionProperty(a)
 }
 
@@ -352,7 +352,7 @@ func (teb *Bucket) actionProperty(a Action) {
 
 //
 func (teb *Bucket) actionCheckNew(a Action) {
-	a.Action = "check_new"
+	a.Action = ActionCheckNew
 	a.Type = teb.Type
 	a.Bucket = teb.export()
 	a.Check.RepositoryID = teb.Repository.String()
@@ -362,7 +362,7 @@ func (teb *Bucket) actionCheckNew(a Action) {
 }
 
 func (teb *Bucket) actionCheckRemoved(a Action) {
-	a.Action = `check_removed`
+	a.Action = ActionCheckRemoved
 	a.Type = teb.Type
 	a.Bucket = teb.export()
 	a.Check.RepositoryID = teb.Repository.String()

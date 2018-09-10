@@ -61,50 +61,50 @@ func TestCheckerAddCheck(t *testing.T) {
 
 	elem := 0
 	actions := [][]string{
-		[]string{`repository`, `create`},
-		[]string{`fault`, `create`},
+		[]string{`repository`, ActionCreate},
+		[]string{`fault`, ActionCreate},
 		[]string{`errorchannel`, `attached`},
-		[]string{`bucket`, `create`},
-		[]string{`group`, `create`},
-		[]string{`group`, `create`},
-		[]string{`cluster`, `create`},
-		[]string{`cluster`, `create`},
-		[]string{`bucket`, `node_assignment`}, // NewNode
-		[]string{`node`, `update`},
-		[]string{`bucket`, `node_assignment`}, // NewNode
-		[]string{`node`, `update`},
-		[]string{`bucket`, `node_assignment`}, // NewNode
-		[]string{`node`, `update`},
-		[]string{`bucket`, `node_assignment`}, // NewNode
-		[]string{`node`, `update`},
-		[]string{`group`, `member_new`}, // MoveGroupToGroup
-		[]string{`group`, `update`},
-		[]string{`group`, `member_new`}, // MoveClusterToGroup
-		[]string{`cluster`, `update`},
-		[]string{`cluster`, `member_new`}, // MoveNodeToCluster
-		[]string{`node`, `update`},
-		[]string{`group`, `member_new`}, // MoveNodeToGroup
-		[]string{`node`, `update`},
-		[]string{`cluster`, `member_new`}, // MoveNodeToCluster
-		[]string{`node`, `update`},
-		[]string{`node`, `check_new`}, // SetCheck
-		[]string{`cluster`, `check_new`},
-		[]string{`node`, `check_new`},
-		[]string{`group`, `check_new`},
-		[]string{`group`, `check_new`},
-		[]string{`node`, `check_new`},
-		[]string{`cluster`, `check_new`},
-		[]string{`node`, `check_new`},
-		[]string{`bucket`, `check_new`},
-		[]string{`repository`, `check_new`},
-		[]string{`node`, `check_instance_create`}, // ComputeInstances
-		[]string{`cluster`, `check_instance_create`},
-		[]string{`node`, `check_instance_create`},
-		[]string{`group`, `check_instance_create`},
-		[]string{`group`, `check_instance_create`},
-		[]string{`node`, `check_instance_create`},
-		[]string{`cluster`, `check_instance_create`},
-		[]string{`node`, `check_instance_create`},
+		[]string{`bucket`, ActionCreate},
+		[]string{`group`, ActionCreate},
+		[]string{`group`, ActionCreate},
+		[]string{`cluster`, ActionCreate},
+		[]string{`cluster`, ActionCreate},
+		[]string{`bucket`, ActionNodeAssignment}, // NewNode
+		[]string{`node`, ActionUpdate},
+		[]string{`bucket`, ActionNodeAssignment}, // NewNode
+		[]string{`node`, ActionUpdate},
+		[]string{`bucket`, ActionNodeAssignment}, // NewNode
+		[]string{`node`, ActionUpdate},
+		[]string{`bucket`, ActionNodeAssignment}, // NewNode
+		[]string{`node`, ActionUpdate},
+		[]string{`group`, ActionMemberNew}, // MoveGroupToGroup
+		[]string{`group`, ActionUpdate},
+		[]string{`group`, ActionMemberNew}, // MoveClusterToGroup
+		[]string{`cluster`, ActionUpdate},
+		[]string{`cluster`, ActionMemberNew}, // MoveNodeToCluster
+		[]string{`node`, ActionUpdate},
+		[]string{`group`, ActionMemberNew}, // MoveNodeToGroup
+		[]string{`node`, ActionUpdate},
+		[]string{`cluster`, ActionMemberNew}, // MoveNodeToCluster
+		[]string{`node`, ActionUpdate},
+		[]string{`node`, ActionCheckNew}, // SetCheck
+		[]string{`cluster`, ActionCheckNew},
+		[]string{`node`, ActionCheckNew},
+		[]string{`group`, ActionCheckNew},
+		[]string{`group`, ActionCheckNew},
+		[]string{`node`, ActionCheckNew},
+		[]string{`cluster`, ActionCheckNew},
+		[]string{`node`, ActionCheckNew},
+		[]string{`bucket`, ActionCheckNew},
+		[]string{`repository`, ActionCheckNew},
+		[]string{`node`, ActionCheckInstanceCreate}, // ComputeInstances
+		[]string{`cluster`, ActionCheckInstanceCreate},
+		[]string{`node`, ActionCheckInstanceCreate},
+		[]string{`group`, ActionCheckInstanceCreate},
+		[]string{`group`, ActionCheckInstanceCreate},
+		[]string{`node`, ActionCheckInstanceCreate},
+		[]string{`cluster`, ActionCheckInstanceCreate},
+		[]string{`node`, ActionCheckInstanceCreate},
 	}
 	for a := range actionC {
 		if elem >= len(actions) {
@@ -189,68 +189,68 @@ func TestCheckerDeleteCheck(t *testing.T) {
 
 	elem := 0
 	actions := [][]string{
-		[]string{`repository`, `create`},
-		[]string{`fault`, `create`},
+		[]string{`repository`, ActionCreate},
+		[]string{`fault`, ActionCreate},
 		[]string{`errorchannel`, `attached`},
-		[]string{`bucket`, `create`},
-		[]string{`group`, `create`},
-		[]string{`group`, `create`},
-		[]string{`cluster`, `create`},
-		[]string{`cluster`, `create`},
-		[]string{`bucket`, `node_assignment`}, // NewNode
-		[]string{`node`, `update`},
-		[]string{`bucket`, `node_assignment`}, // NewNode
-		[]string{`node`, `update`},
-		[]string{`bucket`, `node_assignment`}, // NewNode
-		[]string{`node`, `update`},
-		[]string{`bucket`, `node_assignment`}, // NewNode
-		[]string{`node`, `update`},
-		[]string{`group`, `member_new`}, // MoveGroupToGroup
-		[]string{`group`, `update`},
-		[]string{`group`, `member_new`}, // MoveClusterToGroup
-		[]string{`cluster`, `update`},
-		[]string{`cluster`, `member_new`}, // MoveNodeToCluster
-		[]string{`node`, `update`},
-		[]string{`group`, `member_new`}, // MoveNodeToGroup
-		[]string{`node`, `update`},
-		[]string{`cluster`, `member_new`}, // MoveNodeToCluster
-		[]string{`node`, `update`},
-		[]string{`node`, `check_new`}, // SetCheck
-		[]string{`cluster`, `check_new`},
-		[]string{`node`, `check_new`},
-		[]string{`group`, `check_new`},
-		[]string{`group`, `check_new`},
-		[]string{`node`, `check_new`},
-		[]string{`cluster`, `check_new`},
-		[]string{`node`, `check_new`},
-		[]string{`bucket`, `check_new`},
-		[]string{`repository`, `check_new`},
-		[]string{`node`, `check_instance_create`}, // ComputeInstances
-		[]string{`cluster`, `check_instance_create`},
-		[]string{`node`, `check_instance_create`},
-		[]string{`group`, `check_instance_create`},
-		[]string{`group`, `check_instance_create`},
-		[]string{`node`, `check_instance_create`},
-		[]string{`cluster`, `check_instance_create`},
-		[]string{`node`, `check_instance_create`},
-		[]string{`node`, `check_removed`}, // DeleteCheck
-		[]string{`cluster`, `check_removed`},
-		[]string{`node`, `check_removed`},
-		[]string{`group`, `check_removed`},
-		[]string{`group`, `check_removed`},
-		[]string{`node`, `check_removed`},
-		[]string{`cluster`, `check_removed`},
-		[]string{`node`, `check_removed`},
-		[]string{`bucket`, `check_removed`},
-		[]string{`repository`, `check_removed`},
-		[]string{`node`, `check_instance_delete`}, // ComputeInstances
-		[]string{`cluster`, `check_instance_delete`},
-		[]string{`node`, `check_instance_delete`},
-		[]string{`group`, `check_instance_delete`},
-		[]string{`group`, `check_instance_delete`},
-		[]string{`node`, `check_instance_delete`},
-		[]string{`cluster`, `check_instance_delete`},
-		[]string{`node`, `check_instance_delete`},
+		[]string{`bucket`, ActionCreate},
+		[]string{`group`, ActionCreate},
+		[]string{`group`, ActionCreate},
+		[]string{`cluster`, ActionCreate},
+		[]string{`cluster`, ActionCreate},
+		[]string{`bucket`, ActionNodeAssignment}, // NewNode
+		[]string{`node`, ActionUpdate},
+		[]string{`bucket`, ActionNodeAssignment}, // NewNode
+		[]string{`node`, ActionUpdate},
+		[]string{`bucket`, ActionNodeAssignment}, // NewNode
+		[]string{`node`, ActionUpdate},
+		[]string{`bucket`, ActionNodeAssignment}, // NewNode
+		[]string{`node`, ActionUpdate},
+		[]string{`group`, ActionMemberNew}, // MoveGroupToGroup
+		[]string{`group`, ActionUpdate},
+		[]string{`group`, ActionMemberNew}, // MoveClusterToGroup
+		[]string{`cluster`, ActionUpdate},
+		[]string{`cluster`, ActionMemberNew}, // MoveNodeToCluster
+		[]string{`node`, ActionUpdate},
+		[]string{`group`, ActionMemberNew}, // MoveNodeToGroup
+		[]string{`node`, ActionUpdate},
+		[]string{`cluster`, ActionMemberNew}, // MoveNodeToCluster
+		[]string{`node`, ActionUpdate},
+		[]string{`node`, ActionCheckNew}, // SetCheck
+		[]string{`cluster`, ActionCheckNew},
+		[]string{`node`, ActionCheckNew},
+		[]string{`group`, ActionCheckNew},
+		[]string{`group`, ActionCheckNew},
+		[]string{`node`, ActionCheckNew},
+		[]string{`cluster`, ActionCheckNew},
+		[]string{`node`, ActionCheckNew},
+		[]string{`bucket`, ActionCheckNew},
+		[]string{`repository`, ActionCheckNew},
+		[]string{`node`, ActionCheckInstanceCreate}, // ComputeInstances
+		[]string{`cluster`, ActionCheckInstanceCreate},
+		[]string{`node`, ActionCheckInstanceCreate},
+		[]string{`group`, ActionCheckInstanceCreate},
+		[]string{`group`, ActionCheckInstanceCreate},
+		[]string{`node`, ActionCheckInstanceCreate},
+		[]string{`cluster`, ActionCheckInstanceCreate},
+		[]string{`node`, ActionCheckInstanceCreate},
+		[]string{`node`, ActionCheckRemoved}, // DeleteCheck
+		[]string{`cluster`, ActionCheckRemoved},
+		[]string{`node`, ActionCheckRemoved},
+		[]string{`group`, ActionCheckRemoved},
+		[]string{`group`, ActionCheckRemoved},
+		[]string{`node`, ActionCheckRemoved},
+		[]string{`cluster`, ActionCheckRemoved},
+		[]string{`node`, ActionCheckRemoved},
+		[]string{`bucket`, ActionCheckRemoved},
+		[]string{`repository`, ActionCheckRemoved},
+		[]string{`node`, ActionCheckInstanceDelete}, // ComputeInstances
+		[]string{`cluster`, ActionCheckInstanceDelete},
+		[]string{`node`, ActionCheckInstanceDelete},
+		[]string{`group`, ActionCheckInstanceDelete},
+		[]string{`group`, ActionCheckInstanceDelete},
+		[]string{`node`, ActionCheckInstanceDelete},
+		[]string{`cluster`, ActionCheckInstanceDelete},
+		[]string{`node`, ActionCheckInstanceDelete},
 	}
 	for a := range actionC {
 		if elem >= len(actions) {

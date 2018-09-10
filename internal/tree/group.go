@@ -367,7 +367,7 @@ func (teg *Group) export() proto.Group {
 
 func (teg *Group) actionCreate() {
 	teg.Action <- &Action{
-		Action: "create",
+		Action: ActionCreate,
 		Type:   teg.Type,
 		Group:  teg.export(),
 	}
@@ -375,7 +375,7 @@ func (teg *Group) actionCreate() {
 
 func (teg *Group) actionUpdate() {
 	teg.Action <- &Action{
-		Action: "update",
+		Action: ActionUpdate,
 		Type:   teg.Type,
 		Group:  teg.export(),
 	}
@@ -383,14 +383,14 @@ func (teg *Group) actionUpdate() {
 
 func (teg *Group) actionDelete() {
 	teg.Action <- &Action{
-		Action: "delete",
+		Action: ActionDelete,
 		Type:   teg.Type,
 		Group:  teg.export(),
 	}
 }
 
 func (teg *Group) actionMemberNew(a Action) {
-	a.Action = "member_new"
+	a.Action = ActionMemberNew
 	a.Type = teg.Type
 	a.Group = teg.export()
 
@@ -398,7 +398,7 @@ func (teg *Group) actionMemberNew(a Action) {
 }
 
 func (teg *Group) actionMemberRemoved(a Action) {
-	a.Action = "member_removed"
+	a.Action = ActionMemberRemoved
 	a.Type = teg.Type
 	a.Group = teg.export()
 
@@ -407,17 +407,17 @@ func (teg *Group) actionMemberRemoved(a Action) {
 
 //
 func (teg *Group) actionPropertyNew(a Action) {
-	a.Action = `property_new`
+	a.Action = ActionPropertyNew
 	teg.actionProperty(a)
 }
 
 func (teg *Group) actionPropertyUpdate(a Action) {
-	a.Action = `property_update`
+	a.Action = ActionPropertyUpdate
 	teg.actionProperty(a)
 }
 
 func (teg *Group) actionPropertyDelete(a Action) {
-	a.Action = `property_delete`
+	a.Action = ActionPropertyDelete
 	teg.actionProperty(a)
 }
 
@@ -441,13 +441,13 @@ func (teg *Group) actionProperty(a Action) {
 func (teg *Group) actionCheckNew(a Action) {
 	a.Check.RepositoryID = teg.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
 	a.Check.BucketID = teg.Parent.(Bucketeer).GetBucket().(Builder).GetID()
-	teg.actionDispatch("check_new", a)
+	teg.actionDispatch(ActionCheckNew, a)
 }
 
 func (teg *Group) actionCheckRemoved(a Action) {
 	a.Check.RepositoryID = teg.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
 	a.Check.BucketID = teg.Parent.(Bucketeer).GetBucket().(Builder).GetID()
-	teg.actionDispatch(`check_removed`, a)
+	teg.actionDispatch(ActionCheckRemoved, a)
 }
 
 func (teg *Group) setupCheckAction(c Check) Action {
@@ -455,15 +455,15 @@ func (teg *Group) setupCheckAction(c Check) Action {
 }
 
 func (teg *Group) actionCheckInstanceCreate(a Action) {
-	teg.actionDispatch("check_instance_create", a)
+	teg.actionDispatch(ActionCheckInstanceCreate, a)
 }
 
 func (teg *Group) actionCheckInstanceUpdate(a Action) {
-	teg.actionDispatch("check_instance_update", a)
+	teg.actionDispatch(ActionCheckInstanceUpdate, a)
 }
 
 func (teg *Group) actionCheckInstanceDelete(a Action) {
-	teg.actionDispatch("check_instance_delete", a)
+	teg.actionDispatch(ActionCheckInstanceDelete, a)
 }
 
 func (teg *Group) actionDispatch(action string, a Action) {

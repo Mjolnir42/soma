@@ -294,7 +294,7 @@ func (ter *Repository) export() proto.Repository {
 
 func (ter *Repository) actionCreate() {
 	ter.Action <- &Action{
-		Action:     "create",
+		Action:     ActionCreate,
 		Type:       ter.Type,
 		Repository: ter.export(),
 	}
@@ -302,7 +302,7 @@ func (ter *Repository) actionCreate() {
 
 func (ter *Repository) actionUpdate() {
 	ter.Action <- &Action{
-		Action:     "update",
+		Action:     ActionUpdate,
 		Type:       ter.Type,
 		Repository: ter.export(),
 	}
@@ -310,24 +310,24 @@ func (ter *Repository) actionUpdate() {
 
 func (ter *Repository) actionDelete() {
 	ter.Action <- &Action{
-		Action:     "delete",
+		Action:     ActionDelete,
 		Type:       ter.Type,
 		Repository: ter.export(),
 	}
 }
 
 func (ter *Repository) actionPropertyNew(a Action) {
-	a.Action = "property_new"
+	a.Action = ActionPropertyNew
 	ter.actionProperty(a)
 }
 
 func (ter *Repository) actionPropertyUpdate(a Action) {
-	a.Action = "property_update"
+	a.Action = ActionPropertyUpdate
 	ter.actionProperty(a)
 }
 
 func (ter *Repository) actionPropertyDelete(a Action) {
-	a.Action = "property_delete"
+	a.Action = ActionPropertyDelete
 	ter.actionProperty(a)
 }
 
@@ -348,7 +348,7 @@ func (ter *Repository) actionProperty(a Action) {
 }
 
 func (ter *Repository) actionCheckNew(a Action) {
-	a.Action = "check_new"
+	a.Action = ActionCheckNew
 	a.Type = ter.Type
 	a.Repository = ter.export()
 	a.Check.RepositoryID = ter.ID.String()
@@ -358,7 +358,7 @@ func (ter *Repository) actionCheckNew(a Action) {
 }
 
 func (ter *Repository) actionCheckRemoved(a Action) {
-	a.Action = `check_removed`
+	a.Action = ActionCheckRemoved
 	a.Type = ter.Type
 	a.Repository = ter.export()
 	a.Check.RepositoryID = ter.ID.String()

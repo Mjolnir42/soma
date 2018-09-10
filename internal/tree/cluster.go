@@ -333,7 +333,7 @@ func (tec *Cluster) export() proto.Cluster {
 
 func (tec *Cluster) actionCreate() {
 	tec.Action <- &Action{
-		Action:  "create",
+		Action:  ActionCreate,
 		Type:    tec.Type,
 		Cluster: tec.export(),
 	}
@@ -341,7 +341,7 @@ func (tec *Cluster) actionCreate() {
 
 func (tec *Cluster) actionUpdate() {
 	tec.Action <- &Action{
-		Action:  "update",
+		Action:  ActionUpdate,
 		Type:    tec.Type,
 		Cluster: tec.export(),
 	}
@@ -349,14 +349,14 @@ func (tec *Cluster) actionUpdate() {
 
 func (tec *Cluster) actionDelete() {
 	tec.Action <- &Action{
-		Action:  "delete",
+		Action:  ActionDelete,
 		Type:    tec.Type,
 		Cluster: tec.export(),
 	}
 }
 
 func (tec *Cluster) actionMemberNew(a Action) {
-	a.Action = "member_new"
+	a.Action = ActionMemberNew
 	a.Type = tec.Type
 	a.Cluster = tec.export()
 
@@ -364,7 +364,7 @@ func (tec *Cluster) actionMemberNew(a Action) {
 }
 
 func (tec *Cluster) actionMemberRemoved(a Action) {
-	a.Action = "member_removed"
+	a.Action = ActionMemberRemoved
 	a.Type = tec.Type
 	a.Cluster = tec.export()
 
@@ -373,17 +373,17 @@ func (tec *Cluster) actionMemberRemoved(a Action) {
 
 //
 func (tec *Cluster) actionPropertyNew(a Action) {
-	a.Action = `property_new`
+	a.Action = ActionPropertyNew
 	tec.actionProperty(a)
 }
 
 func (tec *Cluster) actionPropertyUpdate(a Action) {
-	a.Action = `property_update`
+	a.Action = ActionPropertyUpdate
 	tec.actionProperty(a)
 }
 
 func (tec *Cluster) actionPropertyDelete(a Action) {
-	a.Action = `property_delete`
+	a.Action = ActionPropertyDelete
 	tec.actionProperty(a)
 }
 
@@ -407,13 +407,13 @@ func (tec *Cluster) actionProperty(a Action) {
 func (tec *Cluster) actionCheckNew(a Action) {
 	a.Check.RepositoryID = tec.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
 	a.Check.BucketID = tec.Parent.(Bucketeer).GetBucket().(Builder).GetID()
-	tec.actionDispatch("check_new", a)
+	tec.actionDispatch(ActionCheckNew, a)
 }
 
 func (tec *Cluster) actionCheckRemoved(a Action) {
 	a.Check.RepositoryID = tec.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepository()
 	a.Check.BucketID = tec.Parent.(Bucketeer).GetBucket().(Builder).GetID()
-	tec.actionDispatch(`check_removed`, a)
+	tec.actionDispatch(ActionCheckRemoved, a)
 }
 
 func (tec *Cluster) setupCheckAction(c Check) Action {
@@ -421,15 +421,15 @@ func (tec *Cluster) setupCheckAction(c Check) Action {
 }
 
 func (tec *Cluster) actionCheckInstanceCreate(a Action) {
-	tec.actionDispatch("check_instance_create", a)
+	tec.actionDispatch(ActionCheckInstanceCreate, a)
 }
 
 func (tec *Cluster) actionCheckInstanceUpdate(a Action) {
-	tec.actionDispatch("check_instance_update", a)
+	tec.actionDispatch(ActionCheckInstanceUpdate, a)
 }
 
 func (tec *Cluster) actionCheckInstanceDelete(a Action) {
-	tec.actionDispatch("check_instance_delete", a)
+	tec.actionDispatch(ActionCheckInstanceDelete, a)
 }
 
 func (tec *Cluster) actionDispatch(action string, a Action) {
