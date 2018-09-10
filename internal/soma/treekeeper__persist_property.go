@@ -45,13 +45,13 @@ func (tk *TreeKeeper) txPropertyNew(a *tree.Action,
 	}
 
 	switch a.Property.Type {
-	case `custom`:
+	case msg.PropertyCustom:
 		return tk.txPropertyNewCustom(a, stm)
-	case `system`:
+	case msg.PropertySystem:
 		return tk.txPropertyNewSystem(a, stm)
-	case `service`:
+	case msg.PropertyService:
 		return tk.txPropertyNewService(a, stm)
-	case `oncall`:
+	case msg.PropertyOncall:
 		return tk.txPropertyNewOncall(a, stm)
 	}
 	return fmt.Errorf(`Impossible property type`)
@@ -65,19 +65,19 @@ func (tk *TreeKeeper) txPropertyNewCustom(a *tree.Action,
 		id        string
 	)
 	switch a.Type {
-	case `repository`:
+	case msg.EntityRepository:
 		statement = stm[`RepositoryPropertyCustomCreate`]
 		id = a.Property.Custom.RepositoryID
-	case `bucket`:
+	case msg.EntityBucket:
 		statement = stm[`BucketPropertyCustomCreate`]
 		id = a.Bucket.ID
-	case `group`:
+	case msg.EntityGroup:
 		statement = stm[`GroupPropertyCustomCreate`]
 		id = a.Group.ID
-	case `cluster`:
+	case msg.EntityCluster:
 		statement = stm[`ClusterPropertyCustomCreate`]
 		id = a.Cluster.ID
-	case `node`:
+	case msg.EntityNode:
 		statement = stm[`NodePropertyCustomCreate`]
 		id = a.Node.ID
 	}
@@ -102,19 +102,19 @@ func (tk *TreeKeeper) txPropertyNewSystem(a *tree.Action,
 		id        string
 	)
 	switch a.Type {
-	case `repository`:
+	case msg.EntityRepository:
 		statement = stm[`RepositoryPropertySystemCreate`]
 		id = a.Repository.ID
-	case `bucket`:
+	case msg.EntityBucket:
 		statement = stm[`BucketPropertySystemCreate`]
 		id = a.Bucket.ID
-	case `group`:
+	case msg.EntityGroup:
 		statement = stm[`GroupPropertySystemCreate`]
 		id = a.Group.ID
-	case `cluster`:
+	case msg.EntityCluster:
 		statement = stm[`ClusterPropertySystemCreate`]
 		id = a.Cluster.ID
-	case `node`:
+	case msg.EntityNode:
 		statement = stm[`NodePropertySystemCreate`]
 		id = a.Node.ID
 	}
@@ -142,19 +142,19 @@ func (tk *TreeKeeper) txPropertyNewService(a *tree.Action,
 		id        string
 	)
 	switch a.Type {
-	case `repository`:
+	case msg.EntityRepository:
 		statement = stm[`RepositoryPropertyServiceCreate`]
 		id = a.Repository.ID
-	case `bucket`:
+	case msg.EntityBucket:
 		statement = stm[`BucketPropertyServiceCreate`]
 		id = a.Bucket.ID
-	case `group`:
+	case msg.EntityGroup:
 		statement = stm[`GroupPropertyServiceCreate`]
 		id = a.Group.ID
-	case `cluster`:
+	case msg.EntityCluster:
 		statement = stm[`ClusterPropertyServiceCreate`]
 		id = a.Cluster.ID
-	case `node`:
+	case msg.EntityNode:
 		statement = stm[`NodePropertyServiceCreate`]
 		id = a.Node.ID
 	}
@@ -180,19 +180,19 @@ func (tk *TreeKeeper) txPropertyNewOncall(a *tree.Action,
 		id        string
 	)
 	switch a.Type {
-	case `repository`:
+	case msg.EntityRepository:
 		statement = stm[`RepositoryPropertyOncallCreate`]
 		id = a.Repository.ID
-	case `bucket`:
+	case msg.EntityBucket:
 		statement = stm[`BucketPropertyOncallCreate`]
 		id = a.Bucket.ID
-	case `group`:
+	case msg.EntityGroup:
 		statement = stm[`GroupPropertyOncallCreate`]
 		id = a.Group.ID
-	case `cluster`:
+	case msg.EntityCluster:
 		statement = stm[`ClusterPropertyOncallCreate`]
 		id = a.Cluster.ID
-	case `node`:
+	case msg.EntityNode:
 		statement = stm[`NodePropertyOncallCreate`]
 		id = a.Node.ID
 	}
@@ -223,54 +223,54 @@ func (tk *TreeKeeper) txPropertyDelete(a *tree.Action,
 	switch a.Property.Type {
 	case `custom`:
 		switch a.Type {
-		case `repository`:
+		case msg.EntityRepository:
 			statement = stm[`RepositoryPropertyCustomDelete`]
-		case `bucket`:
+		case msg.EntityBucket:
 			statement = stm[`BucketPropertyCustomDelete`]
-		case `group`:
+		case msg.EntityGroup:
 			statement = stm[`GroupPropertyCustomDelete`]
-		case `cluster`:
+		case msg.EntityCluster:
 			statement = stm[`ClusterPropertyCustomDelete`]
-		case `node`:
+		case msg.EntityNode:
 			statement = stm[`NodePropertyCustomDelete`]
 		}
 	case `system`:
 		switch a.Type {
-		case `repository`:
+		case msg.EntityRepository:
 			statement = stm[`RepositoryPropertySystemDelete`]
-		case `bucket`:
+		case msg.EntityBucket:
 			statement = stm[`BucketPropertySystemDelete`]
-		case `group`:
+		case msg.EntityGroup:
 			statement = stm[`GroupPropertySystemDelete`]
-		case `cluster`:
+		case msg.EntityCluster:
 			statement = stm[`ClusterPropertySystemDelete`]
-		case `node`:
+		case msg.EntityNode:
 			statement = stm[`NodePropertySystemDelete`]
 		}
 	case `service`:
 		switch a.Type {
-		case `repository`:
+		case msg.EntityRepository:
 			statement = stm[`RepositoryPropertyServiceDelete`]
-		case `bucket`:
+		case msg.EntityBucket:
 			statement = stm[`BucketPropertyServiceDelete`]
-		case `group`:
+		case msg.EntityGroup:
 			statement = stm[`GroupPropertyServiceDelete`]
-		case `cluster`:
+		case msg.EntityCluster:
 			statement = stm[`ClusterPropertyServiceDelete`]
-		case `node`:
+		case msg.EntityNode:
 			statement = stm[`NodePropertyServiceDelete`]
 		}
 	case `oncall`:
 		switch a.Type {
-		case `repository`:
+		case msg.EntityRepository:
 			statement = stm[`RepositoryPropertyOncallDelete`]
-		case `bucket`:
+		case msg.EntityBucket:
 			statement = stm[`BucketPropertyOncallDelete`]
-		case `group`:
+		case msg.EntityGroup:
 			statement = stm[`GroupPropertyOncallDelete`]
-		case `cluster`:
+		case msg.EntityCluster:
 			statement = stm[`ClusterPropertyOncallDelete`]
-		case `node`:
+		case msg.EntityNode:
 			statement = stm[`NodePropertyOncallDelete`]
 		}
 	}

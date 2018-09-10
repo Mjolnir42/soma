@@ -12,21 +12,22 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
 )
 
 func (tk *TreeKeeper) txTree(a *tree.Action,
 	stm map[string]*sql.Stmt, user string) error {
 	switch a.Action {
-	case `create`:
+	case tree.ActionCreate:
 		return tk.txTreeCreate(a, stm, user)
-	case `update`:
+	case tree.ActionUpdate:
 		return tk.txTreeUpdate(a, stm)
-	case `delete`:
+	case tree.ActionDelete:
 		return tk.txTreeDelete(a, stm)
-	case `member_new`, `node_assignment`:
+	case tree.ActionMemberNew, tree.ActionNodeAssignment:
 		return tk.txTreeMemberNew(a, stm)
-	case `member_removed`:
+	case tree.ActionMemberRemoved:
 		return tk.txTreeMemberRemoved(a, stm)
 	default:
 		return fmt.Errorf("Illegal tree action: %s", a.Action)
@@ -37,7 +38,7 @@ func (tk *TreeKeeper) txTreeCreate(a *tree.Action,
 	stm map[string]*sql.Stmt, user string) error {
 	var err error
 	switch a.Type {
-	case `bucket`:
+	case msg.EntityBucket:
 		_, err = stm[`CreateBucket`].Exec(
 			a.Bucket.ID,
 			a.Bucket.Name,
@@ -48,7 +49,7 @@ func (tk *TreeKeeper) txTreeCreate(a *tree.Action,
 			a.Bucket.TeamID,
 			user,
 		)
-	case `group`:
+	case msg.EntityGroup:
 		_, err = stm[`GroupCreate`].Exec(
 			a.Group.ID,
 			a.Group.BucketID,
@@ -57,7 +58,7 @@ func (tk *TreeKeeper) txTreeCreate(a *tree.Action,
 			a.Group.TeamID,
 			user,
 		)
-	case `cluster`:
+	case msg.EntityCluster:
 		_, err = stm[`ClusterCreate`].Exec(
 			a.Cluster.ID,
 			a.Cluster.Name,
@@ -78,15 +79,15 @@ func (tk *TreeKeeper) txTreeUpdate(a *tree.Action,
 		id, newState string
 	)
 	switch a.Type {
-	case `group`:
+	case msg.EntityGroup:
 		statement = stm[`GroupUpdate`]
 		id = a.Group.ID
 		newState = a.Group.ObjectState
-	case `cluster`:
+	case msg.EntityCluster:
 		statement = stm[`ClusterUpdate`]
 		id = a.Cluster.ID
 		newState = a.Cluster.ObjectState
-	case `node`:
+	case msg.EntityNode:
 		statement = stm[`UpdateNodeState`]
 		id = a.Node.ID
 		newState = a.Node.State
@@ -102,15 +103,15 @@ func (tk *TreeKeeper) txTreeDelete(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	var err error
 	switch a.Type {
-	case `group`:
+	case msg.EntityGroup:
 		_, err = stm[`GroupDelete`].Exec(
 			a.Group.ID,
 		)
-	case `cluster`:
+	case msg.EntityCluster:
 		_, err = stm[`ClusterDelete`].Exec(
 			a.Cluster.ID,
 		)
-	case `node`:
+	case msg.EntityNode:
 		if _, err = stm[`NodeUnassignFromBucket`].Exec(
 			a.Node.ID,
 			a.Node.Config.BucketID,
@@ -132,28 +133,28 @@ func (tk *TreeKeeper) txTreeMemberNew(a *tree.Action,
 		statement         *sql.Stmt
 	)
 	switch a.Type {
-	case `bucket`:
+	case msg.EntityBucket:
 		_, err = stm[`BucketAssignNode`].Exec(
 			a.ChildNode.ID,
 			a.Bucket.ID,
 			a.Bucket.TeamID,
 		)
 		goto exit
-	case `group`:
+	case msg.EntityGroup:
 		id = a.Group.ID
 		bucket = a.Group.BucketID
 		switch a.ChildType {
-		case `group`:
+		case msg.EntityGroup:
 			statement = stm[`GroupMemberNewGroup`]
 			child = a.ChildGroup.ID
-		case `cluster`:
+		case msg.EntityCluster:
 			statement = stm[`GroupMemberNewCluster`]
 			child = a.ChildCluster.ID
-		case `node`:
+		case msg.EntityNode:
 			statement = stm[`GroupMemberNewNode`]
 			child = a.ChildNode.ID
 		}
-	case `cluster`:
+	case msg.EntityCluster:
 		id = a.Cluster.ID
 		bucket = a.Cluster.BucketID
 		child = a.ChildNode.ID
@@ -176,20 +177,20 @@ func (tk *TreeKeeper) txTreeMemberRemoved(a *tree.Action,
 		statement *sql.Stmt
 	)
 	switch a.Type {
-	case `group`:
+	case msg.EntityGroup:
 		id = a.Group.ID
 		switch a.ChildType {
-		case `group`:
+		case msg.EntityGroup:
 			statement = stm[`GroupMemberRemoveGroup`]
 			child = a.ChildGroup.ID
-		case `cluster`:
+		case msg.EntityCluster:
 			statement = stm[`GroupMemberRemoveCluster`]
 			child = a.ChildCluster.ID
-		case `node`:
+		case msg.EntityNode:
 			statement = stm[`GroupMemberRemoveNode`]
 			child = a.ChildNode.ID
 		}
-	case `cluster`:
+	case msg.EntityCluster:
 		id = a.Cluster.ID
 		child = a.ChildNode.ID
 		statement = stm[`ClusterMemberRemove`]

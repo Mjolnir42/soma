@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
 	"github.com/mjolnir42/soma/lib/proto"
 )
@@ -68,7 +69,7 @@ threshloop:
 constrloop:
 	for _, constr := range conf.Constraints {
 		switch constr.ConstraintType {
-		case "native":
+		case msg.ConstraintNative:
 			if _, err = stm[`CreateCheckConfigurationConstraintNative`].Exec(
 				conf.ID,
 				constr.Native.Name,
@@ -76,14 +77,14 @@ constrloop:
 			); err != nil {
 				break constrloop
 			}
-		case "oncall":
+		case msg.ConstraintOncall:
 			if _, err = stm[`CreateCheckConfigurationConstraintOncall`].Exec(
 				conf.ID,
 				constr.Oncall.ID,
 			); err != nil {
 				break constrloop
 			}
-		case "custom":
+		case msg.ConstraintCustom:
 			if _, err = stm[`CreateCheckConfigurationConstraintCustom`].Exec(
 				conf.ID,
 				constr.Custom.ID,
@@ -92,7 +93,7 @@ constrloop:
 			); err != nil {
 				break constrloop
 			}
-		case "system":
+		case msg.ConstraintSystem:
 			if _, err = stm[`CreateCheckConfigurationConstraintSystem`].Exec(
 				conf.ID,
 				constr.System.Name,
@@ -100,7 +101,7 @@ constrloop:
 			); err != nil {
 				break constrloop
 			}
-		case "service":
+		case msg.ConstraintService:
 			if constr.Service.TeamID != tk.meta.teamID {
 				err = fmt.Errorf(
 					"Service constraint has mismatched TeamID values: %s/%s",
@@ -114,7 +115,7 @@ constrloop:
 			); err != nil {
 				break constrloop
 			}
-		case "attribute":
+		case msg.ConstraintAttribute:
 			if _, err = stm[`CreateCheckConfigurationConstraintAttribute`].Exec(
 				conf.ID,
 				constr.Attribute.Name,
@@ -133,9 +134,9 @@ constrloop:
 func (tk *TreeKeeper) txCheck(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	switch a.Action {
-	case `check_new`:
+	case tree.ActionCheckNew:
 		return tk.txCheckNew(a, stm)
-	case `check_removed`:
+	case tree.ActionCheckRemoved:
 		return tk.txCheckRemoved(a, stm)
 	default:
 		return fmt.Errorf("Illegal check action: %s", a.Action)
@@ -147,16 +148,16 @@ func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 	var id string
 	bucket := sql.NullString{String: a.Bucket.ID, Valid: true}
 	switch a.Type {
-	case `repository`:
+	case msg.EntityRepository:
 		id = a.Repository.ID
 		bucket = sql.NullString{String: "", Valid: false}
-	case `bucket`:
+	case msg.EntityBucket:
 		id = a.Bucket.ID
-	case `group`:
+	case msg.EntityGroup:
 		id = a.Group.ID
-	case `cluster`:
+	case msg.EntityCluster:
 		id = a.Cluster.ID
-	case `node`:
+	case msg.EntityNode:
 		id = a.Node.ID
 	}
 	statement := stm[`CreateCheck`]
@@ -185,21 +186,21 @@ func (tk *TreeKeeper) txCheckRemoved(a *tree.Action,
 func (tk *TreeKeeper) txCheckInstance(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	switch a.Type {
-	case `repository`, `bucket`:
+	case msg.EntityRepository, msg.EntityBucket:
 		return fmt.Errorf("Illegal check instance on %s", a.Type)
 	}
 
 	switch a.Action {
-	case `check_instance_create`:
+	case tree.ActionCheckInstanceCreate:
 		if err := tk.txCheckInstanceCreate(a, stm); err != nil {
 			return err
 		}
 		// for a new check instance, the first instance
 		// configuration must be created alongside it
 		fallthrough
-	case `check_instance_update`:
+	case tree.ActionCheckInstanceUpdate:
 		return tk.txCheckInstanceConfigCreate(a, stm)
-	case `check_instance_delete`:
+	case tree.ActionCheckInstanceDelete:
 		return tk.txCheckInstanceDelete(a, stm)
 	default:
 		return fmt.Errorf("Illegal check instance action: %s", a.Action)
