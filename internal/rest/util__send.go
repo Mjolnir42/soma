@@ -179,7 +179,7 @@ func send(w *http.ResponseWriter, r *msg.Result) {
 		*result.Properties = append(*result.Properties, r.Property...)
 
 	case msg.SectionProvider:
-		result := proto.NewProviderResult()
+		result = proto.NewProviderResult()
 		*result.Providers = append(*result.Providers, r.Provider...)
 
 	case msg.SectionRepository:
