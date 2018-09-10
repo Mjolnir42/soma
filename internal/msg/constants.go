@@ -227,6 +227,7 @@ const (
 	PropertyService  = `service`
 	PropertySystem   = `system`
 	PropertyTemplate = `template`
+	PropertyOncall   = `oncall`
 )
 
 const (
