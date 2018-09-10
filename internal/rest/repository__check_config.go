@@ -136,7 +136,7 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 
 	request := newRequest(r, params)
 	request.Section = msg.SectionCheckConfig
-	request.Action = msg.ActionCreate
+	request.Action = msg.ActionDestroy
 	request.CheckConfig = proto.CheckConfig{
 		ID:           params.ByName(`checkID`),
 		RepositoryID: params.ByName(`repositoryID`),
