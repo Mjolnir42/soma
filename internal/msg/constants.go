@@ -230,6 +230,16 @@ const (
 	PropertyOncall   = `oncall`
 )
 
+// Constraint Types
+const (
+	ConstraintCustom    = `custom`
+	ConstraintNative    = `native`
+	ConstraintService   = `service`
+	ConstraintSystem    = `system`
+	ConstraintOncall    = `oncall`
+	ConstraintAttribute = `attribute`
+)
+
 const (
 	// RFC3339Milli is a format string for millisecond precision RFC3339
 	RFC3339Milli string = "2006-01-02T15:04:05.000Z07:00"
