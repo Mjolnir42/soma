@@ -9,8 +9,10 @@
 package tree
 
 import (
+	"io/ioutil"
 	"testing"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/satori/go.uuid"
 )
 
@@ -294,10 +296,14 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	nod4Id := uuid.Must(uuid.NewV4()).String()
 	srv4Id := uuid.Must(uuid.NewV4()).String()
 
+	discardLog := logrus.New()
+	discardLog.Out = ioutil.Discard
+
 	sTree := New(Spec{
 		ID:     rootID,
 		Name:   `root_checkTest`,
 		Action: actionC,
+		Log:    discardLog,
 	})
 
 	NewRepository(RepositorySpec{
