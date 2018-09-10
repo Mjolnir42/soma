@@ -22,15 +22,15 @@ func TestAttachRepository(t *testing.T) {
 	repoID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    uuid.Must(uuid.NewV4()).String(),
 		Deleted: false,
@@ -64,15 +64,15 @@ func TestAttachBucket(t *testing.T) {
 	buckID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -86,7 +86,7 @@ func TestAttachBucket(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -122,15 +122,15 @@ func TestAttachGroup(t *testing.T) {
 	grpID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -144,7 +144,7 @@ func TestAttachGroup(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -159,7 +159,7 @@ func TestAttachGroup(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -192,15 +192,15 @@ func TestAttachGroupToGroup(t *testing.T) {
 	grpID2 := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -214,7 +214,7 @@ func TestAttachGroupToGroup(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -229,7 +229,7 @@ func TestAttachGroupToGroup(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -240,7 +240,7 @@ func TestAttachGroupToGroup(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID2,
+		ID:   grpID2,
 		Name: `testgroup2`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -272,15 +272,15 @@ func TestAttachCluster(t *testing.T) {
 	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -294,7 +294,7 @@ func TestAttachCluster(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -309,7 +309,7 @@ func TestAttachCluster(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrID,
+		ID:   clrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -342,15 +342,15 @@ func TestAttachNode(t *testing.T) {
 	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -364,7 +364,7 @@ func TestAttachNode(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -379,7 +379,7 @@ func TestAttachNode(t *testing.T) {
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -417,15 +417,15 @@ func TestAttachNodeToGroup(t *testing.T) {
 	grpID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -439,7 +439,7 @@ func TestAttachNodeToGroup(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -454,7 +454,7 @@ func TestAttachNodeToGroup(t *testing.T) {
 
 	// create group
 	grp := NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	})
@@ -466,7 +466,7 @@ func TestAttachNodeToGroup(t *testing.T) {
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -504,15 +504,15 @@ func TestMoveNodeToGroup(t *testing.T) {
 	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -526,7 +526,7 @@ func TestMoveNodeToGroup(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -541,7 +541,7 @@ func TestMoveNodeToGroup(t *testing.T) {
 
 	// create node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -556,7 +556,7 @@ func TestMoveNodeToGroup(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -602,15 +602,15 @@ func TestMoveClusterToGroup(t *testing.T) {
 	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -624,7 +624,7 @@ func TestMoveClusterToGroup(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -639,7 +639,7 @@ func TestMoveClusterToGroup(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrID,
+		ID:   clrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -650,7 +650,7 @@ func TestMoveClusterToGroup(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -696,15 +696,15 @@ func TestMoveGroupToGroup(t *testing.T) {
 	grp2Id := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -718,7 +718,7 @@ func TestMoveGroupToGroup(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -733,7 +733,7 @@ func TestMoveGroupToGroup(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grp2Id,
+		ID:   grp2Id,
 		Name: `testgroup2`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -744,7 +744,7 @@ func TestMoveGroupToGroup(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -791,15 +791,15 @@ func TestMoveNodeToCluster(t *testing.T) {
 	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -813,7 +813,7 @@ func TestMoveNodeToCluster(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -828,7 +828,7 @@ func TestMoveNodeToCluster(t *testing.T) {
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -843,7 +843,7 @@ func TestMoveNodeToCluster(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrID,
+		ID:   clrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -889,15 +889,15 @@ func TestDetachGroupToBucket(t *testing.T) {
 	grp2Id := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -911,7 +911,7 @@ func TestDetachGroupToBucket(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -926,7 +926,7 @@ func TestDetachGroupToBucket(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grp2Id,
+		ID:   grp2Id,
 		Name: `testgroup2`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -937,7 +937,7 @@ func TestDetachGroupToBucket(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -989,15 +989,15 @@ func TestDetachClusterToBucket(t *testing.T) {
 	clrID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -1011,7 +1011,7 @@ func TestDetachClusterToBucket(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1026,7 +1026,7 @@ func TestDetachClusterToBucket(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrID,
+		ID:   clrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1037,7 +1037,7 @@ func TestDetachClusterToBucket(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1091,15 +1091,15 @@ func TestDetachNodeToBucket(t *testing.T) {
 	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -1113,7 +1113,7 @@ func TestDetachNodeToBucket(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1128,7 +1128,7 @@ func TestDetachNodeToBucket(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1139,7 +1139,7 @@ func TestDetachNodeToBucket(t *testing.T) {
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -1154,7 +1154,7 @@ func TestDetachNodeToBucket(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrID,
+		ID:   clrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1218,15 +1218,15 @@ func TestDestroyRepository(t *testing.T) {
 	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -1240,7 +1240,7 @@ func TestDestroyRepository(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1255,7 +1255,7 @@ func TestDestroyRepository(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1266,7 +1266,7 @@ func TestDestroyRepository(t *testing.T) {
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -1281,7 +1281,7 @@ func TestDestroyRepository(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrID,
+		ID:   clrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1349,15 +1349,15 @@ func TestDestroyBucket(t *testing.T) {
 	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -1371,7 +1371,7 @@ func TestDestroyBucket(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1386,7 +1386,7 @@ func TestDestroyBucket(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1397,7 +1397,7 @@ func TestDestroyBucket(t *testing.T) {
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -1412,7 +1412,7 @@ func TestDestroyBucket(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrID,
+		ID:   clrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1476,15 +1476,15 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -1498,7 +1498,7 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1513,7 +1513,7 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grpID,
+		ID:   grpID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1524,7 +1524,7 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 
 	// create new node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -1539,7 +1539,7 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   clrID,
+		ID:   clrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{

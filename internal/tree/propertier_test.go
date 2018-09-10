@@ -30,15 +30,15 @@ func TestSetProperty(t *testing.T) {
 	propUUID, _ := uuid.FromString(propID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -55,7 +55,7 @@ func TestSetProperty(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -65,7 +65,7 @@ func TestSetProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -81,7 +81,7 @@ func TestSetProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -92,7 +92,7 @@ func TestSetProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -103,7 +103,7 @@ func TestSetProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -237,13 +237,13 @@ func TestUpdateProperty(t *testing.T) {
 
 	propUUID, _ := uuid.FromString(propID)
 
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -259,7 +259,7 @@ func TestUpdateProperty(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -269,7 +269,7 @@ func TestUpdateProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -285,7 +285,7 @@ func TestUpdateProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -296,7 +296,7 @@ func TestUpdateProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -307,7 +307,7 @@ func TestUpdateProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -457,13 +457,13 @@ func TestDeleteProperty(t *testing.T) {
 
 	propUUID, _ := uuid.FromString(propID)
 
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -479,7 +479,7 @@ func TestDeleteProperty(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -489,7 +489,7 @@ func TestDeleteProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -505,7 +505,7 @@ func TestDeleteProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -516,7 +516,7 @@ func TestDeleteProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -527,7 +527,7 @@ func TestDeleteProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -674,13 +674,13 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 
 	propUUID, _ := uuid.FromString(propID)
 
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -696,7 +696,7 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  false,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -706,7 +706,7 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -722,7 +722,7 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -733,7 +733,7 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -744,7 +744,7 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -868,13 +868,13 @@ func TestOverwriteProperty(t *testing.T) {
 	propUUID, _ := uuid.FromString(propID)
 	overUUID, _ := uuid.FromString(overID)
 
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -890,7 +890,7 @@ func TestOverwriteProperty(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -900,7 +900,7 @@ func TestOverwriteProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -916,7 +916,7 @@ func TestOverwriteProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -927,7 +927,7 @@ func TestOverwriteProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -938,7 +938,7 @@ func TestOverwriteProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -967,7 +967,7 @@ func TestOverwriteProperty(t *testing.T) {
 		ElementType: `group`,
 		ElementID:   grupID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           overUUID,
+		ID:           overUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1109,13 +1109,13 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 	propUUID, _ := uuid.FromString(propID)
 	overUUID, _ := uuid.FromString(overID)
 
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -1131,7 +1131,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1141,7 +1141,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1157,7 +1157,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1168,7 +1168,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1179,7 +1179,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -1242,7 +1242,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 		ElementType: `group`,
 		ElementID:   grupID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           overUUID,
+		ID:           overUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1434,15 +1434,15 @@ func TestSetAboveSetProperty(t *testing.T) {
 	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -1456,7 +1456,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1472,7 +1472,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1483,7 +1483,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1494,7 +1494,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -1512,7 +1512,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 		ElementType: `cluster`,
 		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1525,7 +1525,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 		ElementType: `bucket`,
 		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           overUUID,
+		ID:           overUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1709,15 +1709,15 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -1731,7 +1731,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1747,7 +1747,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1758,7 +1758,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -1769,7 +1769,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -1787,7 +1787,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 		ElementType: `cluster`,
 		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1800,7 +1800,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 		ElementType: `bucket`,
 		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           overUUID,
+		ID:           overUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -1960,13 +1960,13 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	propUUID, _ := uuid.FromString(propID)
 
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -1980,7 +1980,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -1996,7 +1996,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -2007,7 +2007,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -2018,7 +2018,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -2036,7 +2036,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  false,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -2192,13 +2192,13 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 
 	propUUID, _ := uuid.FromString(propID)
 
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -2212,7 +2212,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -2228,7 +2228,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -2239,7 +2239,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -2250,7 +2250,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -2268,7 +2268,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -2434,15 +2434,15 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -2456,7 +2456,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -2472,7 +2472,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -2483,7 +2483,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -2494,7 +2494,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -2512,7 +2512,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 		ElementType: `cluster`,
 		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -2525,7 +2525,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 		ElementType: `bucket`,
 		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           overUUID,
+		ID:           overUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -2728,15 +2728,15 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -2750,7 +2750,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -2766,7 +2766,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -2777,7 +2777,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -2788,7 +2788,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -2806,7 +2806,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 		ElementType: `cluster`,
 		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -2819,7 +2819,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 		ElementType: `bucket`,
 		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           overUUID,
+		ID:           overUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -3022,15 +3022,15 @@ func TestDeletePropertyAll(t *testing.T) {
 	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -3044,7 +3044,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -3060,7 +3060,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -3071,7 +3071,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -3082,7 +3082,7 @@ func TestDeletePropertyAll(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -3100,7 +3100,7 @@ func TestDeletePropertyAll(t *testing.T) {
 		ElementType: `cluster`,
 		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -3113,7 +3113,7 @@ func TestDeletePropertyAll(t *testing.T) {
 		ElementType: `bucket`,
 		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           overUUID,
+		ID:           overUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -3288,15 +3288,15 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 	overUUID, _ := uuid.FromString(overID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -3310,7 +3310,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -3326,7 +3326,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -3337,7 +3337,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -3348,7 +3348,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -3366,7 +3366,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 		ElementType: `cluster`,
 		ElementID:   cltrID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -3379,7 +3379,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 		ElementType: `bucket`,
 		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           overUUID,
+		ID:           overUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -3542,14 +3542,14 @@ func TestCloneAfterProperty(t *testing.T) {
 	propUUID, _ := uuid.FromString(propID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -3566,7 +3566,7 @@ func TestCloneAfterProperty(t *testing.T) {
 		ElementType: `repository`,
 		ElementID:   repoID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -3576,7 +3576,7 @@ func TestCloneAfterProperty(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -3592,7 +3592,7 @@ func TestCloneAfterProperty(t *testing.T) {
 
 	// create group
 	NewGroup(GroupSpec{
-		Id:   grupID,
+		ID:   grupID,
 		Name: `testgroup`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -3603,7 +3603,7 @@ func TestCloneAfterProperty(t *testing.T) {
 
 	// create cluster
 	NewCluster(ClusterSpec{
-		Id:   cltrID,
+		ID:   cltrID,
 		Name: `testcluster`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -3614,7 +3614,7 @@ func TestCloneAfterProperty(t *testing.T) {
 
 	// assign node
 	NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,
@@ -3752,15 +3752,15 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 	dupeUUID, _ := uuid.FromString(dupeID)
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     treeID,
+	sTree := New(Spec{
+		ID:     treeID,
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
 
 	// create repository
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `testrepo`,
 		Team:    teamID,
 		Deleted: false,
@@ -3774,7 +3774,7 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 
 	// create bucket
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `testrepo_test`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -3793,7 +3793,7 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 		ElementType: `bucket`,
 		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           propUUID,
+		ID:           propUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,
@@ -3806,7 +3806,7 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 		ElementType: `bucket`,
 		ElementID:   buckID,
 	}, true).(Propertier).SetProperty(&PropertySystem{
-		Id:           dupeUUID,
+		ID:           dupeUUID,
 		Inheritance:  true,
 		ChildrenOnly: false,
 		View:         `testview`,

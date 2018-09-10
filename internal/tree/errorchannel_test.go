@@ -26,15 +26,15 @@ func TestErrorChannelNode(t *testing.T) {
 	servID := uuid.Must(uuid.NewV4()).String()
 
 	// create tree
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_testing`,
 		Action: actionC,
 	})
 
 	// create repository
 	repo := NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `test`,
 		Team:    teamID,
 		Deleted: false,
@@ -54,7 +54,7 @@ func TestErrorChannelNode(t *testing.T) {
 
 	// create bucket
 	buck := NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `test_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -75,7 +75,7 @@ func TestErrorChannelNode(t *testing.T) {
 
 	// create new node
 	node := NewNode(NodeSpec{
-		Id:       nodeID,
+		ID:       nodeID,
 		AssetID:  1,
 		Name:     `testnode`,
 		Team:     teamID,

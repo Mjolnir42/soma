@@ -247,7 +247,7 @@ func testSpawnCheck(inherited, inheritance, childrenOnly bool) Check {
 	}
 
 	return Check{
-		Id:            id,
+		ID:            id,
 		SourceID:      uuid.Must(uuid.NewV4()),
 		SourceType:    `sourceType`,
 		Inherited:     inherited,

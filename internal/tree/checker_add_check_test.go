@@ -21,7 +21,7 @@ func TestCheckerAddCheck(t *testing.T) {
 	capID := uuid.Must(uuid.NewV4())
 
 	chk := Check{
-		Id:            uuid.Nil,
+		ID:            uuid.Nil,
 		SourceID:      uuid.Nil,
 		InheritedFrom: uuid.Nil,
 		Inheritance:   true,
@@ -135,7 +135,7 @@ func TestCheckerDeleteCheck(t *testing.T) {
 	chkID := uuid.Must(uuid.NewV4())
 
 	chk := Check{
-		Id:            chkID,
+		ID:            chkID,
 		SourceID:      uuid.Nil,
 		InheritedFrom: uuid.Nil,
 		Inheritance:   true,
@@ -167,7 +167,7 @@ func TestCheckerDeleteCheck(t *testing.T) {
 	sTree.ComputeCheckInstances()
 
 	delChk := Check{
-		Id:            uuid.Nil,
+		ID:            uuid.Nil,
 		InheritedFrom: uuid.Nil,
 		SourceID:      chkID,
 		ConfigID:      chkConfigID,
@@ -294,14 +294,14 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	nod4Id := uuid.Must(uuid.NewV4()).String()
 	srv4Id := uuid.Must(uuid.NewV4()).String()
 
-	sTree := New(TreeSpec{
-		Id:     rootID,
+	sTree := New(Spec{
+		ID:     rootID,
 		Name:   `root_checkTest`,
 		Action: actionC,
 	})
 
 	NewRepository(RepositorySpec{
-		Id:      repoID,
+		ID:      repoID,
 		Name:    `checkTest`,
 		Team:    teamID,
 		Deleted: false,
@@ -314,7 +314,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	sTree.SetError(errC)
 
 	NewBucket(BucketSpec{
-		Id:          buckID,
+		ID:          buckID,
 		Name:        `checkTest_master`,
 		Environment: `testing`,
 		Team:        teamID,
@@ -328,7 +328,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	})
 
 	NewGroup(GroupSpec{
-		Id:   grp1Id,
+		ID:   grp1Id,
 		Name: `testGroup1`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -338,7 +338,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	})
 
 	NewGroup(GroupSpec{
-		Id:   grp2Id,
+		ID:   grp2Id,
 		Name: `testGroup2`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -348,7 +348,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	})
 
 	NewCluster(ClusterSpec{
-		Id:   clr1Id,
+		ID:   clr1Id,
 		Name: `testcluster1`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -358,7 +358,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	})
 
 	NewCluster(ClusterSpec{
-		Id:   clr2Id,
+		ID:   clr2Id,
 		Name: `testcluster2`,
 		Team: teamID,
 	}).Attach(AttachRequest{
@@ -368,7 +368,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	})
 
 	NewNode(NodeSpec{
-		Id:       nod1Id,
+		ID:       nod1Id,
 		AssetID:  1,
 		Name:     `testnode1`,
 		Team:     teamID,
@@ -382,7 +382,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	})
 
 	NewNode(NodeSpec{
-		Id:       nod2Id,
+		ID:       nod2Id,
 		AssetID:  2,
 		Name:     `testnode2`,
 		Team:     teamID,
@@ -396,7 +396,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	})
 
 	NewNode(NodeSpec{
-		Id:       nod3Id,
+		ID:       nod3Id,
 		AssetID:  3,
 		Name:     `testnode3`,
 		Team:     teamID,
@@ -410,7 +410,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 	})
 
 	NewNode(NodeSpec{
-		Id:       nod4Id,
+		ID:       nod4Id,
 		AssetID:  4,
 		Name:     `testnode4`,
 		Team:     teamID,

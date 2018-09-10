@@ -22,7 +22,7 @@ func TestInvalidRepoSpec(t *testing.T) {
 	repoName := `repoTest`
 
 	spec := RepositorySpec{
-		Id:   ``,
+		ID:   ``,
 		Name: ``,
 		Team: ``,
 	}
@@ -83,7 +83,7 @@ func TestInvalidBucketSpec(t *testing.T) {
 	bucketEnv := `envTest`
 
 	spec := BucketSpec{
-		Id:          ``,
+		ID:          ``,
 		Name:        ``,
 		Environment: ``,
 		Team:        ``,
