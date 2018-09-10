@@ -224,6 +224,7 @@ func (x *Rest) ClusterMemberAssign(w http.ResponseWriter, r *http.Request,
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
 	request.Cluster.ID = params.ByName(`clusterID`)
+	request.TargetEntity = msg.EntityNode
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

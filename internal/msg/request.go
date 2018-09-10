@@ -21,6 +21,7 @@ type Request struct {
 	ID            uuid.UUID
 	Section       string
 	Action        string
+	TargetEntity  string
 	RemoteAddr    string
 	AuthUser      string
 	Reply         chan Result

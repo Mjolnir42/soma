@@ -230,6 +230,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 
 	switch params.ByName(`memberType`) {
 	case msg.EntityGroup:
+		request.TargetEntity = msg.EntityGroup
 		cReq.Group.MemberClusters = nil
 		cReq.Group.MemberNodes = nil
 		if cReq.Group.MemberGroups == nil || len(*cReq.Group.MemberGroups) != 1 {
@@ -237,6 +238,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 			return
 		}
 	case msg.EntityCluster:
+		request.TargetEntity = msg.EntityCluster
 		cReq.Group.MemberGroups = nil
 		cReq.Group.MemberNodes = nil
 		if cReq.Group.MemberClusters == nil || len(*cReq.Group.MemberClusters) != 1 {
@@ -244,6 +246,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 			return
 		}
 	case msg.EntityNode:
+		request.TargetEntity = msg.EntityNode
 		cReq.Group.MemberGroups = nil
 		cReq.Group.MemberClusters = nil
 		if cReq.Group.MemberNodes == nil || len(*cReq.Group.MemberNodes) != 1 {
