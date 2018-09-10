@@ -115,9 +115,17 @@ func (x *Rest) CheckConfigCreate(w http.ResponseWriter, r *http.Request,
 	}
 
 	request := newRequest(r, params)
+	request.Section = msg.SectionMonitoringSystem
+	request.Action = msg.ActionUse
+	request.CheckConfig = cReq.CheckConfig.Clone()
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
 	request.Section = msg.SectionCheckConfig
 	request.Action = msg.ActionCreate
-	request.CheckConfig = cReq.CheckConfig.Clone()
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -135,12 +143,20 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	request := newRequest(r, params)
-	request.Section = msg.SectionCheckConfig
-	request.Action = msg.ActionDestroy
+	request.Section = msg.SectionMonitoringSystem
+	request.Action = msg.ActionUse
 	request.CheckConfig = proto.CheckConfig{
 		ID:           params.ByName(`checkID`),
 		RepositoryID: params.ByName(`repositoryID`),
 	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	request.Section = msg.SectionCheckConfig
+	request.Action = msg.ActionDestroy
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
