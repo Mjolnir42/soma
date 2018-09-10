@@ -12,16 +12,19 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
 )
 
 func (tk *TreeKeeper) txProperty(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	switch a.Action {
-	case `property_new`:
+	case tree.ActionPropertyNew:
 		return tk.txPropertyNew(a, stm)
-	case `property_delete`:
+	case tree.ActionPropertyDelete:
 		return tk.txPropertyDelete(a, stm)
+	case tree.ActionPropertyUpdate: // XXX BUG
+		return fmt.Errorf(`TreeKeeper: MISSING TX HANDLER FOR tree.ActionPropertyUpdate`)
 	default:
 		return fmt.Errorf("Illegal property action: %s", a.Action)
 	}

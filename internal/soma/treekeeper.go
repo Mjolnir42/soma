@@ -539,6 +539,7 @@ actionloop:
 				tree.ActionNodeAssignment,
 				tree.ActionPropertyDelete,
 				tree.ActionPropertyNew,
+				tree.ActionPropertyUpdate,
 				tree.ActionUpdate:
 				// ignore in all rebuild modes
 				continue actionloop
@@ -548,7 +549,8 @@ actionloop:
 		switch a.Action {
 		case
 			tree.ActionPropertyDelete,
-			tree.ActionPropertyNew:
+			tree.ActionPropertyNew,
+			tree.ActionPropertyUpdate:
 			if err = tk.txProperty(a, stm); err != nil {
 				break actionloop
 			}
