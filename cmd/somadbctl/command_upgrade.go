@@ -34,6 +34,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 		201610290001: upgradeSomaTo201611060001,
 		201611060001: upgradeSomaTo201611100001,
 		201611100001: upgradeSomaTo201611130001,
+		201611130001: upgradeSomaTo201809100001,
 	},
 	"root": map[int]func(int, string, bool) int{
 		000000000001: installRoot201605150001,
@@ -521,6 +522,43 @@ func upgradeSomaTo201611130001(curr int, tool string, printOnly bool) int {
 	executeUpgrades(stmts, printOnly)
 
 	return 201611130001
+}
+
+func upgradeSomaTo201809100001(curr int, tool string, printOnly bool) int {
+	if curr != 201611130001 {
+		return 0
+	}
+	stmts := []string{
+		`INSERT INTO soma.job_types ( job_type ) VALUES ( 'bucket::create' ), ( 'bucket::property-create' ), ( 'bucket::property-destroy' ), ( 'check-config::create' ), ( 'check-config::destroy' ), ( 'cluster::create' ), ( 'cluster::destroy' ), ( 'cluster::member-assign' ), ( 'cluster::property-create' ), ( 'cluster::property-destroy' ), ( 'group::create' ), ( 'group::destroy' ), ( 'group::member-assign' ), ( 'group::property-create' ), ( 'group::property-destroy ), ( 'node-config::assign' ), ( 'node-config::property-create' ), ( 'node-config::property-destroy' );`,
+		`UPDATE soma.jobs SET job_type = 'check-config::create' WHERE job_type LIKE 'add_check_to_%';`,
+		`UPDATE soma.jobs SET job_type = 'check-config::destroy' WHERE job_type LIKE 'remove_check_from_%';`,
+		`UPDATE soma.jobs SET job_type = 'node-config::property-create' WHERE job_type LIKE 'add_%_property_to_node';`,
+		`UPDATE soma.jobs SET job_type = 'node-config::property-destroy' WHERE job_type LIKE 'delete_%_property_to_node';`,
+		`UPDATE soma.jobs SET job_type = 'cluster::property-create' WHERE job_type LIKE 'add_%_property_to_cluster';`,
+		`UPDATE soma.jobs SET job_type = 'cluster::property-destroy' WHERE job_type LIKE 'delete_%_property_to_cluster';`,
+		`UPDATE soma.jobs SET job_type = 'group::property-create' WHERE job_type LIKE 'add_%_property_to_group';`,
+		`UPDATE soma.jobs SET job_type = 'group::property-destroy' WHERE job_type LIKE 'delete_%_property_to_group';`,
+		`UPDATE soma.jobs SET job_type = 'bucket::property-create' WHERE job_type LIKE 'add_%_property_to_bucket';`,
+		`UPDATE soma.jobs SET job_type = 'bucket::property-destroy' WHERE job_type LIKE 'delete_%_property_to_bucket';`,
+		`UPDATE soma.jobs SET job_type = 'repository-config::property-create' WHERE job_type LIKE 'add_%_property_to_repository';`,
+		`UPDATE soma.jobs SET job_type = 'repository-config::property-destroy' WHERE job_type LIKE 'delete_%_property_to_repository';`,
+		`UPDATE soma.jobs SET job_type = 'bucket::create' WHERE job_type = 'create_bucket';`,
+		`UPDATE soma.jobs SET job_type = 'group::create' WHERE job_type = 'create_group';`,
+		`UPDATE soma.jobs SET job_type = 'cluster::create' WHERE job_type = 'create_cluster';`,
+		`UPDATE soma.jobs SET job_type = 'node-config::assign' WHERE job_type = 'assign_node';`,
+		`UPDATE soma.jobs SET job_type = 'group::member-assign' WHERE job_type IN ( 'add_group_to_group', 'add_cluster_to_group', 'add_node_to_group' );`,
+		`UPDATE soma.jobs SET job_type = 'cluster::member-assign' WHERE job_type = 'add_node_to_cluster';`,
+		`UPDATE soma.jobs SET job_type = 'group::destroy' WHERE job_type = 'delete_group';`,
+		`UPDATE soma.jobs SET job_type = 'cluster::destroy' WHERE job_type = 'delete_cluster';`,
+		`UPDATE soma.jobs SET job_type = 'node-config::unassign' WHERE job_type = 'delete_node';`,
+		`DELETE FROM soma.job_types WHERE job_type IN ( 'create_bucket', 'create_group', 'delete_group', 'reset_group_to_bucket', 'add_group_to_group', 'create_cluster', 'delete_cluster', 'reset_cluster_to_bucket', 'add_cluster_to_group', 'assign_node', 'delete_node', 'reset_node_to_bucket', 'add_node_to_group', 'add_node_to_cluster', 'add_system_property_to_repository', 'add_system_property_to_bucket', 'add_system_property_to_group', 'add_system_property_to_cluster', 'add_system_property_to_node', 'add_service_property_to_repository', 'add_service_property_to_bucket', 'add_service_property_to_group', 'add_service_property_to_cluster', 'add_service_property_to_node', 'add_oncall_property_to_repository', 'add_oncall_property_to_bucket', 'add_oncall_property_to_group', 'add_oncall_property_to_cluster', 'add_oncall_property_to_node', 'add_custom_property_to_repository', 'add_custom_property_to_bucket', 'add_custom_property_to_group', 'add_custom_property_to_cluster', 'add_custom_property_to_node', 'delete_system_property_to_repository', 'delete_system_property_to_bucket', 'delete_system_property_to_group', 'delete_system_property_to_cluster', 'delete_system_property_to_node', 'delete_service_property_to_repository', 'delete_service_property_to_bucket', 'delete_service_property_to_group', 'delete_service_property_to_cluster', 'delete_service_property_to_node', 'delete_oncall_property_to_repository', 'delete_oncall_property_to_bucket', 'delete_oncall_property_to_group', 'delete_oncall_property_to_cluster', 'delete_oncall_property_to_node', 'delete_custom_property_to_repository', 'delete_custom_property_to_bucket', 'delete_custom_property_to_group', 'delete_custom_property_to_cluster', 'delete_custom_property_to_node', 'add_check_to_repository', 'add_check_to_bucket', 'add_check_to_group', 'add_check_to_cluster', 'add_check_to_node', 'remove_check_from_repository', 'remove_check_from_bucket', 'remove_check_from_group', 'remove_check_from_cluster', 'remove_check_from_node' );`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201809100001, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+
+	return 201809100001
 }
 
 func installRoot201605150001(curr int, tool string, printOnly bool) int {
