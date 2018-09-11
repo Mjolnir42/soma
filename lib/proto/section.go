@@ -17,6 +17,7 @@ type Section struct {
 }
 
 type SectionFilter struct {
+	ID       string `json:"id,omitempty"`
 	Name     string `json:"name,omitempty"`
 	Category string `json:"category,omitempty"`
 }
