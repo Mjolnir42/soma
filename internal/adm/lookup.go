@@ -296,6 +296,14 @@ func LookupActionID(a, s string) (string, error) {
 	return actionIDByName(a, sID)
 }
 
+// LookupCategoryBySection returns the category for section s
+func LookupCategoryBySection(s string) (string, error) {
+	if IsUUID(s) {
+		return categoryBySectionID(s, nil)
+	}
+	return categoryBySectionID(sectionIDByName(s))
+}
+
 // LookupNodeConfig looks up the node repo/bucket configuration
 // given the name or UUID s of the node.
 func LookupNodeConfig(s string) (*proto.NodeConfig, error) {
@@ -963,6 +971,32 @@ func sectionIDByName(section string) (string, error) {
 
 abort:
 	return ``, fmt.Errorf("SectionID lookup failed: %s",
+		err.Error())
+}
+
+func categoryBySectionID(section string, e error) (string, error) {
+	req := proto.NewSectionFilter()
+	req.Filter.Section.ID = section
+
+	res, err := fetchFilter(req, `/search/section/`)
+	if err != nil {
+		goto abort
+	}
+
+	if res.Sections == nil || len(*res.Sections) == 0 {
+		err = fmt.Errorf(`no object returned`)
+		goto abort
+	}
+
+	if section != (*res.Sections)[0].ID {
+		err = fmt.Errorf("ID mismatch: %s vs %s",
+			section, (*res.Sections)[0].ID)
+		goto abort
+	}
+	return (*res.Sections)[0].Category, nil
+
+abort:
+	return ``, fmt.Errorf("Category by SectionID lookup failed: %s",
 		err.Error())
 }
 

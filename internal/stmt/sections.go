@@ -19,9 +19,11 @@ FROM   soma.sections;`
 
 	SectionSearch = `
 SELECT section_id,
-       section_name
+       section_name,
+       category
 FROM   soma.sections
-WHERE  section_name = $1::varchar;`
+WHERE  (section_name = $1::varchar OR $1::varchar IS NULL)
+  AND  (section_id = $2::uuid OR $2::uuid IS NULL);`
 
 	SectionShow = `
 SELECT ss.section_id,
