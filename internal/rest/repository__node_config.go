@@ -62,12 +62,22 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 	defer panicCatcher(w)
 
 	request := newRequest(r, params)
-	request.Section = msg.SectionNodeConfig
-	request.Action = msg.ActionUnassign
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Node.ID = params.ByName(`nodeID`)
 
+	// check if the user is allowed to unassign nodes from this team
+	request.Section = msg.SectionNode
+	request.Action = msg.ActionUnassign
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	// check if the user is allowed to unassign nodes from the target
+	// repo
+	request.Section = msg.SectionNodeConfig
+	request.Action = msg.ActionUnassign
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
 		return
