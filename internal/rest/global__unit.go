@@ -42,7 +42,7 @@ func (x *Rest) UnitShow(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionUnit
-	request.Action = msg.ActionList
+	request.Action = msg.ActionShow
 	request.Unit.Unit = params.ByName(`unit`)
 
 	if !x.isAuthorized(&request) {
