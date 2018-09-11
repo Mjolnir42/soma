@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -12,41 +12,41 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerCategories(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  "category",
-				Usage: "SUBCOMMANDS for permission categories",
+				Name:  `category`,
+				Usage: `SUBCOMMANDS for permission scope categories`,
 				Subcommands: []cli.Command{
 					{
-						Name:        "add",
-						Usage:       "Register a new permission category",
-						Description: help.Text(`CategoryAdd`),
+						Name:        `add`,
+						Usage:       `Register a new permission scope category`,
+						Description: help.Text(`category::add`),
 						Action:      runtime(cmdPermissionCategoryAdd),
 					},
 					{
-						Name:        "remove",
-						Usage:       "Remove an existing permission category",
-						Description: help.Text(`CategoryRemove`),
-						Action:      runtime(cmdPermissionCategoryDel),
+						Name:        `remove`,
+						Usage:       `Remove an existing permission scope category`,
+						Description: help.Text(`category::remove`),
+						Action:      runtime(cmdPermissionCategoryRemove),
 					},
 					{
-						Name:        "list",
-						Usage:       "List all permission categories",
-						Description: help.Text(`CategoryList`),
+						Name:        `list`,
+						Usage:       `List all permission scope categories`,
+						Description: help.Text(`category::list`),
 						Action:      runtime(cmdPermissionCategoryList),
 					},
 					{
-						Name:        "show",
-						Usage:       "Show details for a permission category",
-						Description: help.Text(`CategoryShow`),
+						Name:        `show`,
+						Usage:       `Show details for a permission scope category`,
+						Description: help.Text(`category::show`),
 						Action:      runtime(cmdPermissionCategoryShow),
 					},
 				},
@@ -56,6 +56,7 @@ func registerCategories(app cli.App) *cli.App {
 	return &app
 }
 
+// cmdPermissionCategoryAdd function -- somaadm category add ${name}
 func cmdPermissionCategoryAdd(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
@@ -73,7 +74,8 @@ func cmdPermissionCategoryAdd(c *cli.Context) error {
 	return adm.Perform(`postbody`, `/category/`, `command`, req, c)
 }
 
-func cmdPermissionCategoryDel(c *cli.Context) error {
+// cmdPermissionCategoryRemove function -- somaadm category remove ${name}
+func cmdPermissionCategoryRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -83,6 +85,7 @@ func cmdPermissionCategoryDel(c *cli.Context) error {
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
+// cmdPermissionCategoryList function -- somaadm category list
 func cmdPermissionCategoryList(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
@@ -91,6 +94,7 @@ func cmdPermissionCategoryList(c *cli.Context) error {
 	return adm.Perform(`get`, `/category/`, `list`, nil, c)
 }
 
+// cmdPermissionCategoryShow function -- somaadm category show ${name}
 func cmdPermissionCategoryShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
