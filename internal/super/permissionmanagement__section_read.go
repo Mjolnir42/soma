@@ -105,10 +105,22 @@ func (s *Supervisor) sectionSearch(q *msg.Request, mr *msg.Result) {
 		err                    error
 		rows                   *sql.Rows
 		sectionID, sectionName string
+		category               string
+		nullName, nullID       sql.NullString
 	)
 
+	if q.Search.SectionObj.Name != `` {
+		nullName.String = q.Search.SectionObj.Name
+		nullName.Valid = true
+	}
+	if q.Search.SectionObj.ID != `` {
+		nullID.String = q.Search.SectionObj.ID
+		nullID.Valid = true
+	}
+
 	if rows, err = s.stmtSectionSearch.Query(
-		q.Search.SectionObj.Name,
+		nullName,
+		nullID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
@@ -119,6 +131,7 @@ func (s *Supervisor) sectionSearch(q *msg.Request, mr *msg.Result) {
 		if err = rows.Scan(
 			&sectionID,
 			&sectionName,
+			&category,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
@@ -126,8 +139,9 @@ func (s *Supervisor) sectionSearch(q *msg.Request, mr *msg.Result) {
 			return
 		}
 		mr.SectionObj = append(mr.SectionObj, proto.Section{
-			ID:   sectionID,
-			Name: sectionName,
+			ID:       sectionID,
+			Name:     sectionName,
+			Category: category,
 		})
 	}
 	if err = rows.Err(); err != nil {

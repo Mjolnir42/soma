@@ -70,7 +70,7 @@ func (x *Rest) SectionSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Section.Name == `` {
+	if cReq.Filter.Section.Name == `` && cReq.Filter.Section.ID == `` {
 		dispatchBadRequest(&w, fmt.Errorf(
 			`Invalid section search specification`))
 		return
@@ -79,7 +79,8 @@ func (x *Rest) SectionSearch(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionSection
 	request.Action = msg.ActionSearch
-	request.Search.SectionObj.Name = cReq.Section.Name
+	request.Search.SectionObj.Name = cReq.Filter.Section.Name
+	request.Search.SectionObj.ID = cReq.Filter.Section.ID
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
