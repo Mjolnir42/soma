@@ -90,7 +90,7 @@ func (r *TreeRead) RegisterRequests(hmap *handler.Map) {
 		msg.SectionBucket,
 		msg.SectionGroup,
 		msg.SectionCluster,
-		msg.SectionNode,
+		msg.SectionNodeConfig,
 	} {
 		hmap.Request(section, msg.ActionTree, r.handlerName)
 	}

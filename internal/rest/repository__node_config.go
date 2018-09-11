@@ -197,4 +197,27 @@ func (x *Rest) NodeConfigPropertyUpdate(w http.ResponseWriter, r *http.Request,
 	// XXX BUG TODO
 }
 
+// NodeConfigTree function
+func (x *Rest) NodeConfigTree(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := newRequest(r, params)
+	request.Section = msg.SectionNodeConfig
+	request.Action = msg.ActionTree
+	request.Tree = proto.Tree{
+		ID:   params.ByName(`nodeID`),
+		Type: msg.EntityNode,
+	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	send(&w, &result)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -104,7 +104,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(rtNodeInstance, x.Verify(x.InstanceList))
 	router.GET(rtNodeInstanceID, x.Verify(x.InstanceShow))
 	router.GET(rtNodeInstanceVersions, x.Verify(x.InstanceVersions))
-	router.GET(rtNodeTree, x.Verify(x.NodeTree))
+	router.GET(rtNodeTree, x.Verify(x.NodeConfigTree))
 	router.GET(rtPermission, x.Verify(x.PermissionList))
 	router.GET(rtPermissionID, x.Verify(x.PermissionShow))
 	router.GET(rtPropertyMgmt, x.Verify(x.PropertyMgmtList))
