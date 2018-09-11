@@ -81,13 +81,14 @@ func cmdSectionAdd(c *cli.Context) error {
 	req := proto.NewSectionRequest()
 	req.Section.Name = c.Args().First()
 	req.Section.Category = opts[`to`][0]
-	return adm.Perform(`postbody`, `/section/`, `command`, req, c)
+	path := fmt.Sprintf("/category/%s/section/", req.Section.Category)
+	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
 func cmdSectionRemove(c *cli.Context) error {
 	var (
-		err       error
-		sectionID string
+		err                 error
+		category, sectionID string
 	)
 	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
@@ -96,8 +97,12 @@ func cmdSectionRemove(c *cli.Context) error {
 		c.Args().First()); err != nil {
 		return err
 	}
+	if category, err = adm.LookupCategoryBySection(
+		sectionID); err != nil {
+		return err
+	}
 
-	path := fmt.Sprintf("/section/%s", sectionID)
+	path := fmt.Sprintf("/category/%s/section/%s", category, sectionID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
