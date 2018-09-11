@@ -14,6 +14,10 @@ func DirectIn(c *cli.Context) {
 	GenericDirect(c, []string{`in`})
 }
 
+func DirectInOf(c *cli.Context) {
+	GenericDirect(c, []string{`in`, `of`})
+}
+
 func InTo(c *cli.Context) {
 	Generic(c, []string{`in`, `to`})
 }
