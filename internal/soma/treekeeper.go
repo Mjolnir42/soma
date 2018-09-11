@@ -21,6 +21,7 @@ import (
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/internal/super"
 	"github.com/mjolnir42/soma/internal/tree"
 	metrics "github.com/rcrowley/go-metrics"
 	uuid "github.com/satori/go.uuid"
@@ -371,6 +372,21 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		jobLog                                *logrus.Logger
 		lfh                                   *os.File
 	)
+	// check if the user is still permitted to issue the asynchronous
+	// request at execution time
+	if !super.IsAuthorized(q) {
+		// open multi-statement transaction so we can close the job
+		// and mark it as failed inside the database, otherwise it would
+		// be loaded and attempted at every startup
+		if tx, _, err = tk.startTx(); err != nil {
+			goto bailout
+		}
+		err = fmt.Errorf("Unauthorized job at execution: %s",
+			q.JobID.String())
+		tk.appLog.Println(err)
+		tk.treeLog.Println(err)
+		goto unauthorized
+	}
 
 	if !tk.status.requiresRebuild {
 		_, err = tk.stmtStartJob.Exec(q.JobID.String(), time.Now().UTC())
@@ -655,12 +671,13 @@ bailout:
 	}
 
 	tk.tree.Rollback()
+unauthorized:
 	tx.Rollback()
 	tk.conn.Exec(
 		stmt.TxFinishJob,
 		q.JobID.String(),
 		time.Now().UTC(),
-		"failed",
+		`failed`,
 		err.Error(),
 	)
 	for i := len(tk.actions); i > 0; i-- {
