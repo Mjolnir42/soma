@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -24,48 +24,48 @@ func registerPermissions(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  "permissions",
-				Usage: "SUBCOMMANDS for permissions",
+				Name:  `permission`,
+				Usage: `SUBCOMMANDS for permissions`,
 				Subcommands: []cli.Command{
 					{
-						Name:         "add",
-						Usage:        "Register a new permission",
-						Description:  help.Text(`PermissionsAdd`),
+						Name:         `add`,
+						Usage:        `Register a new permission`,
+						Description:  help.Text(`permission::add`),
 						Action:       runtime(cmdPermissionAdd),
 						BashComplete: cmpl.To,
 					},
 					{
-						Name:         "remove",
-						Usage:        "Remove a permission from a category",
-						Description:  help.Text(`PermissionsRemove`),
-						Action:       runtime(cmdPermissionDel),
+						Name:         `remove`,
+						Usage:        `Remove a permission from a category`,
+						Description:  help.Text(`permission::remove`),
+						Action:       runtime(cmdPermissionRemove),
 						BashComplete: cmpl.From,
 					},
 					{
-						Name:         "list",
-						Usage:        "List all permissions in a category",
-						Description:  help.Text(`PermissionsList`),
+						Name:         `list`,
+						Usage:        `List all permissions in a category`,
+						Description:  help.Text(`permission::list`),
 						Action:       runtime(cmdPermissionList),
 						BashComplete: cmpl.DirectIn,
 					},
 					{
-						Name:         "show",
-						Usage:        "Show details for a permission",
-						Description:  help.Text(`PermissionsShow`),
+						Name:         `show`,
+						Usage:        `Show details for a permission`,
+						Description:  help.Text(`permission::show`),
 						Action:       runtime(cmdPermissionShow),
 						BashComplete: cmpl.In,
 					},
 					{
 						Name:         `map`,
 						Usage:        `Map an action to a permission`,
-						Description:  help.Text(`PermissionsMap`),
+						Description:  help.Text(`permission::map`),
 						Action:       runtime(cmdPermissionMap),
 						BashComplete: cmpl.To,
 					},
 					{
 						Name:         `unmap`,
 						Usage:        `Unmap an action from a permission`,
-						Description:  help.Text(`PermissionsUnmap`),
+						Description:  help.Text(`permission::unmap`),
 						Action:       runtime(cmdPermissionUnmap),
 						BashComplete: cmpl.From,
 					},
@@ -76,19 +76,24 @@ func registerPermissions(app cli.App) *cli.App {
 	return &app
 }
 
+// cmdPermissionAdd function
+// somaadm permission add ${permission} to ${category}
 func cmdPermissionAdd(c *cli.Context) error {
-	unique := []string{`to`}
-	required := []string{`to`}
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`to`}
+	mandatoryOptions := []string{`to`}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		unique,
-		required,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail(),
 	); err != nil {
 		return err
 	}
+
 	if err := adm.ValidateNoColon(c.Args().First()); err != nil {
 		return err
 	}
@@ -100,23 +105,28 @@ func cmdPermissionAdd(c *cli.Context) error {
 	req := proto.NewPermissionRequest()
 	req.Permission.Name = c.Args().First()
 	req.Permission.Category = opts[`to`][0]
-	path := fmt.Sprintf("/category/%s/permissions/", esc)
+	path := fmt.Sprintf("/category/%s/permission/", esc)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
-func cmdPermissionDel(c *cli.Context) error {
-	unique := []string{`from`}
-	required := []string{`from`}
+// cmdPermissionRemove function
+// somaadm permission remove ${permission} from ${category}
+func cmdPermissionRemove(c *cli.Context) error {
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`from`}
+	mandatoryOptions := []string{`from`}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		unique,
-		required,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail(),
 	); err != nil {
 		return err
 	}
+
 	var permissionID string
 	if err := adm.ValidateCategory(opts[`from`][0]); err != nil {
 		return err
@@ -129,99 +139,144 @@ func cmdPermissionDel(c *cli.Context) error {
 	}
 
 	esc := url.QueryEscape(opts[`from`][0])
-	path := fmt.Sprintf("/category/%s/permissions/%s",
+	path := fmt.Sprintf("/category/%s/permission/%s",
 		esc, permissionID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
+// cmdPermissionList function
+// somaadm permission list in ${category}
 func cmdPermissionList(c *cli.Context) error {
-	unique := []string{`in`}
-	required := []string{`in`}
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`in`}
+	mandatoryOptions := []string{`in`}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		unique,
-		required,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		adm.AllArguments(c),
 	); err != nil {
 		return err
 	}
+
 	if err := adm.ValidateCategory(opts[`in`][0]); err != nil {
 		return err
 	}
 
 	esc := url.QueryEscape(opts[`in`][0])
-	path := fmt.Sprintf("/category/%s/permissions/", esc)
+	path := fmt.Sprintf("/category/%s/permission/", esc)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
+// cmdPermissionShow function
+// somaadm permission show ${permission} in ${category}
+// somaadm permission show ${category}::${permission}
 func cmdPermissionShow(c *cli.Context) error {
-	unique := []string{`in`}
-	required := []string{`in`}
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`in`}
+	mandatoryOptions := []string{`in`}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		unique,
-		required,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail(),
 	); err != nil {
 		return err
 	}
-	var permissionID string
-	if err := adm.ValidateCategory(opts[`in`][0]); err != nil {
+
+	var permission, category, permissionID string
+	permissionSlice := strings.Split(c.Args().First(), `::`)
+	switch len(permissionSlice) {
+	case 1:
+		permission = permissionSlice[0]
+	case 2:
+		permission = permissionSlice[0]
+		category = permissionSlice[1]
+		if err := adm.ValidateCategory(category); err != nil {
+			return err
+		}
+	}
+	if _, ok := opts[`in`]; !ok {
+		if category == `` {
+			return fmt.Errorf(`Missing category information`)
+		}
+	}
+	if category == `` {
+		category = opts[`in`][0]
+	} else {
+		if category != opts[`in`][0] {
+			return fmt.Errorf("Mismatching category information: %s vs %s",
+				category,
+				opts[`in`][0],
+			)
+		}
+	}
+	if err := adm.ValidateCategory(category); err != nil {
 		return err
 	}
-	if err := adm.LookupPermIDRef(c.Args().First(),
-		opts[`in`][0],
+
+	if err := adm.LookupPermIDRef(permission, category,
 		&permissionID,
 	); err != nil {
 		return err
 	}
 
-	esc := url.QueryEscape(opts[`in`][0])
-	path := fmt.Sprintf("/category/%s/permissions/%s",
-		esc, permissionID)
+	escCategory := url.QueryEscape(category)
+	escPermissionID := url.QueryEscape(permissionID)
+	path := fmt.Sprintf("/category/%s/permission/%s",
+		escCategory, escPermissionID)
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
+// cmdPermissionMap function
+// somaadm permission map ${section}::${action} to ${category}::${permission}
+// somaadm permission map ${section} to ${category}::${permission}
 func cmdPermissionMap(c *cli.Context) error {
 	return cmdPermissionEdit(c, `map`)
 }
 
+// cmdPermissionUnmap function
+// somaadm permission map ${section}::${action} from ${category}::${permission}
 func cmdPermissionUnmap(c *cli.Context) error {
 	return cmdPermissionEdit(c, `unmap`)
 }
 
+// cmdPermissionEdit function
 func cmdPermissionEdit(c *cli.Context, cmd string) error {
-	var syn string
+	var (
+		err                                              error
+		section, action, category, permission, sCategory string
+		sectionID, actionID, permissionID, syn           string
+		sectionMapping                                   bool
+	)
 	switch cmd {
 	case `map`:
 		syn = `to`
 	case `unmap`:
 		syn = `from`
 	}
-	unique := []string{syn}
-	required := []string{syn}
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{syn}
+	mandatoryOptions := []string{syn}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		unique,
-		required,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail(),
 	); err != nil {
 		return err
 	}
-	var (
-		err                                   error
-		section, action, category, permission string
-		sectionID, actionID, permissionID     string
-		sectionMapping                        bool
-	)
+
 	actionSlice := strings.Split(c.Args().First(), `::`)
-	permissionSlice := strings.Split(opts[syn][0], `::`)
 	switch len(actionSlice) {
 	case 1:
 		section = actionSlice[0]
@@ -233,6 +288,8 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 		return fmt.Errorf("Not a valid {section}::{action}"+
 			" specifier: %s", c.Args().First())
 	}
+
+	permissionSlice := strings.Split(opts[syn][0], `::`)
 	switch len(permissionSlice) {
 	case 2:
 		category = permissionSlice[0]
@@ -245,7 +302,7 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 	if err = adm.ValidateCategory(category); err != nil {
 		return err
 	}
-	// lookup permissionid
+	// lookup permissionID
 	if err = adm.LookupPermIDRef(
 		permission,
 		category,
@@ -253,14 +310,26 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 	); err != nil {
 		return err
 	}
-	// lookup sectionid
+	// lookup sectionID
 	if sectionID, err = adm.LookupSectionID(
 		section,
 	); err != nil {
 		return err
 	}
+	// lookup ${category} for ${sectionID}
+	if sCategory, err = adm.LookupCategoryBySection(
+		sectionID,
+	); err != nil {
+		return err
+	}
+	// mapped section's category must match permission's category
+	if sCategory != category {
+		return fmt.Errorf("Category mismatch. Section %s from category %s can not be mapped to permission %s in category %s",
+			section, sCategory, permission, category)
+	}
+
+	// lookup actionID
 	if !sectionMapping {
-		// lookup actionid
 		if actionID, err = adm.LookupActionID(
 			action,
 			sectionID,
@@ -299,7 +368,7 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 	}
 
 	esc := url.QueryEscape(category)
-	path := fmt.Sprintf("/category/%s/permissions/%s",
+	path := fmt.Sprintf("/category/%s/permission/%s",
 		esc, permissionID)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
