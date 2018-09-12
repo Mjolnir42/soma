@@ -266,7 +266,7 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 	uniqueOptions := []string{syn}
 	mandatoryOptions := []string{syn}
 
-	if err := adm.ParseVariadicArguments(
+	if err = adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
 		uniqueOptions,

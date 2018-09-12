@@ -98,8 +98,7 @@ Welcome to SOMA!
 This dialogue will guide you to set up the system's root account of
 your new instance.
 
-As first step, enter the root password you want to set.
-`)
+As first step, enter the root password you want to set.`)
 
 password_read:
 	password = adm.ReadVerified(`password`)
@@ -114,8 +113,7 @@ password_read:
 
 	fmt.Println(`
 Very good. Now enter the bootstrap token printed by somadbctl at the
-end of the schema installation.
-`)
+end of the schema installation.`)
 
 	token = adm.ReadVerified(`password`)
 

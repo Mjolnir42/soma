@@ -11,6 +11,7 @@ import (
 //go:generate go run ../../script/render_markdown.go ../../docs/somaadm/command_reference ../../internal/help/rendered
 //go:generate go-bindata -pkg help -ignore .gitignore -o ../../internal/help/bindata.go -prefix "../../internal/help/rendered/" ../../internal/help/rendered/...
 
+// Cfg is the configuration that is exported for unknown reasons XXX
 var Cfg Config
 var store db.DB
 var somaVersion string

@@ -212,11 +212,7 @@ func cmdGroupCreate(c *cli.Context) error {
 		return err
 	}
 
-	if resp, err := adm.PostReqBody(req, "/group/"); err != nil {
-		return err
-	} else {
-		return adm.FormatOut(c, resp, ``)
-	}
+	return adm.Perform(`postbody`, `/group/`, `command`, req, c)
 }
 
 func cmdGroupDelete(c *cli.Context) error {
@@ -245,11 +241,7 @@ func cmdGroupDelete(c *cli.Context) error {
 	}
 	path := fmt.Sprintf("/groups/%s", groupID)
 
-	if resp, err := adm.DeleteReq(path); err != nil {
-		return err
-	} else {
-		return adm.FormatOut(c, resp, ``)
-	}
+	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
 func cmdGroupRename(c *cli.Context) error {

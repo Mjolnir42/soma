@@ -16,6 +16,7 @@ import (
 	"github.com/peterh/liner"
 )
 
+// Client is the resty client that is exported for unknown reasons XXX
 var Client *resty.Client
 
 // initCommon provides common startup initialization

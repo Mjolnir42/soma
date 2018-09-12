@@ -72,7 +72,7 @@ func cmdActionAdd(c *cli.Context) error {
 	uniqueOptions := []string{`to`, `in`}
 	mandatoryOptions := []string{`to`}
 
-	if err := adm.ParseVariadicArguments(
+	if err = adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
 		uniqueOptions,
@@ -133,7 +133,7 @@ func cmdActionRemove(c *cli.Context) error {
 	uniqueOptions := []string{`from`, `in`}
 	mandatoryOptions := []string{`from`}
 
-	if err := adm.ParseVariadicArguments(
+	if err = adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
 		uniqueOptions,
@@ -193,7 +193,7 @@ func cmdActionList(c *cli.Context) error {
 	uniqueOptions := []string{`in`, `of`}
 	mandatoryOptions := []string{`in`}
 
-	if err := adm.ParseVariadicArguments(
+	if err = adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
 		uniqueOptions,
@@ -247,7 +247,7 @@ func cmdActionShow(c *cli.Context) error {
 	uniqueOptions := []string{`from`, `in`}
 	mandatoryOptions := []string{`from`}
 
-	if err := adm.ParseVariadicArguments(
+	if err = adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
 		uniqueOptions,

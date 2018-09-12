@@ -13,6 +13,7 @@ import (
 	"github.com/nahanni/go-ucl"
 )
 
+// Config struct
 type Config struct {
 	API        string       `json:"api"`
 	Cert       string       `json:"cert"`
@@ -27,12 +28,14 @@ type Config struct {
 	Run        RunTimeConfig
 }
 
+// AuthConfig struct
 type AuthConfig struct {
 	User  string `json:"user"`
 	Pass  string `json:"pass"`
 	Token string `json:"token"`
 }
 
+// ConfigBoltDB struct
 type ConfigBoltDB struct {
 	Path    string `json:"path"`
 	File    string `json:"file"`
@@ -40,6 +43,7 @@ type ConfigBoltDB struct {
 	Timeout uint   `json:"open.timeout,string"`
 }
 
+// RunTimeConfig struct
 type RunTimeConfig struct {
 	SomaAPI       *url.URL      `json:"-"`
 	PathLogs      string        `json:"-"`

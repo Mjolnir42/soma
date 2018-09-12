@@ -103,11 +103,12 @@ func cmdJobLocalOutstanding(c *cli.Context) error {
 		})
 	}
 
-	if enc, err := json.Marshal(&pj); err != nil {
+	enc, err := json.Marshal(&pj)
+	if err != nil {
 		return err
-	} else {
-		fmt.Println(string(enc))
 	}
+
+	fmt.Println(string(enc))
 	// XXX adm.FormatOut support missing
 	return nil
 }
@@ -181,11 +182,11 @@ func cmdJobLocalList(c *cli.Context) error {
 	}
 
 	jobs = append(jobs, finished...)
-	if enc, err := json.Marshal(&jobs); err != nil {
+	enc, err := json.Marshal(&jobs)
+	if err != nil {
 		return err
-	} else {
-		fmt.Println(string(enc))
 	}
+	fmt.Println(string(enc))
 	// XXX adm.FormatOut support missing
 	return nil
 }
