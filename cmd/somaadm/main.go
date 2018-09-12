@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mjolnir42/soma/internal/db"
 	"github.com/codegangsta/cli"
+	"github.com/mjolnir42/soma/internal/db"
 )
 
 //go:generate go run ../../script/render_markdown.go ../../docs/somaadm/command_reference ../../internal/help/rendered
