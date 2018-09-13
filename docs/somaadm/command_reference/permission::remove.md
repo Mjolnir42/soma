@@ -9,8 +9,7 @@ syntax.
 # SYNOPSIS
 
 ```
-somaadm permission remove ${permission} from ${category}
-somaadm permission remove ${category}::${permission}
+soma permission remove [${category}::]${permission} [from ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -34,8 +33,8 @@ permission | permission | remove | yes | no
 # EXAMPLES
 
 ```
-./somaadm permission remove auditor from permission
-./somaadm permission remove permission::designer
-./somaadm permission remove self::information
-./somaadm permission remove browse from global
+soma permission remove auditor from permission
+soma permission remove permission::designer
+soma permission remove self::information
+soma permission remove browse from global
 ```

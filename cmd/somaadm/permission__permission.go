@@ -24,8 +24,9 @@ func registerPermissions(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `permission`,
-				Usage: `SUBCOMMANDS for permissions`,
+				Name:        `permission`,
+				Usage:       `SUBCOMMANDS for permissions`,
+				Description: help.Text(`permission`),
 				Subcommands: []cli.Command{
 					{
 						Name:         `add`,

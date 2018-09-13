@@ -1,18 +1,18 @@
-# somaadm permission list
+# DESCRIPTION
 
-This command is used to list all permissions in a specific category.
+This command is used to add entity definitions to SOMA.
 
 # SYNOPSIS
 
 ```
-soma permission list in ${category}
+soma entity add ${entity}
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-category | string | Name of the category | | no
+entity | string | Name of the entity | | no
 
 # PERMISSIONS
 
@@ -22,14 +22,12 @@ sufficient or all required permissions.
 Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
-system | permission | | no | yes
-permission | permission | list | yes | no
+system | global | | no | yes
+global | entity | add | yes | no
 
 # EXAMPLES
 
 ```
-soma permission list in global
-soma permission list in self
-soma permission list in repository
-soma permission list in monitoring
+soma entity add repository
+soma entity add bucket
 ```

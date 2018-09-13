@@ -22,8 +22,9 @@ func registerSection(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `section`,
-				Usage: `SUBCOMMANDS for permission sections`,
+				Name:        `section`,
+				Usage:       `SUBCOMMANDS for permission sections`,
+				Description: help.Text(`section`),
 				Subcommands: []cli.Command{
 					{
 						Name:         `add`,

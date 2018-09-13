@@ -10,7 +10,7 @@ Permission names must not contain the : character.
 # SYNOPSIS
 
 ```
-somaadm permission add ${permission} to ${category}
+soma permission add ${permission} to ${category}
 ```
 # ARGUMENT TYPES
 
@@ -33,7 +33,7 @@ permission | permission | add | yes | no
 # EXAMPLES
 
 ```
-./somaadm permission add auditor to permission
-./somaadm permission add information to self
-./somaadm permission add browse to global
+soma permission add auditor to permission
+soma permission add information to self
+soma permission add browse to global
 ```

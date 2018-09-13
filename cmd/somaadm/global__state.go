@@ -23,8 +23,9 @@ func registerStates(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `state`,
-				Usage: `SUBCOMMANDS for states`,
+				Name:        `state`,
+				Usage:       `SUBCOMMANDS for states`,
+				Description: help.Text(`state`),
 				Subcommands: []cli.Command{
 					{
 						Name:        `add`,

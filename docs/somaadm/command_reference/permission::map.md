@@ -1,4 +1,4 @@
-# somaadm permission map
+# DESCRIPTION
 
 This command is used to map specific sections or actions to the
 permission, including them in what the permission authorizes to perform.
@@ -13,7 +13,7 @@ sections or actions via a repository scoped permission.
 # SYNOPSIS
 
 ```
-somaadm permission map ${section}[::${action}] to ${category}::${permission}
+soma permission map ${section}[::${action}] to ${category}::${permission}
 ```
 
 # ARGUMENT TYPES
@@ -39,7 +39,7 @@ permission | permission | map | yes | no
 # EXAMPLES
 
 ```
-./somaadm permission map right::grant to permission::admin
-./somaadm permission map right::revoke to permission::admin
-./somaadm permission map datacenter to global::dc-maintainer
+soma permission map right::grant to permission::admin
+soma permission map right::revoke to permission::admin
+soma permission map datacenter to global::dc-maintainer
 ```

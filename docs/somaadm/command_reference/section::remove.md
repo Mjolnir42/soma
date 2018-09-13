@@ -5,7 +5,7 @@ This command is used to delete a permission section from the system.
 # SYNOPSIS
 
 ```
-somaadm sections remove ${section} [from ${category}]
+soma sections remove ${section} [from ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -29,6 +29,6 @@ permission | section | remove | yes | no
 # EXAMPLES
 
 ```
-./somaadm section remove environment
-./somaadm section remove datacenter from global
+soma section remove environment
+soma section remove datacenter from global
 ```

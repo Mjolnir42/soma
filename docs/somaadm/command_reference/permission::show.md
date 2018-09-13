@@ -8,8 +8,7 @@ syntax.
 # SYNOPSIS
 
 ```
-somaadm permission show ${permission} in ${category}
-somaadm permission show ${category}::${permission}
+soma permission show [${category}::]${permission} [in ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -33,6 +32,6 @@ permission | permission | show | yes | no
 # EXAMPLES
 
 ```
-./somaadm permission show browse in global
-./somaadm permission show permission::auditor
+soma permission show browse in global
+soma permission show permission::auditor
 ```

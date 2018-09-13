@@ -10,7 +10,7 @@ actions.
 # SYNOPSIS
 
 ```
-somaadm permission unmap ${section}[::${action}] from ${category}::${permission}
+soma permission unmap ${section}[::${action}] from ${category}::${permission}
 ```
 
 # ARGUMENT TYPES
@@ -36,7 +36,7 @@ permission | permission | unmap | yes | no
 # EXAMPLES
 
 ```
-./somaadm permission unmap right::grant from permission::admin
-./somaadm permission unmap right::revoke from permission::admin
-./somaadm permission unmap datacenter from global::dc-maintainer
+soma permission unmap right::grant from permission::admin
+soma permission unmap right::revoke from permission::admin
+soma permission unmap datacenter from global::dc-maintainer
 ```

@@ -1,18 +1,20 @@
-# somaadm permission list
+# DESCRIPTION
 
-This command is used to list all permissions in a specific category.
+This command is used to rename an entity definitions in SOMA. Outside of
+typofixing during system setup this command is probably unused.
 
 # SYNOPSIS
 
 ```
-soma permission list in ${category}
+soma entity rename ${entity} to ${new-entity}
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-category | string | Name of the category | | no
+entity | string | Old name of the entity | | no
+new-entity | string | New name of the entity | | no
 
 # PERMISSIONS
 
@@ -22,14 +24,11 @@ sufficient or all required permissions.
 Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
-system | permission | | no | yes
-permission | permission | list | yes | no
+system | global | | no | yes
+global | entity | rename | yes | no
 
 # EXAMPLES
 
 ```
-soma permission list in global
-soma permission list in self
-soma permission list in repository
-soma permission list in monitoring
+soma entity rename rpeository to repository
 ```

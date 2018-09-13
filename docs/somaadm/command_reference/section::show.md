@@ -5,7 +5,7 @@ This command shows details about a permission section.
 # SYNOPSIS
 
 ```
-somaadm section show ${section} [in ${category}]
+soma section show ${section} [in ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -29,5 +29,5 @@ permission | section | show | yes | no
 # EXAMPLES
 
 ```
-./somaadm section show environment in global
+soma section show environment in global
 ```

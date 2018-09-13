@@ -9,7 +9,7 @@ from.
 # SYNOPSIS
 
 ```
-somaadm action add ${action} to ${section} [in ${category}]
+soma action add ${action} to ${section} [in ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -34,8 +34,8 @@ permission | action | add | yes | no
 # EXAMPLES
 
 ```
-./somaadm action add add to environment
-./somaadm action add remove to environment
-./somaadm action add list to environment in global
-./somaadm action add show to environment
+soma action add add to environment
+soma action add remove to environment
+soma action add list to environment in global
+soma action add show to environment
 ```

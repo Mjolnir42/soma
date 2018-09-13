@@ -5,7 +5,7 @@ This command is used to list permission categories.
 # SYNOPSIS
 
 ```
-somaadm category list
+soma category list
 ```
 
 # ARGUMENT TYPES
@@ -26,5 +26,5 @@ permission | category | list | yes | no
 # EXAMPLES
 
 ```
-./somaadm category list
+soma category list
 ```

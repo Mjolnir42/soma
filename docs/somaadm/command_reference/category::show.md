@@ -5,7 +5,7 @@ This command shows details about a permission category.
 # SYNOPSIS
 
 ```
-somaadm category show ${category}
+soma category show ${category}
 ```
 
 # ARGUMENT TYPES
@@ -28,6 +28,6 @@ permission | category | show | yes | no
 # EXAMPLES
 
 ```
-./somaadm category show global
-./somaadm category show monitoring
+soma category show global
+soma category show monitoring
 ```

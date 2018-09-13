@@ -5,7 +5,7 @@ This command lists all permission sections registered in the system.
 # SYNOPSIS
 
 ```
-somaadm section list in ${category}
+soma section list in ${category}
 ```
 
 # ARGUMENT TYPES
@@ -28,5 +28,5 @@ permission | section | list | yes | no
 # EXAMPLES
 
 ```
-./somaadm section list in global
+soma section list in global
 ```

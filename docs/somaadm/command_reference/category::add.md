@@ -11,7 +11,7 @@ server's code. All categories have to be created.
 # SYNOPSIS
 
 ```
-somaadm category add ${category}
+soma category add ${category}
 ```
 
 # ARGUMENT TYPES
@@ -34,7 +34,7 @@ permission | category | add | yes | no
 # EXAMPLES
 
 ```
-./somaadm category add global
-./somaadm category add repository
-./somaadm category add monitoring
+soma category add global
+soma category add repository
+soma category add monitoring
 ```

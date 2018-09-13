@@ -23,8 +23,9 @@ func registerEntities(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `entity`,
-				Usage: `SUBCOMMANDS for entities`,
+				Name:        `entity`,
+				Usage:       `SUBCOMMANDS for entities`,
+				Description: help.Text(`entity`),
 				Subcommands: []cli.Command{
 					{
 						Name:        `add`,

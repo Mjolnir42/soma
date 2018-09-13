@@ -5,7 +5,7 @@ This command shows the actions for a specific section.
 # SYNOPSIS
 
 ```
-somaadm action list in ${section} [of ${category}]
+soma action list in ${section} [of ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -29,5 +29,5 @@ permission | action | list | yes | no
 # EXAMPLES
 
 ```
-./somaadm action list in environment of global
+soma action list in environment of global
 ```

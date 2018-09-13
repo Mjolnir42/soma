@@ -24,8 +24,9 @@ func registerViews(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `view`,
-				Usage: `SUBCOMMANDS for views`,
+				Name:        `view`,
+				Usage:       `SUBCOMMANDS for views`,
+				Description: help.Text(`view`),
 				Subcommands: []cli.Command{
 					{
 						Name:        `add`,

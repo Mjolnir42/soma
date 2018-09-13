@@ -5,7 +5,7 @@ This command show details about a specific action.
 # SYNOPSIS
 
 ```
-somaadm action show ${action} from ${section} [in ${category}]
+soma action show ${action} from ${section} [in ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -30,8 +30,8 @@ permission | action | show | yes | no
 # EXAMPLES
 
 ```
-./somaadm action show add from environment in global
-./somaadm action show remove from environment
-./somaadm action show list from environment
-./somaadm action show show from environment in global
+soma action show add from environment in global
+soma action show remove from environment
+soma action show list from environment
+soma action show show from environment in global
 ```

@@ -7,7 +7,7 @@ a typo during `category add`.
 # SYNOPSIS
 
 ```
-somaadm category remove ${category}
+soma category remove ${category}
 ```
 
 # ARGUMENT TYPES
@@ -31,5 +31,5 @@ permission | category | remove | yes | no
 # EXAMPLES
 
 ```
-./somaadm category remove global
+soma category remove global
 ```

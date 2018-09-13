@@ -13,7 +13,7 @@ to perform any actions from that section.
 # SYNOPSIS
 
 ```
-somaadm section add ${section} to ${category}
+soma section add ${section} to ${category}
 ```
 
 # ARGUMENT TYPES
@@ -37,5 +37,5 @@ permission | section | add | yes | no
 # EXAMPLES
 
 ```
-./somaadm section add environment to global
+soma section add environment to global
 ```
