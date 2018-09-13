@@ -10,8 +10,7 @@ soma view list
 
 # ARGUMENT TYPES
 
-Name | Type |     Description   | Default | Optional
- --- |  --- | ----------------- | ------- | --------
+This command takes no arguments.
 
 # PERMISSIONS
 
