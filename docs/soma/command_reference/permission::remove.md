@@ -1,4 +1,4 @@
-# somaadm permission remove
+# DESCRIPTION
 
 This command is used to delete a permission. Deleting a permission
 revokes all grants of that permission.

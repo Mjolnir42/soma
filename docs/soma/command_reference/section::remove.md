@@ -1,18 +1,19 @@
-# somaadm section list
+# DESCRIPTION
 
-This command lists all permission sections registered in the system.
+This command is used to delete a permission section from the system.
 
 # SYNOPSIS
 
 ```
-soma section list in ${category}
+soma sections remove ${section} [from ${category}]
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-category | string | Name of the category | | no
+section | string | Name of the section | | no
+category | string | Name of the category | | yes
 
 # PERMISSIONS
 
@@ -23,10 +24,11 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | section | list | yes | no
+permission | section | remove | yes | no
 
 # EXAMPLES
 
 ```
-soma section list in global
+soma section remove environment
+soma section remove datacenter from global
 ```

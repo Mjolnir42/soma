@@ -1,4 +1,4 @@
-# somaadm permission add
+# DESCRIPTION
 
 This command is used to create a new permission within a scope category.
 Permissions can be granted to users or teams.  Sections and actions can

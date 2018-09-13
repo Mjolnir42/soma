@@ -1,11 +1,15 @@
-# somaadm action remove
+# DESCRIPTION
 
-This command is used to delete an action from a section.
+This command is used to add a new permission action to a permission
+section.
+
+Actions are grouped in sections, and are used to build permissions
+from.
 
 # SYNOPSIS
 
 ```
-soma action remove ${action} from ${section} [in ${category}]
+soma action add ${action} to ${section} [in ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -25,13 +29,13 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | action | remove | yes | no
+permission | action | add | yes | no
 
 # EXAMPLES
 
 ```
-soma actions remove add from environment
-soma actions remove remove from environment
-soma actions remove list from environment
-soma actions remove show from environment in global
+soma action add add to environment
+soma action add remove to environment
+soma action add list to environment in global
+soma action add show to environment
 ```

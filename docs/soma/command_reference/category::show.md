@@ -1,21 +1,17 @@
-# somaadm permission show
+# DESCRIPTION
 
-This command is used to show details about a specific permission.
-
-The permission to show can be specified via shorthand or regular
-syntax.
+This command shows details about a permission category.
 
 # SYNOPSIS
 
 ```
-soma permission show [${category}::]${permission} [in ${category}]
+soma category show ${category}
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-permission | string | Name of the permission | | no
 category | string | Name of the category | | no
 
 # PERMISSIONS
@@ -27,11 +23,11 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | permission | show | yes | no
+permission | category | show | yes | no
 
 # EXAMPLES
 
 ```
-soma permission show browse in global
-soma permission show permission::auditor
+soma category show global
+soma category show monitoring
 ```

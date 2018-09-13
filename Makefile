@@ -38,8 +38,8 @@ build:
 vet:
 	@echo "Running 'go vet' ...."
 	@go vet ./cmd/eye/
+	@go vet ./cmd/somad/
 	@go vet ./cmd/soma/
-	@go vet ./cmd/somaadm/
 	@go vet ./cmd/somadbctl/
 	@go vet ./lib/auth/
 	@go vet ./lib/proto/
@@ -57,8 +57,8 @@ vet:
 	@go vet ./internal/tree/
 	@echo "Running 'go vet -shadow' ...."
 	@go tool vet -shadow ./cmd/eye/
+	@go tool vet -shadow ./cmd/somad/
 	@go tool vet -shadow ./cmd/soma/
-	@go tool vet -shadow ./cmd/somaadm/
 	@go tool vet -shadow ./cmd/somadbctl/
 	@go tool vet -shadow ./lib/auth/
 	@go tool vet -shadow ./lib/proto/

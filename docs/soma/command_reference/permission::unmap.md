@@ -1,4 +1,4 @@
-# somaadm permission unmap
+# DESCRIPTION
 
 This command is used to unmap specific sections or actions from a
 permission, removing them from what the permission authorizes to perform.

@@ -1,4 +1,4 @@
-# somaadm category add
+# DESCRIPTION
 
 This command is used to add a new permission category
 to the system. Categories group permission sections

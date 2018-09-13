@@ -33,5 +33,6 @@ _testmain.go
 
 # Dev
 /docs/private
-/cmd/somaadm/somaadm
+/cmd/somad/somad
+/cmd/soma/soma
 /.zsh_source

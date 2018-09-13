@@ -1,17 +1,21 @@
-# somaadm permission list
+# DESCRIPTION
 
-This command is used to list all permissions in a specific category.
+This command is used to show details about a specific permission.
+
+The permission to show can be specified via shorthand or regular
+syntax.
 
 # SYNOPSIS
 
 ```
-soma permission list in ${category}
+soma permission show [${category}::]${permission} [in ${category}]
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
+permission | string | Name of the permission | | no
 category | string | Name of the category | | no
 
 # PERMISSIONS
@@ -23,13 +27,11 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | permission | list | yes | no
+permission | permission | show | yes | no
 
 # EXAMPLES
 
 ```
-soma permission list in global
-soma permission list in self
-soma permission list in repository
-soma permission list in monitoring
+soma permission show browse in global
+soma permission show permission::auditor
 ```

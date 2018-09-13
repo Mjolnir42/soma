@@ -1,15 +1,11 @@
-# somaadm action add
+# DESCRIPTION
 
-This command is used to add a new permission action to a permission
-section.
-
-Actions are grouped in sections, and are used to build permissions
-from.
+This command show details about a specific action.
 
 # SYNOPSIS
 
 ```
-soma action add ${action} to ${section} [in ${category}]
+soma action show ${action} from ${section} [in ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -29,13 +25,13 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | action | add | yes | no
+permission | action | show | yes | no
 
 # EXAMPLES
 
 ```
-soma action add add to environment
-soma action add remove to environment
-soma action add list to environment in global
-soma action add show to environment
+soma action show add from environment in global
+soma action show remove from environment
+soma action show list from environment
+soma action show show from environment in global
 ```

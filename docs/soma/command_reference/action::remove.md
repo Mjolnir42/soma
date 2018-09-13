@@ -1,17 +1,18 @@
-# somaadm section show
+# DESCRIPTION
 
-This command shows details about a permission section.
+This command is used to delete an action from a section.
 
 # SYNOPSIS
 
 ```
-soma section show ${section} [in ${category}]
+soma action remove ${action} from ${section} [in ${category}]
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
+action | string | Name of the action | | no
 section | string | Name of the section | | no
 category | string | Name of the category | | yes
 
@@ -24,10 +25,13 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | section | show | yes | no
+permission | action | remove | yes | no
 
 # EXAMPLES
 
 ```
-soma section show environment in global
+soma actions remove add from environment
+soma actions remove remove from environment
+soma actions remove list from environment
+soma actions remove show from environment in global
 ```

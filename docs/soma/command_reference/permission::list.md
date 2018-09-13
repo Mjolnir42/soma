@@ -1,19 +1,18 @@
-# somaadm action list
+# DESCRIPTION
 
-This command shows the actions for a specific section.
+This command is used to list all permissions in a specific category.
 
 # SYNOPSIS
 
 ```
-soma action list in ${section} [of ${category}]
+soma permission list in ${category}
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-section | string | Name of the section | | no
-category | string | Name of the category | | yes
+category | string | Name of the category | | no
 
 # PERMISSIONS
 
@@ -24,10 +23,13 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | action | list | yes | no
+permission | permission | list | yes | no
 
 # EXAMPLES
 
 ```
-soma action list in environment of global
+soma permission list in global
+soma permission list in self
+soma permission list in repository
+soma permission list in monitoring
 ```

@@ -1,4 +1,4 @@
-# somaadm section add
+# DESCRIPTION
 
 This command adds a new permission section to the system. Sections
 are groups of actions and belong to one permission category. They

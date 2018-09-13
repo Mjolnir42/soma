@@ -1,4 +1,4 @@
-# somaadm category remove
+# DESCRIPTION
 
 This command removes a permission category from the
 server. Using this should only be required to correct

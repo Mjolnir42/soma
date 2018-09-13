@@ -1,11 +1,11 @@
-# somaadm section remove
+# DESCRIPTION
 
-This command is used to delete a permission section from the system.
+This command shows the actions for a specific section.
 
 # SYNOPSIS
 
 ```
-soma sections remove ${section} [from ${category}]
+soma action list in ${section} [of ${category}]
 ```
 
 # ARGUMENT TYPES
@@ -24,11 +24,10 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | section | remove | yes | no
+permission | action | list | yes | no
 
 # EXAMPLES
 
 ```
-soma section remove environment
-soma section remove datacenter from global
+soma action list in environment of global
 ```

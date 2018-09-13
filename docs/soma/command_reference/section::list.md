@@ -1,11 +1,11 @@
-# somaadm category show
+# DESCRIPTION
 
-This command shows details about a permission category.
+This command lists all permission sections registered in the system.
 
 # SYNOPSIS
 
 ```
-soma category show ${category}
+soma section list in ${category}
 ```
 
 # ARGUMENT TYPES
@@ -23,11 +23,10 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | category | show | yes | no
+permission | section | list | yes | no
 
 # EXAMPLES
 
 ```
-soma category show global
-soma category show monitoring
+soma section list in global
 ```

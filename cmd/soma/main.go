@@ -8,7 +8,7 @@ import (
 	"github.com/mjolnir42/soma/internal/db"
 )
 
-//go:generate go run ../../script/render_markdown.go ../../docs/somaadm/command_reference ../../internal/help/rendered
+//go:generate go run ../../script/render_markdown.go ../../docs/soma/command_reference ../../internal/help/rendered
 //go:generate go-bindata -pkg help -ignore .gitignore -o ../../internal/help/bindata.go -prefix "../../internal/help/rendered/" ../../internal/help/rendered/...
 
 // Cfg is the configuration that is exported for unknown reasons XXX

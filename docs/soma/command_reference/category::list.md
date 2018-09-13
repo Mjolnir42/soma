@@ -1,4 +1,4 @@
-# somaadm category list
+# DESCRIPTION
 
 This command is used to list permission categories.
 
