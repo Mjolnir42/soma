@@ -1,18 +1,20 @@
 # DESCRIPTION
 
-This command is used to remove entity definitions from SOMA.
+This command is used to rename an view definitions in SOMA. Outside of
+typofixing during system setup this command is probably unused.
 
 # SYNOPSIS
 
 ```
-soma entity remove ${entity}
+soma view rename ${view} to ${new-view}
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-entity | string | Name of the entity | | no
+view | string | Old name of the view | | no
+new-view | string | New name of the view | | no
 
 # PERMISSIONS
 
@@ -23,11 +25,10 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | global | | no | yes
-global | entity | remove | yes | no
+global | view | rename | yes | no
 
 # EXAMPLES
 
 ```
-soma entity remove repository
-soma entity remove bucket
+soma view rename int to internal
 ```

@@ -1,6 +1,6 @@
 # DESCRIPTION
 
-This command lists show details for an entity defined in SOMA.
+This command shows details for an entity defined in SOMA.
 
 # SYNOPSIS
 

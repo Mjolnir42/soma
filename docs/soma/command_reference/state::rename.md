@@ -1,18 +1,20 @@
 # DESCRIPTION
 
-This command is used to remove entity definitions from SOMA.
+This command is used to rename a state definitions in SOMA. Outside of
+typofixing during system setup this command is probably unused.
 
 # SYNOPSIS
 
 ```
-soma entity remove ${entity}
+soma state rename ${state} to ${new-state}
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-entity | string | Name of the entity | | no
+state | string | Old name of the state | | no
+new-state | string | New name of the state | | no
 
 # PERMISSIONS
 
@@ -23,11 +25,10 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | global | | no | yes
-global | entity | remove | yes | no
+global | state | rename | yes | no
 
 # EXAMPLES
 
 ```
-soma entity remove repository
-soma entity remove bucket
+soma state rename stadnalone to standalone
 ```

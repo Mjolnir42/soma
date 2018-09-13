@@ -27,6 +27,6 @@ global | entity | list | yes | no
 # EXAMPLES
 
 ```
-soma entity rename rpeository to repository
+soma entity list
 ```
 

@@ -1,18 +1,17 @@
 # DESCRIPTION
 
-This command is used to remove entity definitions from SOMA.
+This command lists all views defined in SOMA.
 
 # SYNOPSIS
 
 ```
-soma entity remove ${entity}
+soma view list
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-entity | string | Name of the entity | | no
 
 # PERMISSIONS
 
@@ -23,11 +22,10 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | global | | no | yes
-global | entity | remove | yes | no
+global | view | list | yes | no
 
 # EXAMPLES
 
 ```
-soma entity remove repository
-soma entity remove bucket
+soma view list
 ```

@@ -1,18 +1,18 @@
 # DESCRIPTION
 
-This command is used to remove entity definitions from SOMA.
+This command is used to add state definitions to SOMA.
 
 # SYNOPSIS
 
 ```
-soma entity remove ${entity}
+soma state add ${state}
 ```
 
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional
  --- |  --- | ----------------- | ------- | --------
-entity | string | Name of the entity | | no
+state | string | Name of the state | | no
 
 # PERMISSIONS
 
@@ -23,11 +23,11 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | global | | no | yes
-global | entity | remove | yes | no
+global | state | add | yes | no
 
 # EXAMPLES
 
 ```
-soma entity remove repository
-soma entity remove bucket
+soma state add standalone
+soma state add clustered
 ```
