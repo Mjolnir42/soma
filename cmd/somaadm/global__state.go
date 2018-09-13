@@ -1,3 +1,11 @@
+/*-
+ * Copyright (c) 2015-2018, Jörg Pernfuß
+ * Copyright (c) 2016, 1&1 Internet SE
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
 package main
 
 import (
@@ -15,34 +23,34 @@ func registerStates(app cli.App) *cli.App {
 		[]cli.Command{
 			// states
 			{
-				Name:  "states",
-				Usage: "SUBCOMMANDS for states",
+				Name:  `state`,
+				Usage: `SUBCOMMANDS for states`,
 				Subcommands: []cli.Command{
 					{
-						Name:   "add",
-						Usage:  "Add a new object state",
-						Action: runtime(cmdObjectStatesAdd),
+						Name:   `add`,
+						Usage:  `Add a new object state`,
+						Action: runtime(cmdStateAdd),
 					},
 					{
-						Name:   "remove",
-						Usage:  "Remove an existing object state",
-						Action: runtime(cmdObjectStatesRemove),
+						Name:   `remove`,
+						Usage:  `Remove an existing object state`,
+						Action: runtime(cmdStateRemove),
 					},
 					{
-						Name:         "rename",
-						Usage:        "Rename an existing object state",
-						Action:       runtime(cmdObjectStatesRename),
+						Name:         `rename`,
+						Usage:        `Rename an existing object state`,
+						Action:       runtime(cmdStateRename),
 						BashComplete: cmpl.To,
 					},
 					{
-						Name:   "list",
-						Usage:  "List all object states",
-						Action: runtime(cmdObjectStatesList),
+						Name:   `list`,
+						Usage:  `List all object states`,
+						Action: runtime(cmdStateList),
 					},
 					{
-						Name:   "show",
-						Usage:  "Show information about an object states",
-						Action: runtime(cmdObjectStatesShow),
+						Name:   `show`,
+						Usage:  `Show information about an object states`,
+						Action: runtime(cmdStateShow),
 					},
 				},
 			}, // end states
@@ -51,7 +59,9 @@ func registerStates(app cli.App) *cli.App {
 	return &app
 }
 
-func cmdObjectStatesAdd(c *cli.Context) error {
+// cmdStateAdd function
+// somaadm state add ${state}
+func cmdStateAdd(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -62,7 +72,9 @@ func cmdObjectStatesAdd(c *cli.Context) error {
 	return adm.Perform(`postbody`, `/state/`, `command`, req, c)
 }
 
-func cmdObjectStatesRemove(c *cli.Context) error {
+// cmdStateRemove function
+// somaadm state remove ${state}
+func cmdStateRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -72,13 +84,19 @@ func cmdObjectStatesRemove(c *cli.Context) error {
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
-func cmdObjectStatesRename(c *cli.Context) error {
+// cmdStateRename function
+// somaadm state rename ${state} to ${new-state}
+func cmdStateRename(c *cli.Context) error {
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`to`}
+	mandatoryOptions := []string{`to`}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		[]string{`to`},
-		[]string{`to`},
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail(),
 	); err != nil {
 		return err
@@ -92,7 +110,9 @@ func cmdObjectStatesRename(c *cli.Context) error {
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
-func cmdObjectStatesList(c *cli.Context) error {
+// cmdStateList function
+// somaadm state list
+func cmdStateList(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
 	}
@@ -100,7 +120,9 @@ func cmdObjectStatesList(c *cli.Context) error {
 	return adm.Perform(`get`, `/state/`, `list`, nil, c)
 }
 
-func cmdObjectStatesShow(c *cli.Context) error {
+// cmdStateShow function
+// somaadm state show ${state}
+func cmdStateShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
