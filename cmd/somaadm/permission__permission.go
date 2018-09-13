@@ -111,11 +111,12 @@ func cmdPermissionAdd(c *cli.Context) error {
 
 // cmdPermissionRemove function
 // somaadm permission remove ${permission} from ${category}
+// somaadm permission remove ${category}::${permission}
 func cmdPermissionRemove(c *cli.Context) error {
 	opts := map[string][]string{}
 	multipleAllowed := []string{}
 	uniqueOptions := []string{`from`}
-	mandatoryOptions := []string{`from`}
+	mandatoryOptions := []string{}
 
 	if err := adm.ParseVariadicArguments(
 		opts,
@@ -127,20 +128,49 @@ func cmdPermissionRemove(c *cli.Context) error {
 		return err
 	}
 
-	var permissionID string
-	if err := adm.ValidateCategory(opts[`from`][0]); err != nil {
-		return err
+	var permission, category, permissionID string
+	permissionSlice := strings.Split(c.Args().First(), `::`)
+	switch len(permissionSlice) {
+	case 1:
+		permission = permissionSlice[0]
+	case 2:
+		permission = permissionSlice[0]
+		category = permissionSlice[1]
+		if err := adm.ValidateCategory(category); err != nil {
+			return err
+		}
 	}
-	if err := adm.LookupPermIDRef(c.Args().First(),
-		opts[`from`][0],
+	if _, ok := opts[`from`]; !ok {
+		// if the optional argument was not provided, then category must
+		// have been set via splitting permissionSlice
+		if category == `` {
+			return fmt.Errorf(`Missing category information`)
+		}
+	}
+	if category == `` {
+		category = opts[`from`][0]
+		if err := adm.ValidateCategory(category); err != nil {
+			return err
+		}
+	} else {
+		if category != opts[`from`][0] {
+			// example: somaadm permission remove self::information from global
+			return fmt.Errorf("Mismatching category information: %s vs %s",
+				category,
+				opts[`from`][0],
+			)
+		}
+	}
+
+	if err := adm.LookupPermIDRef(permission, category,
 		&permissionID,
 	); err != nil {
 		return err
 	}
 
-	esc := url.QueryEscape(opts[`from`][0])
 	path := fmt.Sprintf("/category/%s/permission/%s",
-		esc, permissionID)
+		url.QueryEscape(category),
+		url.QueryEscape(permissionID))
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
