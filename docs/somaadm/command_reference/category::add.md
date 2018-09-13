@@ -22,8 +22,14 @@ category | string | Name of the category | | no
 
 # PERMISSIONS
 
-Since this command is used during bootstrap of the permission
-system, it is generally advisable to have `omnipotence`.
+The request is authorized if the user either has at least one
+sufficient or all required permissions.
+
+Category | Section | Action | Required | Sufficient
+ ------- | ------- | ------ | -------- | ----------
+omnipotence | | | no | yes
+system | permission | | no | yes
+permission | category | add | yes | no
 
 # EXAMPLES
 

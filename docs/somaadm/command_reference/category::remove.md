@@ -18,6 +18,16 @@ category | string | Name of the category | | no
 
 # PERMISSIONS
 
+The request is authorized if the user either has at least one
+sufficient or all required permissions.
+
+Category | Section | Action | Required | Sufficient
+ ------- | ------- | ------ | -------- | ----------
+omnipotence | | | no | yes
+system | permission | | no | yes
+permission | category | remove | yes | no
+
+
 # EXAMPLES
 
 ```

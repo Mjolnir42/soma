@@ -14,6 +14,15 @@ This command takes no arguments.
 
 # PERMISSIONS
 
+The request is authorized if the user either has at least one
+sufficient or all required permissions.
+
+Category | Section | Action | Required | Sufficient
+ ------- | ------- | ------ | -------- | ----------
+omnipotence | | | no | yes
+system | permission | | no | yes
+permission | category | list | yes | no
+
 # EXAMPLES
 
 ```

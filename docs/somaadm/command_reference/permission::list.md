@@ -1,11 +1,11 @@
-# somaadm category show
+# somaadm permission list
 
-This command shows details about a permission category.
+This command is used to list all permissions in a specific category.
 
 # SYNOPSIS
 
 ```
-somaadm category show ${category}
+somaadm permission list in ${category}
 ```
 
 # ARGUMENT TYPES
@@ -23,11 +23,13 @@ Category | Section | Action | Required | Sufficient
  ------- | ------- | ------ | -------- | ----------
 omnipotence | | | no | yes
 system | permission | | no | yes
-permission | category | show | yes | no
+permission | permission | list | yes | no
 
 # EXAMPLES
 
 ```
-./somaadm category show global
-./somaadm category show monitoring
+./somaadm permission list in global
+./somaadm permission list in self
+./somaadm permission list in repository
+./somaadm permission list in monitoring
 ```

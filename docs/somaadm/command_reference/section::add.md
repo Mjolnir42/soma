@@ -1,4 +1,4 @@
-# somaadm sections add
+# somaadm section add
 
 This command adds a new permission section to the system. Sections
 are groups of actions and belong to one permission category. They
@@ -13,7 +13,7 @@ to perform any actions from that section.
 # SYNOPSIS
 
 ```
-somaadm sections add ${section} to ${category}
+somaadm section add ${section} to ${category}
 ```
 
 # ARGUMENT TYPES
@@ -25,8 +25,17 @@ category | string | Name of the category of the section | | no
 
 # PERMISSIONS
 
+The request is authorized if the user either has at least one
+sufficient or all required permissions.
+
+Category | Section | Action | Required | Sufficient
+ ------- | ------- | ------ | -------- | ----------
+omnipotence | | | no | yes
+system | permission | | no | yes
+permission | section | add | yes | no
+
 # EXAMPLES
 
 ```
-./somaadm sections add environments to global
+./somaadm section add environment to global
 ```
