@@ -1,45 +1,54 @@
-package main
+/*-
+ * Copyright (c) 2015-2018, Jörg Pernfuß
+ * Copyright (c) 2016, 1&1 Internet SE
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package main // import "github.com/mjolnir42/soma/cmd/somaadm"
 
 import (
 	"fmt"
+	"net/url"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerEntities(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  "entity",
-				Usage: "SUBCOMMANDS for entities (object types)",
+				Name:  `entity`,
+				Usage: `SUBCOMMANDS for entities (object types)`,
 				Subcommands: []cli.Command{
 					{
-						Name:   "add",
-						Usage:  "Add a new entity",
+						Name:   `add`,
+						Usage:  `Add a new entity`,
 						Action: runtime(cmdEntityAdd),
 					},
 					{
-						Name:   "remove",
-						Usage:  "Remove an existing entity",
+						Name:   `remove`,
+						Usage:  `Remove an existing entity`,
 						Action: runtime(cmdEntityRemove),
 					},
 					{
-						Name:         "rename",
-						Usage:        "Rename an existing entity",
+						Name:         `rename`,
+						Usage:        `Rename an existing entity`,
 						Action:       runtime(cmdEntityRename),
 						BashComplete: cmpl.To,
 					},
 					{
-						Name:   "list",
-						Usage:  "List all entities",
+						Name:   `list`,
+						Usage:  `List all entities`,
 						Action: runtime(cmdEntityList),
 					},
 					{
-						Name:   "show",
-						Usage:  "Show information about a specific entity",
+						Name:   `show`,
+						Usage:  `Show information about a specific entity`,
 						Action: runtime(cmdEntityShow),
 					},
 				},
@@ -49,6 +58,8 @@ func registerEntities(app cli.App) *cli.App {
 	return &app
 }
 
+// cmdEntityAdd  function
+// somaadm entity add ${entity}
 func cmdEntityAdd(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
@@ -60,22 +71,30 @@ func cmdEntityAdd(c *cli.Context) error {
 	return adm.Perform(`postbody`, `/entity/`, `command`, req, c)
 }
 
+// cmdEntityRemove function
+// somaadm entity remove ${entity}
 func cmdEntityRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/entity/%s", c.Args().First())
+	path := fmt.Sprintf("/entity/%s", url.QueryEscape(c.Args().First()))
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
+// cmdEntityRename function
+// somaadm entity rename ${entity} to ${new-entity}
 func cmdEntityRename(c *cli.Context) error {
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`to`}
+	mandatoryOptions := []string{`to`}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		[]string{`to`},
-		[]string{`to`},
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail(),
 	); err != nil {
 		return err
@@ -84,10 +103,12 @@ func cmdEntityRename(c *cli.Context) error {
 	req := proto.NewEntityRequest()
 	req.Entity.Name = opts[`to`][0]
 
-	path := fmt.Sprintf("/entity/%s", c.Args().First())
+	path := fmt.Sprintf("/entity/%s", url.QueryEscape(c.Args().First()))
 	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
+// cmdEntityList function
+// somaadm entity list
 func cmdEntityList(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
@@ -96,12 +117,14 @@ func cmdEntityList(c *cli.Context) error {
 	return adm.Perform(`get`, `/entity/`, `list`, nil, c)
 }
 
+// cmdEntityShow function
+// somaadm entity show ${entity}
 func cmdEntityShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
 
-	path := fmt.Sprintf("/entity/%s", c.Args().First())
+	path := fmt.Sprintf("/entity/%s", url.QueryEscape(c.Args().First()))
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
