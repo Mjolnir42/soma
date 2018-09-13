@@ -178,7 +178,7 @@ func cmdPermissionShow(c *cli.Context) error {
 	opts := map[string][]string{}
 	multipleAllowed := []string{}
 	uniqueOptions := []string{`in`}
-	mandatoryOptions := []string{`in`}
+	mandatoryOptions := []string{}
 
 	if err := adm.ParseVariadicArguments(
 		opts,
