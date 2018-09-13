@@ -6,7 +6,7 @@
  * that can be found in the LICENSE file.
  */
 
-package main
+package main // import "github.com/mjolnir42/soma/cmd/somaadm"
 
 import (
 	"fmt"
@@ -15,42 +15,47 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
+	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
 func registerStates(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
-			// states
 			{
 				Name:  `state`,
 				Usage: `SUBCOMMANDS for states`,
 				Subcommands: []cli.Command{
 					{
-						Name:   `add`,
-						Usage:  `Add a new object state`,
-						Action: runtime(cmdStateAdd),
+						Name:        `add`,
+						Usage:       `Add a new object state`,
+						Description: help.Text(`state::add`),
+						Action:      runtime(cmdStateAdd),
 					},
 					{
-						Name:   `remove`,
-						Usage:  `Remove an existing object state`,
-						Action: runtime(cmdStateRemove),
+						Name:        `remove`,
+						Usage:       `Remove an existing object state`,
+						Description: help.Text(`state::remove`),
+						Action:      runtime(cmdStateRemove),
 					},
 					{
 						Name:         `rename`,
 						Usage:        `Rename an existing object state`,
+						Description:  help.Text(`state::rename`),
 						Action:       runtime(cmdStateRename),
 						BashComplete: cmpl.To,
 					},
 					{
-						Name:   `list`,
-						Usage:  `List all object states`,
-						Action: runtime(cmdStateList),
+						Name:        `list`,
+						Usage:       `List all object states`,
+						Description: help.Text(`state::list`),
+						Action:      runtime(cmdStateList),
 					},
 					{
-						Name:   `show`,
-						Usage:  `Show information about an object states`,
-						Action: runtime(cmdStateShow),
+						Name:        `show`,
+						Usage:       `Show information about an object states`,
+						Description: help.Text(`state::show`),
+						Action:      runtime(cmdStateShow),
 					},
 				},
 			}, // end states

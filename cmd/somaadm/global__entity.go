@@ -15,6 +15,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
+	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -23,33 +24,38 @@ func registerEntities(app cli.App) *cli.App {
 		[]cli.Command{
 			{
 				Name:  `entity`,
-				Usage: `SUBCOMMANDS for entities (object types)`,
+				Usage: `SUBCOMMANDS for entities`,
 				Subcommands: []cli.Command{
 					{
-						Name:   `add`,
-						Usage:  `Add a new entity`,
-						Action: runtime(cmdEntityAdd),
+						Name:        `add`,
+						Usage:       `Add a new entity`,
+						Description: help.Text(`entity::add`),
+						Action:      runtime(cmdEntityAdd),
 					},
 					{
-						Name:   `remove`,
-						Usage:  `Remove an existing entity`,
-						Action: runtime(cmdEntityRemove),
+						Name:        `remove`,
+						Usage:       `Remove an existing entity`,
+						Description: help.Text(`entity::remove`),
+						Action:      runtime(cmdEntityRemove),
 					},
 					{
 						Name:         `rename`,
 						Usage:        `Rename an existing entity`,
+						Description:  help.Text(`entity::rename`),
 						Action:       runtime(cmdEntityRename),
 						BashComplete: cmpl.To,
 					},
 					{
-						Name:   `list`,
-						Usage:  `List all entities`,
-						Action: runtime(cmdEntityList),
+						Name:        `list`,
+						Usage:       `List all entities`,
+						Description: help.Text(`entity::list`),
+						Action:      runtime(cmdEntityList),
 					},
 					{
-						Name:   `show`,
-						Usage:  `Show information about a specific entity`,
-						Action: runtime(cmdEntityShow),
+						Name:        `show`,
+						Usage:       `Show information about a specific entity`,
+						Description: help.Text(`entity::show`),
+						Action:      runtime(cmdEntityShow),
 					},
 				},
 			},
