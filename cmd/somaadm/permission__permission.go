@@ -233,12 +233,17 @@ func cmdPermissionShow(c *cli.Context) error {
 		}
 	}
 	if _, ok := opts[`in`]; !ok {
+		// if the optional argument was not provided, then category must
+		// have been set via splitting permissionSlice
 		if category == `` {
 			return fmt.Errorf(`Missing category information`)
 		}
 	}
 	if category == `` {
 		category = opts[`in`][0]
+		if err := adm.ValidateCategory(category); err != nil {
+			return err
+		}
 	} else {
 		if category != opts[`in`][0] {
 			return fmt.Errorf("Mismatching category information: %s vs %s",
@@ -247,9 +252,6 @@ func cmdPermissionShow(c *cli.Context) error {
 			)
 		}
 	}
-	if err := adm.ValidateCategory(category); err != nil {
-		return err
-	}
 
 	if err := adm.LookupPermIDRef(permission, category,
 		&permissionID,
@@ -257,10 +259,9 @@ func cmdPermissionShow(c *cli.Context) error {
 		return err
 	}
 
-	escCategory := url.QueryEscape(category)
-	escPermissionID := url.QueryEscape(permissionID)
 	path := fmt.Sprintf("/category/%s/permission/%s",
-		escCategory, escPermissionID)
+		url.QueryEscape(category),
+		url.QueryEscape(permissionID))
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
