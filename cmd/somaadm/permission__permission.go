@@ -273,7 +273,8 @@ func cmdPermissionMap(c *cli.Context) error {
 }
 
 // cmdPermissionUnmap function
-// somaadm permission map ${section}::${action} from ${category}::${permission}
+// somaadm permission unmap ${section}::${action} from ${category}::${permission}
+// somaadm permission unmap ${section} from ${category}::${permission}
 func cmdPermissionUnmap(c *cli.Context) error {
 	return cmdPermissionEdit(c, `unmap`)
 }
