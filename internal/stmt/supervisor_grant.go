@@ -147,7 +147,7 @@ SELECT grant_id,
        organizational_team_id
 FROM   soma.authorizations_global
 WHERE  permission_id = $1::uuid
-  AND  category = $2::uuid;`
+  AND  category = $2::varchar;`
 
 	ListRepositoryAuthorization = `
 SELECT grant_id,
@@ -163,7 +163,7 @@ SELECT grant_id,
        node_id
 FROM   soma.authorizations_repository
 WHERE  permission_id = $1::uuid
-  AND  category = $2::uuid;`
+  AND  category = $2::varchar;`
 
 	ListMonitoringAuthorization = `
 SELECT grant_id
@@ -173,7 +173,7 @@ SELECT grant_id
        monitoring_id
 FROM   soma.authorizations_monitoring
 WHERE  permission_id = $1::uuid
-  AND  category = $2::uuid;`
+  AND  category = $2::varchar;`
 
 	ListTeamAuthorization = `
 SELECT grant_id,
@@ -183,7 +183,7 @@ SELECT grant_id,
        authorized_team_id
 FROM   soma.authorizations_team
 WHERE  permission_id = $1::uuid
-  AND  category = $2::uuid;`
+  AND  category = $2::varchar;`
 
 	ShowGlobalAuthorization = `
 SELECT grant_id,
@@ -196,7 +196,7 @@ SELECT grant_id,
 FROM   soma.authorizations_global
 WHERE  grant_id = $1::uuid
   AND  permission_id = $2::uuid
-  AND  category = $3::uuid;`
+  AND  category = $3::varchar;`
 
 	ShowRepositoryAuthorization = `
 SELECT grant_id,
@@ -215,7 +215,7 @@ SELECT grant_id,
 FROM   soma.authorizations_repository
 WHERE  grant_id = $1::uuid
   AND  permission_id = $2::uuid
-  AND  category = $3::uuid;`
+  AND  category = $3::varchar;`
 
 	ShowMonitoringAuthorization = `
 SELECT grant_id,
@@ -228,7 +228,7 @@ SELECT grant_id,
 FROM   soma.authorizations_monitoring
 WHERE  grant_id = $1::uuid
   AND  permission_id = $2::uuid
-  AND  category = $3::uuid;`
+  AND  category = $3::varchar;`
 
 	ShowTeamAuthorization = `
 SELECT grant_id,
@@ -241,7 +241,7 @@ SELECT grant_id,
 FROM   soma.authorizations_team
 WHERE  grant_id = $1::uuid
   AND  permission_id = $2::uuid
-  AND  category = $3::uuid;`
+  AND  category = $3::varchar;`
 
 	SearchGlobalAuthorization = `
 SELECT grant_id
