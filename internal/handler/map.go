@@ -100,7 +100,7 @@ func (h *Map) Request(section, action, name string) {
 		h.requestPath[section] = make(map[string]Handler)
 	}
 	if _, ok := h.hmap[name]; !ok {
-		panic(fmt.Sprintf("RequestPath attmpted register for unknown handler, %s::%s by %s",
+		panic(fmt.Sprintf("RequestPath attempted register for unknown handler, %s::%s by %s",
 			section, action, name))
 	}
 	h.requestPath[section][action] = h.hmap[name]

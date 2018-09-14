@@ -62,7 +62,7 @@ func (r *JobRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
 	} {
-		hmap.Request(msg.SectionJobMgmt, action, `job_r`)
+		hmap.Request(msg.SectionJobMgmt, action, r.handlerName)
 	}
 	for _, action := range []string{
 		msg.ActionList,
