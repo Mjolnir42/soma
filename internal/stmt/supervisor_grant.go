@@ -276,7 +276,7 @@ WHERE  permission_id = $1::uuid
   AND ((user_id = $3::uuid AND 'user' = $4::varchar )
     OR (tool_id = $3::uuid AND 'tool' = $4::varchar )
     OR (organizational_team_id = $3::uuid AND 'team' = $4::varchar))
-  AND  object_type = $5::varchar
+  AND  'team' = $5::varchar
   AND  authorized_team_id = $6::uuid;`
 
 	SearchMonitoringAuthorization = `
@@ -287,7 +287,7 @@ WHERE  permission_id = $1::uuid
   AND ((user_id = $3::uuid AND 'user' = $4::varchar )
     OR (tool_id = $3::uuid AND 'tool' = $4::varchar )
     OR (organizational_team_id = $3::uuid AND 'team' = $4::varchar))
-  AND  object_type = $5::varchar
+  AND  'monitoring' = $5::varchar
   AND  monitoring_id = $6::uuid;`
 
 	GrantRemoveSystem = `
