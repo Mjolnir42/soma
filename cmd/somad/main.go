@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 	"github.com/asaskevich/govalidator"
 	"github.com/client9/reopen"
 	"github.com/mjolnir42/soma/internal/config"
@@ -37,7 +37,7 @@ var (
 )
 
 func init() {
-	log.SetOutput(os.Stderr)
+	logrus.SetOutput(os.Stderr)
 }
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 		configFlag, configFile, obsRepoFlag         string
 		noPokeFlag, forcedCorruption, versionFlag   bool
 		err                                         error
-		appLog, reqLog, errLog, auditLog            *log.Logger
+		appLog, reqLog, errLog, auditLog            *logrus.Logger
 		lfhGlobal, lfhApp, lfhReq, lfhErr, lfhAudit *reopen.FileWriter
 		app                                         *soma.Soma
 		hm                                          *handler.Map
@@ -65,19 +65,19 @@ func main() {
 		version() // exit(0)
 	}
 
-	log.Printf("Starting runtime config initialization, SOMA v%s", somaVersion)
+	logrus.Printf("Starting runtime config initialization, SOMA v%s", somaVersion)
 	/*
 	 * Read configuration file
 	 */
 	if configFile, err = filepath.Abs(configFlag); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	if configFile, err = filepath.EvalSymlinks(configFile); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	err = SomaCfg.ReadConfigFile(configFile)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 	SomaCfg.Version = somaVersion
 
@@ -85,45 +85,61 @@ func main() {
 	if lfhGlobal, err = reopen.NewFileWriter(
 		filepath.Join(SomaCfg.LogPath, `global.log`),
 	); err != nil {
-		log.Fatalf("Unable to open global output log: %s", err)
+		logrus.Fatalf("Unable to open global output log: %s", err)
 	}
-	log.SetOutput(lfhGlobal)
+	logrus.SetOutput(lfhGlobal)
 	logFileMap[`global`] = lfhGlobal
 
-	appLog = log.New()
+	appLog = logrus.New()
 	if lfhApp, err = reopen.NewFileWriter(
 		filepath.Join(SomaCfg.LogPath, `application.log`),
 	); err != nil {
-		log.Fatalf("Unable to open application log: %s", err)
+		logrus.Fatalf("Unable to open application log: %s", err)
 	}
 	appLog.Out = lfhApp
+	appLog.Formatter = &logrus.TextFormatter{
+		DisableColors: true,
+		FullTimestamp: true,
+	}
 	logFileMap[`application`] = lfhApp
 
-	reqLog = log.New()
+	reqLog = logrus.New()
 	if lfhReq, err = reopen.NewFileWriter(
 		filepath.Join(SomaCfg.LogPath, `request.log`),
 	); err != nil {
-		log.Fatalf("Unable to open request log: %s", err)
+		logrus.Fatalf("Unable to open request log: %s", err)
 	}
 	reqLog.Out = lfhReq
+	reqLog.Formatter = &logrus.TextFormatter{
+		DisableColors: true,
+		FullTimestamp: true,
+	}
 	logFileMap[`request`] = lfhReq
 
-	errLog = log.New()
+	errLog = logrus.New()
 	if lfhErr, err = reopen.NewFileWriter(
 		filepath.Join(SomaCfg.LogPath, `error.log`),
 	); err != nil {
-		log.Fatalf("Unable to open error log: %s", err)
+		logrus.Fatalf("Unable to open error log: %s", err)
 	}
 	errLog.Out = lfhErr
+	errLog.Formatter = &logrus.TextFormatter{
+		DisableColors: true,
+		FullTimestamp: true,
+	}
 	logFileMap[`error`] = lfhErr
 
-	auditLog = log.New()
+	auditLog = logrus.New()
 	if lfhAudit, err = reopen.NewFileWriter(
 		filepath.Join(SomaCfg.LogPath, `audit.log`),
 	); err != nil {
-		log.Fatalf("Unable to open audit log: %s", err)
+		logrus.Fatalf("Unable to open audit log: %s", err)
 	}
 	auditLog.Out = lfhAudit
+	auditLog.Formatter = &logrus.TextFormatter{
+		DisableColors: true,
+		FullTimestamp: true,
+	}
 	logFileMap[`audit`] = lfhAudit
 
 	hm = handler.NewMap()
