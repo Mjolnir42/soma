@@ -144,6 +144,7 @@ create table if not exists soma.authorizations_repository (
     grant_id                    uuid            PRIMARY KEY,
     user_id                     uuid            REFERENCES inventory.users ( user_id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
+    admin_id                    uuid            REFERENCES auth.admins ( admin_id ) DEFERRABLE,
     organizational_team_id      uuid            REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
     object_type                 varchar(64)     NOT NULL REFERENCES soma.object_types ( object_type ) DEFERRABLE,
     repository_id               uuid            REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
@@ -160,16 +161,19 @@ create table if not exists soma.authorizations_repository (
     FOREIGN KEY ( bucket_id, group_id ) REFERENCES soma.groups ( bucket_id, group_id ) DEFERRABLE,
     FOREIGN KEY ( bucket_id, cluster_id ) REFERENCES soma.clusters ( bucket_id, cluster_id ) DEFERRABLE,
     FOREIGN KEY ( node_id, bucket_id ) REFERENCES soma.node_bucket_assignment ( node_id, bucket_id ) DEFERRABLE,
-    CHECK ( ( user_id IS NOT NULL AND tool_id IS     NULL AND organizational_team_id IS     NULL )
-         OR ( user_id IS     NULL AND tool_id IS NOT NULL AND organizational_team_id IS     NULL )
-         OR ( user_id IS     NULL AND tool_id IS     NULL AND organizational_team_id IS NOT NULL ) ),
-    CHECK ( category IN ( 'repository', 'repository:grant' ) ),
-    CHECK ( object_type IN ( 'repository', 'bucket', 'group', 'cluster', 'node' )),
-    CHECK ( object_type != 'repository' OR repository_id IS NOT NULL ),
-    CHECK ( object_type != 'bucket' OR bucket_id IS NOT NULL ),
-    CHECK ( object_type != 'group' OR group_id IS NOT NULL ),
-    CHECK ( object_type != 'cluster' OR cluster_id IS NOT NULL ),
-    CHECK ( object_type != 'node' OR node_id IS NOT NULL ),
+    CONSTRAINT check_single_subject_id_set
+    CHECK ( ( user_id IS NOT NULL AND tool_id IS     NULL AND organizational_team_id IS     NULL AND admin_id IS     NULL )
+         OR ( user_id IS     NULL AND tool_id IS NOT NULL AND organizational_team_id IS     NULL AND admin_id IS     NULL )
+         OR ( user_id IS     NULL AND tool_id IS     NULL AND organizational_team_id IS NOT NULL AND admin_id IS     NULL )
+         OR ( user_id IS     NULL AND tool_id IS     NULL AND organizational_team_id IS     NULL AND admin_id IS NOT NULL ) ),
+    CONSTRAINT check_category CHECK ( category IN ( 'repository', 'repository:grant' ) ),
+    CONSTRAINT check_object_types CHECK ( object_type IN ( 'repository', 'bucket', 'group', 'cluster', 'node' )),
+    CONSTRAINT check_type_repository_id CHECK ( object_type != 'repository' OR repository_id IS NOT NULL ),
+    CONSTRAINT check_type_bucket_id CHECK ( object_type != 'bucket' OR bucket_id IS NOT NULL ),
+    CONSTRAINT check_type_group_id CHECK ( object_type != 'group' OR group_id IS NOT NULL ),
+    CONSTRAINT check_type_cluster_id CHECK ( object_type != 'cluster' OR cluster_id IS NOT NULL ),
+    CONSTRAINT check_type_node_id CHECK ( object_type != 'node' OR node_id IS NOT NULL ),
+    CONSTRAINT check_single_object_id_set
     CHECK ( ( repository_id IS NOT NULL AND bucket_id IS     NULL AND group_id IS     NULL AND cluster_id IS     NULL AND node_id IS     NULL )
          OR ( repository_id IS NOT NULL AND bucket_id IS NOT NULL AND group_id IS     NULL AND cluster_id IS     NULL AND node_id IS     NULL )
          OR ( repository_id IS NOT NULL AND bucket_id IS NOT NULL AND group_id IS NOT NULL AND cluster_id IS     NULL AND node_id IS     NULL )

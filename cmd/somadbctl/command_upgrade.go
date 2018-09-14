@@ -36,6 +36,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 		201611100001: upgradeSomaTo201611130001,
 		201611130001: upgradeSomaTo201809100001,
 		201809100001: upgradeSomaTo201809140001,
+		201809140001: upgradeSomaTo201809140002,
 	},
 	"root": map[int]func(int, string, bool) int{
 		000000000001: installRoot201605150001,
@@ -574,6 +575,38 @@ func upgradeSomaTo201809140001(curr int, tool string, printOnly bool) int {
 	)
 	executeUpgrades(stmts, printOnly)
 	return 201809140001
+}
+
+func upgradeSomaTo201809140002(curr int, tool string, printOnly bool) int {
+	if curr != 201809140001 {
+		return 0
+	}
+	stmts := []string{
+		`ALTER TABLE soma.authorizations_repository ADD COLUMN admin_id uuid REFERENCES auth.admins ( admin_id ) DEFERRABLE;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_category_check;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_object_type_check;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_check;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_check1;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_check2;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_check3;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_check4;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_check5;`,
+		`ALTER TABLE soma.authorizations_repository DROP CONSTRAINT authorizations_repository_check6;`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_single_subject_id_set CHECK ( ( user_id IS NOT NULL AND tool_id IS NULL AND organizational_team_id IS NULL AND admin_id IS NULL ) OR ( user_id IS NULL AND tool_id IS NOT NULL AND organizational_team_id IS NULL AND admin_id IS NULL ) OR ( user_id IS NULL AND tool_id IS NULL AND organizational_team_id IS NOT NULL AND admin_id IS NULL ) OR ( user_id IS NULL AND tool_id IS NULL AND organizational_team_id IS NULL AND admin_id IS NOT NULL ) );`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_category CHECK ( category IN ( 'repository', 'repository:grant' ) );`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_object_types CHECK ( object_type IN ( 'repository', 'bucket', 'group', 'cluster', 'node' ));`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_type_repository_id CHECK ( object_type != 'repository' OR repository_id IS NOT NULL );`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_type_bucket_id CHECK ( object_type != 'bucket' OR bucket_id IS NOT NULL );`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_type_group_id CHECK ( object_type != 'group' OR group_id IS NOT NULL );`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_type_cluster_id CHECK ( object_type != 'cluster' OR cluster_id IS NOT NULL );`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_type_node_id CHECK ( object_type != 'node' OR node_id IS NOT NULL );`,
+		`ALTER TABLE soma.authorizations_repository ADD CONSTRAINT check_single_object_id_set CHECK ( ( repository_id IS NOT NULL AND bucket_id IS NULL AND group_id IS NULL AND cluster_id IS NULL AND node_id IS NULL ) OR ( repository_id IS NOT NULL AND bucket_id IS NOT NULL AND group_id IS NULL AND cluster_id IS NULL AND node_id IS NULL ) OR ( repository_id IS NOT NULL AND bucket_id IS NOT NULL AND group_id IS NOT NULL AND cluster_id IS NULL AND node_id IS NULL ) OR ( repository_id IS NOT NULL AND bucket_id IS NOT NULL AND group_id IS NULL AND cluster_id IS NOT NULL AND node_id IS NULL ) OR ( repository_id IS NOT NULL AND bucket_id IS NOT NULL AND group_id IS NULL AND cluster_id IS NULL AND node_id IS NOT NULL ));`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201809140002, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+	return 201809140002
 }
 
 func installRoot201605150001(curr int, tool string, printOnly bool) int {
