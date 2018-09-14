@@ -22,7 +22,7 @@ SELECT oncall_duty_id,
        oncall_duty_name,
        oncall_duty_phone_number
 FROM   inventory.oncall_duty_teams
-WHERE  oncall_duty_id = $1::varchar;`
+WHERE  oncall_duty_id = $1::uuid;`
 
 	OncallSearch = `
 SELECT oncall_duty_id,
@@ -57,7 +57,7 @@ WHERE  oncall_duty_id = $3::uuid;`
 
 	OncallDel = `
 DELETE FROM inventory.oncall_duty_teams
-WHERE  oncall_duty_id = $1::varchar;`
+WHERE  oncall_duty_id = $1::uuid;`
 )
 
 func init() {
