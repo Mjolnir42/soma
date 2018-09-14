@@ -39,9 +39,9 @@ func commandInitialize(done chan<- bool, printOnly bool, verbose bool, version s
 
 	createTablesGroups(printOnly, verbose)
 
-	createTablesPermissions(printOnly, verbose)
-
 	createTablesMetricsMonitoring(printOnly, verbose)
+
+	createTablesPermissions(printOnly, verbose)
 
 	createTablesChecks(printOnly, verbose)
 
