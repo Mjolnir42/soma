@@ -84,20 +84,20 @@ func (lc *LifeCycle) Run() {
 		time.Duration(lc.soma.conf.LifeCycleTick) * time.Second,
 	).C
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.LifecycleActiveUnblockCondition:           lc.stmtUnblock,
-		stmt.LifecycleReadyDeployments:                 lc.stmtPoke,
-		stmt.LifecycleClearUpdateFlag:                  lc.stmtClear,
-		stmt.LifecycleBlockedConfigsForDeletedInstance: lc.stmtDeleteBlocked,
-		stmt.LifecycleDeprovisionDeletedActive:         lc.stmtDeleteActive,
-		stmt.LifecycleDeadLockResolver:                 lc.stmtDeadlock,
-		stmt.LifecycleRescheduleDeployments:            lc.stmtReschedule,
-		stmt.LifecycleSetNotified:                      lc.stmtSetNotify,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.LifecycleActiveUnblockCondition:           &lc.stmtUnblock,
+		stmt.LifecycleReadyDeployments:                 &lc.stmtPoke,
+		stmt.LifecycleClearUpdateFlag:                  &lc.stmtClear,
+		stmt.LifecycleBlockedConfigsForDeletedInstance: &lc.stmtDeleteBlocked,
+		stmt.LifecycleDeprovisionDeletedActive:         &lc.stmtDeleteActive,
+		stmt.LifecycleDeadLockResolver:                 &lc.stmtDeadlock,
+		stmt.LifecycleRescheduleDeployments:            &lc.stmtReschedule,
+		stmt.LifecycleSetNotified:                      &lc.stmtSetNotify,
 	} {
-		if prepStmt, err = lc.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = lc.conn.Prepare(statement); err != nil {
 			lc.errLog.Fatal(`lifecycle`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 	if lc.soma.conf.Observer {

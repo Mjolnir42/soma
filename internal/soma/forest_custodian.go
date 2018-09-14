@@ -80,18 +80,18 @@ func (f *ForestCustodian) PriorityIntake() chan msg.Request {
 func (f *ForestCustodian) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ForestAddRepository:          f.stmtAdd,
-		stmt.ForestLoadRepository:         f.stmtLoad,
-		stmt.ForestRepoNameByID:           f.stmtRepoName,
-		stmt.ForestRebuildDeleteChecks:    f.stmtRebuildCheck,
-		stmt.ForestRebuildDeleteInstances: f.stmtRebuildInstance,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ForestAddRepository:          &f.stmtAdd,
+		stmt.ForestLoadRepository:         &f.stmtLoad,
+		stmt.ForestRepoNameByID:           &f.stmtRepoName,
+		stmt.ForestRebuildDeleteChecks:    &f.stmtRebuildCheck,
+		stmt.ForestRebuildDeleteInstances: &f.stmtRebuildInstance,
 	} {
-		if prepStmt, err = f.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = f.conn.Prepare(statement); err != nil {
 			f.errLog.Fatal(`forestcustodian`, err,
 				stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 	f.initialLoad()
