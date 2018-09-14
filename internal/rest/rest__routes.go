@@ -152,7 +152,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(`/accounts/tokens/:account`, x.Verify(x.SupervisorTokenInvalidateAccount))
 			router.DELETE(`/attribute/:attribute`, x.Verify(x.AttributeRemove))
 			router.DELETE(`/capability/:capabilityID`, x.Verify(x.CapabilityRemove))
-			router.DELETE(`/category/:category/section/:section/action/:actionID`, x.Verify(x.ActionRemove))
+			router.DELETE(`/category/:category/section/:sectionID/action/:actionID`, x.Verify(x.ActionRemove))
 			router.DELETE(`/category/:category/section/:sectionID`, x.Verify(x.SectionRemove))
 			router.DELETE(`/category/:category`, x.Verify(x.CategoryRemove))
 			router.DELETE(`/checkconfig/:repositoryID/:checkID`, x.Verify(x.CheckConfigDestroy))
