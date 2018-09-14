@@ -68,7 +68,7 @@ create table if not exists soma.check_configurations (
     external_id                 varchar(64)     NOT NULL DEFAULT 'none',
     deleted                     boolean         NOT NULL DEFAULT 'no',
     -- required for custom property constraint foreign key
-    UNIQUE ( configuration_id, repository_id ) DEFERRABLE,
+    UNIQUE ( configuration_id, repository_id ),
     FOREIGN KEY ( bucket_id, repository_id ) REFERENCES soma.buckets ( bucket_id, repository_id ) DEFERRABLE,
     CHECK ( configuration_object_type != 'server' ),
     CHECK ( external_id = 'none' OR configuration_object_type != 'template' ),
