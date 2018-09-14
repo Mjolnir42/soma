@@ -153,7 +153,7 @@ INSERT INTO soma.permission_map (
             permission_id,
             section_id,
             action_id)
-VALUES $1::uuid,
+SELECT $1::uuid,
        $2::varchar,
        $3::uuid,
        $4::uuid,
