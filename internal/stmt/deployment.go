@@ -52,7 +52,7 @@ UPDATE soma.check_instance_configurations
 SET    status = $1::varchar,
        next_status = $2::varchar,
        activated_at = $3::timestamptz,
-       status_last_updated_at = NOW()::timestamptz,
+       status_last_updated_at = NOW()::timestamptz
 WHERE  check_instance_config_id = $4::uuid;`
 
 	DeploymentDeprovision = `
@@ -60,7 +60,7 @@ UPDATE soma.check_instance_configurations
 SET    status = $1::varchar,
        next_status = $2::varchar,
        deprovisioned_at = $3::timestamptz,
-       status_last_updated_at = NOW()::timestamptz,
+       status_last_updated_at = NOW()::timestamptz
 WHERE  check_instance_config_id = $4::uuid;`
 
 	DeploymentList = `
