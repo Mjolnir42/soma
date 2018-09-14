@@ -46,7 +46,7 @@ create table if not exists soma.actions (
 	queries[idx] = "createTableActions"
 	idx++
 
-	queryMap["createTableSomaPermissions"] = `
+	queryMap["createTablePermissions"] = `
 create table if not exists soma.permissions (
     permission_id               uuid            PRIMARY KEY,
     permission_name             varchar(128)    NOT NULL,
@@ -58,7 +58,7 @@ create table if not exists soma.permissions (
     -- only omnipotence is category omnipotence
     CHECK  ( category != 'omnipotence' OR permission_name = 'omnipotence' )
 );`
-	queries[idx] = "createTableSomaPermissions"
+	queries[idx] = "createTablePermissions"
 	idx++
 
 	queryMap["createTablePermissionMap"] = `
@@ -72,7 +72,7 @@ create table if not exists soma.permission_map (
     FOREIGN KEY ( section_id, category )        REFERENCES soma.sections ( section_id, category ),
     FOREIGN KEY ( section_id, action_id )       REFERENCES soma.actions ( section_id, action_id )
 );`
-	queries[idx] = "createTableSomaPermissionMap"
+	queries[idx] = "createTablePermissionMap"
 	idx++
 
 	queryMap[`createTablePermissionGrantMap`] = `
