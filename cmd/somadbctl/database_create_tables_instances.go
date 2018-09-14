@@ -23,7 +23,8 @@ create table if not exists soma.check_instances (
     current_instance_config_id  uuid            NOT NULL,
     last_configuration_created  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
     update_available            boolean         NOT NULL DEFAULT 'no',
-    deleted                     boolean         NOT NULL DEFAULT 'no'
+    deleted                     boolean         NOT NULL DEFAULT 'no',
+    notified_at                 timestamptz(3)  NULL
 );`
 	queries[idx] = "createTableCheckInstances"
 	idx++
