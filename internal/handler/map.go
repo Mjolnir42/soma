@@ -9,6 +9,7 @@ package handler // import "github.com/mjolnir42/soma/internal/handler"
 
 import (
 	"database/sql"
+	"fmt"
 	"sync"
 
 	"github.com/Sirupsen/logrus"
@@ -99,7 +100,8 @@ func (h *Map) Request(section, action, name string) {
 		h.requestPath[section] = make(map[string]Handler)
 	}
 	if _, ok := h.hmap[name]; !ok {
-		panic(`RequestPath attmpted register for unknown handler`)
+		panic(fmt.Sprintf("RequestPath attmpted register for unknown handler, %s::%s by %s",
+			section, action, name))
 	}
 	h.requestPath[section][action] = h.hmap[name]
 }
