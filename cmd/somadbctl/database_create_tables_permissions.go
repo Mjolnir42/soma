@@ -14,7 +14,7 @@ create table if not exists soma.categories (
     created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()
 );`
-	queries[idx] = "createTablePermissionTypes"
+	queries[idx] = "createTableCategories"
 	idx++
 
 	queryMap["createTableSections"] = `
