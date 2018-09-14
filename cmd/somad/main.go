@@ -216,7 +216,11 @@ func main() {
 
 	go rst.Run()
 
-	//XXX wait for shutdown
+	// signal handler for shutdown
+	sigChanShutdown := make(chan os.Signal, 1)
+	signal.Notify(sigChanShutdown, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+	appLog.Println(`somad server process started, waiting for shutdown signal`)
+	<-sigChanShutdown
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
