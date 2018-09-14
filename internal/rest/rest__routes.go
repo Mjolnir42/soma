@@ -47,7 +47,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/metric/`, x.Verify(x.MetricList))
 	router.GET(`/mode/:mode`, x.Verify(x.ModeShow))
 	router.GET(`/mode/`, x.Verify(x.ModeList))
-	router.GET(`/monitoringsystem/:monitoring`, x.Verify(x.MonitoringShow))
+	router.GET(`/monitoringsystem/:monitoringID`, x.Verify(x.MonitoringShow))
 	router.GET(`/monitoringsystem/`, x.Verify(x.ScopeSelectMonitoringList))
 	router.GET(`/oncall/:oncall`, x.Verify(x.OncallShow))
 	router.GET(`/oncall/`, x.Verify(x.OncallList))
