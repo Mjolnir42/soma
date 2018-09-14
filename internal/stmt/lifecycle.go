@@ -82,7 +82,7 @@ AND    sms.monitoring_callback_uri IS NOT NULL
 AND    scic.status_last_updated_at IS NOT NULL
 AND    scic.notified_at IS NOT NULL
 AND    NOW() > (scic.status_last_updated_at + '5 minute'::interval)
-AND    NOW() > (scic.scic.notified_at + '5 minute'::interval)
+AND    NOW() > (scic.notified_at + '5 minute'::interval)
 AND    NOT sci.update_available;`
 
 	LifecycleSetNotified = `
