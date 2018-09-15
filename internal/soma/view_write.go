@@ -75,15 +75,15 @@ func (w *ViewWrite) PriorityIntake() chan msg.Request {
 func (w *ViewWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ViewAdd:    w.stmtAdd,
-		stmt.ViewDel:    w.stmtRemove,
-		stmt.ViewRename: w.stmtRename,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ViewAdd:    &w.stmtAdd,
+		stmt.ViewDel:    &w.stmtRemove,
+		stmt.ViewRename: &w.stmtRename,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`view`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

@@ -77,15 +77,15 @@ func (w *OncallWrite) PriorityIntake() chan msg.Request {
 func (w *OncallWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.OncallAdd:    w.stmtAdd,
-		stmt.OncallUpdate: w.stmtUpdate,
-		stmt.OncallDel:    w.stmtRemove,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.OncallAdd:    &w.stmtAdd,
+		stmt.OncallUpdate: &w.stmtUpdate,
+		stmt.OncallDel:    &w.stmtRemove,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`oncall`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

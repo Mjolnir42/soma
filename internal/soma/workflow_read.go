@@ -78,15 +78,15 @@ func (r *WorkflowRead) PriorityIntake() chan msg.Request {
 func (r *WorkflowRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.WorkflowSummary: r.stmtSummary,
-		stmt.WorkflowList:    r.stmtList,
-		stmt.WorkflowSearch:  r.stmtSearch,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.WorkflowSummary: &r.stmtSummary,
+		stmt.WorkflowList:    &r.stmtList,
+		stmt.WorkflowSearch:  &r.stmtSearch,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`workflow_r`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

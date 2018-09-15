@@ -74,15 +74,15 @@ func (w *WorkflowWrite) PriorityIntake() chan msg.Request {
 func (w *WorkflowWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.WorkflowRetry:           w.stmtRetryDeployment,
-		stmt.WorkflowUpdateAvailable: w.stmtTriggerAvailableUpdate,
-		stmt.WorkflowSet:             w.stmtSet,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.WorkflowRetry:           &w.stmtRetryDeployment,
+		stmt.WorkflowUpdateAvailable: &w.stmtTriggerAvailableUpdate,
+		stmt.WorkflowSet:             &w.stmtSet,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`workflow_w`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

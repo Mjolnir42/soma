@@ -78,16 +78,16 @@ func (r *UserRead) PriorityIntake() chan msg.Request {
 func (r *UserRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ListUsers:   r.stmtList,
-		stmt.SearchUsers: r.stmtSearch,
-		stmt.ShowUsers:   r.stmtShow,
-		stmt.SyncUsers:   r.stmtSync,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ListUsers:   &r.stmtList,
+		stmt.SearchUsers: &r.stmtSearch,
+		stmt.ShowUsers:   &r.stmtShow,
+		stmt.SyncUsers:   &r.stmtSync,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`user`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

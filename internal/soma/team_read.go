@@ -76,15 +76,15 @@ func (r *TeamRead) PriorityIntake() chan msg.Request {
 func (r *TeamRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ListTeams: r.stmtList,
-		stmt.ShowTeams: r.stmtShow,
-		stmt.SyncTeams: r.stmtSync,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ListTeams: &r.stmtList,
+		stmt.ShowTeams: &r.stmtShow,
+		stmt.SyncTeams: &r.stmtSync,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`team`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

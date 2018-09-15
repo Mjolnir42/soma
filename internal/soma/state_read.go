@@ -74,14 +74,14 @@ func (r *StateRead) PriorityIntake() chan msg.Request {
 func (r *StateRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ObjectStateList: r.stmtList,
-		stmt.ObjectStateShow: r.stmtShow,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ObjectStateList: &r.stmtList,
+		stmt.ObjectStateShow: &r.stmtShow,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`state`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

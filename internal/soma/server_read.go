@@ -67,16 +67,16 @@ func (r *ServerRead) RegisterRequests(hmap *handler.Map) {
 func (r *ServerRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ListServers:  r.stmtList,
-		stmt.ShowServers:  r.stmtShow,
-		stmt.SyncServers:  r.stmtSync,
-		stmt.SearchServer: r.stmtSearch,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ListServers:  &r.stmtList,
+		stmt.ShowServers:  &r.stmtShow,
+		stmt.SyncServers:  &r.stmtSync,
+		stmt.SearchServer: &r.stmtSearch,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`servers`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

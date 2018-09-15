@@ -73,14 +73,14 @@ func (r *UnitRead) PriorityIntake() chan msg.Request {
 func (r *UnitRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.UnitList: r.stmtList,
-		stmt.UnitShow: r.stmtShow,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.UnitList: &r.stmtList,
+		stmt.UnitShow: &r.stmtShow,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`unit`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

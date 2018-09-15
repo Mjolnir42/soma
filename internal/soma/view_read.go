@@ -73,14 +73,14 @@ func (r *ViewRead) PriorityIntake() chan msg.Request {
 func (r *ViewRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ViewList: r.stmtList,
-		stmt.ViewShow: r.stmtShow,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ViewList: &r.stmtList,
+		stmt.ViewShow: &r.stmtShow,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`view`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 	for {

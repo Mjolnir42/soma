@@ -73,14 +73,14 @@ func (w *ValidityWrite) PriorityIntake() chan msg.Request {
 func (w *ValidityWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ValidityAdd: w.stmtAdd,
-		stmt.ValidityDel: w.stmtRemove,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ValidityAdd: &w.stmtAdd,
+		stmt.ValidityDel: &w.stmtRemove,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`validity`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

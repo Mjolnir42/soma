@@ -75,15 +75,15 @@ func (w *StateWrite) PriorityIntake() chan msg.Request {
 func (w *StateWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ObjectStateAdd:    w.stmtCreate,
-		stmt.ObjectStateRemove: w.stmtDelete,
-		stmt.ObjectStateRename: w.stmtRename,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ObjectStateAdd:    &w.stmtCreate,
+		stmt.ObjectStateRemove: &w.stmtDelete,
+		stmt.ObjectStateRename: &w.stmtRename,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`state`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

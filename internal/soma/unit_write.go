@@ -73,14 +73,14 @@ func (w *UnitWrite) PriorityIntake() chan msg.Request {
 func (w *UnitWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.UnitAdd: w.stmtAdd,
-		stmt.UnitDel: w.stmtRemove,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.UnitAdd: &w.stmtAdd,
+		stmt.UnitDel: &w.stmtRemove,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`unit`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

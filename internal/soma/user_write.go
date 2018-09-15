@@ -80,16 +80,16 @@ func (w *UserWrite) PriorityIntake() chan msg.Request {
 func (w *UserWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.UserAdd:    w.stmtAdd,
-		stmt.UserUpdate: w.stmtUpdate,
-		stmt.UserDel:    w.stmtRemove,
-		stmt.UserPurge:  w.stmtPurge,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.UserAdd:    &w.stmtAdd,
+		stmt.UserUpdate: &w.stmtUpdate,
+		stmt.UserDel:    &w.stmtRemove,
+		stmt.UserPurge:  &w.stmtPurge,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`user`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

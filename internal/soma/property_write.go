@@ -95,26 +95,26 @@ func (w *PropertyWrite) PriorityIntake() chan msg.Request {
 func (w *PropertyWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.PropertyCustomAdd:            w.stmtAddCustom,
-		stmt.PropertyCustomDel:            w.stmtRemoveCustom,
-		stmt.PropertyNativeAdd:            w.stmtAddNative,
-		stmt.PropertyNativeDel:            w.stmtRemoveNative,
-		stmt.PropertyServiceAdd:           w.stmtAddService,
-		stmt.PropertyServiceAttributeAdd:  w.stmtAddServiceAttr,
-		stmt.PropertyServiceAttributeDel:  w.stmtRemoveServiceAttr,
-		stmt.PropertyServiceDel:           w.stmtRemoveService,
-		stmt.PropertySystemAdd:            w.stmtAddSystem,
-		stmt.PropertySystemDel:            w.stmtRemoveSystem,
-		stmt.PropertyTemplateAdd:          w.stmtAddTemplate,
-		stmt.PropertyTemplateAttributeAdd: w.stmtAddTemplateAttr,
-		stmt.PropertyTemplateAttributeDel: w.stmtRemoveTemplateAttr,
-		stmt.PropertyTemplateDel:          w.stmtRemoveTemplate,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.PropertyCustomAdd:            &w.stmtAddCustom,
+		stmt.PropertyCustomDel:            &w.stmtRemoveCustom,
+		stmt.PropertyNativeAdd:            &w.stmtAddNative,
+		stmt.PropertyNativeDel:            &w.stmtRemoveNative,
+		stmt.PropertyServiceAdd:           &w.stmtAddService,
+		stmt.PropertyServiceAttributeAdd:  &w.stmtAddServiceAttr,
+		stmt.PropertyServiceAttributeDel:  &w.stmtRemoveServiceAttr,
+		stmt.PropertyServiceDel:           &w.stmtRemoveService,
+		stmt.PropertySystemAdd:            &w.stmtAddSystem,
+		stmt.PropertySystemDel:            &w.stmtRemoveSystem,
+		stmt.PropertyTemplateAdd:          &w.stmtAddTemplate,
+		stmt.PropertyTemplateAttributeAdd: &w.stmtAddTemplateAttr,
+		stmt.PropertyTemplateAttributeDel: &w.stmtRemoveTemplateAttr,
+		stmt.PropertyTemplateDel:          &w.stmtRemoveTemplate,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`property`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

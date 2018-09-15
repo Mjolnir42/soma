@@ -73,14 +73,14 @@ func (w *ProviderWrite) PriorityIntake() chan msg.Request {
 func (w *ProviderWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ProviderAdd: w.stmtAdd,
-		stmt.ProviderDel: w.stmtRemove,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ProviderAdd: &w.stmtAdd,
+		stmt.ProviderDel: &w.stmtRemove,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`provider`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

@@ -78,15 +78,15 @@ func (w *TeamWrite) PriorityIntake() chan msg.Request {
 func (w *TeamWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.TeamAdd:    w.stmtAdd,
-		stmt.TeamUpdate: w.stmtUpdate,
-		stmt.TeamDel:    w.stmtRemove,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.TeamAdd:    &w.stmtAdd,
+		stmt.TeamUpdate: &w.stmtUpdate,
+		stmt.TeamDel:    &w.stmtRemove,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`team`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

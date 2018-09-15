@@ -81,22 +81,22 @@ func (r *PropertyRead) RegisterRequests(hmap *handler.Map) {
 func (r *PropertyRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.PropertyCustomList:   r.stmtListCustom,
-		stmt.PropertyCustomShow:   r.stmtShowCustom,
-		stmt.PropertyNativeList:   r.stmtListNative,
-		stmt.PropertyNativeShow:   r.stmtShowNative,
-		stmt.PropertyServiceList:  r.stmtListService,
-		stmt.PropertyServiceShow:  r.stmtShowService,
-		stmt.PropertySystemList:   r.stmtListSystem,
-		stmt.PropertySystemShow:   r.stmtShowSystem,
-		stmt.PropertyTemplateList: r.stmtListTemplate,
-		stmt.PropertyTemplateShow: r.stmtShowTemplate,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.PropertyCustomList:   &r.stmtListCustom,
+		stmt.PropertyCustomShow:   &r.stmtShowCustom,
+		stmt.PropertyNativeList:   &r.stmtListNative,
+		stmt.PropertyNativeShow:   &r.stmtShowNative,
+		stmt.PropertyServiceList:  &r.stmtListService,
+		stmt.PropertyServiceShow:  &r.stmtShowService,
+		stmt.PropertySystemList:   &r.stmtListSystem,
+		stmt.PropertySystemShow:   &r.stmtShowSystem,
+		stmt.PropertyTemplateList: &r.stmtListTemplate,
+		stmt.PropertyTemplateShow: &r.stmtShowTemplate,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`property`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:

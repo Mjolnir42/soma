@@ -76,15 +76,15 @@ func (r *OncallRead) PriorityIntake() chan msg.Request {
 func (r *OncallRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.OncallList:   r.stmtList,
-		stmt.OncallSearch: r.stmtSearch,
-		stmt.OncallShow:   r.stmtShow,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.OncallList:   &r.stmtList,
+		stmt.OncallSearch: &r.stmtSearch,
+		stmt.OncallShow:   &r.stmtShow,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`oncall`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()()
 	}
 
 runloop:
