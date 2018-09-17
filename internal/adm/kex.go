@@ -32,6 +32,7 @@ func KeyExchange(c *resty.Client) (*auth.Kex, error) {
 
 	// store settings from peer
 	kex.SetPeerKey(peer.PublicKey())
+	kex.ImportInitializationVector(peer.ExportInitializationVector())
 	if err = kex.SetRequestUUID(peer.Request.String()); err != nil {
 		goto fail
 	}
