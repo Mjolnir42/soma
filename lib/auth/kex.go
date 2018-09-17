@@ -134,6 +134,19 @@ func (k *Kex) GenerateNewVector() error {
 	return nil
 }
 
+// ExportInitializationVector returns the initialization vector of k as
+// hex encoded string
+func (k *Kex) ExportInitializationVector() string {
+	return k.InitializationVector
+}
+
+// ImportInitializationVector sets the initialization vector of k. iv
+// must be a hex encoded string as returned by
+// ExportInitializationVector
+func (k *Kex) ImportInitializationVector(iv string) {
+	k.InitializationVector = iv
+}
+
 // IsExpired returns true if the Kex-Exchange is more than
 // KexExpirySeconds seconds old
 func (k *Kex) IsExpired() bool {
