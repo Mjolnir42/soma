@@ -228,7 +228,7 @@ func main() {
 	app = soma.New(hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog, auditLog)
 	app.Start()
 
-	rst = rest.New(super.IsAuthorized, hm, &SomaCfg)
+	rst = rest.New(super.IsAuthorized, hm, &SomaCfg, reqLog, errLog)
 
 	go rst.Run()
 

@@ -11,6 +11,7 @@ package rest // import "github.com/mjolnir42/soma/internal/rest"
 import (
 	"net/http"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/handler"
@@ -30,6 +31,8 @@ type Rest struct {
 	isAuthorized func(*msg.Request) bool
 	handlerMap   *handler.Map
 	conf         *config.Config
+	reqLog       *logrus.Logger
+	errLog       *logrus.Logger
 	restricted   bool
 }
 
@@ -38,11 +41,14 @@ func New(
 	authorizationFunction func(*msg.Request) bool,
 	appHandlerMap *handler.Map,
 	conf *config.Config,
+	reqLog, errLog *logrus.Logger,
 ) *Rest {
 	x := Rest{}
 	x.isAuthorized = authorizationFunction
 	x.restricted = false
 	x.handlerMap = appHandlerMap
+	x.reqLog = reqLog
+	x.errLog = errLog
 	x.conf = conf
 	return &x
 }
