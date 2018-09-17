@@ -250,6 +250,7 @@ func send(w *http.ResponseWriter, r *msg.Result) {
 				dispatchInternalError(w, nil)
 				return
 			}
+			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, r.Code)
 			goto dispatchJSON
 		case msg.ActionPassword: // switch r.Action
 			switch r.Super.Task {
