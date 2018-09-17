@@ -81,7 +81,7 @@ func (r *ValidityRead) Run() {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`validity`, err, stmt.Name(statement))
 		}
-		defer (*prepStmt).Close()()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

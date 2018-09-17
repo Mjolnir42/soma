@@ -81,7 +81,7 @@ func (r *StateRead) Run() {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`state`, err, stmt.Name(statement))
 		}
-		defer (*prepStmt).Close()()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

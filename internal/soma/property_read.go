@@ -96,7 +96,7 @@ func (r *PropertyRead) Run() {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`property`, err, stmt.Name(statement))
 		}
-		defer (*prepStmt).Close()()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

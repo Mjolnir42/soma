@@ -84,7 +84,7 @@ func (r *OncallRead) Run() {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`oncall`, err, stmt.Name(statement))
 		}
-		defer (*prepStmt).Close()()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

@@ -80,7 +80,7 @@ func (w *ProviderWrite) Run() {
 		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`provider`, err, stmt.Name(statement))
 		}
-		defer (*prepStmt).Close()()
+		defer (*prepStmt).Close()
 	}
 
 runloop:
