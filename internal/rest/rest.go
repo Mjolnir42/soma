@@ -59,16 +59,14 @@ func (x *Rest) Run() {
 
 	// TODO switch to new abortable interface
 	if x.conf.Daemon.TLS {
-		// XXX log.Fatal
-		http.ListenAndServeTLS(
+		x.errLog.Fatal(http.ListenAndServeTLS(
 			x.conf.Daemon.URL.Host,
 			x.conf.Daemon.Cert,
 			x.conf.Daemon.Key,
 			router,
-		)
+		))
 	} else {
-		// XXX log.Fatal
-		http.ListenAndServe(x.conf.Daemon.URL.Host, router)
+		x.errLog.Fatal(http.ListenAndServe(x.conf.Daemon.URL.Host, router))
 	}
 }
 
