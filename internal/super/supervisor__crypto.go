@@ -27,8 +27,8 @@ func (s *Supervisor) decrypt(q *msg.Request, mr *msg.Result) (*auth.Token, *auth
 		err   error
 		kex   *auth.Kex
 		plain []byte
-		token *auth.Token
 	)
+	token := &auth.Token{}
 
 	// lookup requested KeyExchange by provided KeyExchangeID
 	if kex = s.kex.read(q.Super.Encrypted.KexID); kex == nil {
