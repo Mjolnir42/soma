@@ -140,11 +140,14 @@ Alright. Let's sully that pristine database. Here we go!  `)
 		os.Exit(1)
 	}
 
+	// import server provided public key
 	kex.SetPeerKey(peer.PublicKey())
 	if err = kex.SetRequestUUID(peer.Request.String()); err != nil {
 		fmt.Fprintln(os.Stderr, adm.RED+adm.FAILURE+adm.CLEAR, err)
 		os.Exit(1)
 	}
+	// switch to server provided IV
+	kex.ImportInitializationVector(peer.ExportInitializationVector())
 	fmt.Println(adm.GREEN+adm.SUCCESS+adm.CLEAR, ` OK`)
 
 	tCred = &auth.Token{
