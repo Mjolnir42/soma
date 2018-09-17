@@ -81,7 +81,7 @@ func (s *Supervisor) activate(q *msg.Request) {
 
 returnImmediate:
 	// cleanup delay timer
-	if !timer.Stop() {
+	if timer.Stop() {
 		<-timer.C
 	}
 	q.Reply <- result
