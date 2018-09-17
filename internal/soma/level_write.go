@@ -73,14 +73,14 @@ func (w *LevelWrite) PriorityIntake() chan msg.Request {
 func (w *LevelWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.LevelAdd: w.stmtAdd,
-		stmt.LevelDel: w.stmtRemove,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.LevelAdd: &w.stmtAdd,
+		stmt.LevelDel: &w.stmtRemove,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`level`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

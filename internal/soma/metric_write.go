@@ -79,18 +79,18 @@ func (w *MetricWrite) PriorityIntake() chan msg.Request {
 func (w *MetricWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.MetricAdd:      w.stmtAdd,
-		stmt.MetricDel:      w.stmtRemove,
-		stmt.MetricPkgAdd:   w.stmtPkgAdd,
-		stmt.MetricPkgDel:   w.stmtPkgRemove,
-		stmt.ProviderVerify: w.stmtVerifyProvider,
-		stmt.UnitVerify:     w.stmtVerifyUnit,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.MetricAdd:      &w.stmtAdd,
+		stmt.MetricDel:      &w.stmtRemove,
+		stmt.MetricPkgAdd:   &w.stmtPkgAdd,
+		stmt.MetricPkgDel:   &w.stmtPkgRemove,
+		stmt.ProviderVerify: &w.stmtVerifyProvider,
+		stmt.UnitVerify:     &w.stmtVerifyUnit,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`metric`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

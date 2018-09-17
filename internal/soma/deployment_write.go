@@ -87,21 +87,21 @@ func (w *DeploymentWrite) PriorityIntake() chan msg.Request {
 func (w *DeploymentWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.DeploymentGet:              w.stmtGet,
-		stmt.DeploymentUpdate:           w.stmtSetStatusUpdate,
-		stmt.DeploymentStatus:           w.stmtGetStatus,
-		stmt.DeploymentActivate:         w.stmtActivate,
-		stmt.DeploymentList:             w.stmtList,
-		stmt.DeploymentListAll:          w.stmtAll,
-		stmt.DeploymentClearFlag:        w.stmtClearFlag,
-		stmt.DeploymentDeprovision:      w.stmtDeprovision,
-		stmt.DeploymentDeprovisionStyle: w.stmtDeprovisionForUpdate,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.DeploymentGet:              &w.stmtGet,
+		stmt.DeploymentUpdate:           &w.stmtSetStatusUpdate,
+		stmt.DeploymentStatus:           &w.stmtGetStatus,
+		stmt.DeploymentActivate:         &w.stmtActivate,
+		stmt.DeploymentList:             &w.stmtList,
+		stmt.DeploymentListAll:          &w.stmtAll,
+		stmt.DeploymentClearFlag:        &w.stmtClearFlag,
+		stmt.DeploymentDeprovision:      &w.stmtDeprovision,
+		stmt.DeploymentDeprovisionStyle: &w.stmtDeprovisionForUpdate,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`deployment`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

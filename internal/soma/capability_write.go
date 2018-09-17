@@ -78,17 +78,17 @@ func (w *CapabilityWrite) PriorityIntake() chan msg.Request {
 func (w *CapabilityWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.AddCapability:          w.stmtAdd,
-		stmt.DelCapability:          w.stmtRemove,
-		stmt.MetricVerify:           w.stmtVerifyMetric,
-		stmt.VerifyMonitoringSystem: w.stmtVerifyMonitoring,
-		stmt.ViewVerify:             w.stmtVerifyView,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.AddCapability:          &w.stmtAdd,
+		stmt.DelCapability:          &w.stmtRemove,
+		stmt.MetricVerify:           &w.stmtVerifyMetric,
+		stmt.VerifyMonitoringSystem: &w.stmtVerifyMonitoring,
+		stmt.ViewVerify:             &w.stmtVerifyView,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`capability`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

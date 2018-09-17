@@ -78,18 +78,18 @@ func (r *BucketRead) PriorityIntake() chan msg.Request {
 func (r *BucketRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.BucketList:     r.stmtList,
-		stmt.BucketShow:     r.stmtShow,
-		stmt.BucketOncProps: r.stmtPropOncall,
-		stmt.BucketSvcProps: r.stmtPropService,
-		stmt.BucketSysProps: r.stmtPropSystem,
-		stmt.BucketCstProps: r.stmtPropCustom,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.BucketList:     &r.stmtList,
+		stmt.BucketShow:     &r.stmtShow,
+		stmt.BucketOncProps: &r.stmtPropOncall,
+		stmt.BucketSvcProps: &r.stmtPropService,
+		stmt.BucketSysProps: &r.stmtPropSystem,
+		stmt.BucketCstProps: &r.stmtPropCustom,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`bucket`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

@@ -75,15 +75,15 @@ func (w *DatacenterWrite) PriorityIntake() chan msg.Request {
 func (w *DatacenterWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.DatacenterAdd:    w.stmtAdd,
-		stmt.DatacenterDel:    w.stmtRemove,
-		stmt.DatacenterRename: w.stmtRename,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.DatacenterAdd:    &w.stmtAdd,
+		stmt.DatacenterDel:    &w.stmtRemove,
+		stmt.DatacenterRename: &w.stmtRename,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`datacenter`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 	for {

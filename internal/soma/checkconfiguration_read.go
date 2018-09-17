@@ -87,22 +87,22 @@ func (r *CheckConfigurationRead) PriorityIntake() chan msg.Request {
 func (r *CheckConfigurationRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.CheckConfigList:                r.stmtList,
-		stmt.CheckConfigShowBase:            r.stmtShow,
-		stmt.CheckConfigShowThreshold:       r.stmtShowThreshold,
-		stmt.CheckConfigShowConstrCustom:    r.stmtShowConstraintCustom,
-		stmt.CheckConfigShowConstrSystem:    r.stmtShowConstraintSystem,
-		stmt.CheckConfigShowConstrNative:    r.stmtShowConstraintNative,
-		stmt.CheckConfigShowConstrService:   r.stmtShowConstraintService,
-		stmt.CheckConfigShowConstrAttribute: r.stmtShowConstraintAttribute,
-		stmt.CheckConfigShowConstrOncall:    r.stmtShowConstraintOncall,
-		stmt.CheckConfigInstanceInfo:        r.stmtShowInstanceInfo,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.CheckConfigList:                &r.stmtList,
+		stmt.CheckConfigShowBase:            &r.stmtShow,
+		stmt.CheckConfigShowThreshold:       &r.stmtShowThreshold,
+		stmt.CheckConfigShowConstrCustom:    &r.stmtShowConstraintCustom,
+		stmt.CheckConfigShowConstrSystem:    &r.stmtShowConstraintSystem,
+		stmt.CheckConfigShowConstrNative:    &r.stmtShowConstraintNative,
+		stmt.CheckConfigShowConstrService:   &r.stmtShowConstraintService,
+		stmt.CheckConfigShowConstrAttribute: &r.stmtShowConstraintAttribute,
+		stmt.CheckConfigShowConstrOncall:    &r.stmtShowConstraintOncall,
+		stmt.CheckConfigInstanceInfo:        &r.stmtShowInstanceInfo,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`checkconfig`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

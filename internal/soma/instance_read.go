@@ -80,15 +80,15 @@ func (r *InstanceRead) PriorityIntake() chan msg.Request {
 func (r *InstanceRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.InstanceScopedList: r.stmtList,
-		stmt.InstanceShow:       r.stmtShow,
-		stmt.InstanceVersions:   r.stmtVersions,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.InstanceScopedList: &r.stmtList,
+		stmt.InstanceShow:       &r.stmtShow,
+		stmt.InstanceVersions:   &r.stmtVersions,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`instance`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

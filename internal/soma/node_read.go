@@ -81,20 +81,20 @@ func (r *NodeRead) PriorityIntake() chan msg.Request {
 func (r *NodeRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.NodeList:       r.stmtList,
-		stmt.NodeShow:       r.stmtShow,
-		stmt.NodeShowConfig: r.stmtShowConfig,
-		stmt.NodeSync:       r.stmtSync,
-		stmt.NodeOncProps:   r.stmtPropOncall,
-		stmt.NodeSvcProps:   r.stmtPropService,
-		stmt.NodeSysProps:   r.stmtPropSystem,
-		stmt.NodeCstProps:   r.stmtPropCustom,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.NodeList:       &r.stmtList,
+		stmt.NodeShow:       &r.stmtShow,
+		stmt.NodeShowConfig: &r.stmtShowConfig,
+		stmt.NodeSync:       &r.stmtSync,
+		stmt.NodeOncProps:   &r.stmtPropOncall,
+		stmt.NodeSvcProps:   &r.stmtPropService,
+		stmt.NodeSysProps:   &r.stmtPropSystem,
+		stmt.NodeCstProps:   &r.stmtPropCustom,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`node`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

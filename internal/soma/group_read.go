@@ -82,21 +82,21 @@ func (r *GroupRead) PriorityIntake() chan msg.Request {
 func (r *GroupRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.GroupList:              r.stmtList,
-		stmt.GroupShow:              r.stmtShow,
-		stmt.GroupMemberGroupList:   r.stmtMemberListGroup,
-		stmt.GroupMemberClusterList: r.stmtMemberListCluster,
-		stmt.GroupMemberNodeList:    r.stmtMemberListNode,
-		stmt.GroupOncProps:          r.stmtPropOncall,
-		stmt.GroupSvcProps:          r.stmtPropService,
-		stmt.GroupSysProps:          r.stmtPropSystem,
-		stmt.GroupCstProps:          r.stmtPropCustom,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.GroupList:              &r.stmtList,
+		stmt.GroupShow:              &r.stmtShow,
+		stmt.GroupMemberGroupList:   &r.stmtMemberListGroup,
+		stmt.GroupMemberClusterList: &r.stmtMemberListCluster,
+		stmt.GroupMemberNodeList:    &r.stmtMemberListNode,
+		stmt.GroupOncProps:          &r.stmtPropOncall,
+		stmt.GroupSvcProps:          &r.stmtPropService,
+		stmt.GroupSysProps:          &r.stmtPropSystem,
+		stmt.GroupCstProps:          &r.stmtPropCustom,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`group`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

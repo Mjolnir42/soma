@@ -74,14 +74,14 @@ func (w *MonitoringWrite) PriorityIntake() chan msg.Request {
 func (w *MonitoringWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.MonitoringSystemAdd:    w.stmtCreate,
-		stmt.MonitoringSystemRemove: w.stmtDelete,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.MonitoringSystemAdd:    &w.stmtCreate,
+		stmt.MonitoringSystemRemove: &w.stmtDelete,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`monitoring`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

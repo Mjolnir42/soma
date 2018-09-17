@@ -119,23 +119,23 @@ func (g *GuidePost) PriorityIntake() chan msg.Request {
 func (g *GuidePost) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.JobSave:               g.stmtJobSave,
-		stmt.RepoByBucketID:        g.stmtRepoForBucketID,
-		stmt.NodeDetails:           g.stmtNodeDetails,
-		stmt.RepoNameByID:          g.stmtRepoNameByID,
-		stmt.ServiceLookup:         g.stmtServiceLookup,
-		stmt.ServiceAttributes:     g.stmtServiceAttributes,
-		stmt.CapabilityThresholds:  g.stmtCapabilityThresholds,
-		stmt.CheckDetailsForDelete: g.stmtCheckDetailsForDelete,
-		stmt.NodeBucketID:          g.stmtBucketForNodeID,
-		stmt.ClusterBucketID:       g.stmtBucketForClusterID,
-		stmt.GroupBucketID:         g.stmtBucketForGroupID,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.JobSave:               &g.stmtJobSave,
+		stmt.RepoByBucketID:        &g.stmtRepoForBucketID,
+		stmt.NodeDetails:           &g.stmtNodeDetails,
+		stmt.RepoNameByID:          &g.stmtRepoNameByID,
+		stmt.ServiceLookup:         &g.stmtServiceLookup,
+		stmt.ServiceAttributes:     &g.stmtServiceAttributes,
+		stmt.CapabilityThresholds:  &g.stmtCapabilityThresholds,
+		stmt.CheckDetailsForDelete: &g.stmtCheckDetailsForDelete,
+		stmt.NodeBucketID:          &g.stmtBucketForNodeID,
+		stmt.ClusterBucketID:       &g.stmtBucketForClusterID,
+		stmt.GroupBucketID:         &g.stmtBucketForGroupID,
 	} {
-		if prepStmt, err = g.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = g.conn.Prepare(statement); err != nil {
 			g.errLog.Fatal(`guidepost`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 	if g.soma.conf.Observer {

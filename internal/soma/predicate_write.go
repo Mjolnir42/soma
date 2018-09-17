@@ -73,14 +73,14 @@ func (w *PredicateWrite) PriorityIntake() chan msg.Request {
 func (w *PredicateWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.PredicateAdd: w.stmtAdd,
-		stmt.PredicateDel: w.stmtRemove,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.PredicateAdd: &w.stmtAdd,
+		stmt.PredicateDel: &w.stmtRemove,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`predicate`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

@@ -111,25 +111,25 @@ func (r *TreeRead) Run() {
 	var err error
 
 	// single-object return statements
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.TreeShowRepository:      r.stmtShowRepository,
-		stmt.TreeShowBucket:          r.stmtShowBucket,
-		stmt.TreeShowGroup:           r.stmtShowGroup,
-		stmt.TreeShowCluster:         r.stmtShowCluster,
-		stmt.TreeShowNode:            r.stmtShowNode,
-		stmt.TreeBucketsInRepository: r.stmtListRepositoryMemberBuckets,
-		stmt.TreeGroupsInBucket:      r.stmtListBucketMemberGroups,
-		stmt.TreeClustersInBucket:    r.stmtListBucketMemberClusters,
-		stmt.TreeNodesInBucket:       r.stmtListBucketMemberNodes,
-		stmt.TreeGroupsInGroup:       r.stmtListGroupMemberGroups,
-		stmt.TreeClustersInGroup:     r.stmtListGroupMemberClusters,
-		stmt.TreeNodesInGroup:        r.stmtListGroupMemberNodes,
-		stmt.TreeNodesInCluster:      r.stmtListClusterMemberNodes,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.TreeShowRepository:      &r.stmtShowRepository,
+		stmt.TreeShowBucket:          &r.stmtShowBucket,
+		stmt.TreeShowGroup:           &r.stmtShowGroup,
+		stmt.TreeShowCluster:         &r.stmtShowCluster,
+		stmt.TreeShowNode:            &r.stmtShowNode,
+		stmt.TreeBucketsInRepository: &r.stmtListRepositoryMemberBuckets,
+		stmt.TreeGroupsInBucket:      &r.stmtListBucketMemberGroups,
+		stmt.TreeClustersInBucket:    &r.stmtListBucketMemberClusters,
+		stmt.TreeNodesInBucket:       &r.stmtListBucketMemberNodes,
+		stmt.TreeGroupsInGroup:       &r.stmtListGroupMemberGroups,
+		stmt.TreeClustersInGroup:     &r.stmtListGroupMemberClusters,
+		stmt.TreeNodesInGroup:        &r.stmtListGroupMemberNodes,
+		stmt.TreeNodesInCluster:      &r.stmtListClusterMemberNodes,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`tree_r`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

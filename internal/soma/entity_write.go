@@ -75,15 +75,15 @@ func (w *EntityWrite) PriorityIntake() chan msg.Request {
 func (w *EntityWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.EntityAdd:    w.stmtAdd,
-		stmt.EntityDel:    w.stmtRemove,
-		stmt.EntityRename: w.stmtRename,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.EntityAdd:    &w.stmtAdd,
+		stmt.EntityDel:    &w.stmtRemove,
+		stmt.EntityRename: &w.stmtRename,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`entity`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

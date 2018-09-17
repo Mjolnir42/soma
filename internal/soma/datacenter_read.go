@@ -75,14 +75,14 @@ func (r *DatacenterRead) PriorityIntake() chan msg.Request {
 func (r *DatacenterRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.DatacenterList: r.stmtList,
-		stmt.DatacenterShow: r.stmtShow,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.DatacenterList: &r.stmtList,
+		stmt.DatacenterShow: &r.stmtShow,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`datacenter`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 	for {

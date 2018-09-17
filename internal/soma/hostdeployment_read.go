@@ -76,14 +76,14 @@ func (r *HostDeploymentRead) PriorityIntake() chan msg.Request {
 func (r *HostDeploymentRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.DeploymentInstancesForNode:    r.stmtInstancesForNode,
-		stmt.DeploymentLastInstanceVersion: r.stmtLastInstanceVersion,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.DeploymentInstancesForNode:    &r.stmtInstancesForNode,
+		stmt.DeploymentLastInstanceVersion: &r.stmtLastInstanceVersion,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`hostdeployment`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

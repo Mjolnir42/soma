@@ -70,17 +70,17 @@ func (r *MonitoringRead) RegisterRequests(hmap *handler.Map) {
 func (r *MonitoringRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ListAllMonitoringSystems:      r.stmtListAll,
-		stmt.ListScopedMonitoringSystems:   r.stmtListScoped,
-		stmt.ShowMonitoringSystem:          r.stmtShow,
-		stmt.SearchAllMonitoringSystems:    r.stmtSearchAll,
-		stmt.SearchScopedMonitoringSystems: r.stmtSearchScoped,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ListAllMonitoringSystems:      &r.stmtListAll,
+		stmt.ListScopedMonitoringSystems:   &r.stmtListScoped,
+		stmt.ShowMonitoringSystem:          &r.stmtShow,
+		stmt.SearchAllMonitoringSystems:    &r.stmtSearchAll,
+		stmt.SearchScopedMonitoringSystems: &r.stmtSearchScoped,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`monitoring`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

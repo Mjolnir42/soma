@@ -73,14 +73,14 @@ func (w *AttributeWrite) PriorityIntake() chan msg.Request {
 func (w *AttributeWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.AttributeAdd:    w.stmtAdd,
-		stmt.AttributeRemove: w.stmtRemove,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.AttributeAdd:    &w.stmtAdd,
+		stmt.AttributeRemove: &w.stmtRemove,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`attribute`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

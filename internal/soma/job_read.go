@@ -87,16 +87,16 @@ func (r *JobRead) PriorityIntake() chan msg.Request {
 func (r *JobRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ListAllOutstandingJobs:    r.stmtListAllOutstanding,
-		stmt.ListScopedOutstandingJobs: r.stmtListScopedOutstanding,
-		stmt.JobResultForID:            r.stmtResultByID,
-		stmt.JobResultsForList:         r.stmtResultByIDList,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ListAllOutstandingJobs:    &r.stmtListAllOutstanding,
+		stmt.ListScopedOutstandingJobs: &r.stmtListScopedOutstanding,
+		stmt.JobResultForID:            &r.stmtResultByID,
+		stmt.JobResultsForList:         &r.stmtResultByIDList,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`jobs`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

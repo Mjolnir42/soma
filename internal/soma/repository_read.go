@@ -84,18 +84,18 @@ func (r *RepositoryRead) PriorityIntake() chan msg.Request {
 func (r *RepositoryRead) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.ListAllRepositories: r.stmtList,
-		stmt.ShowRepository:      r.stmtShow,
-		stmt.RepoOncProps:        r.stmtPropOncall,
-		stmt.RepoSvcProps:        r.stmtPropService,
-		stmt.RepoSysProps:        r.stmtPropSystem,
-		stmt.RepoCstProps:        r.stmtPropCustom,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.ListAllRepositories: &r.stmtList,
+		stmt.ShowRepository:      &r.stmtShow,
+		stmt.RepoOncProps:        &r.stmtPropOncall,
+		stmt.RepoSvcProps:        &r.stmtPropService,
+		stmt.RepoSysProps:        &r.stmtPropSystem,
+		stmt.RepoCstProps:        &r.stmtPropCustom,
 	} {
-		if prepStmt, err = r.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`repository`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

@@ -78,16 +78,16 @@ func (w *NodeWrite) PriorityIntake() chan msg.Request {
 func (w *NodeWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.NodeAdd:    w.stmtAdd,
-		stmt.NodeUpdate: w.stmtUpdate,
-		stmt.NodeRemove: w.stmtRemove,
-		stmt.NodePurge:  w.stmtPurge,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.NodeAdd:    &w.stmtAdd,
+		stmt.NodeUpdate: &w.stmtUpdate,
+		stmt.NodeRemove: &w.stmtRemove,
+		stmt.NodePurge:  &w.stmtPurge,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`node`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:

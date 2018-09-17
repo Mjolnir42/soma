@@ -75,15 +75,15 @@ func (w *EnvironmentWrite) PriorityIntake() chan msg.Request {
 func (w *EnvironmentWrite) Run() {
 	var err error
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.EnvironmentAdd:    w.stmtCreate,
-		stmt.EnvironmentRemove: w.stmtDelete,
-		stmt.EnvironmentRename: w.stmtRename,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.EnvironmentAdd:    &w.stmtCreate,
+		stmt.EnvironmentRemove: &w.stmtDelete,
+		stmt.EnvironmentRename: &w.stmtRename,
 	} {
-		if prepStmt, err = w.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`environment`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 runloop:
