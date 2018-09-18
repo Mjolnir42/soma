@@ -34,6 +34,8 @@ func (s *Supervisor) startupLoad() {
 	s.startupUser()
 
 	s.startupCategory()
+
+	s.startupSection()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -299,6 +301,45 @@ func (s *Supervisor) startupCategory() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-category,next: `, err)
+	}
+}
+
+func (s *Supervisor) startupSection() {
+	var (
+		err                              error
+		category, sectionID, sectionName string
+		rows                             *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.SectionLoad)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-section,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&sectionID,
+			&sectionName,
+			&category,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-section,scan: `, err)
+		}
+		go func(sID, sNam, cat string) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionSection,
+				Action:  msg.ActionAdd,
+				SectionObj: proto.Section{
+					ID:       sID,
+					Name:     sNam,
+					Category: cat,
+				},
+			})
+		}(sectionID, sectionName, category)
+		s.appLog.Infof("supervisor/startup: permCache update - loaded section: %s|%s|%s", sectionID, sectionName, category)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-section,next: `, err)
 	}
 }
 

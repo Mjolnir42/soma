@@ -36,6 +36,12 @@ JOIN   inventory.users iu
   ON   ss.created_by = iu.user_id
 WHERE  ss.section_id = $1::uuid;`
 
+	SectionLoad = `
+SELECT section_id,
+       section_name,
+       category
+FROM   soma.sections;`
+
 	SectionRemoveFromMap = `
 DELETE FROM soma.permission_map
 WHERE       section_id = $1::uuid
@@ -72,6 +78,7 @@ func init() {
 	m[SectionAdd] = `SectionAdd`
 	m[SectionListActions] = `SectionListActions`
 	m[SectionList] = `SectionList`
+	m[SectionLoad] = `SectionLoad`
 	m[SectionRemoveFromMap] = `SectionRemoveFromMap`
 	m[SectionRemove] = `SectionRemove`
 	m[SectionSearch] = `SectionSearch`
