@@ -470,7 +470,7 @@ func (s *Supervisor) startupPermissionMap() {
 		}
 		// ID and name must be NULL or NOT NULL at the same time
 		if nullActionID.Valid != nullActionName.Valid {
-			s.errLog.Fatalf("supervisor/load-permission-map,partial null action %s|%s", nullActionID, nullActionName)
+			s.errLog.Fatalf("supervisor/load-permission-map,partial null action %s|%s", nullActionID.String, nullActionName.String)
 		}
 		switch nullActionID.Valid {
 		case true:
