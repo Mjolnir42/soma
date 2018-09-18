@@ -42,6 +42,8 @@ func (s *Supervisor) startupLoad() {
 	s.startupPermission()
 
 	s.startupPermissionMap()
+
+	s.startupGrant()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -531,6 +533,76 @@ func (s *Supervisor) startupPermissionMap() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-permission-map,next: `, err)
+	}
+}
+
+func (s *Supervisor) startupGrant() {
+	var (
+		err                                 error
+		grantID, permissionID, category     string
+		recipientType, recipientID          string
+		nAdminID, nUserID, nToolID, nTeamID sql.NullString
+		rows                                *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.LoadGlobalAuthorization)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-grant,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&grantID,
+			&nAdminID,
+			&nUserID,
+			&nToolID,
+			&nTeamID,
+			&permissionID,
+			&category,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-grant,scan: `, err)
+		}
+		// only one of the can be !NULL, enforced by database check
+		// constraint
+		switch {
+		case nAdminID.Valid:
+			recipientType = msg.SubjectAdmin
+			recipientID = nAdminID.String
+		case nUserID.Valid:
+			recipientType = msg.SubjectUser
+			recipientID = nUserID.String
+		case nToolID.Valid:
+			recipientType = msg.SubjectTool
+			recipientID = nToolID.String
+		case nTeamID.Valid:
+			recipientType = msg.SubjectTeam
+			recipientID = nTeamID.String
+		}
+		go func(gID, cat, pID, rTyp, rID string) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionRight,
+				Action:  msg.ActionGrant,
+				Grant: proto.Grant{
+					ID:            gID,
+					Category:      category,
+					PermissionID:  permissionID,
+					RecipientType: rTyp,
+					RecipientID:   rID,
+				},
+			})
+		}(grantID, category, permissionID, recipientType, recipientID)
+
+		s.appLog.Infof("supervisor/startup: permCache update - loaded right grant: %s|%s|%s|%s|%s",
+			grantID,
+			category,
+			permissionID,
+			recipientType,
+			recipientID,
+		)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-grant,next: `, err)
 	}
 }
 
