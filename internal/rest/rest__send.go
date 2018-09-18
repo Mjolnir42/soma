@@ -50,133 +50,106 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 
 	// copy result data into the output object
 	switch r.Section {
+	// simple result data with straight forward copying
+
 	case msg.SectionAction:
 		result = proto.NewActionResult()
 		*result.Actions = append(*result.Actions, r.ActionObj...)
-
 	case msg.SectionAttribute:
 		result = proto.NewAttributeResult()
 		*result.Attributes = append(*result.Attributes, r.Attribute...)
-
-	case msg.SectionBucket:
-		switch r.Action {
-		case msg.ActionTree:
-			result = proto.NewTreeResult()
-			*result.Tree = r.Tree
-		default:
-			result = proto.NewBucketResult()
-			*result.Buckets = append(*result.Buckets, r.Bucket...)
-		}
-
 	case msg.SectionCapability:
 		result = proto.NewCapabilityResult()
 		*result.Capabilities = append(*result.Capabilities, r.Capability...)
-
 	case msg.SectionCategory:
 		result = proto.NewCategoryResult()
 		*result.Categories = append(*result.Categories, r.Category...)
-
 	case msg.SectionCheckConfig:
 		result = proto.NewCheckConfigResult()
 		*result.CheckConfigs = append(*result.CheckConfigs, r.CheckConfig...)
-
-	case msg.SectionCluster:
-		switch r.Action {
-		case msg.ActionTree:
-			result = proto.NewTreeResult()
-			*result.Tree = r.Tree
-		default:
-			result = proto.NewClusterResult()
-			*result.Clusters = append(*result.Clusters, r.Cluster...)
-		}
-
 	case msg.SectionDatacenter:
 		result = proto.NewDatacenterResult()
 		*result.Datacenters = append(*result.Datacenters, r.Datacenter...)
-
 	case msg.SectionDeployment:
 		result = proto.NewDeploymentResult()
 		*result.Deployments = append(*result.Deployments, r.Deployment...)
-
 	case msg.SectionEntity:
 		result = proto.NewEntityResult()
 		*result.Entities = append(*result.Entities, r.Entity...)
-
 	case msg.SectionEnvironment:
 		result = proto.NewEnvironmentResult()
 		*result.Environments = append(*result.Environments, r.Environment...)
-
-	case msg.SectionGroup:
-		switch r.Action {
-		case msg.ActionTree:
-			result = proto.NewTreeResult()
-			*result.Tree = r.Tree
-		default:
-			result = proto.NewGroupResult()
-			*result.Groups = append(*result.Groups, r.Group...)
-		}
-
 	case msg.SectionHostDeployment:
 		result = proto.NewHostDeploymentResult()
 		*result.Deployments = append(*result.Deployments, r.Deployment...)
 		*result.HostDeployments = append(*result.HostDeployments, r.HostDeployment...)
+	case msg.SectionLevel:
+		result = proto.NewLevelResult()
+		*result.Levels = append(*result.Levels, r.Level...)
+	case msg.SectionMetric:
+		result = proto.NewMetricResult()
+		*result.Metrics = append(*result.Metrics, r.Metric...)
+	case msg.SectionMode:
+		result = proto.NewModeResult()
+		*result.Modes = append(*result.Modes, r.Mode...)
+	case msg.SectionOncall:
+		result = proto.NewOncallResult()
+		*result.Oncalls = append(*result.Oncalls, r.Oncall...)
+	case msg.SectionPermission:
+		result = proto.NewPermissionResult()
+		*result.Permissions = append(*result.Permissions, r.Permission...)
+	case msg.SectionPredicate:
+		result = proto.NewPredicateResult()
+		*result.Predicates = append(*result.Predicates, r.Predicate...)
+	case msg.SectionProvider:
+		result = proto.NewProviderResult()
+		*result.Providers = append(*result.Providers, r.Provider...)
+	case msg.SectionRight:
+		result = proto.NewGrantResult()
+		*result.Grants = append(*result.Grants, r.Grant...)
+	case msg.SectionSection:
+		result = proto.NewSectionResult()
+		*result.Sections = append(*result.Sections, r.SectionObj...)
+	case msg.SectionServer:
+		result = proto.NewServerResult()
+		*result.Servers = append(*result.Servers, r.Server...)
+	case msg.SectionState:
+		result = proto.NewStateResult()
+		*result.States = append(*result.States, r.State...)
+	case msg.SectionStatus:
+		result = proto.NewStatusResult()
+		*result.Status = append(*result.Status, r.Status...)
+	case msg.SectionUnit:
+		result = proto.NewUnitResult()
+		*result.Units = append(*result.Units, r.Unit...)
+	case msg.SectionValidity:
+		result = proto.NewValidityResult()
+		*result.Validities = append(*result.Validities, r.Validity...)
+	case msg.SectionView:
+		result = proto.NewViewResult()
+		*result.Views = append(*result.Views, r.View...)
+	case msg.SectionWorkflow:
+		result = proto.NewWorkflowResult()
+		*result.Workflows = append(*result.Workflows, r.Workflow...)
+
+	// result data with multiple permission scopes combines different
+	// sections
 
 	case msg.SectionInstance:
 		fallthrough
 	case msg.SectionInstanceMgmt:
 		result = proto.NewInstanceResult()
 		*result.Instances = append(*result.Instances, r.Instance...)
-
 	case msg.SectionJob:
 		fallthrough
 	case msg.SectionJobMgmt:
 		result = proto.NewJobResult()
 		*result.Jobs = append(*result.Jobs, r.Job...)
-
-	case msg.SectionLevel:
-		result = proto.NewLevelResult()
-		*result.Levels = append(*result.Levels, r.Level...)
-
-	case msg.SectionMetric:
-		result = proto.NewMetricResult()
-		*result.Metrics = append(*result.Metrics, r.Metric...)
-
-	case msg.SectionMode:
-		result = proto.NewModeResult()
-		*result.Modes = append(*result.Modes, r.Mode...)
-
 	case msg.SectionMonitoring:
 		fallthrough
 	case msg.SectionMonitoringMgmt:
 		result = proto.NewMonitoringResult()
 		*result.Monitorings = append(*result.Monitorings, r.Monitoring...)
-
-	case msg.SectionNode:
-		fallthrough
-	case msg.SectionNodeConfig:
-		fallthrough
-	case msg.SectionNodeMgmt:
-		switch r.Action {
-		case msg.ActionTree:
-			result = proto.NewTreeResult()
-			*result.Tree = r.Tree
-		default:
-			result = proto.NewNodeResult()
-			*result.Nodes = append(*result.Nodes, r.Node...)
-		}
-
-	case msg.SectionOncall:
-		result = proto.NewOncallResult()
-		*result.Oncalls = append(*result.Oncalls, r.Oncall...)
-
-	case msg.SectionPermission:
-		result = proto.NewPermissionResult()
-		*result.Permissions = append(*result.Permissions, r.Permission...)
-
-	case msg.SectionPredicate:
-		result = proto.NewPredicateResult()
-		*result.Predicates = append(*result.Predicates, r.Predicate...)
-
 	case msg.SectionPropertyMgmt:
 		fallthrough
 	case msg.SectionPropertyCustom:
@@ -190,10 +163,19 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	case msg.SectionPropertyTemplate:
 		result = proto.NewPropertyResult()
 		*result.Properties = append(*result.Properties, r.Property...)
+	case msg.SectionTeam:
+		fallthrough
+	case msg.SectionTeamMgmt:
+		result = proto.NewTeamResult()
+		*result.Teams = append(*result.Teams, r.Team...)
+	case msg.SectionUser:
+		fallthrough
+	case msg.SectionUserMgmt:
+		result = proto.NewUserResult()
+		*result.Users = append(*result.Users, r.User...)
 
-	case msg.SectionProvider:
-		result = proto.NewProviderResult()
-		*result.Providers = append(*result.Providers, r.Provider...)
+	// tree configuration results have different result data based on
+	// the action and may have multiple scopes
 
 	case msg.SectionRepository:
 		fallthrough
@@ -208,137 +190,49 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			result = proto.NewRepositoryResult()
 			*result.Repositories = append(*result.Repositories, r.Repository...)
 		}
-
-	case msg.SectionRight:
-		result = proto.NewGrantResult()
-		*result.Grants = append(*result.Grants, r.Grant...)
-
-	case msg.SectionSection:
-		result = proto.NewSectionResult()
-		*result.Sections = append(*result.Sections, r.SectionObj...)
-
-	case msg.SectionServer:
-		result = proto.NewServerResult()
-		*result.Servers = append(*result.Servers, r.Server...)
-
-	case msg.SectionState:
-		result = proto.NewStateResult()
-		*result.States = append(*result.States, r.State...)
-
-	case msg.SectionStatus:
-		result = proto.NewStatusResult()
-		*result.Status = append(*result.Status, r.Status...)
-
-	case msg.SectionSupervisor:
+	case msg.SectionBucket:
 		switch r.Action {
-		case msg.ActionToken: // switch r.Action
-			switch r.Super.Task {
-			case msg.TaskInvalidate: // switch r.Super.Task
-				fallthrough
-			case msg.TaskInvalidateAccount: // switch r.Super.Task
-				result = proto.NewResult()
-				if r.Code == 200 && r.Super.Verdict == 200 {
-					result.OK()
-					logEntry.WithField(`Code`, r.Code).Info(`OK`)
-					goto buildJSON
-				}
-				logEntry.WithField(`Code`, r.Code).
-					WithField(`Masked`, 403).
-					Warnf(`Forbidden`)
-				dispatchForbidden(w, nil)
-			case msg.TaskRequest: // switch r.Super.Task
-				// token requests are encrypted
-				result = proto.NewResult()
-				if r.Code == 200 && r.Super.Verdict == 200 {
-					logEntry.WithField(`Code`, r.Code).Info(`OK`)
-					goto dispatchOCTET
-				}
-			default: // switch r.Super.Task
-				logEntry.WithField(`Code`, r.Code).
-					WithField(`Masked`, 403).
-					WithField(`Task`, r.Super.Task).
-					Warnf(`Unhandled supervisor task`)
-				dispatchForbidden(w, nil)
-			}
-			return
-		case msg.ActionKex: // switch r.Action
-			k = r.Super.Kex
-			if bjson, err = json.Marshal(&k); err != nil {
-				logEntry.WithField(`Code`, 500).Warn(`ServerError`)
-				x.errLog.WithField(`RequestID`, r.ID.String()).
-					WithField(`Phase`, `json`).
-					Error(err)
-				dispatchInternalError(w, nil)
-				return
-			}
-			logEntry.WithField(`Code`, r.Code).Info(`OK`)
-			goto dispatchJSON
-		case msg.ActionPassword: // switch r.Action
-			switch r.Super.Task {
-			case msg.TaskChange: // switch r.Super.Task
-			case msg.TaskReset: // switch r.Super.Task
-			default: // switch r.Super.Task
-				logEntry.WithField(`Code`, r.Code).
-					WithField(`Masked`, 403).
-					WithField(`Task`, r.Super.Task).
-					Warnf(`Unhandled supervisor task`)
-				dispatchForbidden(w, nil)
-				return
-			}
-			switch r.Code {
-			case 200: // switch r.Code
-				if r.Super.Verdict == 200 {
-					logEntry.WithField(`Code`, r.Code).Info(`OK`)
-					goto dispatchOCTET
-				}
-				logEntry.WithField(`Code`, r.Code).
-					WithField(`Masked`, 403).Warn(`Forbidden`)
-				dispatchForbidden(w, nil)
-			default: // switch r.Code
-				logEntry.WithField(`Code`, r.Code).
-					WithField(`Masked`, 403).Warn(`Forbidden`)
-				dispatchForbidden(w, nil)
-			}
-			return
-		case msg.ActionActivate: // switch r.Action
-			switch r.Super.Task {
-			case msg.SubjectRoot: // switch r.Super.Task
-			case msg.SubjectUser: // switch r.Super.Task
-			default: // switch r.Super.Task
-				logEntry.WithField(`Code`, r.Code).
-					WithField(`Masked`, 403).
-					WithField(`Task`, r.Super.Task).
-					Warnf(`Unhandled supervisor task`)
-				dispatchForbidden(w, nil)
-				return
-			}
-			switch r.Code {
-			case 200: // switch r.Code
-				if r.Super.Verdict == 200 {
-					logEntry.WithField(`Code`, r.Code).Info(`OK`)
-					goto dispatchOCTET
-				}
-				logEntry.WithField(`Code`, r.Code).
-					WithField(`Masked`, 403).Warn(`Forbidden`)
-				dispatchForbidden(w, nil)
-			case 406: // switch r.Code
-				logEntry.WithField(`Code`, r.Code).Warn(`Conflict`)
-				// request failed due to a policy constraint, do not
-				// mask the error and return the full detail error message
-				dispatchConflict(w, r.Error)
-			default: // switch r.Code
-				logEntry.WithField(`Code`, r.Code).
-					WithField(`Masked`, 403).Warn(`Forbidden`)
-				dispatchForbidden(w, nil)
-			}
-			return
-		default: // switch r.Action
-			logEntry.WithField(`Code`, r.Code).
-				WithField(`Masked`, 403).
-				Warnf(`Unhandled supervisor action`)
-			dispatchForbidden(w, nil)
-			return
+		case msg.ActionTree:
+			result = proto.NewTreeResult()
+			*result.Tree = r.Tree
+		default:
+			result = proto.NewBucketResult()
+			*result.Buckets = append(*result.Buckets, r.Bucket...)
 		}
+	case msg.SectionGroup:
+		switch r.Action {
+		case msg.ActionTree:
+			result = proto.NewTreeResult()
+			*result.Tree = r.Tree
+		default:
+			result = proto.NewGroupResult()
+			*result.Groups = append(*result.Groups, r.Group...)
+		}
+	case msg.SectionCluster:
+		switch r.Action {
+		case msg.ActionTree:
+			result = proto.NewTreeResult()
+			*result.Tree = r.Tree
+		default:
+			result = proto.NewClusterResult()
+			*result.Clusters = append(*result.Clusters, r.Cluster...)
+		}
+	case msg.SectionNode:
+		fallthrough
+	case msg.SectionNodeConfig:
+		fallthrough
+	case msg.SectionNodeMgmt:
+		switch r.Action {
+		case msg.ActionTree:
+			result = proto.NewTreeResult()
+			*result.Tree = r.Tree
+		default:
+			result = proto.NewNodeResult()
+			*result.Nodes = append(*result.Nodes, r.Node...)
+		}
+
+	// system results have generally no output, or a supervisor actions
+	// that require special handling
 
 	case msg.SectionSystem:
 		result = proto.NewResult()
@@ -348,8 +242,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		case msg.ActionRepoStop:
 		case msg.ActionShutdown:
 		case msg.ActionToken:
-			// system::token is a supervisor action and
-			// supervisor interactions are masked
+			// system::token is a supervisor action
 
 			// check supervisor task
 			switch r.Super.Task {
@@ -366,8 +259,8 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 
 			// check supervisor verdict
 			if r.Code == 200 && r.Super.Verdict == 200 {
-				logEntry.WithField(`Code`, r.Code).Info(`OK`)
 				result.OK()
+				logEntry.WithField(`Code`, r.Code).Info(`OK`)
 				goto buildJSON
 			}
 
@@ -386,33 +279,154 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			return
 		}
 
-	case msg.SectionTeam:
-		fallthrough
-	case msg.SectionTeamMgmt:
-		result = proto.NewTeamResult()
-		*result.Teams = append(*result.Teams, r.Team...)
+	// supervisor results handle AAA data and mask internal error codes
+	// to avoid information leaks
 
-	case msg.SectionUnit:
-		result = proto.NewUnitResult()
-		*result.Units = append(*result.Units, r.Unit...)
+	case msg.SectionSupervisor:
+		switch r.Action {
+		case msg.ActionToken:
+			result = proto.NewResult()
 
-	case msg.SectionUser:
-		fallthrough
-	case msg.SectionUserMgmt:
-		result = proto.NewUserResult()
-		*result.Users = append(*result.Users, r.User...)
+			switch r.Super.Task {
+			// invalidate Token requests
+			case msg.TaskInvalidate:
+				fallthrough
+			case msg.TaskInvalidateAccount:
+				// check supervisor verdict
+				if r.Code == 200 && r.Super.Verdict == 200 {
+					result.OK()
+					logEntry.WithField(`Code`, r.Code).Info(`OK`)
+					goto buildJSON
+				}
 
-	case msg.SectionValidity:
-		result = proto.NewValidityResult()
-		*result.Validities = append(*result.Validities, r.Validity...)
+				// mask as 403/Forbidden
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Forbidden`)
+				dispatchForbidden(w, nil)
+				return
 
-	case msg.SectionView:
-		result = proto.NewViewResult()
-		*result.Views = append(*result.Views, r.View...)
+			// token generation request - encrypted payload
+			case msg.TaskRequest:
+				// check supervisor verdict
+				if r.Code == 200 && r.Super.Verdict == 200 {
+					logEntry.WithField(`Code`, r.Code).Info(`OK`)
+					goto dispatchOCTET
+				}
 
-	case msg.SectionWorkflow:
-		result = proto.NewWorkflowResult()
-		*result.Workflows = append(*result.Workflows, r.Workflow...)
+				// mask as 403/Forbidden
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Forbidden`)
+				dispatchForbidden(w, nil)
+				return
+
+			default: // switch r.Super.Task
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Unhandled supervisor task`)
+				dispatchForbidden(w, nil)
+				return
+
+			}
+			// unreachable
+
+		case msg.ActionKex:
+			// Key Exchange request -- encrypted payload
+			k = r.Super.Kex
+			// special KEX payload is generated here
+			if bjson, err = json.Marshal(&k); err != nil {
+				logEntry.WithField(`Code`, 500).
+					WithField(`HasError`, `true`).
+					Warn(`ServerError`)
+				x.errLog.WithField(`RequestID`, r.ID.String()).
+					WithField(`Phase`, `json`).
+					Error(err)
+				dispatchInternalError(w, nil)
+				return
+			}
+			logEntry.WithField(`Code`, r.Code).Info(`OK`)
+			goto dispatchJSON
+
+		case msg.ActionPassword:
+			// Password manipulation request -- encrypted payload
+
+			// check upervisor task
+			switch r.Super.Task {
+			case msg.TaskChange:
+			case msg.TaskReset:
+			default:
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Unhandled supervisor task`)
+				dispatchForbidden(w, nil)
+				return
+			}
+
+			// check supervisor verdict
+			if r.Code == 200 && r.Super.Verdict == 200 {
+				result.OK()
+				logEntry.WithField(`Code`, r.Code).Info(`OK`)
+				goto dispatchOCTET
+			}
+
+			// mask as 403/Forbidden
+			logEntry.WithField(`Code`, r.Code).
+				WithField(`Masked`, 403).
+				Warnf(`Forbidden`)
+			dispatchForbidden(w, nil)
+			return
+
+		case msg.ActionActivate:
+			// Account activation request -- encrypted payload
+
+			// check upervisor task
+			switch r.Super.Task {
+			case msg.SubjectRoot:
+			case msg.SubjectUser:
+			default:
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Unhandled supervisor task`)
+				dispatchForbidden(w, nil)
+				return
+			}
+
+			// check supervisor verdict
+			if r.Code == 200 && r.Super.Verdict == 200 {
+				result.OK()
+				logEntry.WithField(`Code`, r.Code).Info(`OK`)
+				goto dispatchOCTET
+			}
+
+			// check policy violation
+			if r.Code == 406 {
+				// request failed due to a policy constraint, do not
+				// mask the error and return the full detail error message
+				logEntry.WithField(`Code`, r.Code).Warn(r.Error)
+				dispatchConflict(w, r.Error)
+				return
+			}
+
+			// mask as 403/Forbidden
+			logEntry.WithField(`Code`, r.Code).
+				WithField(`Masked`, 403).
+				Warnf(`Forbidden`)
+			dispatchForbidden(w, nil)
+			return
+
+		default:
+			logEntry.WithField(`Code`, r.Code).
+				WithField(`Masked`, 403).
+				Warnf(`Unhandled supervisor action`)
+			dispatchForbidden(w, nil)
+			return
+		}
 
 	default:
 		logEntry.WithField(`Code`, r.Code).
@@ -426,9 +440,6 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 
 	switch r.Code {
 	case 200:
-		if r.Error != nil {
-			result.Error(r.Error)
-		}
 		result.OK()
 		logEntry.WithField(`Code`, r.Code).Info(`OK`)
 	case 202:
@@ -455,8 +466,9 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		result.Unavailable()
 		logEntry.WithField(`Code`, r.Code).Warn(`ServiceUnavailable`)
 	default:
-		logEntry.WithField(`Code`, r.Code).Errorf(
-			"Unhandled internal result code: %d", r.Code)
+		logEntry.WithField(`Code`, r.Code).
+			WithField(`Masked`, 500).
+			Warn(`Unhandled internal result code`)
 		dispatchInternalError(w, nil)
 		return
 	}
