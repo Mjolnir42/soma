@@ -216,58 +216,58 @@ func (s *Supervisor) Run() {
 	// load from database
 	s.startupLoad()
 
-	for statement, prepStmt := range map[string]*sql.Stmt{
-		stmt.SelectToken:                   s.stmtTokenSelect,
-		stmt.FindUserID:                    s.stmtFindUserID,
-		stmt.CategoryList:                  s.stmtCategoryList,
-		stmt.CategoryShow:                  s.stmtCategoryShow,
-		stmt.PermissionList:                s.stmtPermissionList,
-		stmt.PermissionSearchByName:        s.stmtPermissionSearch,
-		stmt.SectionList:                   s.stmtSectionList,
-		stmt.SectionShow:                   s.stmtSectionShow,
-		stmt.SectionSearch:                 s.stmtSectionSearch,
-		stmt.ActionList:                    s.stmtActionList,
-		stmt.ActionShow:                    s.stmtActionShow,
-		stmt.ActionSearch:                  s.stmtActionSearch,
-		stmt.SearchGlobalAuthorization:     s.stmtSearchAuthorizationGlobal,
-		stmt.SearchRepositoryAuthorization: s.stmtSearchAuthorizationRepository,
-		stmt.SearchTeamAuthorization:       s.stmtSearchAuthorizationTeam,
-		stmt.SearchMonitoringAuthorization: s.stmtSearchAuthorizationMonitoring,
-		stmt.ListGlobalAuthorization:       s.stmtListAuthorizationGlobal,
-		stmt.ListRepositoryAuthorization:   s.stmtListAuthorizationRepository,
-		stmt.ListTeamAuthorization:         s.stmtListAuthorizationTeam,
-		stmt.ListMonitoringAuthorization:   s.stmtListAuthorizationMonitoring,
-		stmt.ShowGlobalAuthorization:       s.stmtShowAuthorizationGlobal,
-		stmt.ShowRepositoryAuthorization:   s.stmtShowAuthorizationRepository,
-		stmt.ShowTeamAuthorization:         s.stmtShowAuthorizationTeam,
-		stmt.ShowMonitoringAuthorization:   s.stmtShowAuthorizationMonitoring,
+	for statement, prepStmt := range map[string]**sql.Stmt{
+		stmt.SelectToken:                   &s.stmtTokenSelect,
+		stmt.FindUserID:                    &s.stmtFindUserID,
+		stmt.CategoryList:                  &s.stmtCategoryList,
+		stmt.CategoryShow:                  &s.stmtCategoryShow,
+		stmt.PermissionList:                &s.stmtPermissionList,
+		stmt.PermissionSearchByName:        &s.stmtPermissionSearch,
+		stmt.SectionList:                   &s.stmtSectionList,
+		stmt.SectionShow:                   &s.stmtSectionShow,
+		stmt.SectionSearch:                 &s.stmtSectionSearch,
+		stmt.ActionList:                    &s.stmtActionList,
+		stmt.ActionShow:                    &s.stmtActionShow,
+		stmt.ActionSearch:                  &s.stmtActionSearch,
+		stmt.SearchGlobalAuthorization:     &s.stmtSearchAuthorizationGlobal,
+		stmt.SearchRepositoryAuthorization: &s.stmtSearchAuthorizationRepository,
+		stmt.SearchTeamAuthorization:       &s.stmtSearchAuthorizationTeam,
+		stmt.SearchMonitoringAuthorization: &s.stmtSearchAuthorizationMonitoring,
+		stmt.ListGlobalAuthorization:       &s.stmtListAuthorizationGlobal,
+		stmt.ListRepositoryAuthorization:   &s.stmtListAuthorizationRepository,
+		stmt.ListTeamAuthorization:         &s.stmtListAuthorizationTeam,
+		stmt.ListMonitoringAuthorization:   &s.stmtListAuthorizationMonitoring,
+		stmt.ShowGlobalAuthorization:       &s.stmtShowAuthorizationGlobal,
+		stmt.ShowRepositoryAuthorization:   &s.stmtShowAuthorizationRepository,
+		stmt.ShowTeamAuthorization:         &s.stmtShowAuthorizationTeam,
+		stmt.ShowMonitoringAuthorization:   &s.stmtShowAuthorizationMonitoring,
 	} {
-		if prepStmt, err = s.conn.Prepare(statement); err != nil {
+		if *prepStmt, err = s.conn.Prepare(statement); err != nil {
 			s.errLog.Fatal(`supervisor`, err, stmt.Name(statement))
 		}
-		defer prepStmt.Close()
+		defer (*prepStmt).Close()
 	}
 
 	if !s.readonly {
-		for statement, prepStmt := range map[string]*sql.Stmt{
-			stmt.CheckUserActive:               s.stmtCheckUserActive,
-			stmt.SectionAdd:                    s.stmtSectionAdd,
-			stmt.ActionAdd:                     s.stmtActionAdd,
-			stmt.RevokeGlobalAuthorization:     s.stmtRevokeAuthorizationGlobal,
-			stmt.RevokeRepositoryAuthorization: s.stmtRevokeAuthorizationRepository,
-			stmt.RevokeTeamAuthorization:       s.stmtRevokeAuthorizationTeam,
-			stmt.RevokeMonitoringAuthorization: s.stmtRevokeAuthorizationMonitoring,
-			stmt.GrantGlobalAuthorization:      s.stmtGrantAuthorizationGlobal,
-			stmt.GrantRepositoryAuthorization:  s.stmtGrantAuthorizationRepository,
-			stmt.GrantTeamAuthorization:        s.stmtGrantAuthorizationTeam,
-			stmt.GrantMonitoringAuthorization:  s.stmtGrantAuthorizationMonitoring,
-			stmt.PermissionMapEntry:            s.stmtPermissionMapEntry,
-			stmt.PermissionUnmapEntry:          s.stmtPermissionUnmapEntry,
+		for statement, prepStmt := range map[string]**sql.Stmt{
+			stmt.CheckUserActive:               &s.stmtCheckUserActive,
+			stmt.SectionAdd:                    &s.stmtSectionAdd,
+			stmt.ActionAdd:                     &s.stmtActionAdd,
+			stmt.RevokeGlobalAuthorization:     &s.stmtRevokeAuthorizationGlobal,
+			stmt.RevokeRepositoryAuthorization: &s.stmtRevokeAuthorizationRepository,
+			stmt.RevokeTeamAuthorization:       &s.stmtRevokeAuthorizationTeam,
+			stmt.RevokeMonitoringAuthorization: &s.stmtRevokeAuthorizationMonitoring,
+			stmt.GrantGlobalAuthorization:      &s.stmtGrantAuthorizationGlobal,
+			stmt.GrantRepositoryAuthorization:  &s.stmtGrantAuthorizationRepository,
+			stmt.GrantTeamAuthorization:        &s.stmtGrantAuthorizationTeam,
+			stmt.GrantMonitoringAuthorization:  &s.stmtGrantAuthorizationMonitoring,
+			stmt.PermissionMapEntry:            &s.stmtPermissionMapEntry,
+			stmt.PermissionUnmapEntry:          &s.stmtPermissionUnmapEntry,
 		} {
-			if prepStmt, err = s.conn.Prepare(statement); err != nil {
+			if *prepStmt, err = s.conn.Prepare(statement); err != nil {
 				s.errLog.Fatal(`supervisor`, err, stmt.Name(statement))
 			}
-			defer prepStmt.Close()
+			defer (*prepStmt).Close()
 		}
 	}
 
