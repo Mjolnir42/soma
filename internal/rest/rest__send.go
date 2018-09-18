@@ -11,10 +11,8 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/auth"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -30,9 +28,24 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		result proto.Result
 	)
 
-	// this is central error command, proceeding to log
+	// build RequestLog entry
+	logEntry := x.reqLog.WithField(`RequestID`, r.ID.String()).
+		WithField(`Section`, r.Section).
+		WithField(`Action`, r.Action).
+		WithField(`Phase`, `result`)
+
+	// this is central error command, proceeding to ErrorLog while
+	// updating the RequestLog metadata
 	if r.Error != nil {
-		log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, r.Error.Error())
+		x.errLog.WithField(`RequestID`, r.ID.String()).
+			WithField(`Section`, r.Section).
+			WithField(`Action`, r.Action).
+			WithField(`Phase`, `result`).
+			WithField(`Code`, r.Code).
+			Errorln(r.Error.Error())
+		logEntry = logEntry.WithField(`HasError`, `true`)
+	} else {
+		logEntry = logEntry.WithField(`HasError`, `false`)
 	}
 
 	// copy result data into the output object
@@ -225,53 +238,65 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			case msg.TaskInvalidateAccount: // switch r.Super.Task
 				result = proto.NewResult()
 				if r.Code == 200 && r.Super.Verdict == 200 {
-					log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 					result.OK()
+					logEntry.WithField(`Code`, r.Code).Info(`OK`)
 					goto buildJSON
 				}
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					Warnf(`Forbidden`)
 				dispatchForbidden(w, nil)
 			case msg.TaskRequest: // switch r.Super.Task
 				// token requests are encrypted
 				result = proto.NewResult()
 				if r.Code == 200 && r.Super.Verdict == 200 {
-					log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
+					logEntry.WithField(`Code`, r.Code).Info(`OK`)
 					goto dispatchOCTET
 				}
 			default: // switch r.Super.Task
-				log.Printf(msg.LogStrErr, r.Section, fmt.Sprintf("%s/%s", r.Action, r.Super.Task), 0,
-					`Result for unhandled supervisor task`)
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Unhandled supervisor task`)
 				dispatchForbidden(w, nil)
 			}
 			return
 		case msg.ActionKex: // switch r.Action
 			k = r.Super.Kex
 			if bjson, err = json.Marshal(&k); err != nil {
-				log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, err.Error())
+				logEntry.WithField(`Code`, 500).Warn(`ServerError`)
+				x.errLog.WithField(`RequestID`, r.ID.String()).
+					WithField(`Phase`, `json`).
+					Error(err)
 				dispatchInternalError(w, nil)
 				return
 			}
-			log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, r.Code)
+			logEntry.WithField(`Code`, r.Code).Info(`OK`)
 			goto dispatchJSON
 		case msg.ActionPassword: // switch r.Action
 			switch r.Super.Task {
 			case msg.TaskChange: // switch r.Super.Task
 			case msg.TaskReset: // switch r.Super.Task
 			default: // switch r.Super.Task
-				log.Printf(msg.LogStrErr, r.Section, fmt.Sprintf("%s/%s", r.Action, r.Super.Task), 0,
-					`Result for unhandled supervisor task`)
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Unhandled supervisor task`)
 				dispatchForbidden(w, nil)
 				return
 			}
 			switch r.Code {
 			case 200: // switch r.Code
 				if r.Super.Verdict == 200 {
-					log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
+					logEntry.WithField(`Code`, r.Code).Info(`OK`)
 					goto dispatchOCTET
 				}
-				log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 403)
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).Warn(`Forbidden`)
 				dispatchForbidden(w, nil)
 			default: // switch r.Code
-				log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 403)
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).Warn(`Forbidden`)
 				dispatchForbidden(w, nil)
 			}
 			return
@@ -280,31 +305,37 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			case msg.SubjectRoot: // switch r.Super.Task
 			case msg.SubjectUser: // switch r.Super.Task
 			default: // switch r.Super.Task
-				log.Printf(msg.LogStrErr, r.Section, fmt.Sprintf("%s/%s", r.Action, r.Super.Task), 0,
-					`Result for unhandled supervisor task subject`)
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Unhandled supervisor task`)
 				dispatchForbidden(w, nil)
 				return
 			}
 			switch r.Code {
 			case 200: // switch r.Code
 				if r.Super.Verdict == 200 {
-					log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
+					logEntry.WithField(`Code`, r.Code).Info(`OK`)
 					goto dispatchOCTET
 				}
-				log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 403)
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).Warn(`Forbidden`)
 				dispatchForbidden(w, nil)
 			case 406: // switch r.Code
-				log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 406)
+				logEntry.WithField(`Code`, r.Code).Warn(`Conflict`)
 				// request failed due to a policy constraint, do not
 				// mask the error and return the full detail error message
 				dispatchConflict(w, r.Error)
 			default: // switch r.Code
-				log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 403)
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).Warn(`Forbidden`)
 				dispatchForbidden(w, nil)
 			}
 			return
 		default: // switch r.Action
-			log.Printf(msg.LogStrErr, r.Section, r.Action, 0, `Result for unhandled supervisor action`)
+			logEntry.WithField(`Code`, r.Code).
+				WithField(`Masked`, 403).
+				Warnf(`Unhandled supervisor action`)
 			dispatchForbidden(w, nil)
 			return
 		}
@@ -317,25 +348,40 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		case msg.ActionRepoStop:
 		case msg.ActionShutdown:
 		case msg.ActionToken:
-			// Supervisor interactions are masked
+			// system::token is a supervisor action and
+			// supervisor interactions are masked
+
+			// check supervisor task
 			switch r.Super.Task {
 			case msg.TaskInvalidateAccount:
 			case msg.TaskInvalidateGlobal:
 			default:
-				log.Printf(msg.LogStrErr, r.Section, fmt.Sprintf("%s/%s", r.Action, r.Super.Task), 0,
-					`Result for unhandled supervisor task`)
+				logEntry.WithField(`Code`, r.Code).
+					WithField(`Masked`, 403).
+					WithField(`Task`, r.Super.Task).
+					Warnf(`Unhandled supervisor task`)
 				dispatchForbidden(w, nil)
 				return
 			}
+
+			// check supervisor verdict
 			if r.Code == 200 && r.Super.Verdict == 200 {
-				log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
+				logEntry.WithField(`Code`, r.Code).Info(`OK`)
 				result.OK()
 				goto buildJSON
 			}
+
+			// mask as 403/Forbidden
+			logEntry.WithField(`Code`, r.Code).
+				WithField(`Masked`, 403).
+				Warnf(`Forbidden`)
 			dispatchForbidden(w, nil)
 			return
+
 		default:
-			log.Printf(msg.LogStrErr, r.Section, r.Action, 0, `Result for unhandled system action`)
+			logEntry.WithField(`Code`, r.Code).
+				WithField(`Masked`, 500).
+				Warnf(`Unhandled system action`)
 			dispatchInternalError(w, nil)
 			return
 		}
@@ -369,42 +415,48 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		*result.Workflows = append(*result.Workflows, r.Workflow...)
 
 	default:
-		log.Printf(msg.LogStrErr, r.Section, r.Action, 0, `Result from unhandled subsystem`)
+		logEntry.WithField(`Code`, r.Code).
+			WithField(`Masked`, 500).
+			Warnf(`Result for unhandled section`)
 		dispatchInternalError(w, nil)
 		return
 	}
 
+	logEntry = logEntry.WithField(`Code`, r.Code)
+
 	switch r.Code {
 	case 200:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		if r.Error != nil {
 			result.Error(r.Error)
 		}
 		result.OK()
+		logEntry.WithField(`Code`, r.Code).Info(`OK`)
 	case 202:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 202)
 		result.JobID = r.JobID
 		result.Accepted()
+		logEntry.WithField(`Code`, r.Code).
+			WithField(`JobID`, r.JobID).Info(`Accepted`)
 	case 400:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.BadRequest(r.Error)
+		logEntry.WithField(`Code`, r.Code).Warn(`BadRequest`)
 	case 403:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.Forbidden(r.Error)
+		logEntry.WithField(`Code`, r.Code).Warn(`Forbidden`)
 	case 404:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.NotFoundErr(r.Error)
+		logEntry.WithField(`Code`, r.Code).Warn(`NotFound`)
 	case 500:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.Error(r.Error)
+		logEntry.WithField(`Code`, r.Code).Warn(`ServerError`)
 	case 501:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.NotImplemented()
+		logEntry.WithField(`Code`, r.Code).Warn(`NotImplemented`)
 	case 503:
-		log.Printf(msg.LogStrOK, r.Section, r.Action, r.Code, 200)
 		result.Unavailable()
+		logEntry.WithField(`Code`, r.Code).Warn(`ServiceUnavailable`)
 	default:
-		log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, `Unhandled internal result code`)
+		logEntry.WithField(`Code`, r.Code).Errorf(
+			"Unhandled internal result code: %d", r.Code)
 		dispatchInternalError(w, nil)
 		return
 	}
@@ -416,7 +468,9 @@ dispatchOCTET:
 
 buildJSON:
 	if bjson, err = json.Marshal(&result); err != nil {
-		log.Printf(msg.LogStrErr, r.Section, r.Action, r.Code, err)
+		x.errLog.WithField(`RequestID`, r.ID.String()).
+			WithField(`Phase`, `json`).
+			Error(err)
 		dispatchInternalError(w, nil)
 		return
 	}
