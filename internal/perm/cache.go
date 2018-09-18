@@ -67,31 +67,31 @@ func New() *Cache {
 // Perform executes the request on the cache
 func (c *Cache) Perform(q *msg.Request) {
 	// delegate the request to per-section methods
-	switch q.Section {
-	case `action`:
-		c.performAction(q)
-	case `bucket`:
-		c.performBucket(q)
-	case `category`:
-		c.performCategory(q)
-	case `cluster`:
-		c.performCluster(q)
-	case `group`:
-		c.performGroup(q)
-	case `node-config`:
-		c.performNode(q)
-	case `permission`:
-		c.performPermission(q)
-	case `repository`:
-		c.performRepository(q)
-	case `right`:
-		c.performRight(q)
-	case `section`:
-		c.performSection(q)
-	case `team`:
-		c.performTeam(q)
-	case `user`:
-		c.performUser(q)
+	switch q.Cache.Section {
+	case msg.SectionAction:
+		c.performAction(q.Cache)
+	case msg.SectionBucket:
+		c.performBucket(q.Cache)
+	case msg.SectionCategory:
+		c.performCategory(q.Cache)
+	case msg.SectionCluster:
+		c.performCluster(q.Cache)
+	case msg.SectionGroup:
+		c.performGroup(q.Cache)
+	case msg.SectionNodeConfig:
+		c.performNode(q.Cache)
+	case msg.SectionPermission:
+		c.performPermission(q.Cache)
+	case msg.SectionRepository:
+		c.performRepository(q.Cache)
+	case msg.SectionRight:
+		c.performRight(q.Cache)
+	case msg.SectionSection:
+		c.performSection(q.Cache)
+	case msg.SectionTeam:
+		c.performTeam(q.Cache)
+	case msg.SectionUser:
+		c.performUser(q.Cache)
 	}
 }
 
