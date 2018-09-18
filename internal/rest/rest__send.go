@@ -11,6 +11,7 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/mjolnir42/soma/internal/msg"
@@ -32,6 +33,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	logEntry := x.reqLog.WithField(`RequestID`, r.ID.String()).
 		WithField(`Section`, r.Section).
 		WithField(`Action`, r.Action).
+		WithField(`Request`, fmt.Sprintf("%s::%s", r.Section, r.Action)).
 		WithField(`Phase`, `result`)
 
 	// this is central error command, proceeding to ErrorLog while
