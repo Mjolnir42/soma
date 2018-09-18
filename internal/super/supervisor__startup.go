@@ -9,11 +9,13 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
+	"strconv"
 	"time"
 
 	"github.com/mjolnir42/scrypth64"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -26,6 +28,8 @@ func (s *Supervisor) startupLoad() {
 	}
 
 	s.startupTokens()
+
+	s.startupTeam()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -160,4 +164,46 @@ func (s *Supervisor) startupTokens() {
 	}
 }
 
+func (s *Supervisor) startupTeam() {
+	var (
+		err              error
+		teamID, teamName string
+		isSystem         bool
+		ldapID           int
+		rows             *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.TeamLoad)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-team,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&teamID,
+			&teamName,
+			&ldapID,
+			&isSystem,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-team,scan: `, err)
+		}
+		go func(tID, tName string, lID int, isSys bool) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionTeam,
+				Action:  msg.ActionAdd,
+				Team: proto.Team{
+					ID:       tID,
+					Name:     tName,
+					LdapID:   strconv.Itoa(lID),
+					IsSystem: isSys,
+				},
+			})
+		}(teamID, teamName, ldapID, isSystem)
+		s.appLog.Infof("supervisor/startup: permCache update - loaded team: %s", teamName)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-team,next: `, err)
+	}
+}
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

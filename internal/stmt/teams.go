@@ -57,6 +57,13 @@ WHERE  organizational_team_id = $4::uuid;`
 	TeamDel = `
 DELETE FROM inventory.organizational_teams
 WHERE       organizational_team_id = $1;`
+
+	TeamLoad = `
+SELECT organizational_team_id,
+       organizational_team_name,
+       organizational_team_ldap_id,
+       organizational_team_system
+FROM   inventory.organizational_teams;`
 )
 
 func init() {
@@ -65,6 +72,7 @@ func init() {
 	m[SyncTeams] = `SyncTeams`
 	m[TeamAdd] = `TeamAdd`
 	m[TeamDel] = `TeamDel`
+	m[TeamLoad] = `TeamLoad`
 	m[TeamUpdate] = `TeamUpdate`
 }
 
