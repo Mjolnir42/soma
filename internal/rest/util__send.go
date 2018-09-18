@@ -22,7 +22,7 @@ import (
 
 // send is the output function for all requests that did not
 // fail input validation and got processes by the application.
-func send(w *http.ResponseWriter, r *msg.Result) {
+func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	var (
 		bjson  []byte
 		err    error

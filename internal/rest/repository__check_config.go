@@ -36,7 +36,7 @@ func (x *Rest) CheckConfigList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // CheckConfigSearch function
@@ -77,7 +77,7 @@ func (x *Rest) CheckConfigSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.CheckConfig = filtered
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // CheckConfigShow function
@@ -100,7 +100,7 @@ func (x *Rest) CheckConfigShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // CheckConfigCreate function
@@ -134,7 +134,7 @@ func (x *Rest) CheckConfigCreate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // CheckConfigDestroy function
@@ -165,7 +165,7 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

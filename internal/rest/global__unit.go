@@ -32,7 +32,7 @@ func (x *Rest) UnitList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // UnitShow function
@@ -52,7 +52,7 @@ func (x *Rest) UnitShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // UnitAdd function
@@ -79,7 +79,7 @@ func (x *Rest) UnitAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // UnitRemove function
@@ -105,7 +105,7 @@ func (x *Rest) UnitRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -32,7 +32,7 @@ func (x *Rest) StateList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // StateShow function
@@ -52,7 +52,7 @@ func (x *Rest) StateShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // StateAdd function
@@ -78,7 +78,7 @@ func (x *Rest) StateAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // StateRemove function
@@ -98,7 +98,7 @@ func (x *Rest) StateRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // StateRename function
@@ -125,7 +125,7 @@ func (x *Rest) StateRename(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

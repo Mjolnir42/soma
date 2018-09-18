@@ -34,7 +34,7 @@ func (x *Rest) RightList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RightShow function
@@ -56,7 +56,7 @@ func (x *Rest) RightShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RightSearch function
@@ -87,7 +87,7 @@ func (x *Rest) RightSearch(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RightGrant function
@@ -120,7 +120,7 @@ func (x *Rest) RightGrant(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RightRevoke function
@@ -142,7 +142,7 @@ func (x *Rest) RightRevoke(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

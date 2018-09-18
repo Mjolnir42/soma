@@ -53,7 +53,7 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // NodeConfigUnassign function
@@ -85,7 +85,7 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // NodeConfigPropertyCreate function
@@ -136,7 +136,7 @@ func (x *Rest) NodeConfigPropertyCreate(w http.ResponseWriter,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // NodeConfigPropertyDestroy function
@@ -196,7 +196,7 @@ func (x *Rest) NodeConfigPropertyDestroy(w http.ResponseWriter,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // NodeConfigPropertyUpdate function
@@ -227,7 +227,7 @@ func (x *Rest) NodeConfigTree(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

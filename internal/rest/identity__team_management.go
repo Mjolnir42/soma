@@ -34,7 +34,7 @@ func (x *Rest) TeamMgmtList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // TeamMgmtSearch function
@@ -76,7 +76,7 @@ func (x *Rest) TeamMgmtSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Team = filtered
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // TeamMgmtShow function
@@ -98,7 +98,7 @@ func (x *Rest) TeamMgmtShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // TeamMgmtSync function
@@ -118,7 +118,7 @@ func (x *Rest) TeamMgmtSync(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // TeamMgmtAdd function
@@ -144,7 +144,7 @@ func (x *Rest) TeamMgmtAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // TeamMgmtUpdate function
@@ -178,7 +178,7 @@ func (x *Rest) TeamMgmtUpdate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // TeamMgmtRemove function
@@ -200,7 +200,7 @@ func (x *Rest) TeamMgmtRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

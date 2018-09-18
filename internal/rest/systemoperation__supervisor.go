@@ -54,7 +54,7 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // SupervisorTokenInvalidate is the rest endpoint to invalidate
@@ -76,7 +76,7 @@ func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // SupervisorTokenInvalidateSelf is the rest endpoint for all users
@@ -98,7 +98,7 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // SupervisorTokenRequest is the encrypted endpoint used to
@@ -192,7 +192,7 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(w, &result)
+	x.send(w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

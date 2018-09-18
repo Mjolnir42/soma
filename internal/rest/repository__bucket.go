@@ -33,7 +33,7 @@ func (x *Rest) BucketList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // BucketSearch function
@@ -75,7 +75,7 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Bucket = filtered
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // BucketShow function
@@ -97,7 +97,7 @@ func (x *Rest) BucketShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // BucketTree function
@@ -120,7 +120,7 @@ func (x *Rest) BucketTree(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // BucketCreate function
@@ -160,7 +160,7 @@ func (x *Rest) BucketCreate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // BucketDestroy function
@@ -230,7 +230,7 @@ func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // BucketPropertyDestroy function
@@ -261,7 +261,7 @@ func (x *Rest) BucketPropertyDestroy(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // BucketPropertyUpdate function

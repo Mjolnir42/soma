@@ -35,7 +35,7 @@ func (x *Rest) ClusterList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterSearch function
@@ -78,7 +78,7 @@ func (x *Rest) ClusterSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Cluster = filtered
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterShow function
@@ -100,7 +100,7 @@ func (x *Rest) ClusterShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterTree function
@@ -124,7 +124,7 @@ func (x *Rest) ClusterTree(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterCreate function
@@ -159,7 +159,7 @@ func (x *Rest) ClusterCreate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterDestroy function
@@ -181,7 +181,7 @@ func (x *Rest) ClusterDestroy(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterMemberList function
@@ -203,7 +203,7 @@ func (x *Rest) ClusterMemberList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterMemberAssign function
@@ -233,7 +233,7 @@ func (x *Rest) ClusterMemberAssign(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterMemberUnassign function
@@ -266,7 +266,7 @@ func (x *Rest) ClusterMemberUnassign(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterPropertyCreate function
@@ -318,7 +318,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterPropertyDestroy function
@@ -374,7 +374,7 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // ClusterPropertyUpdate function
@@ -420,7 +420,7 @@ func (x *Rest) ClusterRename(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

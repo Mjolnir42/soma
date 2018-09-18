@@ -32,7 +32,7 @@ func (x *Rest) RepositoryConfigList(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RepositoryConfigSearch function
@@ -68,7 +68,7 @@ func (x *Rest) RepositoryConfigSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Repository = filtered
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RepositoryConfigShow function
@@ -88,7 +88,7 @@ func (x *Rest) RepositoryConfigShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RepositoryConfigTree function
@@ -111,7 +111,7 @@ func (x *Rest) RepositoryConfigTree(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RepositoryConfigPropertyCreate function
@@ -157,7 +157,7 @@ func (x *Rest) RepositoryConfigPropertyCreate(w http.ResponseWriter, r *http.Req
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RepositoryConfigPropertyDestroy function
@@ -186,7 +186,7 @@ func (x *Rest) RepositoryConfigPropertyDestroy(w http.ResponseWriter, r *http.Re
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // RepositoryConfigPropertyUpdate function
@@ -239,7 +239,7 @@ func (x *Rest) RepositoryConfigPropertyUpdate(w http.ResponseWriter, r *http.Req
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

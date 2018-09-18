@@ -56,7 +56,7 @@ func (x *Rest) PropertyMgmtServiceAdd(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 }
 
 // PropertyMgmtServiceRemove function
@@ -86,7 +86,7 @@ func (x *Rest) PropertyMgmtServiceRemove(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	send(&w, &result)
+	x.send(&w, &result)
 
 }
 
