@@ -88,6 +88,7 @@ func (s *Supervisor) startupRoot() {
 			&expiresAt,
 		); err == sql.ErrNoRows {
 			// root bootstrap outstanding
+			s.appLog.Infoln(`supervisor/startup: root account not bootstrapped yet`)
 			return
 		} else if err != nil {
 			s.errLog.Fatal(`supervisor/load-root-password: `, err)
@@ -97,6 +98,7 @@ func (s *Supervisor) startupRoot() {
 		}
 		s.credentials.insert(`root`, uuid.Nil, validFrom.UTC(),
 			msg.PosTimeInf.UTC(), mcf)
+		s.appLog.Infoln(`supervisor/startup: loaded root account configuration`)
 	}
 }
 
