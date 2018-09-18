@@ -55,7 +55,7 @@ WHERE  NOW() < valid_until;`
 	ExpireToken = `
 UPDATE auth.tokens
 SET    valid_until = $1::timestamptz
-WHERE  token = $1::varchar;`
+WHERE  token = $2::varchar;`
 )
 
 func init() {
