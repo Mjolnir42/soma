@@ -8,6 +8,8 @@
 package soma
 
 import (
+	"fmt"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/msg"
 )
@@ -18,8 +20,9 @@ func logRequest(l *logrus.Logger, q *msg.Request) {
 		WithField(`UserName`, q.AuthUser).
 		WithField(`Section`, q.Section).
 		WithField(`Action`, q.Action).
+		WithField(`Request`, fmt.Sprintf("%s::%s", q.Section, q.Action)).
 		WithField(`Phase`, `request`).
-		Infoln(`received by SOMA`)
+		Infoln(`received`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

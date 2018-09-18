@@ -43,10 +43,10 @@ func (s *Supervisor) password(q *msg.Request) {
 		WithField(`Action`, q.Action).
 		WithField(`Code`, result.Code).
 		WithField(`Verdict`, result.Super.Verdict).
-		WithField(`RequestType`, fmt.Sprintf(
-			"%s/%s", q.Section, q.Action)).
+		WithField(`Request`, fmt.Sprintf(
+			"%s::%s", q.Section, q.Action)).
 		WithField(`Supervisor`, fmt.Sprintf(
-			"%s/%s:%s", q.Section, q.Action, q.Super.Task))
+			"%s::%s=%s", q.Section, q.Action, q.Super.Task))
 
 	// password changes are master instance functions
 	if s.readonly {

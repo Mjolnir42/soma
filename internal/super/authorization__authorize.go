@@ -34,8 +34,8 @@ func IsAuthorized(q *msg.Request) bool {
 		WithField(`Action`, q.Action).
 		WithField(`Code`, 403).
 		WithField(`Verdict`, 403).
-		WithField(`RequestType`, fmt.Sprintf("%s/%s", q.Section, q.Action)).
-		WithField(`Supervisor`, fmt.Sprintf("%s/%s:%s", msg.SectionSupervisor, msg.ActionAuthorize, msg.ActionAuthorize))
+		WithField(`Request`, fmt.Sprintf("%s::%s", q.Section, q.Action)).
+		WithField(`Supervisor`, fmt.Sprintf("%s::%s=%s", msg.SectionSupervisor, msg.ActionAuthorize, msg.ActionAuthorize))
 
 	// the original request is wrapped because the http handler
 	// is reading from q.Reply
