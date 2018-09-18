@@ -12,9 +12,10 @@ package stmt
 const (
 	SupervisorPermissionStatements = ``
 
-	LoadPermissions = `
+	PermissionLoad = `
 SELECT permission_id,
-       permission_name
+       permission_name,
+       category
 FROM   soma.permissions;`
 
 	PermissionAdd = `
@@ -168,10 +169,10 @@ WHERE       permission_id = $1::uuid
 )
 
 func init() {
-	m[LoadPermissions] = `LoadPermissions`
 	m[PermissionAdd] = `PermissionAdd`
 	m[PermissionLinkGrant] = `PermissionLinkGrant`
 	m[PermissionList] = `PermissionList`
+	m[PermissionLoad] = `PermissionLoad`
 	m[PermissionLookupGrantID] = `PermissionLookupGrantID`
 	m[PermissionMapEntry] = `PermissionMapEntry`
 	m[PermissionMappedActions] = `PermissionMappedActions`

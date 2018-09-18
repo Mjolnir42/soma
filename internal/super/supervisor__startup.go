@@ -38,6 +38,8 @@ func (s *Supervisor) startupLoad() {
 	s.startupSection()
 
 	s.startupAction()
+
+	s.startupPermission()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -387,6 +389,49 @@ func (s *Supervisor) startupAction() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-action,next: `, err)
+	}
+}
+
+func (s *Supervisor) startupPermission() {
+	var (
+		err                          error
+		permissionID, permissionName string
+		category                     string
+		rows                         *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.PermissionLoad)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-permission,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&permissionID,
+			&permissionName,
+			&category,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-permission,scan: `, err)
+		}
+		go func(pID, pNam, cat string) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionPermission,
+				Action:  msg.ActionAdd,
+				Permission: proto.Permission{
+					ID:       pID,
+					Name:     pNam,
+					Category: cat,
+				},
+			})
+		}(permissionID, permissionName, category)
+		s.appLog.Infof("supervisor/startup: permCache update - loaded permission: %s|%s|%s",
+			permissionID,
+			permissionName,
+			category)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-permission,next: `, err)
 	}
 }
 
