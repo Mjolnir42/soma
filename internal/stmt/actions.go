@@ -41,6 +41,16 @@ JOIN   soma.sections ss
   ON   sa.section_id = ss.section_id
 WHERE  sa.action_id = $1::uuid;`
 
+	ActionLoad = `
+SELECT sa.action_id,
+       sa.action_name,
+       sa.section_id,
+       ss.section_name,
+       sa.category
+FROM   soma.actions sa
+JOIN   soma.sections ss
+  ON   sa.section_id = ss.section_id;`
+
 	ActionRemoveFromMap = `
 DELETE FROM soma.permission_map
 WHERE       action_id = $1::uuid;`
@@ -75,6 +85,7 @@ WHERE       NOT EXISTS (
 func init() {
 	m[ActionAdd] = `ActionAdd`
 	m[ActionList] = `ActionList`
+	m[ActionLoad] = `ActionLoad`
 	m[ActionRemoveFromMap] = `ActionRemoveFromMap`
 	m[ActionRemove] = `ActionRemove`
 	m[ActionSearch] = `ActionSearch`
