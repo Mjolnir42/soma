@@ -116,6 +116,23 @@ FROM   soma.permissions
 WHERE  permission_name = $1::varchar
   AND  category= $2::varchar;`
 
+	PermissionMapLoad = `
+SELECT    spm.mapping_id,
+          spm.category,
+          spm.permission_id,
+          sp.permission_name,
+          spm.section_id,
+          ss.section_name,
+          spm.action_id,
+          sa.action_name
+FROM      soma.permission_map spm
+JOIN      soma.permissions sp
+  ON      spm.permission_id = sp.permission_id
+JOIN      soma.sections ss
+  ON      spm.section_id = ss.section_id
+LEFT JOIN soma.actions sa
+  ON      spm.action_id = sa.action_id;`
+
 	PermissionMappedActions = `
 SELECT sa.action_id,
        sa.action_name,
@@ -175,6 +192,7 @@ func init() {
 	m[PermissionLoad] = `PermissionLoad`
 	m[PermissionLookupGrantID] = `PermissionLookupGrantID`
 	m[PermissionMapEntry] = `PermissionMapEntry`
+	m[PermissionMapLoad] = `PermissionMapLoad`
 	m[PermissionMappedActions] = `PermissionMappedActions`
 	m[PermissionMappedSections] = `PermissionMappedSections`
 	m[PermissionRemoveByName] = `PermissionRemoveByName`

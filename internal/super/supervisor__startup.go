@@ -40,6 +40,8 @@ func (s *Supervisor) startupLoad() {
 	s.startupAction()
 
 	s.startupPermission()
+
+	s.startupPermissionMap()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -432,6 +434,103 @@ func (s *Supervisor) startupPermission() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-permission,next: `, err)
+	}
+}
+
+func (s *Supervisor) startupPermissionMap() {
+	var (
+		err                          error
+		permissionID, permissionName string
+		mappingID, category          string
+		sectionID, sectionName       string
+		actionID, actionName         string
+		nullActionID, nullActionName sql.NullString
+		rows                         *sql.Rows
+		sectionMapping               bool
+	)
+
+	rows, err = s.conn.Query(stmt.PermissionMapLoad)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-permission-map,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&mappingID,
+			&category,
+			&permissionID,
+			&permissionName,
+			&sectionID,
+			&sectionName,
+			&nullActionID,
+			&nullActionName,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-permission-map,scan: `, err)
+		}
+		// ID and name must be NULL or NOT NULL at the same time
+		if nullActionID.Valid != nullActionName.Valid {
+			s.errLog.Fatalf("supervisor/load-permission-map,partial null action %s|%s", nullActionID, nullActionName)
+		}
+		switch nullActionID.Valid {
+		case true:
+			actionID = nullActionID.String
+			actionName = nullActionName.String
+			sectionMapping = false
+		default:
+			actionID = ``
+			actionName = ``
+			sectionMapping = true
+		}
+		go func(pID, pNam, mID, cat, sID, sNam, aID, aNam string, sm bool) {
+			switch sm {
+			case true:
+				s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+					Section: msg.SectionPermission,
+					Action:  msg.ActionMap,
+					Permission: proto.Permission{
+						ID:       pID,
+						Name:     pNam,
+						Category: cat,
+						Sections: &[]proto.Section{proto.Section{
+							ID:       sID,
+							Name:     sNam,
+							Category: cat,
+						}},
+					},
+				})
+			default:
+				s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+					Section: msg.SectionPermission,
+					Action:  msg.ActionMap,
+					Permission: proto.Permission{
+						ID:       pID,
+						Name:     pNam,
+						Category: cat,
+						Actions: &[]proto.Action{proto.Action{
+							ID:        aID,
+							Name:      aNam,
+							SectionID: sID,
+							Category:  cat,
+						}},
+					},
+				})
+			}
+		}(permissionID, permissionName, mappingID, category, sectionID, sectionName, actionID, actionName, sectionMapping)
+
+		s.appLog.Infof("supervisor/startup: permCache update - loaded permission map: %s|%s|%s|%s|%s|%s|%s|%s",
+			mappingID,
+			category,
+			permissionID,
+			permissionName,
+			sectionID,
+			sectionName,
+			actionID,
+			actionName,
+		)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-permission-map,next: `, err)
 	}
 }
 
