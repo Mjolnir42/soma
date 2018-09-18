@@ -99,6 +99,19 @@ WHERE  user_id = $1::uuid;`
 DELETE FROM inventory.users
 WHERE  user_id = $1::uuid
 AND    user_is_deleted;`
+
+	UserLoad = `
+SELECT user_id,
+       user_uid,
+       user_first_name,
+       user_last_name,
+       user_employee_number,
+       user_mail_address,
+       user_is_active,
+       user_is_system,
+       user_is_deleted,
+       organizational_team_id
+FROM   inventory.users;`
 )
 
 func init() {
@@ -108,6 +121,7 @@ func init() {
 	m[SyncUsers] = `SyncUsers`
 	m[UserAdd] = `UserAdd`
 	m[UserDel] = `UserDel`
+	m[UserLoad] = `UserLoad`
 	m[UserPurge] = `UserPurge`
 	m[UserUpdate] = `UserUpdate`
 }

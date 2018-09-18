@@ -30,6 +30,8 @@ func (s *Supervisor) startupLoad() {
 	s.startupTokens()
 
 	s.startupTeam()
+
+	s.startupUser()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -206,4 +208,61 @@ func (s *Supervisor) startupTeam() {
 		s.errLog.Fatal(`supervisor/load-team,next: `, err)
 	}
 }
+
+func (s *Supervisor) startupUser() {
+	var (
+		err                                  error
+		userID, userUID, firstName, lastName string
+		mailAddr, teamID                     string
+		isActive, isSystem, isDeleted        bool
+		employeeNum                          int
+		rows                                 *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.UserLoad)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-user,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&userID,
+			&userUID,
+			&firstName,
+			&lastName,
+			&employeeNum,
+			&mailAddr,
+			&isActive,
+			&isSystem,
+			&isDeleted,
+			&teamID,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-user,scan: `, err)
+		}
+		go func(uID, uUID, fName, lName, mAddr, tID string, eNum int, act, sys, del bool) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionUser,
+				Action:  msg.ActionAdd,
+				User: proto.User{
+					ID:             uID,
+					UserName:       uUID,
+					FirstName:      fName,
+					LastName:       lName,
+					EmployeeNumber: strconv.Itoa(eNum),
+					MailAddress:    mAddr,
+					IsActive:       act,
+					IsSystem:       sys,
+					IsDeleted:      del,
+					TeamID:         tID,
+				},
+			})
+		}(userID, userUID, firstName, lastName, mailAddr, teamID, employeeNum, isActive, isSystem, isDeleted)
+		s.appLog.Infof("supervisor/startup: permCache update - loaded user: %s", userUID)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-user,next: `, err)
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
