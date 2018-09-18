@@ -12,13 +12,14 @@ import (
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
-func msgRequest(l *logrus.Logger, q *msg.Request) {
-	l.Infof(msg.LogStrSRq,
-		q.Section,
-		q.Action,
-		q.AuthUser,
-		q.RemoteAddr,
-	)
+func logRequest(l *logrus.Logger, q *msg.Request) {
+	l.WithField(`RequestID`, q.ID.String()).
+		WithField(`IPAddr`, q.RemoteAddr).
+		WithField(`UserName`, q.AuthUser).
+		WithField(`Section`, q.Section).
+		WithField(`Action`, q.Action).
+		WithField(`Phase`, `request`).
+		Infoln(`received by SOMA`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

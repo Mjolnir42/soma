@@ -115,7 +115,7 @@ runloop:
 // process is the request dispatcher
 func (r *GroupRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)
-	msgRequest(r.reqLog, q)
+	logRequest(r.reqLog, q)
 
 	switch q.Action {
 	case msg.ActionList:

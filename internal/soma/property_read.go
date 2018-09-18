@@ -125,7 +125,7 @@ func (r *PropertyRead) PriorityIntake() chan msg.Request {
 // process is the request dispatcher
 func (r *PropertyRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)
-	msgRequest(r.reqLog, q)
+	logRequest(r.reqLog, q)
 
 	switch q.Action {
 	case msg.ActionList:

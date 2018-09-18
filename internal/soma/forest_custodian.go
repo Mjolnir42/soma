@@ -125,7 +125,7 @@ exit:
 // process is the request dispatcher
 func (f *ForestCustodian) process(q *msg.Request) {
 	result := msg.FromRequest(q)
-	msgRequest(f.reqLog, q)
+	logRequest(f.reqLog, q)
 
 	switch q.Action {
 	case msg.ActionCreate:

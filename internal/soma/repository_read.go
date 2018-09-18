@@ -114,7 +114,7 @@ runloop:
 // process is the event dispatcher for RepositoryRead
 func (r *RepositoryRead) process(q *msg.Request) {
 	result := msg.FromRequest(q)
-	msgRequest(r.reqLog, q)
+	logRequest(r.reqLog, q)
 
 	switch q.Action {
 	case msg.ActionList:

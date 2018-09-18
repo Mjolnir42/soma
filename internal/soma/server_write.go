@@ -105,7 +105,7 @@ runloop:
 // process is the request dispatcher
 func (w *ServerWrite) process(q *msg.Request) {
 	result := msg.FromRequest(q)
-	msgRequest(w.reqLog, q)
+	logRequest(w.reqLog, q)
 
 	switch q.Action {
 	case msg.ActionAdd:

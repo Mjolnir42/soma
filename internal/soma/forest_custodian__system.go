@@ -20,7 +20,7 @@ import (
 // sysProcess is the request dispatcher for privileged requests
 func (f *ForestCustodian) sysProcess(q *msg.Request) {
 	result := msg.FromRequest(q)
-	msgRequest(f.reqLog, q)
+	logRequest(f.reqLog, q)
 
 	switch q.Action {
 	case msg.ActionRepoRebuild:
