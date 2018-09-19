@@ -43,7 +43,7 @@ func (s *Supervisor) startupLoad() {
 
 	s.startupPermissionMap()
 
-	s.startupGrant()
+	s.startupGrantGlobalAuthorization()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -538,7 +538,7 @@ func (s *Supervisor) startupPermissionMap() {
 	}
 }
 
-func (s *Supervisor) startupGrant() {
+func (s *Supervisor) startupGrantGlobalAuthorization() {
 	var (
 		err                                 error
 		grantID, permissionID, category     string
