@@ -175,6 +175,21 @@ FROM   soma.authorizations_repository
 WHERE  permission_id = $1::uuid
   AND  category = $2::varchar;`
 
+	LoadRepositoryAuthorization = `
+SELECT grant_id,
+       user_id,
+       tool_id,
+       organizational_team_id,
+       category,
+       permission_id,
+       object_type,
+       repository_id,
+       bucket_id,
+       group_id,
+       cluster_id,
+       node_id
+FROM   soma.authorizations_repository;`
+
 	ListMonitoringAuthorization = `
 SELECT grant_id,
        user_id,
@@ -329,6 +344,7 @@ func init() {
 	m[ListTeamAuthorization] = `ListTeamAuthorization`
 	m[LoadGlobalAuthorization] = `LoadGlobalAuthorization`
 	m[LoadGlobalOrSystemUserGrants] = `LoadGlobalOrSystemUserGrants`
+	m[LoadRepositoryAuthorization] = `LoadRepositoryAuthorization`
 	m[RevokeGlobalAuthorization] = `RevokeGlobalAuthorization`
 	m[RevokeMonitoringAuthorization] = `RevokeMonitoringAuthorization`
 	m[RevokeRepositoryAuthorization] = `RevokeRepositoryAuthorization`
