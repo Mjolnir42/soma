@@ -44,6 +44,7 @@ func (s *Supervisor) startupLoad() {
 	s.startupPermissionMap()
 
 	s.startupGrantGlobalAuthorization()
+	s.startupGrantRepositoryAuthorization()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -605,6 +606,116 @@ func (s *Supervisor) startupGrantGlobalAuthorization() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-grant,next: `, err)
+	}
+}
+
+func (s *Supervisor) startupGrantRepositoryAuthorization() {
+	var (
+		err                                               error
+		grantID, permissionID, category                   string
+		recipientType, recipientID                        string
+		entityType, entityID                              string
+		nUserID, nToolID, nTeamID                         sql.NullString
+		nRepoID, nBucketID, nGroupID, nClusterID, nNodeID sql.NullString
+		rows                                              *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.LoadGlobalAuthorization)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-grant-repository,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&grantID,
+			&nUserID,
+			&nToolID,
+			&nTeamID,
+			&category,
+			&permissionID,
+			&entityType,
+			&nRepoID,
+			&nBucketID,
+			&nGroupID,
+			&nClusterID,
+			&nNodeID,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-grant-repository,scan: `, err)
+		}
+		// only one of the can be !NULL, enforced by database check
+		// constraint
+		switch {
+		case nUserID.Valid:
+			recipientType = msg.SubjectUser
+			recipientID = nUserID.String
+		case nToolID.Valid:
+			recipientType = msg.SubjectTool
+			recipientID = nToolID.String
+		case nTeamID.Valid:
+			recipientType = msg.SubjectTeam
+			recipientID = nTeamID.String
+		}
+		switch {
+		case nRepoID.Valid:
+			if entityType != msg.EntityRepository {
+				s.errLog.Fatal(`supervisor/load-grant-repository,validate: `,
+					`illegal entity mismatch`)
+			}
+			entityID = nRepoID.String
+		case nBucketID.Valid:
+			if entityType != msg.EntityBucket {
+				s.errLog.Fatal(`supervisor/load-grant-repository,validate: `,
+					`illegal entity mismatch`)
+			}
+			entityID = nBucketID.String
+		case nGroupID.Valid:
+			if entityType != msg.EntityGroup {
+				s.errLog.Fatal(`supervisor/load-grant-repository,validate: `,
+					`illegal entity mismatch`)
+			}
+			entityID = nGroupID.String
+		case nClusterID.Valid:
+			if entityType != msg.EntityCluster {
+				s.errLog.Fatal(`supervisor/load-grant-repository,validate: `,
+					`illegal entity mismatch`)
+			}
+			entityID = nClusterID.String
+		case nNodeID.Valid:
+			if entityType != msg.EntityNode {
+				s.errLog.Fatal(`supervisor/load-grant-repository,validate: `,
+					`illegal entity mismatch`)
+			}
+			entityID = nNodeID.String
+		}
+		go func(gID, cat, pID, rTyp, rID, oTyp, oID string) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionRight,
+				Action:  msg.ActionGrant,
+				Grant: proto.Grant{
+					ID:            gID,
+					Category:      category,
+					PermissionID:  permissionID,
+					RecipientType: rTyp,
+					RecipientID:   rID,
+					ObjectType:    oTyp,
+					ObjectID:      oID,
+				},
+			})
+		}(grantID, category, permissionID, recipientType, recipientID, entityType, entityID)
+
+		s.appLog.Infof("supervisor/startup: permCache update - loaded repository right grant: %s|%s|%s|%s|%s|%s|%s",
+			grantID,
+			category,
+			permissionID,
+			recipientType,
+			recipientID,
+			entityType,
+			entityID,
+		)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-grant-repository,next: `, err)
 	}
 }
 
