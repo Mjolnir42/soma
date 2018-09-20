@@ -45,6 +45,7 @@ func (s *Supervisor) startupLoad() {
 
 	s.startupGrantGlobalAuthorization()
 	s.startupGrantRepositoryAuthorization()
+	s.startupGrantMonitoringAuthorization()
 }
 
 func (s *Supervisor) startupRoot() {
