@@ -620,7 +620,7 @@ func (s *Supervisor) startupGrantRepositoryAuthorization() {
 		rows                                              *sql.Rows
 	)
 
-	rows, err = s.conn.Query(stmt.LoadGlobalAuthorization)
+	rows, err = s.conn.Query(stmt.LoadRepositoryAuthorization)
 	if err != nil {
 		s.errLog.Fatal(`supervisor/load-grant-repository,query: `, err)
 	}
