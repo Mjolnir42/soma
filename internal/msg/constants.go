@@ -211,6 +211,7 @@ const (
 	EntityCluster    = `cluster`
 	EntityNode       = `node`
 	EntityMonitoring = `monitoring`
+	EntityTeam       = `team`
 )
 
 // Subject types
