@@ -46,6 +46,7 @@ func (s *Supervisor) startupLoad() {
 	s.startupGrantGlobalAuthorization()
 	s.startupGrantRepositoryAuthorization()
 	s.startupGrantMonitoringAuthorization()
+	s.startupGrantTeamAuthorization()
 }
 
 func (s *Supervisor) startupRoot() {
@@ -787,6 +788,76 @@ func (s *Supervisor) startupGrantMonitoringAuthorization() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-grant-monitoring,next: `, err)
+	}
+}
+
+func (s *Supervisor) startupGrantTeamAuthorization() {
+	var (
+		err                                           error
+		grantID, permissionID, targetTeamID, category string
+		recipientType, recipientID                    string
+		nUserID, nToolID, nTeamID                     sql.NullString
+		rows                                          *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.LoadTeamAuthorization)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-grant-team,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&grantID,
+			&nUserID,
+			&nToolID,
+			&nTeamID,
+			&targetTeamID,
+			&permissionID,
+			&category,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-grant-team,scan: `, err)
+		}
+		// only one of the can be !NULL, enforced by database check
+		// constraint
+		switch {
+		case nUserID.Valid:
+			recipientType = msg.SubjectUser
+			recipientID = nUserID.String
+		case nToolID.Valid:
+			recipientType = msg.SubjectTool
+			recipientID = nToolID.String
+		case nTeamID.Valid:
+			recipientType = msg.SubjectTeam
+			recipientID = nTeamID.String
+		}
+		go func(gID, cat, pID, rTyp, rID, oID string) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionRight,
+				Action:  msg.ActionGrant,
+				Grant: proto.Grant{
+					ID:            gID,
+					Category:      category,
+					PermissionID:  permissionID,
+					RecipientType: rTyp,
+					RecipientID:   rID,
+					ObjectType:    msg.EntityTeam,
+					ObjectID:      oID,
+				},
+			})
+		}(grantID, category, permissionID, recipientType, recipientID, targetTeamID)
+
+		s.appLog.Infof("supervisor/startup: permCache update - loaded team right grant: %s|%s|%s|%s|%s|%s",
+			grantID,
+			category,
+			permissionID,
+			recipientType,
+			recipientID,
+			targetTeamID,
+		)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-grant-team,next: `, err)
 	}
 }
 
