@@ -719,4 +719,74 @@ func (s *Supervisor) startupGrantRepositoryAuthorization() {
 	}
 }
 
+func (s *Supervisor) startupGrantMonitoringAuthorization() {
+	var (
+		err                                           error
+		grantID, permissionID, monitoringID, category string
+		recipientType, recipientID                    string
+		nUserID, nToolID, nTeamID                     sql.NullString
+		rows                                          *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.LoadMonitoringAuthorization)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-grant-monitoring,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&grantID,
+			&nUserID,
+			&nToolID,
+			&nTeamID,
+			&monitoringID,
+			&permissionID,
+			&category,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-grant-monitoring,scan: `, err)
+		}
+		// only one of the can be !NULL, enforced by database check
+		// constraint
+		switch {
+		case nUserID.Valid:
+			recipientType = msg.SubjectUser
+			recipientID = nUserID.String
+		case nToolID.Valid:
+			recipientType = msg.SubjectTool
+			recipientID = nToolID.String
+		case nTeamID.Valid:
+			recipientType = msg.SubjectTeam
+			recipientID = nTeamID.String
+		}
+		go func(gID, cat, pID, rTyp, rID, oID string) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionRight,
+				Action:  msg.ActionGrant,
+				Grant: proto.Grant{
+					ID:            gID,
+					Category:      category,
+					PermissionID:  permissionID,
+					RecipientType: rTyp,
+					RecipientID:   rID,
+					ObjectType:    msg.EntityMonitoring,
+					ObjectID:      oID,
+				},
+			})
+		}(grantID, category, permissionID, recipientType, recipientID, monitoringID)
+
+		s.appLog.Infof("supervisor/startup: permCache update - loaded monitoring right grant: %s|%s|%s|%s|%s|%s",
+			grantID,
+			category,
+			permissionID,
+			recipientType,
+			recipientID,
+			monitoringID,
+		)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-grant-monitoring,next: `, err)
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
