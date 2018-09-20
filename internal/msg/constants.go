@@ -210,6 +210,7 @@ const (
 	EntityGroup      = `group`
 	EntityCluster    = `cluster`
 	EntityNode       = `node`
+	EntityMonitoring = `monitoring`
 )
 
 // Subject types
