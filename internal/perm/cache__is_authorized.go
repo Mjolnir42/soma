@@ -154,20 +154,24 @@ permloop:
 			objID = msg.InvalidObjectID
 		} else {
 			switch q.Section {
-			case `monitoringsystem`, `capability`:
+			// per-monitoring scope
+			case msg.SectionMonitoring, msg.SectionCapability, msg.SectionDeployment:
 				objID = q.Monitoring.ID
-				// per-team scope
-			case `property_service_team`:
+			// per-team scope
+			case msg.SectionPropertyService:
 				objID = q.Property.Service.TeamID
-			case `node`:
+			case msg.SectionNode:
 				objID = q.Node.TeamID
 			case msg.SectionRepository:
 				objID = q.Repository.TeamID
-			case `repository`, `instance`, `node-config`,
-				`property_custom`:
+			// per-repository scope
+			case msg.SectionInstance, msg.SectionNodeConfig, msg.SectionPropertyCustom,
+				msg.SectionRepositoryConfig:
 				objID = q.Repository.ID
-			case `bucket`, `clusters`, `checks`, `groups`:
+			case msg.SectionBucket, msg.SectionCluster, msg.SectionCheckConfig,
+				msg.SectionGroup:
 				objID = q.Bucket.ID
+			// global scope
 			default:
 				// invalid uuid
 				objID = msg.InvalidObjectID
@@ -182,15 +186,17 @@ permloop:
 				category, objID, permID, any) {
 				return true
 			}
-		case `bucket`, `instance`, `node-config`,
-			`property_custom`, `clusters`, `checks`, `groups`:
+		case msg.SectionBucket, msg.SectionCheckConfig, msg.SectionCluster,
+			msg.SectionGroup, msg.SectionInstance, msg.SectionNodeConfig,
+			msg.SectionPropertyCustom, msg.SectionRepositoryConfig:
 			// per-repository sections
 			if c.grantRepository.assess(subjectType, subjectID,
 				category, objID, permID, any) {
 				return true
 			}
 			switch q.Section {
-			case `bucket`, `clusters`, `checks`, `groups`:
+			case msg.SectionBucket, msg.SectionCluster, msg.SectionCheckConfig,
+				msg.SectionGroup:
 				// permission could be on the repository
 				objID = c.object.repoForBucket(q.Bucket.ID)
 				if objID == `` {
