@@ -151,7 +151,7 @@ permloop:
 		// determine objID
 		if any {
 			// invalid uuid
-			objID = `ffffffff-ffff-3fff-ffff-ffffffffffff`
+			objID = msg.InvalidObjectID
 		} else {
 			switch q.Section {
 			case `monitoringsystem`, `capability`:
@@ -170,7 +170,7 @@ permloop:
 				objID = q.Bucket.ID
 			default:
 				// invalid uuid
-				objID = `ffffffff-ffff-3fff-ffff-ffffffffffff`
+				objID = msg.InvalidObjectID
 			}
 		}
 

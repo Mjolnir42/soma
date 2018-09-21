@@ -212,6 +212,7 @@ const (
 	EntityNode       = `node`
 	EntityMonitoring = `monitoring`
 	EntityTeam       = `team`
+	InvalidObjectID  = `ffffffff-ffff-3fff-ffff-ffffffffffff`
 )
 
 // Subject types
