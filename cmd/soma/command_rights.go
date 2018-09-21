@@ -81,17 +81,19 @@ func cmdRightGrant(c *cli.Context) error {
 
 	// check optional argument chain
 	switch req.Grant.Category {
-	case `system`, `global`, `permission`, `operations`:
+	case msg.CategoryGlobal, msg.CategoryIdentity, msg.CategoryOperation,
+		msg.CategoryPermission, msg.CategorySelf, msg.CategorySystem:
 		fallthrough
-	case `global:grant`, `permission:grant`, `operations:grant`:
+	case msg.CategoryGrantGlobal, msg.CategoryGrantIdentity, msg.CategoryGrantOperation,
+		msg.CategoryGrantPermission, msg.CategoryGrantSelf:
 		if len(opts[`on`]) != 0 {
 			return fmt.Errorf("Permissions in category %s are global"+
 				" and require no 'on' keyword target.",
 				req.Grant.Category)
 		}
-	case `repository`, `team`, `monitoring`:
+	case msg.CategoryMonitoring, msg.CategoryRepository, msg.CategoryTeam:
 		fallthrough
-	case `repository:grant`, `team:grant`, `monitoring:grant`:
+	case msg.CategoryGrantMonitoring, msg.CategoryGrantRepository, msg.CategoryGrantTeam:
 		if len(opts[`on`]) != 1 {
 			return fmt.Errorf("Permissions in category %s require a"+
 				" target, specified via 'on' keyword.",
@@ -129,17 +131,17 @@ func cmdRightGrant(c *cli.Context) error {
 
 	if len(opts[`on`]) == 1 {
 		switch req.Grant.Category {
-		case `repository`, `repository:grant`:
+		case msg.CategoryRepository, msg.CategoryGrantRepository:
 			switch opts[`on`][0][0] {
-			case `repository`:
-				req.Grant.ObjectType = `repository`
+			case msg.EntityRepository:
+				req.Grant.ObjectType = msg.EntityRepository
 				if req.Grant.ObjectID, err = adm.LookupRepoID(
 					opts[`on`][0][1],
 				); err != nil {
 					return err
 				}
-			case `bucket`:
-				req.Grant.ObjectType = `bucket`
+			case msg.EntityBucket:
+				req.Grant.ObjectType = msg.EntityBucket
 				if req.Grant.ObjectID, err = adm.LookupBucketID(
 					opts[`on`][0][1],
 				); err != nil {
@@ -148,10 +150,10 @@ func cmdRightGrant(c *cli.Context) error {
 			default:
 				return fmt.Errorf(`Invalid`)
 			}
-		case `team`, `team:grant`:
+		case msg.CategoryTeam, msg.CategoryGrantTeam:
 			switch opts[`on`][0][0] {
-			case `team`:
-				req.Grant.ObjectType = `team`
+			case msg.EntityTeam:
+				req.Grant.ObjectType = msg.EntityTeam
 				if req.Grant.ObjectID, err = adm.LookupTeamID(
 					opts[`on`][0][1],
 				); err != nil {
@@ -160,10 +162,10 @@ func cmdRightGrant(c *cli.Context) error {
 			default:
 				return fmt.Errorf(`Invalid`)
 			}
-		case `monitoring`, `monitoring:grant`:
+		case msg.CategoryMonitoring, msg.CategoryGrantMonitoring:
 			switch opts[`on`][0][0] {
-			case `monitoring`:
-				req.Grant.ObjectType = `monitoring`
+			case msg.EntityMonitoring:
+				req.Grant.ObjectType = msg.EntityMonitoring
 				if req.Grant.ObjectID, err = adm.LookupMonitoringID(
 					opts[`on`][0][1],
 				); err != nil {
@@ -175,12 +177,13 @@ func cmdRightGrant(c *cli.Context) error {
 		}
 	}
 
-	path := fmt.Sprintf("/category/%s/permissions/%s/grant/",
+	path := fmt.Sprintf("/category/%s/permission/%s/grant/",
 		req.Grant.Category, req.Grant.PermissionID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
 func cmdRightRevoke(c *cli.Context) error {
+	// XXX TODO
 	return fmt.Errorf(`Not implemented - TODO`)
 	/*
 		opts := map[string][][2]string{}
@@ -211,8 +214,8 @@ func cmdRightRevoke(c *cli.Context) error {
 			return err
 		}
 
-		path := fmt.Sprintf("/grant/%s/%s/%s/%s", `category`, `user`, userId,
-			grantId)
+		path := fmt.Sprintf( "/category/%s/permission/%s/grant/%s"
+			`category`, permId, grantId)
 		return adm.Perform(`delete`, path, `command`, nil, c)
 	*/
 }

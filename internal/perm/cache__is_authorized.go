@@ -75,6 +75,12 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 		goto dispatch
 	}
 
+	// TODO if (       q.Super.Authorize.Section == msg.SectionRight )
+	// TODO    and (   q.Super.Authorize.Action  == msg.ActionGrant
+	// TODO         or q.Super.Authorize.Action  == msg.ActionRevoke )
+	// TODO then the user could also be authorized by a permission from
+	// TODO the :grant category
+
 	// lookup all permissionIDs that map either section or action
 	sectionPermIDs = c.pmap.getSectionPermissionID(sectionID)
 	actionPermIDs = c.pmap.getActionPermissionID(sectionID, actionID)
