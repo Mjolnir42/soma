@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -163,6 +163,9 @@ type CheckInstance struct {
 	InstanceServiceConfig map[string]string              // attr->value
 	InstanceService       string
 	InstanceSvcCfgHash    string
+	oldConstraintHash     string
+	oldConstraintValHash  string
+	oldInstanceSvcCfgHash string
 }
 
 func (c *Check) GetItemID(objType string, objID uuid.UUID) uuid.UUID {
@@ -351,6 +354,9 @@ func (tci *CheckInstance) calcConstraintHash() {
 			io.WriteString(h, l)
 		}
 	}
+	tci.oldConstraintHash = base64.URLEncoding.EncodeToString(h.Sum(nil))
+	io.WriteString(h, tci.ConfigID.String())
+	io.WriteString(h, tci.CheckID.String())
 	tci.ConstraintHash = base64.URLEncoding.EncodeToString(h.Sum(nil))
 }
 
@@ -426,6 +432,10 @@ func (tci *CheckInstance) calcConstraintValHash() {
 			}
 		}
 	}
+	tci.oldConstraintValHash = base64.URLEncoding.EncodeToString(h.Sum(nil))
+	io.WriteString(h, tci.ConfigID.String())
+	io.WriteString(h, tci.CheckID.String())
+	io.WriteString(h, tci.InstanceService)
 	tci.ConstraintValHash = base64.URLEncoding.EncodeToString(h.Sum(nil))
 }
 
@@ -442,6 +452,10 @@ func (tci *CheckInstance) calcInstanceSvcCfgHash() {
 		io.WriteString(h, i)
 		io.WriteString(h, tci.InstanceServiceConfig[i])
 	}
+	tci.oldInstanceSvcCfgHash = base64.URLEncoding.EncodeToString(h.Sum(nil))
+	io.WriteString(h, tci.ConfigID.String())
+	io.WriteString(h, tci.CheckID.String())
+	io.WriteString(h, tci.InstanceService)
 	tci.InstanceSvcCfgHash = base64.URLEncoding.EncodeToString(h.Sum(nil))
 }
 
@@ -465,6 +479,66 @@ func (tci CheckInstance) MakeAction() Action {
 			InstanceServiceConfig: string(serviceCfg),
 		},
 	}
+}
+
+func (tci *CheckInstance) MatchConstraints(target *CheckInstance) bool {
+	if tci.matchConstraintHash(target) && tci.matchConstraintValHash(target) {
+		return true
+	}
+	if tci.matchOldInstance(target) {
+		return true
+	}
+	return false
+}
+
+func (tci *CheckInstance) MatchServiceConstraints(target *CheckInstance) bool {
+	if tci.matchInstanceSvcCfgHash(target) && tci.MatchConstraints(target) {
+		return true
+	}
+	if tci.matchOldService(target) {
+		return true
+	}
+	return false
+}
+
+func (tci *CheckInstance) matchConstraintHash(target *CheckInstance) bool {
+	if tci.ConstraintHash == target.ConstraintHash {
+		return true
+	}
+	return false
+}
+
+func (tci *CheckInstance) matchConstraintValHash(target *CheckInstance) bool {
+	if tci.ConstraintValHash == target.ConstraintValHash {
+		return true
+	}
+	return false
+}
+
+func (tci *CheckInstance) matchOldInstance(target *CheckInstance) bool {
+	if tci.oldConstraintHash == target.oldConstraintHash &&
+		uuid.Equal(tci.ConfigID, target.ConfigID) &&
+		tci.oldConstraintValHash == target.oldConstraintValHash {
+		return true
+	}
+	return false
+}
+
+func (tci *CheckInstance) matchInstanceSvcCfgHash(target *CheckInstance) bool {
+	if tci.InstanceSvcCfgHash == target.InstanceSvcCfgHash {
+		return true
+	}
+	return false
+}
+
+func (tci *CheckInstance) matchOldService(target *CheckInstance) bool {
+	if tci.oldInstanceSvcCfgHash == target.oldInstanceSvcCfgHash &&
+		tci.oldConstraintHash == target.oldConstraintHash &&
+		tci.oldConstraintValHash == target.oldConstraintValHash &&
+		uuid.Equal(tci.ConfigID, target.ConfigID) {
+		return true
+	}
+	return false
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

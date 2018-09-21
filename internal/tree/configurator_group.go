@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -331,9 +331,7 @@ checksloop:
 					}
 					// check if an instance exists bound against the
 					// same constraints
-					if ldInst.ConstraintHash == inst.ConstraintHash &&
-						uuid.Equal(ldInst.ConfigID, inst.ConfigID) &&
-						ldInst.ConstraintValHash == inst.ConstraintValHash {
+					if inst.MatchConstraints(&ldInst) {
 
 						// found a match
 						inst.InstanceID, _ = uuid.FromString(ldInstID)
@@ -478,11 +476,7 @@ checksloop:
 				if startupLoad {
 					for ldInstID, ldInst := range teg.loadedInstances[i] {
 						// check for data from loaded instance
-						if ldInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash &&
-							ldInst.ConstraintHash == inst.ConstraintHash &&
-							ldInst.ConstraintValHash == inst.ConstraintValHash &&
-							ldInst.InstanceService == inst.InstanceService &&
-							uuid.Equal(ldInst.ConfigID, inst.ConfigID) {
+						if inst.MatchServiceConstraints(&ldInst) {
 
 							// found a match
 							inst.InstanceID, _ = uuid.FromString(ldInstID)
