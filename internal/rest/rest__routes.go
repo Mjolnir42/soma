@@ -202,7 +202,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.GET(rtDeploymentID, x.CheckShutdown(x.DeploymentShow))
 			router.GET(rtDeploymentState, x.CheckShutdown(x.DeploymentPending))
 			router.GET(rtDeploymentStateID, x.CheckShutdown(x.DeploymentFilter))
-			router.GET(rtRepositoryAudit, x.Verify(x.RepositoryAudit))
+			router.GET(rtTeamRepositoryIDAudit, x.Verify(x.RepositoryAudit))
 			router.PATCH(`/accounts/password/:kexID`, x.CheckShutdown(x.SupervisorPasswordChange))
 			router.PATCH(`/oncall/:oncall`, x.Verify(x.OncallUpdate))
 			router.PATCH(`/workflow/retry`, x.Verify(x.WorkflowRetry))

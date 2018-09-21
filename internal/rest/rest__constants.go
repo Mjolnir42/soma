@@ -10,7 +10,6 @@ package rest // import "github.com/mjolnir42/soma/internal/rest"
 const (
 	rtRepository                 = `/repository/`
 	rtRepositoryID               = `/repository/:repositoryID`
-	rtRepositoryAudit            = `/repository/:repositoryID/audit`
 	rtRepositoryInstance         = `/repository/:repositoryID/instance/`
 	rtRepositoryInstanceID       = `/repository/:repositoryID/instance/:instanceID`
 	rtRepositoryInstanceVersions = `/repository/:repositoryID/instance/:instanceID/versions`
@@ -69,6 +68,7 @@ const (
 	rtPropertyMgmt               = `/property-mgmt/:propertyType/`
 	rtPropertyMgmtID             = `/property-mgmt/:propertyType/:propertyID`
 	rtTeamRepositoryID           = `/team/:teamID/repository/:repositoryID`
+	rtTeamRepositoryIDAudit      = `/team/:teamID/repository/:repositoryID/audit`
 	rtTeamPropertyMgmt           = `/team/:teamID/property-mgmt/:propertyType/`
 	rtTeamPropertyMgmtID         = `/team/:teamID/property-mgmt/:propertyType/:propertyID`
 	rtSearchRepository           = `/search/repository/`
