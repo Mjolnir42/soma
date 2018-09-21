@@ -23,6 +23,7 @@ func (x *Rest) RepositoryDestroy(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionRepository
 	request.Action = msg.ActionDestroy
 	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Repository.TeamID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

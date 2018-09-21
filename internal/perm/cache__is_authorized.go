@@ -156,10 +156,13 @@ permloop:
 			switch q.Section {
 			case `monitoringsystem`, `capability`:
 				objID = q.Monitoring.ID
+				// per-team scope
 			case `property_service_team`:
 				objID = q.Property.Service.TeamID
 			case `node`:
 				objID = q.Node.TeamID
+			case msg.SectionRepository:
+				objID = q.Repository.TeamID
 			case `repository`, `instance`, `node-config`,
 				`property_custom`:
 				objID = q.Repository.ID
@@ -173,13 +176,13 @@ permloop:
 
 		// check authorization
 		switch q.Section {
-		case `monitoringsystem`, `capability`:
+		case msg.SectionMonitoring, msg.SectionCapability, msg.SectionDeployment:
 			// per-monitoring sections
 			if c.grantMonitoring.assess(subjectType, subjectID,
 				category, objID, permID, any) {
 				return true
 			}
-		case `repository`, `bucket`, `instance`, `node-config`,
+		case `bucket`, `instance`, `node-config`,
 			`property_custom`, `clusters`, `checks`, `groups`:
 			// per-repository sections
 			if c.grantRepository.assess(subjectType, subjectID,
@@ -198,7 +201,7 @@ permloop:
 					return true
 				}
 			}
-		case `node`, `property_service_team`:
+		case msg.SectionNode, msg.SectionPropertyService, msg.SectionRepository:
 			// per-team sections
 			if c.grantTeam.assess(subjectType, subjectID,
 				category, objID, permID, any) {

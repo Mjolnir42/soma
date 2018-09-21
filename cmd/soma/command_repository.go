@@ -164,7 +164,11 @@ func cmdRepositoryDestroy(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/repository/%s", id)
+	teamID, err := adm.LookupTeamByRepo(id)
+	if err != nil {
+		return err
+	}
+	path := fmt.Sprintf("/team/%s/repository/%s", teamID, id)
 
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }

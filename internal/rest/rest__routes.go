@@ -192,7 +192,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(rtNodeUnassign, x.Verify(x.NodeConfigUnassign))
 			router.DELETE(rtPermissionID, x.Verify(x.PermissionRemove))
 			router.DELETE(rtPropertyMgmtID, x.Verify(x.PropertyMgmtRemove))
-			router.DELETE(rtRepositoryID, x.Verify(x.RepositoryDestroy))
+			router.DELETE(rtTeamRepositoryID, x.Verify(x.RepositoryDestroy))
 			router.DELETE(rtRepositoryPropertyID, x.Verify(x.RepositoryConfigPropertyDestroy))
 			router.DELETE(rtRepositoryPropertyMgmtID, x.Verify(x.PropertyMgmtCustomRemove))
 			router.DELETE(rtRightID, x.Verify(x.RightRevoke))
