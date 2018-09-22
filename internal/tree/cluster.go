@@ -40,6 +40,7 @@ type Cluster struct {
 	ordChildrenNod  map[int]string
 	hasUpdate       bool
 	log             *log.Logger
+	lock            sync.RWMutex
 }
 
 type ClusterSpec struct {
