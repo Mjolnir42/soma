@@ -245,6 +245,12 @@ const (
 )
 
 const (
+	SystemPropertyDisableAllMonitoring      = `disable_all_monitoring`
+	SystemPropertyDisableCheckConfiguration = `disable_check_configuration`
+	ViewLocal                               = `local`
+)
+
+const (
 	// RFC3339Milli is a format string for millisecond precision RFC3339
 	RFC3339Milli string = "2006-01-02T15:04:05.000Z07:00"
 	// LogStrReq is a format string for logging requests (deprecated)
