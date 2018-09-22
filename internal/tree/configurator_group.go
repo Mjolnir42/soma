@@ -15,10 +15,10 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (teg *Group) evalNativeProp(prop string, val string) bool {
+func (g *Group) evalNativeProp(prop string, val string) bool {
 	switch prop {
 	case msg.NativePropertyEnvironment:
-		env := teg.Parent.(Bucketeer).GetEnvironment()
+		env := g.Parent.(Bucketeer).GetEnvironment()
 		if val == env {
 			return true
 		}
@@ -27,7 +27,7 @@ func (teg *Group) evalNativeProp(prop string, val string) bool {
 			return true
 		}
 	case msg.NativePropertyState:
-		if val == teg.State {
+		if val == g.State {
 			return true
 		}
 	case msg.NativePropertyHardwareNode:
@@ -37,8 +37,8 @@ func (teg *Group) evalNativeProp(prop string, val string) bool {
 	return false
 }
 
-func (teg *Group) evalSystemProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range teg.PropertySystem {
+func (g *Group) evalSystemProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range g.PropertySystem {
 		t := v.(*PropertySystem)
 		if t.Key == prop && (t.Value == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.Key, true, t.Value
@@ -47,8 +47,8 @@ func (teg *Group) evalSystemProp(prop string, val string, view string) (string, 
 	return "", false, ""
 }
 
-func (teg *Group) evalOncallProp(prop string, val string, view string) (string, bool) {
-	for _, v := range teg.PropertyOncall {
+func (g *Group) evalOncallProp(prop string, val string, view string) (string, bool) {
+	for _, v := range g.PropertyOncall {
 		t := v.(*PropertyOncall)
 		if "OncallID" == prop && t.ID.String() == val && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true
@@ -57,8 +57,8 @@ func (teg *Group) evalOncallProp(prop string, val string, view string) (string, 
 	return "", false
 }
 
-func (teg *Group) evalCustomProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range teg.PropertyCustom {
+func (g *Group) evalCustomProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range g.PropertyCustom {
 		t := v.(*PropertyCustom)
 		if t.Key == prop && (t.Value == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.Key, true, t.Value
@@ -67,8 +67,8 @@ func (teg *Group) evalCustomProp(prop string, val string, view string) (string, 
 	return "", false, ""
 }
 
-func (teg *Group) evalServiceProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range teg.PropertyService {
+func (g *Group) evalServiceProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range g.PropertyService {
 		t := v.(*PropertyService)
 		if prop == "name" && (t.Service == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true, t.Service
@@ -77,8 +77,8 @@ func (teg *Group) evalServiceProp(prop string, val string, view string) (string,
 	return "", false, ""
 }
 
-func (teg *Group) evalAttributeOfService(svcID string, view string, attribute string, value string) (bool, string) {
-	t := teg.PropertyService[svcID].(*PropertyService)
+func (g *Group) evalAttributeOfService(svcID string, view string, attribute string, value string) (bool, string) {
+	t := g.PropertyService[svcID].(*PropertyService)
 	for _, a := range t.Attributes {
 		if a.Name == attribute && (t.View == view || t.View == `any`) && (a.Value == value || value == `@defined`) {
 			return true, a.Value
@@ -87,10 +87,10 @@ func (teg *Group) evalAttributeOfService(svcID string, view string, attribute st
 	return false, ""
 }
 
-func (teg *Group) evalAttributeProp(view string, attr string, value string) (bool, map[string]string) {
+func (g *Group) evalAttributeProp(view string, attr string, value string) (bool, map[string]string) {
 	f := map[string]string{}
 svcloop:
-	for _, v := range teg.PropertyService {
+	for _, v := range g.PropertyService {
 		t := v.(*PropertyService)
 		for _, a := range t.Attributes {
 			if a.Name == attr && (a.Value == value || value == `@defined`) && (t.View == view || t.View == `any`) {
@@ -105,9 +105,9 @@ svcloop:
 	return false, f
 }
 
-func (teg *Group) getServiceMap(serviceID string) map[string][]string {
+func (g *Group) getServiceMap(serviceID string) map[string][]string {
 	svc := new(PropertyService)
-	svc = teg.PropertyService[serviceID].(*PropertyService)
+	svc = g.PropertyService[serviceID].(*PropertyService)
 
 	res := map[string][]string{}
 	for _, v := range svc.Attributes {
@@ -674,7 +674,7 @@ func (g *Group) createPerServiceCheckInstances(ctx *checkContext) {
 				g.lock.Unlock()
 				g.lock.RLock()
 			default:
-				// lookup existing instance ids for check in teg.CheckInstances
+				// lookup existing instance ids for check in g.CheckInstances
 				// to determine if this is an update
 				for _, exInstID := range g.CheckInstances[ctx.uuid] {
 					exInst := g.Instances[exInstID]
