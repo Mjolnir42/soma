@@ -257,7 +257,7 @@ checksloop:
 			// if a check has two attribute constraints on the same
 			// attribute, then len(attributeC[id]) != len(attributes)
 			for id := range attributeC {
-				if ten.countAttribC(attributeC[id]) != attrCount {
+				if countAttributeConstraints(attributeC[id]) != attrCount {
 					delete(serviceC, id)
 					delete(attributeC, id)
 				}
