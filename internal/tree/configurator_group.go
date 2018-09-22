@@ -8,612 +8,12 @@
 
 package tree
 
-import uuid "github.com/satori/go.uuid"
+import (
+	"sync"
 
-func (teg *Group) updateCheckInstances() {
-	repoName := teg.GetRepositoryName()
-
-	// object may have no checks, but there could be instances to mop up
-	if len(teg.Checks) == 0 && len(teg.Instances) == 0 {
-		teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, HasChecks=%t",
-			repoName,
-			`UpdateCheckInstances`,
-			`group`,
-			teg.ID.String(),
-			false,
-		)
-		// found nothing to do, ensure update flag is unset again
-		teg.hasUpdate = false
-		return
-	}
-
-	// if there are loaded instances, then this is the initial rebuild
-	// of the tree
-	startupLoad := false
-	if len(teg.loadedInstances) > 0 {
-		startupLoad = true
-	}
-
-	// if this is not the startupLoad and there are no updates, then there
-	// is noting to do
-	if !startupLoad && !teg.hasUpdate {
-		return
-	}
-
-	// scan over all current checkinstances if their check still exists.
-	// If not the check has been deleted and the spawned instances need
-	// a good deletion
-	for ck := range teg.CheckInstances {
-		if _, ok := teg.Checks[ck]; ok {
-			// check still exists
-			continue
-		}
-
-		// check no longer exists -> cleanup
-		inst := teg.CheckInstances[ck]
-		for _, i := range inst {
-			teg.actionCheckInstanceDelete(teg.Instances[i].MakeAction())
-			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
-				repoName,
-				`CleanupInstance`,
-				`group`,
-				teg.ID.String(),
-				ck,
-				i,
-			)
-			delete(teg.Instances, i)
-		}
-		delete(teg.CheckInstances, ck)
-	}
-
-	// loop over all checks and test if there is a reason to disable
-	// its check instances. And with disable we mean delete.
-	for chk := range teg.Checks {
-		disableThis := false
-		// disable this check if the system property
-		// `disable_all_monitoring` is set for the view that the check
-		// uses.
-		if _, hit, _ := teg.evalSystemProp(
-			`disable_all_monitoring`,
-			`true`,
-			teg.Checks[chk].View,
-		); hit {
-			disableThis = true
-		}
-		// disable this check if the system property
-		// `disable_check_configuration` is set to the
-		// check_configuration that spawned this check
-		if _, hit, _ := teg.evalSystemProp(
-			`disable_check_configuration`,
-			teg.Checks[chk].ConfigID.String(),
-			teg.Checks[chk].View,
-		); hit {
-			disableThis = true
-		}
-		// if there was a reason to disable this check, all instances
-		// are deleted
-		if disableThis {
-			if instanceArray, ok := teg.CheckInstances[chk]; ok {
-				for _, i := range instanceArray {
-					teg.actionCheckInstanceDelete(teg.Instances[i].MakeAction())
-					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
-						repoName,
-						`RemoveDisabledInstance`,
-						`group`,
-						teg.ID.String(),
-						chk,
-						i,
-					)
-					delete(teg.Instances, i)
-				}
-				delete(teg.CheckInstances, chk)
-			}
-		}
-	}
-
-	// process remaining checks
-checksloop:
-	for i := range teg.Checks {
-		if teg.Checks[i].Inherited == false && teg.Checks[i].ChildrenOnly == true {
-			continue checksloop
-		}
-		if teg.Checks[i].View == "local" {
-			continue checksloop
-		}
-		// skip check if its view has `disable_all_monitoring`
-		// property set
-		if _, hit, _ := teg.evalSystemProp(
-			`disable_all_monitoring`,
-			`true`,
-			teg.Checks[i].View,
-		); hit {
-			continue checksloop
-		}
-		// skip check if there is a matching `disable_check_configuration`
-		// property
-		if _, hit, _ := teg.evalSystemProp(
-			`disable_check_configuration`,
-			teg.Checks[i].ConfigID.String(),
-			teg.Checks[i].View,
-		); hit {
-			continue checksloop
-		}
-
-		hasBrokenConstraint := false
-		hasServiceConstraint := false
-		hasAttributeConstraint := false
-		view := teg.Checks[i].View
-
-		attributes := []CheckConstraint{}
-		oncallC := ""                                  // Id
-		systemC := map[string]string{}                 // Id->Value
-		nativeC := map[string]string{}                 // Property->Value
-		serviceC := map[string]string{}                // Id->Value
-		customC := map[string]string{}                 // Id->Value
-		attributeC := map[string]map[string][]string{} // svcID->attr->[ value, ... ]
-
-		newInstances := map[string]CheckInstance{}
-		newCheckInstances := []string{}
-
-		// these constaint types must always match for the instance to
-		// be valid. defer service and attribute
-	constraintcheck:
-		for _, c := range teg.Checks[i].Constraints {
-			switch c.Type {
-			case "native":
-				if teg.evalNativeProp(c.Key, c.Value) {
-					nativeC[c.Key] = c.Value
-				} else {
-					hasBrokenConstraint = true
-					break constraintcheck
-				}
-			case "system":
-				if id, hit, bind := teg.evalSystemProp(c.Key, c.Value, view); hit {
-					systemC[id] = bind
-				} else {
-					hasBrokenConstraint = true
-					break constraintcheck
-				}
-			case "oncall":
-				if id, hit := teg.evalOncallProp(c.Key, c.Value, view); hit {
-					oncallC = id
-				} else {
-					hasBrokenConstraint = true
-					break constraintcheck
-				}
-			case "custom":
-				if id, hit, bind := teg.evalCustomProp(c.Key, c.Value, view); hit {
-					customC[id] = bind
-				} else {
-					hasBrokenConstraint = true
-					break constraintcheck
-				}
-			case "service":
-				hasServiceConstraint = true
-				if id, hit, bind := teg.evalServiceProp(c.Key, c.Value, view); hit {
-					serviceC[id] = bind
-				} else {
-					hasBrokenConstraint = true
-					break constraintcheck
-				}
-			case "attribute":
-				hasAttributeConstraint = true
-				attributes = append(attributes, c)
-			}
-		}
-		if hasBrokenConstraint {
-			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
-				repoName,
-				`ConstraintEvaluation`,
-				`group`,
-				teg.ID.String(),
-				i,
-				false,
-			)
-			continue checksloop
-		}
-
-		/* if the check has both service and attribute constraints,
-		* then for the check to hit, the tree element needs to have
-		* all the services, and each of them needs to match all
-		* attribute constraints
-		 */
-		if hasServiceConstraint && hasAttributeConstraint {
-		svcattrloop:
-			for id := range serviceC {
-				for _, attr := range attributes {
-					hit, bind := teg.evalAttributeOfService(id, view, attr.Key, attr.Value)
-					if hit {
-						if attributeC[id] == nil {
-							// attributeC[id] might still be a nil map
-							attributeC[id] = map[string][]string{}
-						}
-						attributeC[id][attr.Key] = append(attributeC[id][attr.Key], bind)
-					} else {
-						hasBrokenConstraint = true
-						break svcattrloop
-					}
-				}
-			}
-			/* if the check has only attribute constraints and no
-			* service constraint, then we pull in every service that
-			* matches all attribute constraints and generate a check
-			* instance for it
-			 */
-		} else if hasAttributeConstraint {
-			attrCount := len(attributes)
-			for _, attr := range attributes {
-				hit, svcIDMap := teg.evalAttributeProp(view, attr.Key, attr.Value)
-				if hit {
-					for id, bind := range svcIDMap {
-						serviceC[id] = svcIDMap[id]
-						if attributeC[id] == nil {
-							// attributeC[id] might still be a nil map
-							attributeC[id] = make(map[string][]string)
-						}
-						attributeC[id][attr.Key] = append(attributeC[id][attr.Key], bind)
-					}
-				}
-			}
-			// delete all services that did not match all attributes
-			//
-			// if a check has two attribute constraints on the same
-			// attribute, then len(attributeC[id]) != len(attributes)
-			for id := range attributeC {
-				if teg.countAttribC(attributeC[id]) != attrCount {
-					delete(serviceC, id)
-					delete(attributeC, id)
-				}
-			}
-			// declare service constraints in effect if we found a
-			// service that bound all attribute constraints
-			if len(serviceC) > 0 {
-				hasServiceConstraint = true
-			} else {
-				// found no services that fulfilled all constraints
-				hasBrokenConstraint = true
-			}
-		}
-		if hasBrokenConstraint {
-			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
-				repoName,
-				`ConstraintEvaluation`,
-				`group`,
-				teg.ID.String(),
-				i,
-				false,
-			)
-			continue checksloop
-		}
-		// check triggered, create instances
-		teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
-			repoName,
-			`ConstraintEvaluation`,
-			`group`,
-			teg.ID.String(),
-			i,
-			true,
-		)
-
-		/* if there are no service constraints, one check instance is
-		* created for this check
-		 */
-		if !hasServiceConstraint {
-			inst := CheckInstance{
-				InstanceID: uuid.UUID{},
-				CheckID: func(id string) uuid.UUID {
-					f, _ := uuid.FromString(id)
-					return f
-				}(i),
-				ConfigID: func(id string) uuid.UUID {
-					f, _ := uuid.FromString(teg.Checks[id].ConfigID.String())
-					return f
-				}(i),
-				InstanceConfigID:      uuid.Must(uuid.NewV4()),
-				ConstraintOncall:      oncallC,
-				ConstraintService:     serviceC,
-				ConstraintSystem:      systemC,
-				ConstraintCustom:      customC,
-				ConstraintNative:      nativeC,
-				ConstraintAttribute:   attributeC,
-				InstanceService:       "",
-				InstanceServiceConfig: nil,
-				InstanceSvcCfgHash:    "",
-			}
-			inst.calcConstraintHash()
-			inst.calcConstraintValHash()
-
-			if startupLoad {
-			nosvcstartinstanceloop:
-				for ldInstID, ldInst := range teg.loadedInstances[i] {
-					if ldInst.InstanceSvcCfgHash != "" {
-						continue nosvcstartinstanceloop
-					}
-					// check if an instance exists bound against the
-					// same constraints
-					if inst.MatchConstraints(&ldInst) {
-
-						// found a match
-						inst.InstanceID, _ = uuid.FromString(ldInstID)
-						inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
-						inst.Version = ldInst.Version
-						delete(teg.loadedInstances[i], ldInstID)
-						teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
-							repoName,
-							`ComputeInstance`,
-							`group`,
-							teg.ID.String(),
-							i,
-							ldInstID,
-							false,
-						)
-						goto nosvcstartinstancematch
-					}
-				}
-				// if we hit here, then we just computed an instance
-				// that we could not match to any loaded instances
-				// -> something is wrong
-				teg.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
-					" ObjType=%s, ObjId=%s, CheckID=%s", `group`, teg.ID.String(), i, repoName)
-				teg.Fault.Error <- &Error{Action: `Failed to match a computed instance to loaded data`}
-				return
-			nosvcstartinstancematch:
-			} else {
-			nosvcinstanceloop:
-				for _, exInstID := range teg.CheckInstances[i] {
-					exInst := teg.Instances[exInstID]
-					// ignore instances with service constraints
-					if exInst.InstanceSvcCfgHash != "" {
-						continue nosvcinstanceloop
-					}
-					// check if an instance exists bound against the same
-					// constraints
-					if exInst.ConstraintHash == inst.ConstraintHash {
-						inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
-						inst.Version = exInst.Version + 1
-						break nosvcinstanceloop
-					}
-				}
-				if uuid.Equal(uuid.Nil, inst.InstanceID) {
-					// no match was found during nosvcinstanceloop, this
-					// is a new instance
-					inst.Version = 0
-					inst.InstanceID = uuid.Must(uuid.NewV4())
-				}
-				teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
-					repoName,
-					`ComputeInstance`,
-					`group`,
-					teg.ID.String(),
-					i,
-					inst.InstanceID.String(),
-					false,
-				)
-			}
-			newInstances[inst.InstanceID.String()] = inst
-			newCheckInstances = append(newCheckInstances, inst.InstanceID.String())
-		}
-
-		/* if service constraints are in effect, then we generate
-		* instances for every service that bound.
-		* Since service attributes can be specified more than once,
-		* but the semantics are unclear what the expected behaviour of
-		* for example a file age check is that is specified against
-		* more than one file path; all possible attribute value
-		* permutations for each service are built and then one check
-		* instance is built for each of these service config
-		* permutations.
-		 */
-	serviceconstraintloop:
-		for svcID := range serviceC {
-			if !hasServiceConstraint {
-				break serviceconstraintloop
-			}
-
-			svcCfg := teg.getServiceMap(svcID)
-
-			// calculate how many instances this service spawns
-			combinations := 1
-			for attr := range svcCfg {
-				combinations = combinations * len(svcCfg[attr])
-			}
-
-			// build all attribute combinations
-			results := make([]map[string]string, 0, combinations)
-			for attr := range svcCfg {
-				if len(results) == 0 {
-					for i := range svcCfg[attr] {
-						res := map[string]string{}
-						res[attr] = svcCfg[attr][i]
-						results = append(results, res)
-					}
-					continue
-				}
-				ires := make([]map[string]string, 0, combinations)
-				for r := range results {
-					for j := range svcCfg[attr] {
-						res := map[string]string{}
-						for k, v := range results[r] {
-							res[k] = v
-						}
-						res[attr] = svcCfg[attr][j]
-						ires = append(ires, res)
-					}
-				}
-				results = ires
-			}
-			// build a CheckInstance for every result
-			for _, y := range results {
-				// ensure we have a full copy and not a header copy
-				cfg := map[string]string{}
-				for k, v := range y {
-					cfg[k] = v
-				}
-				inst := CheckInstance{
-					InstanceID: uuid.UUID{},
-					CheckID: func(id string) uuid.UUID {
-						f, _ := uuid.FromString(id)
-						return f
-					}(i),
-					ConfigID: func(id string) uuid.UUID {
-						f, _ := uuid.FromString(teg.Checks[id].ConfigID.String())
-						return f
-					}(i),
-					InstanceConfigID:      uuid.Must(uuid.NewV4()),
-					ConstraintOncall:      oncallC,
-					ConstraintService:     serviceC,
-					ConstraintSystem:      systemC,
-					ConstraintCustom:      customC,
-					ConstraintNative:      nativeC,
-					ConstraintAttribute:   attributeC,
-					InstanceService:       svcID,
-					InstanceServiceConfig: cfg,
-				}
-				inst.calcConstraintHash()
-				inst.calcConstraintValHash()
-				inst.calcInstanceSvcCfgHash()
-
-				if startupLoad {
-					for ldInstID, ldInst := range teg.loadedInstances[i] {
-						// check for data from loaded instance
-						if inst.MatchServiceConstraints(&ldInst) {
-
-							// found a match
-							inst.InstanceID, _ = uuid.FromString(ldInstID)
-							inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
-							inst.Version = ldInst.Version
-							// we can assume InstanceServiceConfig to
-							// be equal, since InstanceSvcCfgHash is
-							// equal
-							delete(teg.loadedInstances[i], ldInstID)
-							teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
-								repoName,
-								`ComputeInstance`,
-								`group`,
-								teg.ID.String(),
-								i,
-								ldInstID,
-								true,
-							)
-							goto startinstancematch
-						}
-					}
-					// if we hit here, then just computed an
-					// instance that we could not match to any
-					// loaded instances -> something is wrong
-					teg.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
-						" ObjType=%s, ObjId=%s, CheckID=%s", `group`, teg.ID.String(), i, repoName)
-					teg.Fault.Error <- &Error{Action: `Failed to match a computed instance to loaded data`}
-					return
-				startinstancematch:
-				} else {
-					// lookup existing instance ids for check in teg.CheckInstances
-					// to determine if this is an update
-				instanceloop:
-					for _, exInstID := range teg.CheckInstances[i] {
-						exInst := teg.Instances[exInstID]
-						// this existing instance is for the same service
-						// configuration -> this is an update
-						if exInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash {
-							inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
-							inst.Version = exInst.Version + 1
-							break instanceloop
-						}
-					}
-					if uuid.Equal(uuid.Nil, inst.InstanceID) {
-						// no match was found during instanceloop, this is
-						// a new instance
-						inst.Version = 0
-						inst.InstanceID = uuid.Must(uuid.NewV4())
-					}
-					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
-						repoName,
-						`ComputeInstance`,
-						`group`,
-						teg.ID.String(),
-						i,
-						inst.InstanceID.String(),
-						true,
-					)
-				}
-				newInstances[inst.InstanceID.String()] = inst
-				newCheckInstances = append(newCheckInstances, inst.InstanceID.String())
-			}
-		} // LOOPEND: range serviceC
-
-		// all instances have been built and matched to
-		// loaded instances, but there are loaded
-		// instances left. why?
-		if startupLoad && len(teg.loadedInstances[i]) != 0 {
-			teg.Fault.Error <- &Error{Action: `Leftover matched instances after assignment, computed instances missing`}
-			return
-		}
-
-		// all new check instances have been built, check which
-		// existing instances did not get an update and need to be
-		// deleted
-		for _, oldInstanceID := range teg.CheckInstances[i] {
-			if _, ok := newInstances[oldInstanceID]; !ok {
-				// there is no new version for this instance id
-				teg.actionCheckInstanceDelete(teg.Instances[oldInstanceID].MakeAction())
-				teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
-					repoName,
-					`DeleteInstance`,
-					`group`,
-					teg.ID.String(),
-					i,
-					oldInstanceID,
-				)
-				delete(teg.Instances, oldInstanceID)
-				continue
-			}
-			delete(teg.Instances, oldInstanceID)
-			teg.Instances[oldInstanceID] = newInstances[oldInstanceID]
-			teg.actionCheckInstanceUpdate(teg.Instances[oldInstanceID].MakeAction())
-			teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
-				repoName,
-				`UpdateInstance`,
-				`group`,
-				teg.ID.String(),
-				i,
-				oldInstanceID,
-			)
-		}
-		for _, newInstanceID := range newCheckInstances {
-			if _, ok := teg.Instances[newInstanceID]; !ok {
-				// this instance is new, not an update
-				teg.Instances[newInstanceID] = newInstances[newInstanceID]
-				// no need to send a create action during load; the
-				// action channel is drained anyway
-				if !startupLoad {
-					teg.actionCheckInstanceCreate(teg.Instances[newInstanceID].MakeAction())
-					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
-						repoName,
-						`CreateInstance`,
-						`group`,
-						teg.ID.String(),
-						i,
-						newInstanceID,
-					)
-				} else {
-					teg.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
-						repoName,
-						`RecreateInstance`,
-						`group`,
-						teg.ID.String(),
-						i,
-						newInstanceID,
-					)
-				}
-			}
-		}
-		delete(teg.CheckInstances, i)
-		teg.CheckInstances[i] = newCheckInstances
-	} // LOOPEND: range teg.Checks
-
-	// completed the pass, reset update flag
-	teg.hasUpdate = false
-}
+	"github.com/mjolnir42/soma/internal/msg"
+	uuid "github.com/satori/go.uuid"
+)
 
 func (teg *Group) evalNativeProp(prop string, val string) bool {
 	switch prop {
@@ -716,12 +116,667 @@ func (teg *Group) getServiceMap(serviceID string) map[string][]string {
 	return res
 }
 
-func (teg *Group) countAttribC(attributeC map[string][]string) int {
-	var count int
-	for key := range attributeC {
-		count = count + len(attributeC[key])
+func (g *Group) updateCheckInstances() {
+	// object may have no checks, but there could be instances to mop up
+	if len(g.Checks) == 0 && len(g.Instances) == 0 {
+		g.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, HasChecks=%t",
+			g.GetRepositoryName(),
+			`UpdateCheckInstances`,
+			`group`,
+			g.ID.String(),
+			false,
+		)
+		// found nothing to do, ensure update flag is unset again
+		g.hasUpdate = false
+		return
 	}
-	return count
+
+	// if there are loaded instances, then this is the initial rebuild
+	// of the tree
+	startup := false
+	if len(g.loadedInstances) > 0 {
+		startup = true
+	}
+
+	// if this is not the startupLoad and there are no updates, then there
+	// is noting to do
+	if !startup && !g.hasUpdate {
+		return
+	}
+
+	g.deleteOrphanCheckInstances()
+
+	g.removeDisabledCheckInstances()
+
+	g.calculateCheckInstances(startup)
+}
+
+func (g *Group) deleteOrphanCheckInstances() {
+	g.lock.Lock()
+	defer g.lock.Unlock()
+	// scan over all current checkinstances if their check still exists.
+	// If not the check has been deleted and the spawned instances need
+	// a good deletion
+	for ck := range g.CheckInstances {
+		if _, ok := g.Checks[ck]; ok {
+			// check still exists
+			continue
+		}
+
+		// check no longer exists -> cleanup
+		inst := g.CheckInstances[ck]
+		for _, i := range inst {
+			g.actionCheckInstanceDelete(g.Instances[i].MakeAction())
+			g.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
+				g.GetRepositoryName(),
+				`CleanupInstance`,
+				`group`,
+				g.ID.String(),
+				ck,
+				i,
+			)
+			delete(g.Instances, i)
+		}
+		delete(g.CheckInstances, ck)
+	}
+}
+
+func (g *Group) removeDisabledCheckInstances() {
+	g.lock.Lock()
+	defer g.lock.Unlock()
+	// loop over all checks and test if there is a reason to disable
+	// its check instances. And with disable we mean delete.
+	for chk := range g.Checks {
+		disableThis := false
+		// disable this check if the system property
+		// `disable_all_monitoring` is set for the view that the check
+		// uses.
+		if _, hit, _ := g.evalSystemProp(
+			msg.SystemPropertyDisableAllMonitoring,
+			`true`,
+			g.Checks[chk].View,
+		); hit {
+			disableThis = true
+		}
+		// disable this check if the system property
+		// `disable_check_configuration` is set to the
+		// check_configuration that spawned this check
+		if _, hit, _ := g.evalSystemProp(
+			msg.SystemPropertyDisableCheckConfiguration,
+			g.Checks[chk].ConfigID.String(),
+			g.Checks[chk].View,
+		); hit {
+			disableThis = true
+		}
+		// if there was a reason to disable this check, all instances
+		// are deleted
+		if disableThis {
+			if instanceArray, ok := g.CheckInstances[chk]; ok {
+				for _, i := range instanceArray {
+					g.actionCheckInstanceDelete(g.Instances[i].MakeAction())
+					g.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
+						g.GetRepositoryName(),
+						`RemoveDisabledInstance`,
+						`group`,
+						g.ID.String(),
+						chk,
+						i,
+					)
+					delete(g.Instances, i)
+				}
+				delete(g.CheckInstances, chk)
+			}
+		}
+	}
+}
+
+func (g *Group) calculateCheckInstances(startup bool) {
+	wg := sync.WaitGroup{}
+	for i := range g.Checks {
+		wg.Add(1)
+		go func(name string) {
+			defer wg.Done()
+			g.processCheckForUpdates(name, startup)
+		}(i)
+	}
+	wg.Wait()
+
+	// completed the pass, reset update flag
+	g.hasUpdate = false
+}
+
+func (g *Group) processCheckForUpdates(chkName string, startup bool) {
+	g.lock.RLock()
+	if g.Checks[chkName].Inherited == false && g.Checks[chkName].ChildrenOnly == true {
+		// not active here
+		g.lock.RUnlock()
+		return
+	}
+	if g.Checks[chkName].View == msg.ViewLocal {
+		// groups have no local view
+		g.lock.RUnlock()
+		return
+	}
+	if _, hit, _ := g.evalSystemProp(
+		// skip check if `disable_all_monitoring` property is set
+		msg.SystemPropertyDisableAllMonitoring,
+		`true`,
+		g.Checks[chkName].View,
+	); hit {
+		g.lock.RUnlock()
+		return
+	}
+	if _, hit, _ := g.evalSystemProp(
+		// skip check if `disable_check_configuration` property is set
+		msg.SystemPropertyDisableCheckConfiguration,
+		g.Checks[chkName].ConfigID.String(),
+		g.Checks[chkName].View,
+	); hit {
+		g.lock.RUnlock()
+		return
+	}
+
+	ctx := newCheckContext(chkName, g.Checks[chkName].View, startup)
+	g.lock.RUnlock()
+
+	g.constraintCheck(ctx)
+	g.log.Printf(
+		"TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
+		g.GetRepositoryName(), `ConstraintEvaluation`, `group`,
+		g.ID.String(), chkName, ctx.brokeConstraint,
+	)
+	if ctx.brokeConstraint {
+		return
+	}
+
+	// check triggered, create instances
+	switch {
+	case !ctx.hasServiceConstraint:
+		/* if there are no service constraints, one check instance is
+		 * created for this check
+		 */
+		g.createNoServiceCheckInstance(ctx)
+	default:
+		/* if service constraints are in effect, then we generate
+		 * instances for every service that bound.
+		 * Since service attributes can be specified more than once,
+		 * but the semantics are unclear what the expected behaviour of
+		 * for example a file age check is that is specified against
+		 * more than one file path; all possible attribute value
+		 * permutations for each service are built and then one check
+		 * instance is built for each of these service config
+		 * permutations.
+		 */
+		g.createPerServiceCheckInstances(ctx)
+	}
+
+	if ctx.startupBroken {
+		return
+	}
+
+	// all new check instances have been built, check which
+	// existing instances did not get an update and need to be
+	// deleted
+	if !ctx.startup {
+		g.pruneOldCheckInstances(ctx)
+		g.dispatchCheckInstanceUpdates(ctx)
+	}
+
+	g.createNewCheckInstances(ctx)
+
+	delete(g.CheckInstances, ctx.uuid)
+	g.CheckInstances[ctx.uuid] = ctx.newCheckInstances
+}
+
+func (g *Group) constraintCheck(ctx *checkContext) {
+	g.lock.RLock()
+	defer g.lock.RUnlock()
+	// these constaint types must always match for the instance to
+	// be valid. defer service and attribute
+	for _, c := range g.Checks[ctx.uuid].Constraints {
+		switch c.Type {
+		case msg.ConstraintNative:
+			if g.evalNativeProp(c.Key, c.Value) {
+				ctx.nativeConstr[c.Key] = c.Value
+				continue
+			}
+			ctx.brokeConstraint = true
+			return
+		case msg.ConstraintSystem:
+			if id, hit, bind := g.evalSystemProp(c.Key, c.Value, ctx.view); hit {
+				ctx.systemConstr[id] = bind
+				continue
+			}
+			ctx.brokeConstraint = true
+			return
+		case msg.ConstraintOncall:
+			if id, hit := g.evalOncallProp(c.Key, c.Value, ctx.view); hit {
+				ctx.oncallConstr = id
+				continue
+			}
+			ctx.brokeConstraint = true
+			return
+		case msg.ConstraintCustom:
+			if id, hit, bind := g.evalCustomProp(c.Key, c.Value, ctx.view); hit {
+				ctx.customConstr[id] = bind
+				continue
+			}
+			ctx.brokeConstraint = true
+			return
+		case msg.ConstraintService:
+			ctx.hasServiceConstraint = true
+			if id, hit, bind := g.evalServiceProp(c.Key, c.Value, ctx.view); hit {
+				ctx.serviceConstr[id] = bind
+				continue
+			}
+			ctx.brokeConstraint = true
+			return
+		case msg.ConstraintAttribute:
+			ctx.hasAttributeConstraint = true
+			ctx.attributes = append(ctx.attributes, c)
+		}
+	}
+
+	switch {
+	case ctx.hasServiceConstraint && ctx.hasAttributeConstraint:
+		/* if the check has both service and attribute constraints,
+		* then for the check to hit, the tree element needs to have
+		* all the services, and each of them needs to match all
+		* attribute constraints
+		 */
+		for id := range ctx.serviceConstr {
+			for _, attr := range ctx.attributes {
+				hit, bind := g.evalAttributeOfService(id, ctx.view, attr.Key, attr.Value)
+				if hit {
+					// attributeC[id] might still be a nil map
+					if ctx.attributeConstr[id] == nil {
+						ctx.attributeConstr[id] = make(map[string][]string)
+					}
+					ctx.attributeConstr[id][attr.Key] = append(
+						ctx.attributeConstr[id][attr.Key],
+						bind,
+					)
+					continue
+				}
+				ctx.brokeConstraint = true
+				return
+			}
+		}
+	case ctx.hasAttributeConstraint && !ctx.hasServiceConstraint:
+		/* if the check has only attribute constraints and no
+		* service constraint, then we pull in every service that
+		* matches all attribute constraints and generate a check
+		* instance for it
+		 */
+		attrCount := len(ctx.attributes)
+		for _, attr := range ctx.attributes {
+			if hit, svcIDMap := g.evalAttributeProp(ctx.view, attr.Key, attr.Value); hit {
+				for id, bind := range svcIDMap {
+					ctx.serviceConstr[id] = svcIDMap[id]
+					// attributeC[id] might still be a nil map
+					if ctx.attributeConstr[id] == nil {
+						ctx.attributeConstr[id] = make(map[string][]string)
+					}
+					ctx.attributeConstr[id][attr.Key] = append(
+						ctx.attributeConstr[id][attr.Key],
+						bind,
+					)
+				}
+			}
+		}
+		// delete all services that did not match all attributes
+		//
+		// if a check has two attribute constraints on the same
+		// attribute, then len(attributeC[id]) != len(attributes)
+		for id := range ctx.attributeConstr {
+			if countAttributeConstraints(ctx.attributeConstr[id]) != attrCount {
+				delete(ctx.serviceConstr, id)
+				delete(ctx.attributeConstr, id)
+			}
+		}
+		// declare service constraints in effect if we found a
+		// service that bound all attribute constraints
+		switch len(ctx.serviceConstr) {
+		case 0:
+			// found no services that fulfilled all constraints
+			ctx.brokeConstraint = true
+		default:
+			ctx.hasServiceConstraint = true
+		}
+	}
+}
+
+func (g *Group) createNoServiceCheckInstance(ctx *checkContext) {
+	g.lock.RLock()
+	defer g.lock.RUnlock()
+
+	inst := CheckInstance{
+		InstanceID: uuid.UUID{},
+		CheckID: func(id string) uuid.UUID {
+			f, _ := uuid.FromString(id)
+			return f
+		}(ctx.uuid),
+		ConfigID: func(id string) uuid.UUID {
+			f, _ := uuid.FromString(g.Checks[id].ConfigID.String())
+			return f
+		}(ctx.uuid),
+		InstanceConfigID:      uuid.Must(uuid.NewV4()),
+		ConstraintOncall:      ctx.oncallConstr,
+		ConstraintService:     ctx.serviceConstr,
+		ConstraintSystem:      ctx.systemConstr,
+		ConstraintCustom:      ctx.customConstr,
+		ConstraintNative:      ctx.nativeConstr,
+		ConstraintAttribute:   ctx.attributeConstr,
+		InstanceService:       ``,
+		InstanceServiceConfig: nil,
+		InstanceSvcCfgHash:    ``,
+	}
+	inst.calcConstraintHash()
+	inst.calcConstraintValHash()
+
+	switch ctx.startup {
+	case true:
+		// upgrade to writelock
+		g.lock.RUnlock()
+		g.lock.Lock()
+		matched := false
+
+		for loadedID, loadedInst := range g.loadedInstances[ctx.uuid] {
+			if loadedInst.InstanceSvcCfgHash != `` {
+				continue
+			}
+			// check if an instance exists bound against the
+			// same constraints
+			if inst.MatchConstraints(&loadedInst) {
+				// found a match
+				matched = true
+
+				inst.InstanceID, _ = uuid.FromString(loadedID)
+				inst.InstanceConfigID, _ = uuid.FromString(
+					loadedInst.InstanceConfigID.String(),
+				)
+				inst.Version = loadedInst.Version
+				delete(g.loadedInstances[ctx.uuid], loadedID)
+				g.log.Printf(
+					"TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, "+
+						"InstanceID=%s, ServiceConstrained=%t", g.GetRepositoryName(),
+					`ComputeInstance`, `group`, g.ID.String(), ctx.uuid,
+					loadedID, false,
+				)
+				break
+			}
+		}
+		if !matched {
+			// downgrade to readlock
+			g.lock.Unlock()
+			g.lock.RLock()
+
+			g.log.Printf("TK[%s]: Failed to match computed instance to loaded instances."+
+				" ObjType=%s, ObjId=%s, CheckID=%s", `group`, g.ID.String(), ctx.uuid,
+				g.GetRepositoryName())
+			g.Fault.Error <- &Error{
+				Action: `Failed to match a computed instance to loaded data`,
+			}
+			ctx.startupBroken = true
+			return
+		}
+		// downgrade to readlock
+		g.lock.Unlock()
+		g.lock.RLock()
+	default:
+		for _, existingInstanceID := range g.CheckInstances[ctx.uuid] {
+			existingInstance := g.Instances[existingInstanceID]
+
+			// ignore instances with service constraints
+			if existingInstance.InstanceSvcCfgHash != inst.InstanceSvcCfgHash {
+				continue
+			}
+
+			// check if an instance exists bound against the same constraints
+			if existingInstance.ConstraintHash == inst.ConstraintHash {
+				inst.InstanceID, _ = uuid.FromString(
+					existingInstance.InstanceID.String(),
+				)
+				inst.Version = existingInstance.Version + 1
+				break
+			}
+		}
+		if uuid.Equal(uuid.Nil, inst.InstanceID) {
+			// no match was found during nosvcinstanceloop, this
+			// is a new instance
+			inst.Version = 0
+			inst.InstanceID = uuid.Must(uuid.NewV4())
+		}
+		g.log.Printf(
+			"TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, "+
+				"InstanceID=%s, ServiceConstrained=%t", g.GetRepositoryName(),
+			`ComputeInstance`, `group`, g.ID.String(), ctx.uuid, inst.InstanceID.String(),
+			false,
+		)
+	}
+
+	ctx.newInstances[inst.InstanceID.String()] = inst
+	ctx.newCheckInstances = append(ctx.newCheckInstances, inst.InstanceID.String())
+}
+
+func (g *Group) createPerServiceCheckInstances(ctx *checkContext) {
+	g.lock.RLock()
+	defer g.lock.RUnlock()
+
+	for svcID := range ctx.serviceConstr {
+		svcCfg := g.getServiceMap(svcID)
+
+		// calculate how many instances this service spawns
+		combinations := 1
+		for attr := range svcCfg {
+			combinations = combinations * len(svcCfg[attr])
+		}
+
+		// build all attribute combinations
+		results := make([]map[string]string, 0, combinations)
+		for attr := range svcCfg {
+			if len(results) == 0 {
+				for i := range svcCfg[attr] {
+					res := map[string]string{}
+					res[attr] = svcCfg[attr][i]
+					results = append(results, res)
+				}
+				continue
+			}
+			ires := make([]map[string]string, 0, combinations)
+			for r := range results {
+				for j := range svcCfg[attr] {
+					res := map[string]string{}
+					for k, v := range results[r] {
+						res[k] = v
+					}
+					res[attr] = svcCfg[attr][j]
+					ires = append(ires, res)
+				}
+			}
+			results = ires
+		}
+		// build a CheckInstance for every result
+		for _, y := range results {
+			// ensure we have a full copy and not a header copy
+			cfg := map[string]string{}
+			for k, v := range y {
+				cfg[k] = v
+			}
+			inst := CheckInstance{
+				InstanceID: uuid.UUID{},
+				CheckID: func(id string) uuid.UUID {
+					f, _ := uuid.FromString(id)
+					return f
+				}(ctx.uuid),
+				ConfigID: func(id string) uuid.UUID {
+					f, _ := uuid.FromString(g.Checks[id].ConfigID.String())
+					return f
+				}(ctx.uuid),
+				InstanceConfigID:      uuid.Must(uuid.NewV4()),
+				ConstraintOncall:      ctx.oncallConstr,
+				ConstraintService:     ctx.serviceConstr,
+				ConstraintSystem:      ctx.systemConstr,
+				ConstraintCustom:      ctx.customConstr,
+				ConstraintNative:      ctx.nativeConstr,
+				ConstraintAttribute:   ctx.attributeConstr,
+				InstanceService:       svcID,
+				InstanceServiceConfig: cfg,
+			}
+			inst.calcConstraintHash()
+			inst.calcConstraintValHash()
+			inst.calcInstanceSvcCfgHash()
+
+			switch ctx.startup {
+			case true:
+				// upgrade to writelock
+				g.lock.RUnlock()
+				g.lock.Lock()
+				matched := false
+
+				for ldInstID, ldInst := range g.loadedInstances[ctx.uuid] {
+					// check for data from loaded instance
+					if inst.MatchServiceConstraints(&ldInst) {
+						// found a match
+						matched = true
+
+						inst.InstanceID, _ = uuid.FromString(ldInstID)
+						inst.InstanceConfigID, _ = uuid.FromString(ldInst.InstanceConfigID.String())
+						inst.Version = ldInst.Version
+						// we can assume InstanceServiceConfig to
+						// be equal, since InstanceSvcCfgHash is
+						// equal
+						delete(g.loadedInstances[ctx.uuid], ldInstID)
+						g.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s,"+
+							"CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
+							g.GetRepositoryName(), `ComputeInstance`, `group`,
+							g.ID.String(), ctx.uuid, ldInstID, true,
+						)
+						break
+					}
+				}
+				if !matched {
+					// downgrade to readlock
+					g.lock.Unlock()
+					g.lock.RLock()
+
+					g.log.Printf(
+						"TK[%s]: Failed to match computed instance to loaded instances."+
+							" ObjType=%s, ObjId=%s, CheckID=%s", `group`, g.ID.String(),
+						ctx.uuid, g.GetRepositoryName())
+					g.Fault.Error <- &Error{
+						Action: `Failed to match a computed instance to loaded data`,
+					}
+					ctx.startupBroken = true
+					return
+				}
+				// downgrade to readlock
+				g.lock.Unlock()
+				g.lock.RLock()
+			default:
+				// lookup existing instance ids for check in teg.CheckInstances
+				// to determine if this is an update
+				for _, exInstID := range g.CheckInstances[ctx.uuid] {
+					exInst := g.Instances[exInstID]
+					// this existing instance is for the same service
+					// configuration -> this is an update
+					if exInst.InstanceSvcCfgHash == inst.InstanceSvcCfgHash {
+						inst.InstanceID, _ = uuid.FromString(exInst.InstanceID.String())
+						inst.Version = exInst.Version + 1
+						break
+					}
+				}
+				if uuid.Equal(uuid.Nil, inst.InstanceID) {
+					// no match was found during instanceloop, this is
+					// a new instance
+					inst.Version = 0
+					inst.InstanceID = uuid.Must(uuid.NewV4())
+				}
+				g.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, "+
+					"InstanceID=%s, ServiceConstrained=%t", g.GetRepositoryName(),
+					`ComputeInstance`, `group`, g.ID.String(), ctx.uuid,
+					inst.InstanceID.String(), true,
+				)
+			}
+
+			ctx.newInstances[inst.InstanceID.String()] = inst
+			ctx.newCheckInstances = append(
+				ctx.newCheckInstances,
+				inst.InstanceID.String(),
+			)
+		}
+	}
+	if ctx.startup {
+		// all instances have been built and matched to
+		// loaded instances, but there are loaded
+		// instances left. why?
+		if len(g.loadedInstances[ctx.uuid]) != 0 {
+			g.Fault.Error <- &Error{
+				Action: "Leftover matched instances after assignment, " +
+					"computed instances missing",
+			}
+			ctx.startupBroken = true
+		}
+	}
+}
+
+func (g *Group) pruneOldCheckInstances(ctx *checkContext) {
+	g.lock.Lock()
+	defer g.lock.Unlock()
+
+	for _, oldInstanceID := range g.CheckInstances[ctx.uuid] {
+		if _, ok := ctx.newInstances[oldInstanceID]; !ok {
+			// there is no new version for oldInstanceID
+			g.actionCheckInstanceDelete(g.Instances[oldInstanceID].MakeAction())
+			g.log.Printf(
+				"TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
+				g.GetRepositoryName(), `DeleteInstance`, `group`, g.ID.String(),
+				ctx.uuid, oldInstanceID,
+			)
+			delete(g.Instances, oldInstanceID)
+		}
+	}
+}
+
+func (g *Group) dispatchCheckInstanceUpdates(ctx *checkContext) {
+	g.lock.Lock()
+	defer g.lock.Unlock()
+
+	for _, oldInstanceID := range g.CheckInstances[ctx.uuid] {
+		delete(g.Instances, oldInstanceID)
+		g.Instances[oldInstanceID] = ctx.newInstances[oldInstanceID]
+		g.actionCheckInstanceUpdate(g.Instances[oldInstanceID].MakeAction())
+		g.log.Printf(
+			"TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
+			g.GetRepositoryName(), `UpdateInstance`, `group`, g.ID.String(),
+			ctx.uuid, oldInstanceID,
+		)
+	}
+}
+
+func (g *Group) createNewCheckInstances(ctx *checkContext) {
+	g.lock.Lock()
+	defer g.lock.Unlock()
+
+	for _, newInstanceID := range ctx.newCheckInstances {
+		if _, ok := g.Instances[newInstanceID]; !ok {
+			// this instance is new, not an update
+			g.Instances[newInstanceID] = ctx.newInstances[newInstanceID]
+
+			action := `CreateInstance`
+			switch ctx.startup {
+			case true:
+				action = `RecreateInstance`
+			default:
+				g.actionCheckInstanceCreate(g.Instances[newInstanceID].MakeAction())
+			}
+			g.log.Printf(
+				"TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
+				g.GetRepositoryName(), action, `group`, g.ID.String(),
+				ctx.uuid, newInstanceID,
+			)
+		}
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

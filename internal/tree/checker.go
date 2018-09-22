@@ -543,6 +543,8 @@ func (tci *CheckInstance) matchOldService(target *CheckInstance) bool {
 
 type checkContext struct {
 	uuid                   string
+	startup                bool
+	startupBroken          bool
 	brokeConstraint        bool
 	hasServiceConstraint   bool
 	hasAttributeConstraint bool
@@ -558,7 +560,7 @@ type checkContext struct {
 	newInstances           map[string]CheckInstance
 }
 
-func newCheckContext(uuid, view string) *checkContext {
+func newCheckContext(uuid, view string, startup bool) *checkContext {
 	cc := checkContext{
 		uuid: uuid,
 		view: view,
