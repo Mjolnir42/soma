@@ -15,10 +15,10 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (tec *Cluster) evalNativeProp(prop string, val string) bool {
+func (c *Cluster) evalNativeProp(prop string, val string) bool {
 	switch prop {
 	case msg.NativePropertyEnvironment:
-		env := tec.Parent.(Bucketeer).GetEnvironment()
+		env := c.Parent.(Bucketeer).GetEnvironment()
 		if val == env {
 			return true
 		}
@@ -27,7 +27,7 @@ func (tec *Cluster) evalNativeProp(prop string, val string) bool {
 			return true
 		}
 	case msg.NativePropertyState:
-		if val == tec.State {
+		if val == c.State {
 			return true
 		}
 	case msg.NativePropertyHardwareNode:
@@ -37,8 +37,8 @@ func (tec *Cluster) evalNativeProp(prop string, val string) bool {
 	return false
 }
 
-func (tec *Cluster) evalSystemProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range tec.PropertySystem {
+func (c *Cluster) evalSystemProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range c.PropertySystem {
 		t := v.(*PropertySystem)
 		if t.Key == prop && (t.Value == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.Key, true, t.Value
@@ -47,8 +47,8 @@ func (tec *Cluster) evalSystemProp(prop string, val string, view string) (string
 	return "", false, ""
 }
 
-func (tec *Cluster) evalOncallProp(prop string, val string, view string) (string, bool) {
-	for _, v := range tec.PropertyOncall {
+func (c *Cluster) evalOncallProp(prop string, val string, view string) (string, bool) {
+	for _, v := range c.PropertyOncall {
 		t := v.(*PropertyOncall)
 		if "OncallID" == prop && t.ID.String() == val && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true
@@ -57,8 +57,8 @@ func (tec *Cluster) evalOncallProp(prop string, val string, view string) (string
 	return "", false
 }
 
-func (tec *Cluster) evalCustomProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range tec.PropertyCustom {
+func (c *Cluster) evalCustomProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range c.PropertyCustom {
 		t := v.(*PropertyCustom)
 		if t.Key == prop && (t.Value == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.Key, true, t.Value
@@ -67,8 +67,8 @@ func (tec *Cluster) evalCustomProp(prop string, val string, view string) (string
 	return "", false, ""
 }
 
-func (tec *Cluster) evalServiceProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range tec.PropertyService {
+func (c *Cluster) evalServiceProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range c.PropertyService {
 		t := v.(*PropertyService)
 		if prop == "name" && (t.Service == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true, t.Service
@@ -77,8 +77,8 @@ func (tec *Cluster) evalServiceProp(prop string, val string, view string) (strin
 	return "", false, ""
 }
 
-func (tec *Cluster) evalAttributeOfService(svcID string, view string, attribute string, value string) (bool, string) {
-	t := tec.PropertyService[svcID].(*PropertyService)
+func (c *Cluster) evalAttributeOfService(svcID string, view string, attribute string, value string) (bool, string) {
+	t := c.PropertyService[svcID].(*PropertyService)
 	for _, a := range t.Attributes {
 		if a.Name == attribute && (t.View == view || t.View == `any`) && (a.Value == value || value == `@defined`) {
 			return true, a.Value
@@ -87,10 +87,10 @@ func (tec *Cluster) evalAttributeOfService(svcID string, view string, attribute 
 	return false, ""
 }
 
-func (tec *Cluster) evalAttributeProp(view string, attr string, value string) (bool, map[string]string) {
+func (c *Cluster) evalAttributeProp(view string, attr string, value string) (bool, map[string]string) {
 	f := map[string]string{}
 svcloop:
-	for _, v := range tec.PropertyService {
+	for _, v := range c.PropertyService {
 		t := v.(*PropertyService)
 		for _, a := range t.Attributes {
 			if a.Name == attr && (a.Value == value || value == `@defined`) && (t.View == view || t.View == `any`) {
@@ -105,9 +105,9 @@ svcloop:
 	return false, f
 }
 
-func (tec *Cluster) getServiceMap(serviceID string) map[string][]string {
+func (c *Cluster) getServiceMap(serviceID string) map[string][]string {
 	svc := new(PropertyService)
-	svc = tec.PropertyService[serviceID].(*PropertyService)
+	svc = c.PropertyService[serviceID].(*PropertyService)
 
 	res := map[string][]string{}
 	for _, v := range svc.Attributes {
