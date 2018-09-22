@@ -541,4 +541,37 @@ func (tci *CheckInstance) matchOldService(target *CheckInstance) bool {
 	return false
 }
 
+type checkContext struct {
+	name                   string
+	brokeConstraint        bool
+	hasServiceConstraint   bool
+	hasAttributeConstraint bool
+	view                   string
+	attributes             []CheckConstraint
+	oncallConstr           string
+	systemConstr           map[string]string              // ID -> Value
+	nativeConstr           map[string]string              // Property -> Value
+	serviceConstr          map[string]string              // ID -> Value
+	customConstr           map[string]string              // ID -> Value
+	attributeConstr        map[string]map[string][]string // svcID -> attr -> [ value, ... ]
+	newCheckInstances      []string
+	newInstances           map[string]CheckInstance
+}
+
+func newCheckContext(name, view string) *checkContext {
+	cc := checkContext{
+		name: name,
+		view: view,
+	}
+	cc.attributes = []CheckConstraint{}
+	cc.systemConstr = make(map[string]string)
+	cc.nativeConstr = make(map[string]string)
+	cc.serviceConstr = make(map[string]string)
+	cc.customConstr = make(map[string]string)
+	cc.attributeConstr = make(map[string]map[string][]string)
+	cc.newCheckInstances = []string{}
+	cc.newInstances = make(map[string]CheckInstance)
+	return &cc
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
