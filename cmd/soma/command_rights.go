@@ -8,6 +8,7 @@ import (
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
