@@ -247,6 +247,10 @@ const (
 const (
 	SystemPropertyDisableAllMonitoring      = `disable_all_monitoring`
 	SystemPropertyDisableCheckConfiguration = `disable_check_configuration`
+	NativePropertyEnvironment               = `environment`
+	NativePropertyEntity                    = `entity`
+	NativePropertyState                     = `state`
+	NativePropertyHardwareNode              = `hardware_node`
 	ViewLocal                               = `local`
 )
 
