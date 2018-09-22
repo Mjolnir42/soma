@@ -8,7 +8,33 @@
 
 package tree
 
-import uuid "github.com/satori/go.uuid"
+import (
+	"github.com/mjolnir42/soma/internal/msg"
+	uuid "github.com/satori/go.uuid"
+)
+
+func (ten *Node) evalNativeProp(prop string, val string) bool {
+	switch prop {
+	case msg.NativePropertyEnvironment:
+		env := ten.Parent.(Bucketeer).GetEnvironment()
+		if val == env {
+			return true
+		}
+	case msg.NativePropertyEntity:
+		if val == msg.EntityNode {
+			return true
+		}
+	case msg.NativePropertyState:
+		if val == ten.State {
+			return true
+		}
+	case msg.NativePropertyHardwareNode:
+		// XX needs ten.ServerName extension of ten
+		// if val == ten.ServerName { return true }
+		return false
+	}
+	return false
+}
 
 func (ten *Node) updateCheckInstances() {
 	repoName := ten.repositoryName()
@@ -612,28 +638,6 @@ checksloop:
 	ten.hasUpdate = false
 }
 
-func (ten *Node) evalNativeProp(prop string, val string) bool {
-	switch prop {
-	case "environment":
-		env := ten.Parent.(Bucketeer).GetEnvironment()
-		if val == env {
-			return true
-		}
-	case "object_type":
-		if val == "node" {
-			return true
-		}
-	case "object_state":
-		if val == ten.State {
-			return true
-		}
-	case "hardware_node":
-		// XX needs ten.ServerName extension of ten
-		// if val == ten.ServerName { return true }
-		return false
-	}
-	return false
-}
 
 func (ten *Node) evalSystemProp(prop string, val string, view string) (string, bool, string) {
 	for _, v := range ten.PropertySystem {

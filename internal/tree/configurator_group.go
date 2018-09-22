@@ -17,20 +17,20 @@ import (
 
 func (teg *Group) evalNativeProp(prop string, val string) bool {
 	switch prop {
-	case "environment":
+	case msg.NativePropertyEnvironment:
 		env := teg.Parent.(Bucketeer).GetEnvironment()
 		if val == env {
 			return true
 		}
-	case "object_type":
-		if val == "group" {
+	case msg.NativePropertyEntity:
+		if val == msg.EntityGroup {
 			return true
 		}
-	case "object_state":
+	case msg.NativePropertyState:
 		if val == teg.State {
 			return true
 		}
-	case "hardware_node":
+	case msg.NativePropertyHardwareNode:
 		// group != hardware
 		return false
 	}

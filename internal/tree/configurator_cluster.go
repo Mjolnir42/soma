@@ -17,20 +17,20 @@ import (
 
 func (tec *Cluster) evalNativeProp(prop string, val string) bool {
 	switch prop {
-	case "environment":
+	case msg.NativePropertyEnvironment:
 		env := tec.Parent.(Bucketeer).GetEnvironment()
 		if val == env {
 			return true
 		}
-	case "object_type":
-		if val == "cluster" {
+	case msg.NativePropertyEntity:
+		if val == msg.EntityCluster {
 			return true
 		}
-	case "object_state":
+	case msg.NativePropertyState:
 		if val == tec.State {
 			return true
 		}
-	case "hardware_node":
+	case msg.NativePropertyHardwareNode:
 		// cluster != hardware
 		return false
 	}
