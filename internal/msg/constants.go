@@ -247,6 +247,7 @@ const (
 const (
 	SystemPropertyDisableAllMonitoring      = `disable_all_monitoring`
 	SystemPropertyDisableCheckConfiguration = `disable_check_configuration`
+	SystemPropertyTag                       = `tag`
 	NativePropertyEnvironment               = `environment`
 	NativePropertyEntity                    = `entity`
 	NativePropertyState                     = `state`
