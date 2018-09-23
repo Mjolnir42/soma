@@ -8,7 +8,10 @@
 
 package tree
 
-import "github.com/satori/go.uuid"
+import (
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/satori/go.uuid"
+)
 
 // Implementation of the `Propertier` interface
 

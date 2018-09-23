@@ -11,6 +11,7 @@ package tree
 import (
 	"sync"
 
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/satori/go.uuid"
 )
 
