@@ -687,22 +687,27 @@ propswitch:
 				break propswitch
 			}
 		}
-	case "system":
+	case msg.PropertySystem:
 		for _, pVal := range teg.PropertySystem {
-			// tags are only dupes if the value is the same as well
-			if p.GetKey() != `tag` {
-				dupe, deleteOK, prop = isDupe(pVal, p)
-				if dupe {
-					break propswitch
+			switch p.GetKey() {
+			case msg.SystemPropertyTag:
+				// tags are only dupes if the value is the same as well
+				fallthrough
+			case msg.SystemPropertyDisableCheckConfiguration:
+				// disable_check_configuration checks values as well
+				if p.GetValue() == pVal.GetValue() {
+					// same value, can be a dupe
+					dupe, deleteOK, prop = isDupe(pVal, p)
+					if dupe {
+						break propswitch
+					}
 				}
-			} else if p.GetValue() == pVal.GetValue() {
-				// tag and same value, can be a dupe
+			default:
 				dupe, deleteOK, prop = isDupe(pVal, p)
 				if dupe {
 					break propswitch
 				}
 			}
-			// tag + different value => pass
 		}
 	default:
 		// trigger error path
