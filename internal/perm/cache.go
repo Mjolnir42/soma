@@ -14,6 +14,7 @@
 package perm // import "github.com/mjolnir42/soma/internal/perm"
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/mjolnir42/soma/internal/msg"
@@ -92,6 +93,11 @@ func (c *Cache) Perform(q *msg.Request) {
 		c.performTeam(q.Cache)
 	case msg.SectionUser:
 		c.performUser(q.Cache)
+	default:
+		panic(fmt.Sprintf(
+			"Unhandled permission cache update in section: %s",
+			q.Cache.Section,
+		))
 	}
 }
 
