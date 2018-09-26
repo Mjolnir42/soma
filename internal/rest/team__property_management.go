@@ -75,7 +75,7 @@ func (x *Rest) PropertyMgmtServiceRemove(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionRemove
 	request.Property.Type = msg.PropertyService
 	request.Property.Service = &proto.PropertyService{
-		Name:   params.ByName(`propertyID`),
+		ID:     params.ByName(`propertyID`),
 		TeamID: params.ByName(`teamID`),
 	}
 

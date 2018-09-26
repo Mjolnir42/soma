@@ -1,6 +1,6 @@
 /*-
  * Copyright (c) 2015-2016, 1&1 Internet SE
- * Copyright (c) 2015-2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2015-2018, Jörg Pernfuß <joerg.pernfuss@1und1.de>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -149,6 +149,7 @@ func (t *PropertySystem) DeepCompareSlice(a *[]PropertySystem) bool {
 }
 
 type PropertyService struct {
+	ID         string             `json:"ID,omitempty"`
 	Name       string             `json:"name,omitempty"`
 	TeamID     string             `json:"teamID,omitempty"`
 	Attributes []ServiceAttribute `json:"attributes"`

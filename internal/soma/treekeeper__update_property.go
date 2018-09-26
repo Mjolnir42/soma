@@ -138,6 +138,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 			}
 		}
 	case msg.PropertyService:
+		serviceID, _ := uuid.FromString(pp.Service.ID)
 		switch task {
 		case `add`:
 			return &tree.PropertyService{
@@ -145,15 +146,17 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
 				View:         pp.View,
+				ServiceID:    serviceID,
 				Service:      pp.Service.Name,
 				Attributes:   pp.Service.Attributes,
 			}
 		case `rm`:
 			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
 			return &tree.PropertyService{
-				SourceID: srcUUID,
-				View:     pp.View,
-				Service:  pp.Service.Name,
+				SourceID:  srcUUID,
+				View:      pp.View,
+				ServiceID: serviceID,
+				Service:   pp.Service.Name,
 			}
 		case `update`:
 			srcUUID, _ := uuid.FromString(pp.SourceInstanceID)
@@ -163,6 +166,7 @@ func (tk *TreeKeeper) pTT(task string, pp proto.Property) tree.Property {
 				Inheritance:  pp.Inheritance,
 				ChildrenOnly: pp.ChildrenOnly,
 				View:         pp.View,
+				ServiceID:    serviceID,
 				Service:      pp.Service.Name,
 				Attributes:   pp.Service.Attributes,
 			}

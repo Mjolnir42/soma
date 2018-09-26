@@ -651,15 +651,18 @@ WHERE   snop.instance_id = snop.source_instance_id
   AND   snop.repository_id = $1::uuid;`
 
 	TkStartLoadRepoSvcProp = `
-SELECT instance_id,
-       source_instance_id,
-       repository_id,
-       view,
-       service_property,
-       organizational_team_id,
-       inheritance_enabled,
-       children_only
-FROM   soma.repository_service_properties
+SELECT srsp.instance_id,
+       srsp.source_instance_id,
+       srsp.repository_id,
+       srsp.view,
+	   srsp.svc_id,
+       ssp.name,
+       srsp.organizational_team_id,
+       srsp.inheritance_enabled,
+       srsp.children_only
+FROM   soma.repository_service_properties srsp
+JOIN   soma.service_property ssp
+  ON   srsp.svc_id = ssp.id
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 
@@ -671,15 +674,18 @@ WHERE  organizational_team_id = $1::uuid
 AND    service_property = $2::varchar;`
 
 	TkStartLoadBucketSvcProp = `
-SELECT instance_id,
-       source_instance_id,
-       bucket_id,
-       view,
-       service_property,
-       organizational_team_id,
-       inheritance_enabled,
-       children_only
-FROM   soma.bucket_service_properties
+SELECT sbsp.instance_id,
+       sbsp.source_instance_id,
+       sbsp.bucket_id,
+       sbsp.view,
+       sbsp.svc_id,
+       ssp.name,
+       sbsp.organizational_team_id,
+       sbsp.inheritance_enabled,
+       sbsp.children_only
+FROM   soma.bucket_service_properties sbsp
+JOIN   soma.service_property ssp
+  ON   sbsp.svc_id = ssp.id
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 

@@ -52,11 +52,11 @@ create table if not exists soma.repository_service_properties (
     source_instance_id          uuid            NOT NULL,
     repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
-    service_property            varchar(64)     NOT NULL,
+    svc_id                      uuid            NOT NULL,
     organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',
-    FOREIGN KEY( organizational_team_id, service_property ) REFERENCES soma.team_service_properties ( organizational_team_id, service_property ) DEFERRABLE,
+    FOREIGN KEY( organizational_team_id, svc_id ) REFERENCES soma.service_property ( team_id, id ) DEFERRABLE,
     FOREIGN KEY ( source_instance_id, repository_id ) REFERENCES soma.property_instances ( instance_id, repository_id ) DEFERRABLE
 );`
 	queries[idx] = "createTableRepositoryServiceProperty"

@@ -233,9 +233,9 @@ func (r *PropertyRead) listNative(q *msg.Request, mr *msg.Result) {
 // listService returns all service properties for a team
 func (r *PropertyRead) listService(q *msg.Request, mr *msg.Result) {
 	var (
-		property, team string
-		rows           *sql.Rows
-		err            error
+		id, name, teamID string
+		rows             *sql.Rows
+		err              error
 	)
 
 	if rows, err = r.stmtListService.Query(
@@ -246,7 +246,7 @@ func (r *PropertyRead) listService(q *msg.Request, mr *msg.Result) {
 	}
 
 	for rows.Next() {
-		if err = rows.Scan(&property, &team); err != nil {
+		if err = rows.Scan(&id, &name, &teamID); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
 			return
@@ -254,8 +254,9 @@ func (r *PropertyRead) listService(q *msg.Request, mr *msg.Result) {
 		mr.Property = append(mr.Property, proto.Property{
 			Type: q.Property.Type,
 			Service: &proto.PropertyService{
-				Name:   property,
-				TeamID: team,
+				ID:     id,
+				Name:   name,
+				TeamID: teamID,
 			},
 		})
 	}
@@ -302,7 +303,7 @@ func (r *PropertyRead) listSystem(q *msg.Request, mr *msg.Result) {
 // listTemplate returns all service templates
 func (r *PropertyRead) listTemplate(q *msg.Request, mr *msg.Result) {
 	var (
-		property string
+		id, name string
 		rows     *sql.Rows
 		err      error
 	)
@@ -312,7 +313,7 @@ func (r *PropertyRead) listTemplate(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	for rows.Next() {
-		if err = rows.Scan(&property); err != nil {
+		if err = rows.Scan(&id, &name); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
 			return
@@ -320,7 +321,8 @@ func (r *PropertyRead) listTemplate(q *msg.Request, mr *msg.Result) {
 		mr.Property = append(mr.Property, proto.Property{
 			Type: q.Property.Type,
 			Service: &proto.PropertyService{
-				Name: property,
+				ID:   id,
+				Name: name,
 			},
 		})
 	}
@@ -412,15 +414,14 @@ func (r *PropertyRead) showNative(q *msg.Request, mr *msg.Result) {
 // showService returns the details for a specific service
 func (r *PropertyRead) showService(q *msg.Request, mr *msg.Result) {
 	var (
-		property, team, attribute, value string
-		rows                             *sql.Rows
-		err                              error
-		service                          proto.PropertyService
+		id, name, teamID, attribute, value string
+		rows                               *sql.Rows
+		err                                error
+		service                            proto.PropertyService
 	)
 
 	if rows, err = r.stmtShowService.Query(
-		q.Property.Service.Name,
-		q.Property.Service.TeamID,
+		q.Property.Service.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -429,8 +430,9 @@ func (r *PropertyRead) showService(q *msg.Request, mr *msg.Result) {
 
 	for rows.Next() {
 		if err = rows.Scan(
-			&property,
-			&team,
+			&id,
+			&name,
+			&teamID,
 			&attribute,
 			&value,
 		); err != nil {
@@ -439,8 +441,9 @@ func (r *PropertyRead) showService(q *msg.Request, mr *msg.Result) {
 			return
 		}
 
-		service.Name = property
-		service.TeamID = team
+		service.ID = id
+		service.Name = name
+		service.TeamID = teamID
 		service.Attributes = append(service.Attributes,
 			proto.ServiceAttribute{
 				Name:  attribute,
@@ -490,14 +493,14 @@ func (r *PropertyRead) showSystem(q *msg.Request, mr *msg.Result) {
 // template
 func (r *PropertyRead) showTemplate(q *msg.Request, mr *msg.Result) {
 	var (
-		property, attribute, value string
+		id, name, attribute, value string
 		rows                       *sql.Rows
 		err                        error
 		template                   proto.PropertyService
 	)
 
 	if rows, err = r.stmtShowTemplate.Query(
-		q.Property.Service.Name,
+		q.Property.Service.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -506,7 +509,8 @@ func (r *PropertyRead) showTemplate(q *msg.Request, mr *msg.Result) {
 
 	for rows.Next() {
 		if err = rows.Scan(
-			&property,
+			&id,
+			&name,
 			&attribute,
 			&value,
 		); err != nil {
@@ -515,7 +519,8 @@ func (r *PropertyRead) showTemplate(q *msg.Request, mr *msg.Result) {
 			return
 		}
 
-		template.Name = property
+		template.ID = id
+		template.Name = name
 		template.Attributes = append(template.Attributes,
 			proto.ServiceAttribute{
 				Name:  attribute,

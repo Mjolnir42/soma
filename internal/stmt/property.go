@@ -39,18 +39,20 @@ SELECT system_property
 FROM   soma.system_properties;`
 
 	PropertyServiceList = `
-SELECT service_property,
-       organizational_team_id
-FROM   soma.team_service_properties
-WHERE  organizational_team_id = $1::uuid;`
+SELECT id,
+       name,
+       team_id
+FROM   soma.service_property
+WHERE  team_id = $1::uuid;`
 
 	PropertyNativeList = `
 SELECT native_property
 FROM   soma.native_properties;`
 
 	PropertyTemplateList = `
-SELECT service_property
-FROM   soma.service_properties;`
+SELECT id,
+       name
+FROM   soma.template_property;`
 
 	PropertyCustomList = `
 SELECT custom_property_id,
@@ -78,24 +80,25 @@ WHERE  custom_property_id = $1::uuid
 AND    repository_id = $2::uuid;`
 
 	PropertyServiceShow = `
-SELECT tsp.service_property,
-       tsp.organizational_team_id,
-       tspv.service_property_attribute,
-       tspv.value
-FROM   soma.team_service_properties tsp
-JOIN   soma.team_service_property_values tspv
-ON     tsp.service_property = tspv.service_property
-WHERE  tsp.service_property = $1::varchar
-AND    tsp.organizational_team_id = $2::uuid;`
+SELECT ssp.id,
+       ssp.name,
+       ssp.team_id,
+       sspv.attribute,
+       sspv.value
+FROM   soma.service_property ssp
+JOIN   soma.service_property_value sspv
+ON     ssp.id = sspv.service_id
+WHERE  ssp.id = $1::uuid;`
 
 	PropertyTemplateShow = `
-SELECT sp.service_property,
-       spv.service_property_attribute,
-       spv.value
-FROM   soma.service_properties sp
-JOIN   soma.service_property_values spv
-ON     sp.service_property = spv.service_property
-WHERE  sp.service_property = $1::varchar;`
+SELECT stp.id,
+       stp.name,
+       stpv.attribute,
+       stpv.value
+FROM   soma.template_property stp
+JOIN   soma.template_property_value stpv
+ON     stp.id = stpv.template_id
+WHERE  stp.id = $1::uuid;`
 
 	PropertySystemAdd = `
 INSERT INTO soma.system_properties (
@@ -128,15 +131,17 @@ WHERE  NOT EXISTS (
      AND  repository_id = $2::uuid);`
 
 	PropertyServiceAdd = `
-INSERT INTO soma.team_service_properties (
-            organizational_team_id,
-            service_property)
-SELECT $1::uuid, $2::varchar
+INSERT INTO soma.service_property (
+            id,
+            name,
+            team_id,
+            )
+SELECT $1::uuid, $2::varchar, $3::uuid
 WHERE  NOT EXISTS (
-   SELECT service_property
-   FROM   soma.team_service_properties
-   WHERE  organizational_team_id = $1::uuid
-   AND    service_property = $2::varchar);`
+   SELECT name
+   FROM   soma.service_property
+   WHERE  team_id = $3::uuid
+   AND    name = $2::varchar);`
 
 	PropertyServiceAttributeAdd = `
 INSERT INTO soma.team_service_property_values (
@@ -147,13 +152,14 @@ INSERT INTO soma.team_service_property_values (
 SELECT $1::uuid, $2::varchar, $3::varchar, $4::varchar;`
 
 	PropertyTemplateAdd = `
-INSERT INTO soma.service_properties (
-            service_property)
-SELECT $1::varchar
+INSERT INTO soma.template_property (
+            id,
+            name)
+SELECT $1::uuid, $2::varchar
 WHERE  NOT EXISTS (
-   SELECT service_property
-   FROM   soma.service_properties
-   WHERE  service_property = $1::varchar);`
+   SELECT name
+   FROM   soma.template_property
+   WHERE  name = $2::varchar);`
 
 	PropertyTemplateAttributeAdd = `
 INSERT INTO soma.service_property_values (
@@ -176,22 +182,20 @@ WHERE  repository_id = $1::uuid
 AND    custom_property_id = $2::uuid;`
 
 	PropertyServiceDel = `
-DELETE FROM soma.team_service_properties
-WHERE  organizational_team_id = $1::uuid
-AND    service_property = $2::varchar;`
+DELETE FROM soma.service_property
+WHERE  id = $1::uuid;`
 
 	PropertyServiceAttributeDel = `
-DELETE FROM soma.team_service_property_values
-WHERE  organizational_team_id = $1::uuid
-AND    service_property = $2::varchar;`
+DELETE FROM soma.service_property_value
+WHERE  service_id = $1::uuid;`
 
 	PropertyTemplateDel = `
-DELETE FROM soma.service_properties
-WHERE  service_property = $1::varchar;`
+DELETE FROM soma.template_property
+WHERE  id = $2::uuid;`
 
 	PropertyTemplateAttributeDel = `
-DELETE FROM soma.service_property_values
-WHERE  service_property = $1::varchar;`
+DELETE FROM soma.template_property_value
+WHERE  template_id = $1::uuid;`
 )
 
 func init() {
