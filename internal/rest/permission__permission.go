@@ -224,6 +224,7 @@ func (x *Rest) PermissionEdit(w http.ResponseWriter, r *http.Request,
 	request.Permission.ID = cReq.Permission.ID
 	request.Permission.Name = cReq.Permission.Name
 	request.Permission.Category = cReq.Permission.Category
+	// XXX Clone
 	request.Permission.Sections = cReq.Permission.Sections
 	request.Permission.Actions = cReq.Permission.Actions
 

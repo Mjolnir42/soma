@@ -7,7 +7,9 @@
 
 package perm
 
-import "github.com/mjolnir42/soma/internal/msg"
+import (
+	"github.com/mjolnir42/soma/internal/msg"
+)
 
 // These are the per-Action methods used in Cache.Perform
 
