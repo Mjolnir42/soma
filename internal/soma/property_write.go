@@ -271,7 +271,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 			}
 		case `template`:
 			if res, err = tx.Stmt(w.stmtAddTemplateAttr).Exec(
-				q.Property.Service.Name,
+				q.Property.Service.ID,
 				attr.Name,
 				attr.Value,
 			); err != nil {
@@ -410,7 +410,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 		}
 	case `template`:
 		if res, err = tx.Stmt(w.stmtRemoveTemplate).Exec(
-			q.Property.Service.Name,
+			q.Property.Service.ID,
 		); err != nil {
 			mr.ServerError(err, q.Section)
 			tx.Rollback()

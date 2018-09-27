@@ -417,10 +417,10 @@ SELECT      CASE WHEN srsp.instance_id IS NOT NULL THEN srsp.instance_id
                  END
             END AS "object_id"
 FROM        soma.property_instances spi
-LEFT JOIN   soma.repository_service_properties srsp
+LEFT JOIN   soma.repository_service_property srsp
   ON        spi.instance_id = srsp.instance_id
   AND       spi.source_instance_id = srsp.source_instance_id
-LEFT JOIN   soma.bucket_service_properties sbsp
+LEFT JOIN   soma.bucket_service_property sbsp
   ON        spi.instance_id = sbsp.instance_id
   AND       spi.source_instance_id = sbsp.source_instance_id
 LEFT JOIN   soma.group_service_properties sgsp
@@ -651,44 +651,50 @@ WHERE   snop.instance_id = snop.source_instance_id
   AND   snop.repository_id = $1::uuid;`
 
 	TkStartLoadRepoSvcProp = `
-SELECT instance_id,
-       source_instance_id,
-       repository_id,
-       view,
-       service_property,
-       organizational_team_id,
-       inheritance_enabled,
-       children_only
-FROM   soma.repository_service_properties
+SELECT srsp.instance_id,
+       srsp.source_instance_id,
+       srsp.repository_id,
+       srsp.view,
+       srsp.service_id,
+       ssp.name,
+       srsp.organizational_team_id,
+       srsp.inheritance_enabled,
+       srsp.children_only
+FROM   soma.repository_service_property srsp
+JOIN   soma.service_property ssp
+  ON   srsp.svc_id = ssp.id
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 
 	TkStartLoadRepoSvcAttr = `
-SELECT service_property_attribute,
+SELECT attribute,
        value
-FROM   soma.team_service_property_values
-WHERE  organizational_team_id = $1::uuid
-AND    service_property = $2::varchar;`
+FROM   soma.service_property_value
+WHERE  team_id = $1::uuid
+AND    service_id = $2::uuid;`
 
 	TkStartLoadBucketSvcProp = `
-SELECT instance_id,
-       source_instance_id,
-       bucket_id,
-       view,
-       service_property,
-       organizational_team_id,
-       inheritance_enabled,
-       children_only
-FROM   soma.bucket_service_properties
+SELECT sbsp.instance_id,
+       sbsp.source_instance_id,
+       sbsp.bucket_id,
+       sbsp.view,
+       sbsp.svc_id,
+       ssp.name,
+       sbsp.organizational_team_id,
+       sbsp.inheritance_enabled,
+       sbsp.children_only
+FROM   soma.bucket_service_property sbsp
+JOIN   soma.service_property ssp
+  ON   sbsp.svc_id = ssp.id
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 
 	TkStartLoadBucketSvcAttr = `
-SELECT service_property_attribute,
+SELECT attribute,
        value
-FROM   soma.team_service_property_values
+FROM   soma.service_property_value
 WHERE  organizational_team_id = $1::uuid
-AND    service_property = $2::varchar;`
+AND    service_id = $2::uuid;`
 
 	TkStartLoadGroupSvcProp = `
 SELECT instance_id,
@@ -699,16 +705,16 @@ SELECT instance_id,
        organizational_team_id,
        inheritance_enabled,
        children_only
-FROM   soma.group_service_properties
+FROM   soma.group_service_property
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 
 	TkStartLoadGroupSvcAttr = `
-SELECT service_property_attribute,
+SELECT attribute,
        value
-FROM   soma.team_service_property_values
-WHERE  organizational_team_id = $1::uuid
-AND    service_property = $2::varchar;`
+FROM   soma.service_property_value
+WHERE  team_id = $1::uuid
+AND    service_id = $2::uuid;`
 
 	TkStartLoadClusterSvcProp = `
 SELECT instance_id,
@@ -719,16 +725,16 @@ SELECT instance_id,
        organizational_team_id,
        inheritance_enabled,
        children_only
-FROM   soma.cluster_service_properties
+FROM   soma.cluster_service_property
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 
 	TkStartLoadClusterSvcAttr = `
-SELECT service_property_attribute,
+SELECT attribute,
        value
-FROM   soma.team_service_property_values
-WHERE  organizational_team_id = $1::uuid
-AND    service_property = $2::varchar;`
+FROM   soma.service_property_value
+WHERE  team_id = $1::uuid
+AND    service_id = $2::uuid;`
 
 	TkStartLoadNodeSvcProp = `
 SELECT instance_id,
@@ -739,16 +745,16 @@ SELECT instance_id,
        organizational_team_id,
        inheritance_enabled,
        children_only
-FROM   soma.node_service_properties
+FROM   soma.node_service_property
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 
 	TkStartLoadNodeSvcAttr = `
-SELECT service_property_attribute,
+SELECT attribute,
        value
-FROM   soma.team_service_property_values
-WHERE  organizational_team_id = $1::uuid
-AND    service_property = $2::varchar;`
+FROM   soma.service_property_value
+WHERE  team_id = $1::uuid
+AND    service_id = $2::uuid;`
 
 	TkStartLoadRepoSysProp = `
 SELECT instance_id,

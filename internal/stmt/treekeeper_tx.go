@@ -236,12 +236,12 @@ DELETE FROM soma.repository_oncall_properties
 WHERE       instance_id = $1::uuid;`
 
 	TxRepositoryPropertyServiceCreate = `
-INSERT INTO soma.repository_service_properties (
+INSERT INTO soma.repository_service_property (
             instance_id,
             source_instance_id,
             repository_id,
             view,
-            service_property,
+            service_id,
             organizational_team_id,
             inheritance_enabled,
             children_only)
@@ -249,13 +249,13 @@ SELECT $1::uuid,
        $2::uuid,
        $3::uuid,
        $4::varchar,
-       $5::varchar,
+       $5::uuid,
        $6::uuid,
        $7::boolean,
        $8::boolean;`
 
 	TxRepositoryPropertyServiceDelete = `
-DELETE FROM soma.repository_service_properties
+DELETE FROM soma.repository_service_property
 WHERE       instance_id = $1::uuid;`
 
 	TxRepositoryPropertySystemCreate = `
@@ -799,12 +799,12 @@ DELETE FROM soma.bucket_oncall_properties
 WHERE       instance_id = $1::uuid;`
 
 	TxBucketPropertyServiceCreate = `
-INSERT INTO soma.bucket_service_properties (
+INSERT INTO soma.bucket_service_property (
             instance_id,
             source_instance_id,
             bucket_id,
             view,
-            service_property,
+            service_id,
             organizational_team_id,
             repository_id,
             inheritance_enabled,
@@ -813,14 +813,14 @@ SELECT $1::uuid,
        $2::uuid,
        $3::uuid,
        $4::varchar,
-       $5::varchar,
+       $5::uuid,
        $6::uuid,
        $7::uuid,
        $8::boolean,
        $9::boolean;`
 
 	TxBucketPropertyServiceDelete = `
-DELETE FROM soma.bucket_service_properties
+DELETE FROM soma.bucket_service_property
 WHERE       instance_id = $1::uuid;`
 
 	TxBucketPropertySystemCreate = `

@@ -137,11 +137,11 @@ WHERE  snop.source_instance_id = $1::uuid
 
 	NodeServicePropertyForDelete = `
 SELECT snsp.view,
-       snsp.service_property
-FROM   soma.node_service_properties snsp
-JOIN   soma.team_service_properties stsp
-  ON   snsp.organizational_team_id = stsp.organizational_team_id
- AND   snsp.service_property = stsp.service_property
+       snsp.service_id
+FROM   soma.node_service_property snsp
+JOIN   soma.service_property ssp
+  ON   snsp.team_id = ssp.team_id
+ AND   snsp.service_id = ssp.id
 WHERE  snsp.source_instance_id = $1::uuid
   AND  snsp.source_instance_id = snsp.instance_id;`
 

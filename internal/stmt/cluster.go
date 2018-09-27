@@ -116,11 +116,11 @@ WHERE  scop.source_instance_id = $1::uuid
 
 	ClusterServicePropertyForDelete = `
 SELECT scsp.view,
-       scsp.service_property
-FROM   soma.cluster_service_properties scsp
-JOIN   soma.team_service_properties stsp
-  ON   scsp.organizational_team_id = stsp.organizational_team_id
- AND   scsp.service_property = stsp.service_property
+       scsp.service_id
+FROM   soma.cluster_service_property scsp
+JOIN   soma.service_property ssp
+  ON   scsp.organizational_team_id = ssp.team_id
+ AND   scsp.service_id = ssp.id
 WHERE  scsp.source_instance_id = $1::uuid
   AND  scsp.source_instance_id = scsp.instance_id;`
 )

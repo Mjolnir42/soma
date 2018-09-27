@@ -58,17 +58,17 @@ create table if not exists soma.bucket_oncall_properties (
 	idx++
 
 	queryMap["createTableBucketService"] = `
-create table if not exists soma.bucket_service_properties (
+create table if not exists soma.bucket_service_property (
     instance_id                 uuid            NOT NULL REFERENCES soma.property_instances ( instance_id ) DEFERRABLE,
     source_instance_id          uuid            NOT NULL,
     bucket_id                   uuid            NOT NULL REFERENCES buckets ( bucket_id ) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES views ( view ) DEFERRABLE,
-    service_property            varchar(64)     NOT NULL,
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    service_id                  uuid            NOT NULL,
+    team_id                     uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
     repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',
-    FOREIGN KEY( organizational_team_id, service_property ) REFERENCES soma.team_service_properties ( organizational_team_id, service_property ) DEFERRABLE,
+    CONSTRAINT __bucket_service_property_service_exists FOREIGN KEY ( team_id, service_id ) REFERENCES soma.service_proprty ( team_id, id ) DEFERRABLE,
     FOREIGN KEY ( source_instance_id, repository_id ) REFERENCES soma.property_instances ( instance_id, repository_id ) DEFERRABLE
 );`
 	queries[idx] = "createTableBucketService"

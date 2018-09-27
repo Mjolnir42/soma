@@ -189,7 +189,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 		err                                             error
 		row                                             *sql.Row
 		queryStmt, view, sysProp, value, cstID, cstProp string
-		svcProp, oncID, oncName                         string
+		svcID, oncID, oncName                           string
 		oncNumber                                       int
 	)
 
@@ -276,7 +276,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 	case msg.PropertyCustom:
 		err = row.Scan(&view, &cstID, &value, &cstProp)
 	case msg.PropertyService:
-		err = row.Scan(&view, &svcProp)
+		err = row.Scan(&view, &svcID)
 	case msg.PropertyOncall:
 		err = row.Scan(&view, &oncID, &oncName, &oncNumber)
 	}
@@ -311,7 +311,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 		}
 	case msg.PropertyService:
 		pSvc = &proto.PropertyService{
-			Name: svcProp,
+			ID: svcID,
 		}
 	case msg.PropertyOncall:
 		num := strconv.Itoa(oncNumber)

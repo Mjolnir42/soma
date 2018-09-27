@@ -72,8 +72,8 @@ WHERE  op.repository_id = $1::uuid;`
 SELECT sp.instance_id,
        sp.source_instance_id,
        sp.view,
-       sp.service_property
-FROM   soma.repository_service_properties sp
+       sp.service_id
+FROM   soma.repository_service_property sp
 WHERE  sp.repository_id = $1::uuid;`
 
 	RepoSysProps = `
@@ -130,13 +130,13 @@ WHERE  source_instance_id = $1::uuid
 
 	RepoServicePropertyForDelete = `
 SELECT srsp.view,
-       srsp.service_property
-FROM   soma.repository_service_properties srsp
-JOIN   soma.team_service_properties stsp
-  ON   srsp.organizational_team_id = stsp.organizational_team_id
- AND   srsp.service_property = stsp.service_property
-WHERE  source_instance_id = $1::uuid
-  AND  source_instance_id = instance_id;`
+       srsp.service_id
+FROM   soma.repository_service_property srsp
+JOIN   soma.service_property ssp
+  ON   srsp.team_id = ssp.team_id
+ AND   srsp.service_id = ssp.id
+WHERE  srsp.source_instance_id = $1::uuid
+  AND  srsp.source_instance_id = srsp.instance_id;`
 
 	RepoNameByID = `
 SELECT repository_name
