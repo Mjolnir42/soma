@@ -11,6 +11,7 @@ package tree
 import (
 	"fmt"
 	"reflect"
+	"sync"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -40,6 +41,7 @@ type Node struct {
 	loadedInstances map[string]map[string]CheckInstance
 	hasUpdate       bool
 	log             *log.Logger
+	lock            sync.RWMutex
 }
 
 type NodeSpec struct {
@@ -236,6 +238,11 @@ func (ten *Node) ComputeCheckInstances() {
 		ten.ID.String(),
 	)
 	ten.updateCheckInstances()
+}
+
+//
+func (ten *Node) GetRepositoryName() string {
+	return ten.Parent.(Bucketeer).GetBucket().(Bucketeer).GetRepositoryName()
 }
 
 //
