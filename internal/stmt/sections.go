@@ -15,7 +15,8 @@ const (
 	SectionList = `
 SELECT section_id,
        section_name
-FROM   soma.sections;`
+FROM   soma.sections
+WHERE  category = $1::varchar;`
 
 	SectionSearch = `
 SELECT section_id,

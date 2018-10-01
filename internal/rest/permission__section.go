@@ -25,6 +25,9 @@ func (x *Rest) SectionList(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionSection
 	request.Action = msg.ActionList
+	request.SectionObj = proto.Section{
+		Category: params.ByName(`category`),
+	}
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -47,6 +50,7 @@ func (x *Rest) SectionShow(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionShow
 	request.SectionObj = proto.Section{
 		ID: params.ByName(`section`),
+		Category: params.ByName(`category`),
 	}
 
 	if !x.isAuthorized(&request) {
