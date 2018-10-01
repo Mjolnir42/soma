@@ -232,7 +232,7 @@ func ValidatePredicate(s string) error {
 		return err
 	}
 
-	if res.Predicates != nil || len(*res.Predicates) == 0 {
+	if res.Predicates == nil || len(*res.Predicates) == 0 {
 		return fmt.Errorf(`no object returned`)
 	}
 
@@ -251,7 +251,7 @@ func ValidateCategory(s string) error {
 		return err
 	}
 
-	if res.Categories != nil || len(*res.Categories) == 0 {
+	if res.Categories == nil || len(*res.Categories) == 0 {
 		return fmt.Errorf(`no object returned`)
 	}
 
