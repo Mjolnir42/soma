@@ -252,6 +252,7 @@ const (
 	NativePropertyEntity                    = `entity`
 	NativePropertyState                     = `state`
 	NativePropertyHardwareNode              = `hardware_node`
+	ViewAny                                 = `any`
 	ViewLocal                               = `local`
 )
 
