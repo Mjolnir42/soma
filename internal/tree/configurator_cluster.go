@@ -647,7 +647,7 @@ func (c *Cluster) createPerServiceCheckInstances(ctx *checkContext) {
 						// be equal, since InstanceSvcCfgHash is
 						// equal
 						delete(c.loadedInstances[ctx.uuid], ldInstID)
-						c.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s,"+
+						c.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, "+
 							"CheckID=%s, InstanceID=%s, ServiceConstrained=%t",
 							c.GetRepositoryName(), `ComputeInstance`, `cluster`,
 							c.ID.String(), ctx.uuid, ldInstID, true,
