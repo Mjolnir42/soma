@@ -60,10 +60,10 @@ func (r *NodeRead) oncallProperties(node *proto.Node) error {
 // serviceProperties adds the service properties of the node
 func (r *NodeRead) serviceProperties(node *proto.Node) error {
 	var (
-		rows                               *sql.Rows
-		err                                error
-		instanceID, sourceInstanceID, view string
-		serviceName                        string
+		rows                         *sql.Rows
+		err                          error
+		instanceID, sourceInstanceID string
+		serviceID, view              string
 	)
 
 	if rows, err = r.stmtPropService.Query(
@@ -77,7 +77,7 @@ func (r *NodeRead) serviceProperties(node *proto.Node) error {
 			&instanceID,
 			&sourceInstanceID,
 			&view,
-			&serviceName,
+			&serviceID,
 		); err != nil {
 			rows.Close()
 			return err
@@ -90,7 +90,7 @@ func (r *NodeRead) serviceProperties(node *proto.Node) error {
 			SourceInstanceID: sourceInstanceID,
 			View:             view,
 			Service: &proto.PropertyService{
-				Name: serviceName,
+				ID: serviceID,
 			},
 		})
 	}

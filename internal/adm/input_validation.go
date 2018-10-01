@@ -337,10 +337,11 @@ func ValidateCheckConstraints(repoID, teamID string,
 		case `service`:
 			service := proto.PropertyService{}
 			var err error
-			if service.Name, err = LookupServicePropertyID(
+			if service.ID, err = LookupServicePropertyID(
 				prop.Service.Name, teamID); err != nil {
 				return nil, err
 			}
+			service.Name = prop.Service.Name
 			service.TeamID = teamID
 			valid = append(valid, proto.CheckConfigConstraint{
 				ConstraintType: prop.ConstraintType,

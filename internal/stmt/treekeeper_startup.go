@@ -423,13 +423,13 @@ LEFT JOIN   soma.repository_service_property srsp
 LEFT JOIN   soma.bucket_service_property sbsp
   ON        spi.instance_id = sbsp.instance_id
   AND       spi.source_instance_id = sbsp.source_instance_id
-LEFT JOIN   soma.group_service_properties sgsp
+LEFT JOIN   soma.group_service_property sgsp
   ON        spi.instance_id = sgsp.instance_id
   AND       spi.source_instance_id = sgsp.source_instance_id
-LEFT JOIN   soma.cluster_service_properties scsp
+LEFT JOIN   soma.cluster_service_property scsp
   ON        spi.instance_id = scsp.instance_id
   AND       spi.source_instance_id = scsp.source_instance_id
-LEFT JOIN   soma.node_service_properties snsp
+LEFT JOIN   soma.node_service_property snsp
   ON        spi.instance_id = snsp.instance_id
   AND       spi.source_instance_id = snsp.source_instance_id
 WHERE       spi.instance_id != spi.source_instance_id

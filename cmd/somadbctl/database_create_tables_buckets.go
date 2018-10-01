@@ -68,7 +68,7 @@ create table if not exists soma.bucket_service_property (
     repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',
-    CONSTRAINT __bucket_service_property_service_exists FOREIGN KEY ( team_id, service_id ) REFERENCES soma.service_proprty ( team_id, id ) DEFERRABLE,
+    CONSTRAINT __bucket_service_property_service_exists FOREIGN KEY ( team_id, service_id ) REFERENCES soma.service_property ( team_id, id ) DEFERRABLE,
     FOREIGN KEY ( source_instance_id, repository_id ) REFERENCES soma.property_instances ( instance_id, repository_id ) DEFERRABLE
 );`
 	queries[idx] = "createTableBucketService"

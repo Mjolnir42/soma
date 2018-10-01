@@ -62,23 +62,23 @@ create table if not exists soma.node_oncall_property (
 	queries[idx] = "createTableNodeOncallProperty"
 	idx++
 
-	queryMap["createTableNodeServiceProperties"] = `
+	queryMap["createTableNodeServiceProperty"] = `
 create table if not exists soma.node_service_properties (
     instance_id                 uuid            NOT NULL REFERENCES soma.property_instances ( instance_id ) DEFERRABLE,
     source_instance_id          uuid            NOT NULL,
     node_id                     uuid            NOT NULL REFERENCES soma.nodes ( node_id ) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
-    service_property            varchar(64)     NOT NULL,
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    service_id                  uuid            NOT NULL,
+    team_id                     uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
     repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',
-    UNIQUE ( node_id, service_property, view ),
-    FOREIGN KEY ( organizational_team_id, service_property ) REFERENCES soma.team_service_properties ( organizational_team_id, service_property ) DEFERRABLE,
-    FOREIGN KEY ( node_id, organizational_team_id ) REFERENCES soma.nodes ( node_id, organizational_team_id ) DEFERRABLE,
-    FOREIGN KEY ( source_instance_id, repository_id ) REFERENCES soma.property_instances ( instance_id, repository_id ) DEFERRABLE
+    CONSTRAINT __node_service_property_unique_assignment UNIQUE ( node_id, service_id, view ) DEFERRABLE,
+    CONSTRAINT __node_service_property_service_exists FOREIGN KEY ( team_id, service_id ) REFERENCES soma.service_property ( team_id, id ) DEFERRABLE,
+    CONSTRAINT __node_service_property_service_owner FOREIGN KEY ( node_id, team_id ) REFERENCES soma.nodes ( node_id, organizational_team_id ) DEFERRABLE,
+    CONSTRAINT __node_service_property_same_repository FOREIGN KEY ( source_instance_id, repository_id ) REFERENCES soma.property_instances ( instance_id, repository_id ) DEFERRABLE
 );`
-	queries[idx] = "createTableNodeServiceProperties"
+	queries[idx] = "createTableNodeServiceProperty"
 	idx++
 
 	queryMap["createTableNodeSystemProperties"] = `

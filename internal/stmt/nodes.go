@@ -79,8 +79,8 @@ WHERE  op.node_id = $1::uuid;`
 SELECT sp.instance_id,
        sp.source_instance_id,
        sp.view,
-       sp.service_property
-FROM   soma.node_service_properties sp
+       sp.service_id
+FROM   soma.node_service_property sp
 WHERE  sp.node_id = $1::uuid;`
 
 	NodeSysProps = `

@@ -221,6 +221,7 @@ type PropertyService struct {
 	Inheritance   bool
 	ChildrenOnly  bool
 	View          string
+	ServiceID     uuid.UUID
 	Service       string
 	Attributes    []proto.ServiceAttribute
 	Instances     []PropertyInstance
@@ -263,13 +264,11 @@ func (p *PropertyService) GetView() string {
 }
 
 func (p *PropertyService) GetKey() string {
-	return p.Service
+	return p.ServiceID.String()
 }
 
-// service has no Value per se, so ensure comparing values never
-// succeeds, but Interface is fulfilled
 func (p *PropertyService) GetValue() string {
-	return p.ID.String()
+	return p.Service
 }
 
 func (p *PropertyService) GetInstanceID(objType string, objID uuid.UUID, l *log.Logger) uuid.UUID {

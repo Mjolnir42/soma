@@ -86,7 +86,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 		request.Property.Native.Name = params.ByName(`propertyID`)
 	case msg.PropertyTemplate:
 		request.Section = msg.SectionPropertyTemplate
-		request.Property.Service.Name = params.ByName(`propertyID`)
+		request.Property.Service.ID = params.ByName(`propertyID`)
 	case msg.PropertySystem:
 		request.Section = msg.SectionPropertySystem
 		request.Property.System.Name = params.ByName(`propertyID`)
@@ -100,7 +100,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 		request.Section = msg.SectionPropertyService
 		request.Team.ID = params.ByName(`teamID`)
 		request.Property.Service.TeamID = request.Team.ID
-		request.Property.Service.Name = params.ByName(`propertyID`)
+		request.Property.Service.ID = params.ByName(`propertyID`)
 	default:
 		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
 		return

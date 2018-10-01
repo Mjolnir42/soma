@@ -111,23 +111,23 @@ create table if not exists soma.group_oncall_properties (
 	queries[idx] = "createTableGroupOncallProperty"
 	idx++
 
-	queryMap["createTableGroupServiceProperties"] = `
-create table if not exists soma.group_service_properties (
+	queryMap["createTableGroupServiceProperty"] = `
+create table if not exists soma.group_service_property (
     instance_id                 uuid            NOT NULL REFERENCES soma.property_instances ( instance_id ) DEFERRABLE,
     source_instance_id          uuid            NOT NULL,
     group_id                    uuid            NOT NULL REFERENCES soma.groups ( group_id ) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
-    service_property            varchar(64)     NOT NULL,
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    service_id                  uuid            NOT NULL REFERENCES soma.service_property ( id ) DEFERRABLE,
+    team_id                     uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
     repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',
-    UNIQUE( group_id, service_property, view ),
-    FOREIGN KEY ( organizational_team_id, service_property ) REFERENCES soma.team_service_properties ( organizational_team_id, service_property ) DEFERRABLE,
-    FOREIGN KEY ( group_id, organizational_team_id ) REFERENCES soma.groups ( group_id, organizational_team_id ) DEFERRABLE,
-    FOREIGN KEY ( source_instance_id, repository_id ) REFERENCES soma.property_instances ( instance_id, repository_id ) DEFERRABLE
+    CONSTRAINT __group_service_property_unique_assignment UNIQUE( group_id, service_id, view ),
+    CONSTRAINT __group_service_property_service_exists FOREIGN KEY ( team_id, service_id ) REFERENCES soma.service_property ( team_id, id ) DEFERRABLE,
+    CONSTRAINT __group_service_property_service_owner  FOREIGN KEY ( group_id, team_id ) REFERENCES soma.groups ( group_id, organizational_team_id ) DEFERRABLE,
+    CONSTRAINT __group_service_property_same_repository FOREIGN KEY ( source_instance_id, repository_id ) REFERENCES soma.property_instances ( instance_id, repository_id ) DEFERRABLE
 );`
-	queries[idx] = "createTableGroupServiceProperties"
+	queries[idx] = "createTableGroupServiceProperty"
 	idx++
 
 	queryMap["createTableGroupSystemProperties"] = `

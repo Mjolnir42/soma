@@ -58,8 +58,8 @@ WHERE  op.cluster_id = $1::uuid;`
 SELECT sp.instance_id,
        sp.source_instance_id,
        sp.view,
-       sp.service_property
-FROM   soma.cluster_service_properties sp
+       sp.service_id
+FROM   soma.cluster_service_property sp
 WHERE  sp.cluster_id = $1::uuid;`
 
 	ClusterSysProps = `

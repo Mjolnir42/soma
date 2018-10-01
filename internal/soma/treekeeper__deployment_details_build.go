@@ -230,6 +230,7 @@ deploymentbuilder:
 					detail.CheckInstance.InstanceService,
 					detail.View,
 				).Scan(
+					&detail.Service.ID,
 					&detail.Service.Name,
 					&detail.Service.TeamID,
 				)
@@ -329,6 +330,7 @@ deploymentbuilder:
 					detail.CheckInstance.InstanceService,
 					detail.View,
 				).Scan(
+					&detail.Service.ID,
 					&detail.Service.Name,
 					&detail.Service.TeamID,
 				)
@@ -433,6 +435,7 @@ deploymentbuilder:
 					detail.CheckInstance.InstanceService,
 					detail.View,
 				).Scan(
+					&detail.Service.ID,
 					&detail.Service.Name,
 					&detail.Service.TeamID,
 				)
