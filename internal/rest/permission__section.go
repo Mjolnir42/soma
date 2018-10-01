@@ -49,8 +49,8 @@ func (x *Rest) SectionShow(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionSection
 	request.Action = msg.ActionShow
 	request.SectionObj = proto.Section{
-		ID: params.ByName(`section`),
 		Category: params.ByName(`category`),
+		ID:       params.ByName(`sectionID`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -134,7 +134,7 @@ func (x *Rest) SectionRemove(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionSection
 	request.Action = msg.ActionRemove
 	request.SectionObj = proto.Section{
-		ID: params.ByName(`section`),
+		ID: params.ByName(`sectionID`),
 	}
 
 	if !x.isAuthorized(&request) {
