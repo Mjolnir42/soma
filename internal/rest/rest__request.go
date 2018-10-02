@@ -19,6 +19,7 @@ func newRequest(r *http.Request, params httprouter.Params) msg.Request {
 	returnChannel := make(chan msg.Result, 1)
 	return msg.Request{
 		ID:         requestID(params),
+		RequestURI: requestURI(params),
 		RemoteAddr: extractAddress(r.RemoteAddr),
 		AuthUser:   params.ByName(`AuthenticatedUser`),
 		Reply:      returnChannel,
