@@ -22,7 +22,7 @@ func (x *Rest) ActionList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionList
 	request.ActionObj = proto.Action{
@@ -45,7 +45,7 @@ func (x *Rest) ActionShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionShow
 	request.ActionObj = proto.Action{
@@ -81,7 +81,7 @@ func (x *Rest) ActionSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionSearch
 	request.ActionObj = proto.Action{
@@ -116,7 +116,7 @@ func (x *Rest) ActionAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionAdd
 	request.ActionObj = proto.Action{
@@ -140,7 +140,7 @@ func (x *Rest) ActionRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionRemove
 	request.ActionObj = proto.Action{

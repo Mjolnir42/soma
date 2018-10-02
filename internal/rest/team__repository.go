@@ -19,7 +19,7 @@ func (x *Rest) RepositoryDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepository
 	request.Action = msg.ActionDestroy
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -40,7 +40,7 @@ func (x *Rest) RepositoryAudit(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepository
 	request.Action = msg.ActionAudit
 	request.Repository.ID = params.ByName(`repositoryID`)

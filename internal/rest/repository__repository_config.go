@@ -21,7 +21,7 @@ func (x *Rest) RepositoryConfigList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionList
 
@@ -51,7 +51,7 @@ func (x *Rest) RepositoryConfigSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionSearch
 	request.Search.Repository.ID = cReq.Filter.Repository.ID
@@ -76,7 +76,7 @@ func (x *Rest) RepositoryConfigShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionShow
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -96,7 +96,7 @@ func (x *Rest) RepositoryConfigTree(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionTree
 	request.Tree = proto.Tree{
@@ -143,7 +143,7 @@ func (x *Rest) RepositoryConfigPropertyCreate(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionPropertyCreate
 	request.Repository = cReq.Repository.Clone()
@@ -165,7 +165,7 @@ func (x *Rest) RepositoryConfigPropertyDestroy(w http.ResponseWriter, r *http.Re
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionPropertyDestroy
 	request.TargetEntity = msg.EntityRepository
@@ -218,7 +218,7 @@ func (x *Rest) RepositoryConfigPropertyUpdate(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionPropertyUpdate
 	request.Repository = cReq.Repository.Clone()

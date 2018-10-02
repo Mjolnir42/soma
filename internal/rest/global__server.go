@@ -22,7 +22,7 @@ func (x *Rest) ServerList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionList
 
@@ -41,7 +41,7 @@ func (x *Rest) ServerShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionShow
 	request.Server.ID = params.ByName(`serverID`)
@@ -72,7 +72,7 @@ func (x *Rest) ServerSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionSearch
 	request.Search.Server.Name = cReq.Filter.Server.Name
@@ -93,7 +93,7 @@ func (x *Rest) ServerSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionSync
 
@@ -118,7 +118,7 @@ func (x *Rest) ServerAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionAdd
 	request.Server.AssetID = cReq.Server.AssetID
@@ -149,7 +149,7 @@ func (x *Rest) ServerRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	switch cReq.Flags.Purge {
 	case true:
@@ -184,7 +184,7 @@ func (x *Rest) ServerUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionUpdate
 	request.Server.ID = cReq.Server.ID
@@ -221,7 +221,7 @@ func (x *Rest) ServerAddNull(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionInsertNullID
 	request.Server.Datacenter = cReq.Server.Datacenter

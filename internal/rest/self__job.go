@@ -21,7 +21,7 @@ func (x *Rest) JobList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionJob
 	request.Action = msg.ActionList
 
@@ -40,7 +40,7 @@ func (x *Rest) JobShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionJob
 	request.Action = msg.ActionShow
 	request.Flag.JobDetail = false
@@ -67,7 +67,7 @@ func (x *Rest) JobSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionJob
 	request.Action = msg.ActionSearch
 	request.Flag.JobDetail = false
@@ -89,7 +89,7 @@ func (x *Rest) JobWait(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionJob
 	request.Action = msg.ActionWait
 	request.Job.ID = params.ByName(`jobID`)

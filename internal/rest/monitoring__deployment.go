@@ -26,7 +26,7 @@ func (x *Rest) DeploymentShow(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDeployment
 	request.Action = msg.ActionShow
 	request.Deployment.ID = params.ByName(`deploymentID`)
@@ -51,7 +51,7 @@ func (x *Rest) DeploymentUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDeployment
 	request.Deployment.ID = params.ByName(`deploymentID`)
 
@@ -93,7 +93,7 @@ func (x *Rest) DeploymentList(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDeployment
 	request.Action = msg.ActionList
 	request.Monitoring.ID = params.ByName(`monitoringID`)
@@ -118,7 +118,7 @@ func (x *Rest) DeploymentPending(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDeployment
 	request.Action = msg.ActionPending
 	request.Monitoring.ID = params.ByName(`monitoringID`)

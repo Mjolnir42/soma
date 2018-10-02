@@ -22,7 +22,7 @@ func (x *Rest) GroupList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionList
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -64,7 +64,7 @@ func (x *Rest) GroupSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionSearch
 	request.Search.Group.Name = cReq.Filter.Group.Name
@@ -90,7 +90,7 @@ func (x *Rest) GroupShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionShow
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -112,7 +112,7 @@ func (x *Rest) GroupTree(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionTree
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -148,7 +148,7 @@ func (x *Rest) GroupCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionCreate
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -170,7 +170,7 @@ func (x *Rest) GroupDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionDestroy
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -192,7 +192,7 @@ func (x *Rest) GroupMemberList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionMemberList
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -220,7 +220,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionMemberAssign
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -270,7 +270,7 @@ func (x *Rest) GroupMemberUnassign(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionMemberUnassign
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -337,7 +337,7 @@ func (x *Rest) GroupPropertyCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionPropertyCreate
 	request.TargetEntity = msg.EntityGroup
@@ -378,7 +378,7 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionPropertyDestroy
 	request.TargetEntity = msg.EntityGroup

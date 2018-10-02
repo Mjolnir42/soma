@@ -22,7 +22,7 @@ func (x *Rest) PropertyMgmtList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionList
 
@@ -69,7 +69,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionShow
 
@@ -127,7 +127,7 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionSearch
 
@@ -253,7 +253,7 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionAdd
 
@@ -319,7 +319,7 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionRemove
 

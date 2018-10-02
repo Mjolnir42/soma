@@ -34,7 +34,7 @@ func (x *Rest) SystemOperation(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionSystem
 	request.Action = cReq.System.Request
 	request.System = proto.System{
@@ -59,7 +59,7 @@ func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Re
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionSystem
 	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
@@ -82,7 +82,7 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionSystem
 	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{

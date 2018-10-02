@@ -21,7 +21,7 @@ func (x *Rest) CapabilityList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
 	request.Action = msg.ActionList
 
@@ -52,7 +52,7 @@ func (x *Rest) CapabilitySearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
 	request.Action = msg.ActionSearch
 
@@ -90,7 +90,7 @@ func (x *Rest) CapabilityShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
 	request.Action = msg.ActionShow
 	request.Capability = proto.Capability{
@@ -118,7 +118,7 @@ func (x *Rest) CapabilityAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
 	request.Action = msg.ActionAdd
 	request.Capability = cReq.Capability.Clone()
@@ -138,7 +138,7 @@ func (x *Rest) CapabilityRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
 	request.Action = msg.ActionRemove
 	request.Capability = proto.Capability{

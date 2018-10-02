@@ -19,7 +19,7 @@ import (
 func (x *Rest) ScopeSelectMonitoringList(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoringMgmt
 	request.Action = msg.ActionAll
 	request.Flag.Unscoped = true
@@ -36,7 +36,7 @@ func (x *Rest) ScopeSelectMonitoringList(w http.ResponseWriter,
 func (x *Rest) ScopeSelectMonitoringSearch(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoringMgmt
 	request.Action = msg.ActionSearchAll
 	request.Flag.Unscoped = true
@@ -87,7 +87,7 @@ func (x *Rest) ScopeSelectInstanceShow(w http.ResponseWriter,
 func (x *Rest) ScopeSelectJobList(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionJobMgmt
 	request.Action = msg.ActionList
 	request.Flag.Unscoped = true
@@ -104,7 +104,7 @@ func (x *Rest) ScopeSelectJobList(w http.ResponseWriter,
 func (x *Rest) ScopeSelectJobWait(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionJobMgmt
 	request.Action = msg.ActionWait
 	request.Job.ID = params.ByName(`jobID`)
@@ -122,7 +122,7 @@ func (x *Rest) ScopeSelectJobWait(w http.ResponseWriter, r *http.Request,
 func (x *Rest) ScopeSelectUserShow(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionShow
 	request.User.ID = params.ByName(`userID`)
@@ -147,7 +147,7 @@ func (x *Rest) ScopeSelectUserSearch(w http.ResponseWriter,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionSearch
 	request.Search.User.UserName = cReq.Filter.User.UserName
@@ -165,7 +165,7 @@ func (x *Rest) ScopeSelectUserSearch(w http.ResponseWriter,
 func (x *Rest) ScopeSelectTeamShow(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionShow
 	request.Team.ID = params.ByName(`teamID`)
@@ -190,7 +190,7 @@ func (x *Rest) ScopeSelectTeamSearch(w http.ResponseWriter,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionSearch
 	request.Search.Team.Name = cReq.Filter.Team.Name

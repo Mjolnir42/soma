@@ -75,7 +75,7 @@ func (x *Rest) PermissionSearch(w http.ResponseWriter, r *http.Request,
 			`PermissionSearch request missing permission name or category`))
 		return
 	}
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPermission
 	request.Action = msg.ActionSearch
 	request.Search.Permission.Name = cReq.Filter.Permission.Name

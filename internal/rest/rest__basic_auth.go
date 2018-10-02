@@ -97,7 +97,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 			if err == nil {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
 				if len(pair) == 2 {
-					request := newRequest(r, ps)
+					request := msg.New(r, ps)
 					request.Section = msg.SectionSupervisor
 					request.Action = msg.ActionAuthenticate
 					request.Super = &msg.Supervisor{

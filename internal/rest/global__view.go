@@ -74,7 +74,7 @@ func (x *Rest) ViewAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionAdd
 	request.View = proto.View{
@@ -129,7 +129,7 @@ func (x *Rest) ViewRename(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionRename
 	request.View = proto.View{

@@ -22,7 +22,7 @@ func (x *Rest) TeamMgmtList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionList
 	request.Flag.Unscoped = true
@@ -54,7 +54,7 @@ func (x *Rest) TeamMgmtSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionSearch
 	request.Search.Team.Name = cReq.Filter.Team.Name
@@ -84,7 +84,7 @@ func (x *Rest) TeamMgmtShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionShow
 	request.Team = proto.Team{
@@ -106,7 +106,7 @@ func (x *Rest) TeamMgmtSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionSync
 	request.Flag.Unscoped = true
@@ -132,7 +132,7 @@ func (x *Rest) TeamMgmtAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionAdd
 	request.Team = cReq.Team.Clone()
@@ -166,7 +166,7 @@ func (x *Rest) TeamMgmtUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionUpdate
 	request.Team = cReq.Team.Clone()
@@ -186,7 +186,7 @@ func (x *Rest) TeamMgmtRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
 	request.Action = msg.ActionRemove
 	request.Team = proto.Team{

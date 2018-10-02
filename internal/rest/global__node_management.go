@@ -34,7 +34,7 @@ func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 		serverID = `00000000-0000-0000-0000-000000000000`
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNodeMgmt
 	request.Action = msg.ActionAdd
 	request.Node = proto.Node{
@@ -62,7 +62,7 @@ func (x *Rest) NodeMgmtSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNodeMgmt
 	request.Action = msg.ActionSync
 
@@ -87,7 +87,7 @@ func (x *Rest) NodeMgmtUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNodeMgmt
 	request.Action = msg.ActionUpdate
 	request.Node = proto.Node{
@@ -121,7 +121,7 @@ func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNodeMgmt
 	action := msg.ActionRemove
 	if cReq.Flags.Purge {

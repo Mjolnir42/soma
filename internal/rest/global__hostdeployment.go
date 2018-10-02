@@ -37,7 +37,7 @@ func (x *Rest) HostDeploymentFetch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionHostDeployment
 	request.Action = msg.ActionGet
 	request.Monitoring.ID = params.ByName(`monitoringID`)
@@ -81,7 +81,7 @@ func (x *Rest) HostDeploymentAssemble(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionHostDeployment
 	request.Action = msg.ActionAssemble
 	request.Monitoring.ID = params.ByName(`monitoringID`)

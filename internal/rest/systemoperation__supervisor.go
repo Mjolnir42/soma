@@ -42,7 +42,7 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 		Value: uuid.Must(uuid.NewV4()).String(),
 	})
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionSupervisor
 	request.Action = msg.ActionKex
 	request.Super = &msg.Supervisor{
@@ -63,7 +63,7 @@ func (x *Rest) SupervisorTokenInvalidate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionSupervisor
 	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
@@ -85,7 +85,7 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionSupervisor
 	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
@@ -175,7 +175,7 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 		task = msg.SubjectRoot
 	}
 
-	request := newRequest(r, *params)
+	request := msg.New(r, *params)
 	request.Section = section
 	request.Action = action
 	request.Super = &msg.Supervisor{

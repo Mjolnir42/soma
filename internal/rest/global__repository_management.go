@@ -34,7 +34,7 @@ func (x *Rest) RepositoryMgmtCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryMgmt
 	request.Action = msg.ActionCreate
 	request.Repository = cReq.Repository.Clone()
@@ -66,7 +66,7 @@ func (x *Rest) RepositoryMgmtRename(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryMgmt
 	request.Action = msg.ActionRename
 	request.Repository.ID = params.ByName(`repositoryID`)

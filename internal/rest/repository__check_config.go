@@ -22,7 +22,7 @@ func (x *Rest) CheckConfigList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCheckConfig
 	request.Action = msg.ActionList
 	request.CheckConfig = proto.CheckConfig{
@@ -55,7 +55,7 @@ func (x *Rest) CheckConfigSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCheckConfig
 	request.Action = msg.ActionSearch
 	request.CheckConfig = proto.CheckConfig{
@@ -85,7 +85,7 @@ func (x *Rest) CheckConfigShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCheckConfig
 	request.Action = msg.ActionShow
 	request.CheckConfig = proto.CheckConfig{
@@ -114,7 +114,7 @@ func (x *Rest) CheckConfigCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoring
 	request.Action = msg.ActionUse
 	request.CheckConfig = cReq.CheckConfig.Clone()
@@ -142,7 +142,7 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoring
 	request.Action = msg.ActionUse
 	request.CheckConfig = proto.CheckConfig{

@@ -29,7 +29,7 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 
 	// XXX check params.ByName(`nodeID`) == cReq.Node.ID
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Node.ID = cReq.Node.ID
 	request.Node.Config.RepositoryID = cReq.Node.Config.RepositoryID
 	request.Node.Config.BucketID = cReq.Node.Config.BucketID
@@ -61,7 +61,7 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Node.ID = params.ByName(`nodeID`)
@@ -119,7 +119,7 @@ func (x *Rest) NodeConfigPropertyCreate(w http.ResponseWriter,
 		}
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNodeConfig
 	request.Action = msg.ActionPropertyCreate
 	request.TargetEntity = msg.EntityNode
@@ -170,7 +170,7 @@ func (x *Rest) NodeConfigPropertyDestroy(w http.ResponseWriter,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNodeConfig
 	request.Action = msg.ActionPropertyDestroy
 	request.TargetEntity = msg.EntityNode
@@ -212,7 +212,7 @@ func (x *Rest) NodeConfigTree(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNodeConfig
 	request.Action = msg.ActionTree
 	request.Tree = proto.Tree{

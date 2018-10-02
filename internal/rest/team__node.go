@@ -21,7 +21,7 @@ func (x *Rest) NodeList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNode
 	request.Action = msg.ActionList
 
@@ -46,7 +46,7 @@ func (x *Rest) NodeSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNode
 	request.Action = msg.ActionSearch
 	request.Search.Node.Name = cReq.Filter.Node.Name
@@ -75,7 +75,7 @@ func (x *Rest) NodeShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNode
 	request.Action = msg.ActionShow
 	request.Node.ID = params.ByName(`nodeID`)
@@ -95,7 +95,7 @@ func (x *Rest) NodeShowConfig(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionNode
 	request.Action = msg.ActionShowConfig
 	request.Node.ID = params.ByName(`nodeID`)

@@ -21,7 +21,7 @@ func (x *Rest) AttributeList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionList
 
@@ -40,7 +40,7 @@ func (x *Rest) AttributeShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionShow
 	request.Attribute = proto.Attribute{
@@ -68,7 +68,7 @@ func (x *Rest) AttributeAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionAdd
 	request.Attribute = proto.Attribute{
@@ -91,7 +91,7 @@ func (x *Rest) AttributeRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionRemove
 	request.Attribute = proto.Attribute{
