@@ -383,6 +383,11 @@ func VerifyNoArgument(c *cli.Context) error {
 func AllArguments(c *cli.Context) []string {
 	sl := []string{c.Args().First()}
 	sl = append(sl, c.Args().Tail()...)
+
+	if c.Args().First() == `` && len(sl) == 1 {
+		return []string{}
+	}
+
 	return sl
 }
 
