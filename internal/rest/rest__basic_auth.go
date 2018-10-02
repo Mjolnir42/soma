@@ -65,10 +65,16 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 			Value: r.RequestURI,
 		})
 
+		logEntry := x.reqLog.WithField(`RequestID`, requestID.String()).
+			WithField(`RequestURI`, r.RequestURI).
+			WithField(`Phase`, `basic-auth`)
+
 		// if the supervisor is not available, no requests are accepted
 		if supervisor = x.handlerMap.Get(`supervisor`); supervisor == nil {
 			http.Error(w, `Authentication supervisor not available`,
 				http.StatusServiceUnavailable)
+			logEntry.WithField(`Code`, http.StatusServiceUnavailable).
+				Warn(`Authentication supervisor not available`)
 			return
 		}
 
@@ -109,6 +115,9 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 					result := <-request.Reply
 					if result.Error != nil {
 						// log authentication errors
+						logEntry = logEntry.WithField(`AuthenticationUser`, string(pair[0])).
+							WithField(`AuthenticationError`, result.Error.Error())
+						goto unauthorized
 					}
 					if result.Super.Verdict == 200 {
 						// record the authenticated user
@@ -121,6 +130,13 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 							Key:   `AuthenticatedToken`,
 							Value: string(pair[1]),
 						})
+
+						// log successful basic auth requests only at debug level
+						// since they will also be logged by rest.send()
+						logEntry.WithField(`AuthenticationUser`, string(pair[0])).
+							WithField(`Code`, int(result.Super.Verdict)).
+							Debug(http.StatusText(int(result.Super.Verdict)))
+
 						// Delegate request to given handle
 						h(w, r, ps)
 						return
@@ -128,11 +144,19 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 					}
 				}
 			}
+		} else {
+			logEntry = logEntry.WithField(
+				`AuthenticationError`,
+				`Invalid BasicAuth authorization header`,
+			)
 		}
 
+	unauthorized:
 		w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
 		http.Error(w, http.StatusText(http.StatusUnauthorized),
 			http.StatusUnauthorized)
+		logEntry.WithField(`Code`, http.StatusUnauthorized).
+			Info(http.StatusText(http.StatusUnauthorized))
 	}
 }
 
