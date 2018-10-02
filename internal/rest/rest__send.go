@@ -34,6 +34,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		WithField(`Section`, r.Section).
 		WithField(`Action`, r.Action).
 		WithField(`Request`, fmt.Sprintf("%s::%s", r.Section, r.Action)).
+		WithField(`RequestURI`, r.RequestURI).
 		WithField(`Phase`, `result`)
 
 	// this is central error command, proceeding to ErrorLog while
