@@ -75,7 +75,7 @@ func (x *Rest) ActionSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Action.SectionID == `` || cReq.Action.Name == `` {
+	if cReq.Filter.Action.SectionID == `` || cReq.Filter.Action.Name == `` {
 		dispatchBadRequest(&w,
 			fmt.Errorf(`Invalid action search specification`))
 		return
@@ -84,10 +84,8 @@ func (x *Rest) ActionSearch(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionSearch
-	request.ActionObj = proto.Action{
-		Name:      cReq.Action.Name,
-		SectionID: cReq.Action.SectionID,
-	}
+	request.Search.ActionObj.Name = cReq.Filter.Action.Name
+	request.Search.ActionObj.SectionID = cReq.Filter.Action.SectionID
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

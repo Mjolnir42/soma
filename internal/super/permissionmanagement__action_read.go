@@ -117,8 +117,8 @@ func (s *Supervisor) actionSearch(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = s.stmtActionSearch.Query(
-		q.ActionObj.Name,
-		q.ActionObj.SectionID,
+		q.Search.ActionObj.Name,
+		q.Search.ActionObj.SectionID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
