@@ -28,9 +28,11 @@ func (s *Supervisor) permissionWrite(q *msg.Request, mr *msg.Result) {
 	case msg.ActionAdd:
 		switch q.Permission.Category {
 		case msg.CategoryGlobal,
+			msg.CategoryIdentity,
 			msg.CategoryPermission,
 			msg.CategoryOperation,
 			msg.CategoryRepository,
+			msg.CategorySelf,
 			msg.CategoryTeam,
 			msg.CategoryMonitoring:
 			s.permissionAdd(q, mr)
@@ -44,9 +46,11 @@ func (s *Supervisor) permissionWrite(q *msg.Request, mr *msg.Result) {
 	case msg.ActionRemove:
 		switch q.Permission.Category {
 		case msg.CategoryGlobal,
+			msg.CategoryIdentity,
 			msg.CategoryPermission,
 			msg.CategoryOperation,
 			msg.CategoryRepository,
+			msg.CategorySelf,
 			msg.CategoryTeam,
 			msg.CategoryMonitoring:
 			s.permissionRemove(q, mr)
@@ -300,6 +304,10 @@ func (s *Supervisor) permissionAddTx(q *msg.Request,
 		grantCategory = msg.CategoryGrantTeam
 	case msg.CategoryMonitoring:
 		grantCategory = msg.CategoryGrantMonitoring
+	case msg.CategorySelf:
+		grantCategory = msg.CategoryGrantSelf
+	case msg.CategoryIdentity:
+		grantCategory = msg.CategoryGrantIdentity
 	}
 
 	if res, err = txMap[`permission_add_tx_perm`].Exec(
@@ -341,6 +349,8 @@ func (s *Supervisor) permissionRemoveTx(q *msg.Request,
 	switch q.Permission.Category {
 	case msg.CategoryGlobal,
 		msg.CategoryPermission,
+		msg.CategorySelf,
+		msg.CategoryIdentity,
 		msg.CategoryOperation:
 		revocation = `permission_rm_tx_rev_gl`
 	case msg.CategoryRepository:
