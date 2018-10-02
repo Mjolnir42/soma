@@ -117,6 +117,7 @@ func cmdActionAdd(c *cli.Context) error {
 	req := proto.NewActionRequest()
 	req.Action.Name = c.Args().First()
 	req.Action.SectionID = sectionID
+	req.Action.Category = category
 	path := fmt.Sprintf("/category/%s/section/%s/action/",
 		category, sectionID)
 	return adm.Perform(`postbody`, path, `command`, req, c)
