@@ -211,6 +211,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PATCH(rtClusterID, x.Verify(x.ClusterRename))
 			router.PATCH(rtDeploymentIDAction, x.CheckShutdown(x.DeploymentUpdate))
 			router.PATCH(rtPermissionID, x.Verify(x.PermissionEdit))
+			router.PATCH(rtTeamRepositoryID, x.Verify(x.RepositoryRename))
 			router.POST(`/attribute/`, x.Verify(x.AttributeAdd))
 			router.POST(`/capability/`, x.Verify(x.CapabilityAdd))
 			router.POST(`/category/:category/section/:sectionID/action/`, x.Verify(x.ActionAdd))

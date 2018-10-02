@@ -187,7 +187,11 @@ func cmdRepositoryRename(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	path := fmt.Sprintf("/repository/%s", id)
+	teamID, err := adm.LookupTeamByRepo(id)
+	if err != nil {
+		return err
+	}
+	path := fmt.Sprintf("/team/%s/repository/%s", teamID, id)
 
 	var req proto.Request
 	req.Repository = &proto.Repository{}
