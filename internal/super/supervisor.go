@@ -279,6 +279,7 @@ runloop:
 		// handle cache updates before handling user requests
 		select {
 		case req := <-s.Update:
+			s.appLog.Debug(`Supervisor received cache update`)
 			s.process(&req)
 			continue runloop
 		default:
@@ -288,6 +289,7 @@ runloop:
 		// handle whatever request comes in
 		select {
 		case <-gc.C:
+			s.appLog.Info(`Supervisor running garbage collection cycle`)
 			go func() {
 				s.Update <- msg.Request{
 					Section: msg.SectionSupervisor,
@@ -298,8 +300,10 @@ runloop:
 			gc.Stop()
 			break runloop
 		case req := <-s.Update:
+			s.appLog.Debug(`Supervisor received cache update`)
 			s.process(&req)
 		case req := <-s.Input:
+			s.appLog.Debug(`Supervisor received request`)
 			s.process(&req)
 		}
 	}
