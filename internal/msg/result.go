@@ -16,12 +16,13 @@ import (
 )
 
 type Result struct {
-	ID      uuid.UUID
-	Section string
-	Action  string
-	Code    uint16
-	Error   error
-	JobID   string
+	ID         uuid.UUID
+	RequestURI string
+	Section    string
+	Action     string
+	Code       uint16
+	Error      error
+	JobID      string
 
 	Super Supervisor
 
@@ -69,9 +70,10 @@ type Result struct {
 func FromRequest(rq *Request) Result {
 	if rq.Section == SectionSupervisor && rq.Super != nil {
 		return Result{
-			ID:      rq.ID,
-			Section: rq.Section,
-			Action:  rq.Action,
+			ID:         rq.ID,
+			RequestURI: rq.RequestURI,
+			Section:    rq.Section,
+			Action:     rq.Action,
 			Super: Supervisor{
 				Task: rq.Super.Task,
 			},

@@ -24,6 +24,7 @@ type Request struct {
 	TargetEntity  string
 	RemoteAddr    string
 	AuthUser      string
+	RequestURI    string
 	Reply         chan Result
 	JobID         uuid.UUID
 	Search        Filter
