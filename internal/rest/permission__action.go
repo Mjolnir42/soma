@@ -49,8 +49,8 @@ func (x *Rest) ActionShow(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionShow
 	request.ActionObj = proto.Action{
-		ID:        params.ByName(`action`),
-		SectionID: params.ByName(`section`),
+		ID:        params.ByName(`actionID`),
+		SectionID: params.ByName(`sectionID`),
 	}
 
 	if !x.isAuthorized(&request) {
