@@ -80,9 +80,10 @@ func FromRequest(rq *Request) Result {
 		}
 	}
 	return Result{
-		ID:      rq.ID,
-		Section: rq.Section,
-		Action:  rq.Action,
+		ID:         rq.ID,
+		RequestURI: rq.RequestURI,
+		Section:    rq.Section,
+		Action:     rq.Action,
 	}
 }
 
