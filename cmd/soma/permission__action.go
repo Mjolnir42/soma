@@ -200,7 +200,7 @@ func cmdActionList(c *cli.Context) error {
 		multipleAllowed,
 		uniqueOptions,
 		mandatoryOptions,
-		c.Args().Tail(),
+		adm.AllArguments(c),
 	); err != nil {
 		return err
 	}
