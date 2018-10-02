@@ -35,19 +35,15 @@ package rest // import "github.com/mjolnir42/soma/internal/rest"
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/satori/go.uuid"
 
 	"github.com/julienschmidt/httprouter"
 )
-
-// XXX logging
 
 // BasicAuth handles HTTP BasicAuth on requests
 func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
@@ -107,15 +103,6 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 					result := <-request.Reply
 					if result.Error != nil {
 						// log authentication errors
-						log.Printf(msg.LogStrErr,
-							result.Section,
-							fmt.Sprintf("%s (%s)",
-								result.Action,
-								string(pair[0]),
-							),
-							result.Code,
-							result.Error.Error(),
-						)
 					}
 					if result.Super.Verdict == 200 {
 						// record the authenticated user
