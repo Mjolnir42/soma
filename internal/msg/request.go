@@ -80,6 +80,7 @@ func New(r *http.Request, params httprouter.Params) Request {
 	returnChannel := make(chan Result, 1)
 	return Request{
 		ID:         requestID(params),
+		RequestURI: requestURI(params),
 		RemoteAddr: remoteAddr(r),
 		AuthUser:   authUser(params),
 		Reply:      returnChannel,

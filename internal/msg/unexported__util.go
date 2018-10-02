@@ -47,4 +47,10 @@ func remoteAddr(r *http.Request) string {
 	return addr
 }
 
+// requestURI extracts the recorded RequestURI set by Basic
+// Authentication
+func requestURI(params httprouter.Params) string {
+	return params.ByName(`RequestURI`)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
