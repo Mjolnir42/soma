@@ -158,7 +158,7 @@ func (s *Supervisor) RegisterRequests(hmap *handler.Map) {
 	hmap.Request(msg.SectionCategory, msg.ActionAdd, `supervisor`)
 	hmap.Request(msg.SectionCategory, msg.ActionRemove, `supervisor`)
 	hmap.Request(msg.SectionPermission, msg.ActionList, `supervisor`)
-	hmap.Request(msg.SectionPermission, msg.ActionSearchByName, `supervisor`)
+	hmap.Request(msg.SectionPermission, msg.ActionSearch, `supervisor`)
 	hmap.Request(msg.SectionPermission, msg.ActionShow, `supervisor`)
 	hmap.Request(msg.SectionPermission, msg.ActionAdd, `supervisor`)
 	hmap.Request(msg.SectionPermission, msg.ActionRemove, `supervisor`)

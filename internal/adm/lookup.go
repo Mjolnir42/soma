@@ -837,7 +837,7 @@ func permissionIDByName(perm, cat string, id *string) error {
 	req.Filter.Permission.Name = perm
 	req.Filter.Permission.Category = cat
 
-	res, err := fetchFilter(req, `/filter/permission/`)
+	res, err := fetchFilter(req, `/search/permission/`)
 	if err != nil {
 		goto abort
 	}

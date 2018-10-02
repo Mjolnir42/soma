@@ -24,7 +24,7 @@ func (s *Supervisor) permissionRead(q *msg.Request, mr *msg.Result) {
 		s.permissionList(q, mr)
 	case msg.ActionShow:
 		s.permissionShow(q, mr)
-	case msg.ActionSearchByName:
+	case msg.ActionSearch:
 		s.permissionSearch(q, mr)
 	}
 }
