@@ -285,7 +285,7 @@ func LookupSectionID(s string) (string, error) {
 // LookupActionID looks up the UUID of the action with the name
 // a in section s. Return immediately if a is a UUID.
 func LookupActionID(a, s string) (string, error) {
-	if IsUUID(s) {
+	if IsUUID(a) {
 		return a, nil
 	}
 	var sID string
