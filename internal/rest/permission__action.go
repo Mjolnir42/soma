@@ -110,9 +110,9 @@ func (x *Rest) ActionAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Action.SectionID != params.ByName(`section`) {
+	if cReq.Action.SectionID != params.ByName(`sectionID`) {
 		dispatchBadRequest(&w, fmt.Errorf("SectionId mismatch: %s, %s",
-			cReq.Action.SectionID, params.ByName(`section`)))
+			cReq.Action.SectionID, params.ByName(`sectionID`)))
 		return
 	}
 
@@ -143,8 +143,8 @@ func (x *Rest) ActionRemove(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionRemove
 	request.ActionObj = proto.Action{
-		ID:        params.ByName(`action`),
-		SectionID: params.ByName(`section`),
+		ID:        params.ByName(`actionID`),
+		SectionID: params.ByName(`sectionID`),
 	}
 
 	if !x.isAuthorized(&request) {
