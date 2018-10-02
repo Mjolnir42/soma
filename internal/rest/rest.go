@@ -12,12 +12,10 @@ import (
 	"net/http"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/config"
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	metrics "github.com/rcrowley/go-metrics"
-	"github.com/satori/go.uuid"
 )
 
 // ShutdownInProgress indicates a pending service shutdown
@@ -68,19 +66,6 @@ func (x *Rest) Run() {
 	} else {
 		x.errLog.Fatal(http.ListenAndServe(x.conf.Daemon.URL.Host, router))
 	}
-}
-
-// requestID extracts the RequestID set by Basic Authentication, making
-// the ID consistent between all logs
-func requestID(params httprouter.Params) (id uuid.UUID) {
-	id, _ = uuid.FromString(params.ByName(`RequestID`))
-	return
-}
-
-// requestURI extracts the recorded RequestURI set by Basic
-// Authentication
-func requestURI(params httprouter.Params) string {
-	return params.ByName(`RequestURI`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
