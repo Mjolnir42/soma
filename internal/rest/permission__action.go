@@ -122,6 +122,7 @@ func (x *Rest) ActionAdd(w http.ResponseWriter, r *http.Request,
 	request.ActionObj = proto.Action{
 		Name:      cReq.Action.Name,
 		SectionID: cReq.Action.SectionID,
+		Category:  params.ByName(`category`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -145,6 +146,7 @@ func (x *Rest) ActionRemove(w http.ResponseWriter, r *http.Request,
 	request.ActionObj = proto.Action{
 		ID:        params.ByName(`actionID`),
 		SectionID: params.ByName(`sectionID`),
+		Category:  params.ByName(`category`),
 	}
 
 	if !x.isAuthorized(&request) {
