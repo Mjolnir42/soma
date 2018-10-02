@@ -59,6 +59,12 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 			Value: requestID.String(),
 		})
 
+		// record the request URI
+		ps = append(ps, httprouter.Param{
+			Key:   `RequestURI`,
+			Value: r.RequestURI,
+		})
+
 		// if the supervisor is not available, no requests are accepted
 		if supervisor = x.handlerMap.Get(`supervisor`); supervisor == nil {
 			http.Error(w, `Authentication supervisor not available`,
