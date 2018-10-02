@@ -33,7 +33,9 @@ func (s *Supervisor) actionList(q *msg.Request, mr *msg.Result) {
 		actionID, actionName, sectionID string
 	)
 
-	if rows, err = s.stmtActionList.Query(); err != nil {
+	if rows, err = s.stmtActionList.Query(
+		q.ActionObj.SectionID,
+	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return

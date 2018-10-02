@@ -45,7 +45,7 @@ func registerAction(app cli.App) *cli.App {
 						Usage:        `List permission actions in a section`,
 						Description:  help.Text(`action::list`),
 						Action:       runtime(cmdActionList),
-						BashComplete: cmpl.DirectInOf,
+						BashComplete: cmpl.DirectInFrom,
 					},
 					{
 						Name:         `show`,
@@ -184,7 +184,7 @@ func cmdActionRemove(c *cli.Context) error {
 }
 
 // cmdActionList function
-// somaadm action list in ${section} [of  ${category}]
+// somaadm action list from ${section} [in  ${category}]
 func cmdActionList(c *cli.Context) error {
 	var (
 		err                 error
@@ -192,8 +192,8 @@ func cmdActionList(c *cli.Context) error {
 	)
 	opts := map[string][]string{}
 	multipleAllowed := []string{}
-	uniqueOptions := []string{`in`, `of`}
-	mandatoryOptions := []string{`in`}
+	uniqueOptions := []string{`from`, `in`}
+	mandatoryOptions := []string{`from`}
 
 	if err = adm.ParseVariadicArguments(
 		opts,
@@ -206,7 +206,7 @@ func cmdActionList(c *cli.Context) error {
 	}
 
 	if sectionID, err = adm.LookupSectionID(
-		opts[`in`][0],
+		opts[`from`][0],
 	); err != nil {
 		return err
 	}
@@ -220,13 +220,13 @@ func cmdActionList(c *cli.Context) error {
 
 	// if [of  ${category}] was given on the command line, the given
 	// category must be valid and must be the correct one for ${name}
-	if _, ok := opts[`of`]; ok {
-		if err := adm.ValidateCategory(opts[`of`][0]); err != nil {
+	if _, ok := opts[`in`]; ok {
+		if err := adm.ValidateCategory(opts[`in`][0]); err != nil {
 			return err
 		}
-		if opts[`of`][0] != category {
+		if opts[`in`][0] != category {
 			return fmt.Errorf("Category mismatch: %s vs %s",
-				opts[`of`][0],
+				opts[`in`][0],
 				category,
 			)
 		}
