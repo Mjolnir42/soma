@@ -1,15 +1,15 @@
 {
 	"ImportPath": "github.com/mjolnir42/soma",
 	"GoVersion": "go1.7",
-	"GodepVersion": "v74",
+	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
 	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",
-			"Comment": "v0.10.0-38-g3ec0642",
-			"Rev": "3ec0642a7fb6488f65b06f9040adc67e3990296a"
+			"Comment": "v1.0.5",
+			"Rev": "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
 		},
 		{
 			"ImportPath": "github.com/asaskevich/govalidator",
