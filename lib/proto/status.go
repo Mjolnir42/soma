@@ -9,26 +9,36 @@
 
 package proto
 
+// Status describes the possible status descriptions a check instance
+// can be in
 type Status struct {
 	Name    string         `json:"name,omitempty"`
 	Details *StatusDetails `json:"details,omitempty"`
 }
 
+// Clone returns a copy of s
 func (s *Status) Clone() Status {
-	return Status{
-		Name:    s.Name,
-		Details: s.Details.Clone(),
+	clone := Status{
+		Name: s.Name,
 	}
+	if s.Details != nil {
+		clone.Details = s.Details.Clone()
+	}
+	return clone
 }
 
+// StatusDetails contains metadata about a Status
 type StatusDetails struct {
-	DetailsCreation
+	Creation *DetailsCreation `json:"creation,omitempty"`
 }
 
+// Clone returns a copy of s
 func (s *StatusDetails) Clone() *StatusDetails {
-	return &StatusDetails{
-		DetailsCreation: *s.DetailsCreation.Clone(),
+	clone := &StatusDetails{}
+	if s.Creation != nil {
+		clone.Creation = s.Creation.Clone()
 	}
+	return clone
 }
 
 func NewStatusRequest() Request {
