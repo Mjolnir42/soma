@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/lib/proto"
-	"github.com/codegangsta/cli"
 )
 
 func registerStatus(app cli.App) *cli.App {
@@ -14,27 +14,27 @@ func registerStatus(app cli.App) *cli.App {
 		[]cli.Command{
 			// status
 			{
-				Name:  "status",
-				Usage: "SUBCOMMANDS for check instance status",
+				Name:  `status`,
+				Usage: `SUBCOMMANDS for check instance status`,
 				Subcommands: []cli.Command{
 					{
-						Name:   "create",
-						Usage:  "Add a check instance status",
-						Action: runtime(cmdStatusCreate),
+						Name:   `add`,
+						Usage:  `Add a check instance status`,
+						Action: runtime(cmdStatusAdd),
 					},
 					{
-						Name:   "delete",
-						Usage:  "Delete a check instance status",
-						Action: runtime(cmdStatusDelete),
+						Name:   `remove`,
+						Usage:  `Remove a check instance status`,
+						Action: runtime(cmdStatusRemove),
 					},
 					{
-						Name:   "list",
-						Usage:  "List check instance status",
+						Name:   `list`,
+						Usage:  `List check instance status`,
 						Action: runtime(cmdStatusList),
 					},
 					{
-						Name:   "show",
-						Usage:  "Show details about a check instance status",
+						Name:   `show`,
+						Usage:  `Show details about a check instance status`,
 						Action: runtime(cmdStatusShow),
 					},
 				},
@@ -44,7 +44,7 @@ func registerStatus(app cli.App) *cli.App {
 	return &app
 }
 
-func cmdStatusCreate(c *cli.Context) error {
+func cmdStatusAdd(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func cmdStatusCreate(c *cli.Context) error {
 	return adm.Perform(`postbody`, `/status/`, `command`, req, c)
 }
 
-func cmdStatusDelete(c *cli.Context) error {
+func cmdStatusRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
