@@ -159,7 +159,7 @@ func (w *EntityWrite) rename(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	if res, err = w.stmtRemove.Exec(
+	if res, err = w.stmtRename.Exec(
 		q.Update.Entity.Name,
 		q.Entity.Name,
 	); err != nil {
