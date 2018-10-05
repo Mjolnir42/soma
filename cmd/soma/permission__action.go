@@ -24,7 +24,7 @@ func registerAction(app cli.App) *cli.App {
 			{
 				Name:        `action`,
 				Usage:       `SUBCOMMANDS for permission actions`,
-				Description: help.Text(`action`),
+				Description: help.Text(`action::`),
 				Subcommands: []cli.Command{
 					{
 						Name:         `add`,
