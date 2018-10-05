@@ -233,10 +233,10 @@ func (tk *TreeKeeper) txCheckInstanceConfigCreate(a *tree.Action,
 		a.CheckInstance.InstanceSvcCfgHash,
 		a.CheckInstance.InstanceServiceConfig,
 		time.Now().UTC(),
-		`awaiting_computation`,
-		`none`,
+		proto.DeploymentAwaitingComputation,
+		proto.DeploymentNone,
 		false,
-		"{}",
+		`{}`,
 	)
 	return err
 }

@@ -1,6 +1,6 @@
 /*-
- * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2016,2018, 1&1 Internet SE
+ * Copyright (c) 2016, Jörg Pernfuß <code.jpe@gmail.com>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -8,6 +8,10 @@
  */
 
 package stmt
+
+import (
+	"github.com/mjolnir42/soma/lib/proto"
+)
 
 const (
 	TreekeeperTransactionStatements = ``
@@ -884,12 +888,12 @@ JOIN   soma.check_instances sci
   ON   sc.check_id = sci.check_id
 JOIN   soma.check_instance_configurations scic
   ON   sci.check_instance_id = scic.check_instance_id
-WHERE  scic.status = 'awaiting_computation'
+WHERE  scic.status = '` + proto.DeploymentAwaitingComputation + `'::varchar
   AND  sc.repository_id = $1::uuid;`
 
 	TxDeployDetailsUpdate = `
 UPDATE soma.check_instance_configurations
-SET    status = 'computed',
+SET    status = '` + proto.DeploymentComputed + `'::varchar,
        deployment_details = $1::jsonb,
        monitoring_id = $2::uuid,
        status_last_updated_at = NOW()::timestamptz

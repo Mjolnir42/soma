@@ -1,6 +1,6 @@
 /*-
- * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2016,2018, 1&1 Internet SE
+ * Copyright (c) 2016, Jörg Pernfuß <code.jpe@gmail.com>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -8,6 +8,11 @@
  */
 
 package stmt
+
+import (
+	"github.com/mjolnir42/soma/internal/msg"
+	"github.com/mjolnir42/soma/lib/proto"
+)
 
 const (
 	DeploymentStatements = ``
@@ -22,13 +27,13 @@ JOIN   soma.check_instance_configurations scic
 ON     sci.check_instance_id = scic.check_instance_id
 AND    sci.current_instance_config_id = scic.check_instance_config_id
 WHERE  sci.check_instance_id = $1::uuid
-AND    (  scic.status = 'awaiting_rollout'
-       OR scic.status = 'rollout_in_progress'
-       OR scic.status = 'active'
-       OR scic.status = 'rollout_failed'
-       OR scic.status = 'awaiting_deprovision'
-       OR scic.status = 'deprovision_in_progress'
-       OR scic.status = 'deprovision_failed' );`
+AND    (  scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
+       OR scic.status = '` + proto.DeploymentRolloutInProgress + `'::varchar
+       OR scic.status = '` + proto.DeploymentActive + `'::varchar
+       OR scic.status = '` + proto.DeploymentRolloutFailed + `'::varchar
+       OR scic.status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar
+       OR scic.status = '` + proto.DeploymentDeprovisionInProgress + `'::varchar
+       OR scic.status = '` + proto.DeploymentDeprovisionFailed + `'::varchar);`
 
 	DeploymentUpdate = `
 UPDATE soma.check_instance_configurations
@@ -73,8 +78,8 @@ ON     scic.check_instance_id = sci.check_instance_id
 AND    scic.check_instance_config_id = sci.current_instance_config_id
 WHERE  sms.monitoring_id = $1::uuid
 AND    sci.update_available
-AND    (  scic.status = 'awaiting_rollout'
-       OR scic.status = 'awaiting_deprovision' );`
+AND    (  scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
+       OR scic.status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar);`
 
 	DeploymentListAll = `
 SELECT sci.check_instance_id
@@ -85,10 +90,10 @@ JOIN   soma.check_instances sci
 ON     scic.check_instance_id = sci.check_instance_id
 AND    scic.check_instance_config_id = sci.current_instance_config_id
 WHERE  sms.monitoring_id = $1::uuid
-AND    (  scic.status = 'awaiting_rollout'
-       OR scic.status = 'rollout_in_progress'
-       OR scic.status = 'awaiting_deprovision'
-       OR scic.status = 'deprovision_in_progress');`
+AND    (  scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
+       OR scic.status = '` + proto.DeploymentRolloutInProgress + `'::varchar
+       OR scic.status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar
+       OR scic.status = '` + proto.DeploymentDeprovisionInProgress + `'::varchar);`
 
 	DeploymentClearFlag = `
 UPDATE soma.check_instances
@@ -107,8 +112,8 @@ ON     sc.capability_id = smc.capability_id
 JOIN   soma.check_instances sci
 ON     sc.check_id = sci.check_id
 WHERE  sn.node_asset_id = $1::numeric
-AND    sc.object_type = 'node'
-AND    smc.capability_view = 'local'
+AND    sc.object_type = '` + msg.EntityNode + `'::varchar
+AND    smc.capability_view = '` + msg.ViewLocal + `'::varchar
 AND    smc.capability_monitoring = $2::uuid;`
 
 	DeploymentLastInstanceVersion = `
@@ -116,10 +121,10 @@ SELECT deployment_details,
        status
 FROM   soma.check_instance_configurations
 WHERE  check_instance_id = $1::uuid
-AND    (   status != 'deprovisioned'
-       AND status != 'awaiting_deletion'
-       AND status != 'awaiting_computation'
-       AND status != 'computed')
+AND    (   status != '` + proto.DeploymentDeprovisioned + `'::varchar
+       AND status != '` + proto.DeploymentAwaitingDeletion + `'::varchar
+       AND status != '` + proto.DeploymentAwaitingComputation + `'::varchar
+       AND status != '` + proto.DeploymentComputed + `'::varchar)
 ORDER  BY version DESC
 LIMIT  1;`
 

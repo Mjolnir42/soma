@@ -1,3 +1,11 @@
+/*-
+ * Copyright (c) 2016-2017, Jörg Pernfuß <code.jpe@gmail.com>
+ * Copyright (c) 2016, 1&1 Internet SE
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
 package soma
 
 import (
@@ -86,8 +94,8 @@ deployments:
 
 			//
 			if _, err = txMap[`UpdateStatus`].Exec(
-				"awaiting_rollout",
-				"rollout_in_progress",
+				proto.DeploymentAwaitingRollout,
+				proto.DeploymentRolloutInProgress,
 				currentChkInstanceConfigID,
 			); err != nil {
 				goto bailout_noprev
@@ -164,8 +172,8 @@ deployments:
 		}
 
 		if _, err = txMap[`UpdateStatus`].Exec(
-			"blocked",
-			"awaiting_rollout",
+			proto.DeploymentBlocked,
+			proto.DeploymentAwaitingRollout,
 			currentChkInstanceConfigID,
 		); err != nil {
 			goto bailout_withprev
@@ -180,7 +188,7 @@ deployments:
 		if _, err = txMap[`SetDependency`].Exec(
 			currentChkInstanceConfigID,
 			previousChkInstanceConfigID,
-			"deprovisioned",
+			proto.DeploymentDeprovisioned,
 		); err != nil {
 			goto bailout_withprev
 		}
