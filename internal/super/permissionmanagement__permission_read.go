@@ -190,9 +190,11 @@ func (s *Supervisor) permissionShowTx(q *msg.Request,
 		Category: category,
 		Actions:  &[]proto.Action{},
 		Sections: &[]proto.Section{},
-		Details: &proto.DetailsCreation{
-			CreatedAt: ts.Format(msg.RFC3339Milli),
-			CreatedBy: user,
+		Details: &proto.PermissionDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedAt: ts.Format(msg.RFC3339Milli),
+				CreatedBy: user,
+			},
 		},
 	}
 

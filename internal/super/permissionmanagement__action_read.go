@@ -100,9 +100,11 @@ func (s *Supervisor) actionShow(q *msg.Request, mr *msg.Result) {
 		SectionID:   sectionID,
 		SectionName: sectionName,
 		Category:    category,
-		Details: &proto.DetailsCreation{
-			CreatedBy: user,
-			CreatedAt: ts.Format(msg.RFC3339Milli),
+		Details: &proto.ActionDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedBy: user,
+				CreatedAt: ts.Format(msg.RFC3339Milli),
+			},
 		},
 	})
 	mr.OK()
