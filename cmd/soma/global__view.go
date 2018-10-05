@@ -116,7 +116,7 @@ func cmdViewRename(c *cli.Context) error {
 	req.View.Name = opts[`to`][0]
 
 	path := fmt.Sprintf("/view/%s", url.QueryEscape(c.Args().First()))
-	return adm.Perform(`putbody`, path, `command`, nil, c)
+	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
 // cmdViewList function
