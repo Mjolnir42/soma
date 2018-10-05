@@ -147,7 +147,7 @@ func (w *ViewWrite) remove(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
-		mr.Node = append(mr.Node, q.Node)
+		mr.View = append(mr.View, q.View)
 	}
 }
 
@@ -166,7 +166,7 @@ func (w *ViewWrite) rename(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
-		mr.Node = append(mr.Node, q.Node)
+		mr.View = append(mr.View, q.Update.View)
 	}
 }
 
