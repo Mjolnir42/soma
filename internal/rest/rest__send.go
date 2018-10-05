@@ -445,6 +445,9 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	case 200:
 		result.OK()
 		logEntry.WithField(`Code`, r.Code).Info(`OK`)
+		if r.Error != nil {
+			result.Errors = &[]string{r.Error.Error()}
+		}
 	case 202:
 		result.JobID = r.JobID
 		result.Accepted()
