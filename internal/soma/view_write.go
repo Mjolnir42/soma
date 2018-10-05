@@ -159,8 +159,8 @@ func (w *ViewWrite) rename(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtRename.Exec(
-		q.View.Name,
 		q.Update.View.Name,
+		q.View.Name,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
