@@ -163,6 +163,7 @@ func (r *ModeRead) show(q *msg.Request, mr *msg.Result) {
 	mr.Mode = append(mr.Mode, proto.Mode{
 		Mode: mode,
 	})
+	mr.OK()
 }
 
 // ShutdownNow signals the handler to shut down
