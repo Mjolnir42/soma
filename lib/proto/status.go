@@ -7,7 +7,7 @@
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
 // Status describes the possible status descriptions a check instance
 // can be in
@@ -41,6 +41,8 @@ func (s *StatusDetails) Clone() *StatusDetails {
 	return clone
 }
 
+// NewStatusRequest returns a new Request with fields preallocated
+// for filling in Status data, ensuring no nilptr-deref takes place.
 func NewStatusRequest() Request {
 	return Request{
 		Flags:  &Flags{},
@@ -48,6 +50,8 @@ func NewStatusRequest() Request {
 	}
 }
 
+// NewStatusResult returns a new Result with fields preallocated
+// for filling in Status data, ensuring no nilptr-deref takes place.
 func NewStatusResult() Result {
 	return Result{
 		Errors: &[]string{},
