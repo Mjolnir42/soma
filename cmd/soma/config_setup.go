@@ -70,11 +70,11 @@ func configSetup(c *cli.Context) error {
 				Cfg.Timeout = 2
 			}
 		case "logdir":
-			if Cfg.LogDir == "" {
+			if Cfg.LogDir == `` {
 				Cfg.LogDir = "logs"
 			}
 		case "dbdir":
-			if Cfg.BoltDB.Path == "" {
+			if Cfg.BoltDB.Path == `` {
 				Cfg.BoltDB.Path = "db"
 			}
 		}
@@ -101,7 +101,7 @@ func configSetup(c *cli.Context) error {
 	}
 
 	if Cfg.Run.SomaAPI.Scheme == `https` {
-		if Cfg.Cert == "" {
+		if Cfg.Cert == `` {
 			return fmt.Errorf(
 				`HTTPS API endpoint requires configured CA file`)
 		}

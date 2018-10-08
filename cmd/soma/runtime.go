@@ -124,7 +124,7 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 		}
 
 		// prompt for user
-		for Cfg.Auth.User == "" {
+		for Cfg.Auth.User == `` {
 			if Cfg.Auth.User, err = adm.Read(`user`); err == liner.ErrPromptAborted {
 				os.Exit(0)
 			} else if err != nil {
@@ -133,13 +133,13 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 		}
 
 		// no staticly configured token
-		if Cfg.Auth.Token == "" {
+		if Cfg.Auth.Token == `` {
 		reload:
 			// load token from BoltDB
 			token, err = store.GetActiveToken(Cfg.Auth.User)
 			if err == bolt.ErrBucketNotFound {
 				// no token in cache
-				for Cfg.Auth.Pass == "" {
+				for Cfg.Auth.Pass == `` {
 					if Cfg.Auth.Pass, err = adm.Read(`password`); err == liner.ErrPromptAborted {
 						os.Exit(0)
 					} else if err != nil {
@@ -210,7 +210,7 @@ func comptime(completion cli.BashCompleteFunc) cli.BashCompleteFunc {
 		}
 
 		// prompt for user
-		for Cfg.Auth.User == "" {
+		for Cfg.Auth.User == `` {
 			if Cfg.Auth.User, err = adm.Read(`user`); err == liner.ErrPromptAborted {
 				os.Exit(0)
 			} else if err != nil {
@@ -219,13 +219,13 @@ func comptime(completion cli.BashCompleteFunc) cli.BashCompleteFunc {
 		}
 
 		// no staticly configured token
-		if Cfg.Auth.Token == "" {
+		if Cfg.Auth.Token == `` {
 		reload:
 			// load token from BoltDB
 			token, err = store.GetActiveToken(Cfg.Auth.User)
 			if err == bolt.ErrBucketNotFound {
 				// no token in cache
-				for Cfg.Auth.Pass == "" {
+				for Cfg.Auth.Pass == `` {
 					if Cfg.Auth.Pass, err = adm.Read(`password`); err == liner.ErrPromptAborted {
 						os.Exit(0)
 					} else if err != nil {

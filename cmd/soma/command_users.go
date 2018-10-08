@@ -309,7 +309,7 @@ func cmdUserActivateUser(c *cli.Context) error {
 	var happy bool
 	var cred *auth.Token
 
-	if Cfg.Auth.User == "" {
+	if Cfg.Auth.User == `` {
 		fmt.Println(`Please specify which account to activate.`)
 		if Cfg.Auth.User, err = adm.Read(`user`); err != nil {
 			return err
