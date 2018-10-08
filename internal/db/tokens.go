@@ -73,4 +73,38 @@ func (d *DB) GetActiveToken(user string) (string, error) {
 	return "", bolt.ErrBucketNotFound
 }
 
+// DeleteToken searches for a token of a specifid user and deletes it
+func (d *DB) DeleteToken(user, token string) error {
+	if err := d.Open(); err != nil {
+		return err
+	}
+	defer d.Close()
+
+	if err := d.db.Update(func(tx *bolt.Tx) error {
+		// build cursor seek position
+		var k, v []byte
+		min := []byte(time.Now().UTC().Format(rfc3339Milli))
+
+		// open bucket for that user
+		b := tx.Bucket([]byte(`tokens`)).Bucket([]byte(user))
+		if b == nil {
+			return bolt.ErrBucketNotFound
+		}
+
+		// seek an entry
+		c := b.Cursor()
+		for k, v = c.Seek(min); k != nil; k, v = c.Next() {
+			data := make(map[string]string)
+			json.Unmarshal(v, &data)
+			if token == data[`token`] {
+				return b.Delete(k)
+			}
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+	return bolt.ErrBucketNotFound
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
