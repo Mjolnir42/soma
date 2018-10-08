@@ -134,6 +134,7 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 
 		// no staticly configured token
 		if Cfg.Auth.Token == "" {
+		reload:
 			// load token from BoltDB
 			token, err = store.GetActiveToken(Cfg.Auth.User)
 			if err == bolt.ErrBucketNotFound {
@@ -164,6 +165,19 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 				token = cred.Token
 			} else if err != nil {
 				return err
+			} else {
+				// no error, token loaded from cache. Check it has not been
+				// invalidated; delete it if it has
+				if err := adm.ValidateToken(Client, Cfg.Auth.User, token); err != nil {
+					// delete token
+					if err = store.DeleteToken(
+						Cfg.Auth.User,
+						token,
+					); err != nil {
+						return err
+					}
+					goto reload
+				}
 			}
 		} else {
 			token = Cfg.Auth.Token
@@ -206,6 +220,7 @@ func comptime(completion cli.BashCompleteFunc) cli.BashCompleteFunc {
 
 		// no staticly configured token
 		if Cfg.Auth.Token == "" {
+		reload:
 			// load token from BoltDB
 			token, err = store.GetActiveToken(Cfg.Auth.User)
 			if err == bolt.ErrBucketNotFound {
@@ -236,6 +251,19 @@ func comptime(completion cli.BashCompleteFunc) cli.BashCompleteFunc {
 				token = cred.Token
 			} else if err != nil {
 				return
+			} else {
+				// no error, token loaded from cache. Check it has not been
+				// invalidated; delete it if it has
+				if err := adm.ValidateToken(Client, Cfg.Auth.User, token); err != nil {
+					// delete token
+					if err = store.DeleteToken(
+						Cfg.Auth.User,
+						token,
+					); err != nil {
+						return
+					}
+					goto reload
+				}
 			}
 		} else {
 			token = Cfg.Auth.Token
