@@ -64,7 +64,7 @@ func (r *RepositoryRead) oncallProperties(repo *proto.Repository) error {
 func (r *RepositoryRead) serviceProperties(repo *proto.Repository) error {
 	var (
 		instanceID, sourceInstanceID string
-		serviceName, view            string
+		serviceID, view              string
 		rows                         *sql.Rows
 		err                          error
 	)
@@ -80,7 +80,7 @@ func (r *RepositoryRead) serviceProperties(repo *proto.Repository) error {
 			&instanceID,
 			&sourceInstanceID,
 			&view,
-			&serviceName,
+			&serviceID,
 		); err != nil {
 			rows.Close()
 			return err
@@ -93,7 +93,7 @@ func (r *RepositoryRead) serviceProperties(repo *proto.Repository) error {
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Service: &proto.PropertyService{
-					Name: serviceName,
+					ID: serviceID,
 				},
 			},
 		)

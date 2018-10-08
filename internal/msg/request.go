@@ -24,6 +24,7 @@ type Request struct {
 	TargetEntity  string
 	RemoteAddr    string
 	AuthUser      string
+	RequestURI    string
 	Reply         chan Result
 	JobID         uuid.UUID
 	Search        Filter
@@ -79,6 +80,7 @@ func New(r *http.Request, params httprouter.Params) Request {
 	returnChannel := make(chan Result, 1)
 	return Request{
 		ID:         requestID(params),
+		RequestURI: requestURI(params),
 		RemoteAddr: remoteAddr(r),
 		AuthUser:   authUser(params),
 		Reply:      returnChannel,
@@ -87,6 +89,7 @@ func New(r *http.Request, params httprouter.Params) Request {
 
 type Filter struct {
 	IsDetailed bool
+	ActionObj  proto.Action
 	Bucket     proto.Bucket
 	Cluster    proto.Cluster
 	Grant      proto.Grant

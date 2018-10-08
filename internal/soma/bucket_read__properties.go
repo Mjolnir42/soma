@@ -65,7 +65,7 @@ func (r *BucketRead) oncallProperties(bucket *proto.Bucket) error {
 func (r *BucketRead) serviceProperties(bucket *proto.Bucket) error {
 	var (
 		instanceID, sourceInstanceID string
-		serviceName, view            string
+		serviceID, view              string
 		rows                         *sql.Rows
 		err                          error
 	)
@@ -81,7 +81,7 @@ func (r *BucketRead) serviceProperties(bucket *proto.Bucket) error {
 			&instanceID,
 			&sourceInstanceID,
 			&view,
-			&serviceName,
+			&serviceID,
 		); err != nil {
 			rows.Close()
 			return err
@@ -95,7 +95,7 @@ func (r *BucketRead) serviceProperties(bucket *proto.Bucket) error {
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Service: &proto.PropertyService{
-					Name: serviceName,
+					ID: serviceID,
 				},
 			},
 		)

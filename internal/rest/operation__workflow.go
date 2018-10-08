@@ -23,7 +23,7 @@ func (x *Rest) WorkflowSummary(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionWorkflow
 	request.Action = msg.ActionSummary
 
@@ -42,7 +42,7 @@ func (x *Rest) WorkflowList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionWorkflow
 	request.Action = msg.ActionList
 
@@ -72,7 +72,7 @@ func (x *Rest) WorkflowSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionWorkflow
 	request.Action = msg.ActionSearch
 	request.Workflow = proto.Workflow{
@@ -105,7 +105,7 @@ func (x *Rest) WorkflowRetry(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionWorkflow
 	request.Action = msg.ActionRetry
 	request.Workflow = proto.Workflow{
@@ -153,7 +153,7 @@ func (x *Rest) WorkflowSet(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionWorkflow
 	request.Action = msg.ActionSet
 	request.Workflow = proto.Workflow{

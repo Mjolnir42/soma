@@ -33,7 +33,9 @@ func (s *Supervisor) sectionList(q *msg.Request, mr *msg.Result) {
 		sectionID, sectionName string
 	)
 
-	if rows, err = s.stmtSectionList.Query(); err != nil {
+	if rows, err = s.stmtSectionList.Query(
+		q.SectionObj.Category,
+	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
@@ -91,9 +93,11 @@ func (s *Supervisor) sectionShow(q *msg.Request, mr *msg.Result) {
 		ID:       sectionID,
 		Name:     sectionName,
 		Category: category,
-		Details: &proto.DetailsCreation{
-			CreatedAt: ts.Format(msg.RFC3339Milli),
-			CreatedBy: user,
+		Details: &proto.SectionDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedAt: ts.Format(msg.RFC3339Milli),
+				CreatedBy: user,
+			},
 		},
 	})
 	mr.OK()

@@ -15,10 +15,10 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func (ten *Node) evalNativeProp(prop string, val string) bool {
+func (n *Node) evalNativeProp(prop string, val string) bool {
 	switch prop {
 	case msg.NativePropertyEnvironment:
-		env := ten.Parent.(Bucketeer).GetEnvironment()
+		env := n.Parent.(Bucketeer).GetEnvironment()
 		if val == env {
 			return true
 		}
@@ -27,19 +27,19 @@ func (ten *Node) evalNativeProp(prop string, val string) bool {
 			return true
 		}
 	case msg.NativePropertyState:
-		if val == ten.State {
+		if val == n.State {
 			return true
 		}
 	case msg.NativePropertyHardwareNode:
-		// XX needs ten.ServerName extension of ten
-		// if val == ten.ServerName { return true }
+		// XX needs n.ServerName extension of ten
+		// if val == n.ServerName { return true }
 		return false
 	}
 	return false
 }
 
-func (ten *Node) evalSystemProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range ten.PropertySystem {
+func (n *Node) evalSystemProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range n.PropertySystem {
 		t := v.(*PropertySystem)
 		if t.Key == prop && (t.Value == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.Key, true, t.Value
@@ -48,8 +48,8 @@ func (ten *Node) evalSystemProp(prop string, val string, view string) (string, b
 	return "", false, ""
 }
 
-func (ten *Node) evalOncallProp(prop string, val string, view string) (string, bool) {
-	for _, v := range ten.PropertyOncall {
+func (n *Node) evalOncallProp(prop string, val string, view string) (string, bool) {
+	for _, v := range n.PropertyOncall {
 		t := v.(*PropertyOncall)
 		if "OncallID" == prop && t.ID.String() == val && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true
@@ -58,8 +58,8 @@ func (ten *Node) evalOncallProp(prop string, val string, view string) (string, b
 	return "", false
 }
 
-func (ten *Node) evalCustomProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range ten.PropertyCustom {
+func (n *Node) evalCustomProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range n.PropertyCustom {
 		t := v.(*PropertyCustom)
 		if t.Key == prop && (t.Value == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.Key, true, t.Value
@@ -68,8 +68,8 @@ func (ten *Node) evalCustomProp(prop string, val string, view string) (string, b
 	return "", false, ""
 }
 
-func (ten *Node) evalServiceProp(prop string, val string, view string) (string, bool, string) {
-	for _, v := range ten.PropertyService {
+func (n *Node) evalServiceProp(prop string, val string, view string) (string, bool, string) {
+	for _, v := range n.PropertyService {
 		t := v.(*PropertyService)
 		if prop == "name" && (t.Service == val || val == `@defined`) && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true, t.Service
@@ -78,8 +78,8 @@ func (ten *Node) evalServiceProp(prop string, val string, view string) (string, 
 	return "", false, ""
 }
 
-func (ten *Node) evalAttributeOfService(svcID string, view string, attribute string, value string) (bool, string) {
-	t := ten.PropertyService[svcID].(*PropertyService)
+func (n *Node) evalAttributeOfService(svcID string, view string, attribute string, value string) (bool, string) {
+	t := n.PropertyService[svcID].(*PropertyService)
 	for _, a := range t.Attributes {
 		if a.Name == attribute && (t.View == view || t.View == `any`) && (a.Value == value || value == `@defined`) {
 			return true, a.Value
@@ -88,10 +88,10 @@ func (ten *Node) evalAttributeOfService(svcID string, view string, attribute str
 	return false, ""
 }
 
-func (ten *Node) evalAttributeProp(view string, attr string, value string) (bool, map[string]string) {
+func (n *Node) evalAttributeProp(view string, attr string, value string) (bool, map[string]string) {
 	f := map[string]string{}
 svcloop:
-	for _, v := range ten.PropertyService {
+	for _, v := range n.PropertyService {
 		t := v.(*PropertyService)
 		for _, a := range t.Attributes {
 			if a.Name == attr && (a.Value == value || value == `@defined`) && (t.View == view || t.View == `any`) {
@@ -106,9 +106,9 @@ svcloop:
 	return false, f
 }
 
-func (ten *Node) getServiceMap(serviceID string) map[string][]string {
+func (n *Node) getServiceMap(serviceID string) map[string][]string {
 	svc := new(PropertyService)
-	svc = ten.PropertyService[serviceID].(*PropertyService)
+	svc = n.PropertyService[serviceID].(*PropertyService)
 
 	res := map[string][]string{}
 	for _, v := range svc.Attributes {
@@ -661,7 +661,7 @@ func (n *Node) createPerServiceCheckInstances(ctx *checkContext) {
 				n.lock.Unlock()
 				n.lock.RLock()
 			default:
-				// lookup existing instance ids for check in ten.CheckInstances
+				// lookup existing instance ids for check in n.CheckInstances
 				// to determine if this is an update
 				for _, exInstID := range n.CheckInstances[ctx.uuid] {
 					exInst := n.Instances[exInstID]

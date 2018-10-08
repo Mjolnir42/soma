@@ -1,6 +1,6 @@
 /*-
- * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2016,2018, 1&1 Internet SE
+ * Copyright (c) 2016, Jörg Pernfuß <code.jpe@gmail.com>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -8,6 +8,10 @@
  */
 
 package stmt
+
+import (
+	"github.com/mjolnir42/soma/lib/proto"
+)
 
 const (
 	TreekeeperTransactionStatements = ``
@@ -236,26 +240,26 @@ DELETE FROM soma.repository_oncall_properties
 WHERE       instance_id = $1::uuid;`
 
 	TxRepositoryPropertyServiceCreate = `
-INSERT INTO soma.repository_service_properties (
+INSERT INTO soma.repository_service_property (
             instance_id,
             source_instance_id,
             repository_id,
             view,
-            service_property,
-            organizational_team_id,
+            service_id,
+            team_id,
             inheritance_enabled,
             children_only)
 SELECT $1::uuid,
        $2::uuid,
        $3::uuid,
        $4::varchar,
-       $5::varchar,
+       $5::uuid,
        $6::uuid,
        $7::boolean,
        $8::boolean;`
 
 	TxRepositoryPropertyServiceDelete = `
-DELETE FROM soma.repository_service_properties
+DELETE FROM soma.repository_service_property
 WHERE       instance_id = $1::uuid;`
 
 	TxRepositoryPropertySystemCreate = `
@@ -343,13 +347,13 @@ DELETE FROM soma.node_oncall_property
 WHERE       instance_id = $1::uuid;`
 
 	TxNodePropertyServiceCreate = `
-INSERT INTO soma.node_service_properties (
+INSERT INTO soma.node_service_property (
             instance_id,
             source_instance_id,
             node_id,
             view,
-            service_property,
-            organizational_team_id,
+            service_id,
+            team_id,
             repository_id,
             inheritance_enabled,
             children_only)
@@ -357,14 +361,14 @@ SELECT $1::uuid,
        $2::uuid,
        $3::uuid,
        $4::varchar,
-       $5::varchar,
+       $5::uuid,
        $6::uuid,
        $7::uuid,
        $8::boolean,
        $9::boolean;`
 
 	TxNodePropertyServiceDelete = `
-DELETE FROM soma.node_service_properties
+DELETE FROM soma.node_service_property
 WHERE       instance_id = $1::uuid;`
 
 	TxNodePropertySystemCreate = `
@@ -515,13 +519,13 @@ DELETE FROM soma.group_oncall_properties
 WHERE       instance_id = $1::uuid;`
 
 	TxGroupPropertyServiceCreate = `
-INSERT INTO soma.group_service_properties (
+INSERT INTO soma.group_service_property (
             instance_id,
             source_instance_id,
             group_id,
             view,
-            service_property,
-            organizational_team_id,
+            service_id,
+            team_id,
             repository_id,
             inheritance_enabled,
             children_only)
@@ -529,14 +533,14 @@ SELECT $1::uuid,
        $2::uuid,
        $3::uuid,
        $4::varchar,
-       $5::varchar,
+       $5::uuid,
        $6::uuid,
        $7::uuid,
        $8::boolean,
        $9::boolean;`
 
 	TxGroupPropertyServiceDelete = `
-DELETE FROM soma.group_service_properties
+DELETE FROM soma.group_service_property
 WHERE       instance_id = $1::uuid;`
 
 	TxGroupPropertySystemCreate = `
@@ -659,13 +663,13 @@ DELETE FROM soma.cluster_oncall_properties
 WHERE       instance_id = $1::uuid;`
 
 	TxClusterPropertyServiceCreate = `
-INSERT INTO soma.cluster_service_properties (
+INSERT INTO soma.cluster_service_property (
             instance_id,
             source_instance_id,
             cluster_id,
             view,
-            service_property,
-            organizational_team_id,
+            service_id,
+            team_id,
             repository_id,
             inheritance_enabled,
             children_only)
@@ -673,14 +677,14 @@ SELECT $1::uuid,
        $2::uuid,
        $3::uuid,
        $4::varchar,
-       $5::varchar,
+       $5::uuid,
        $6::uuid,
        $7::uuid,
        $8::boolean,
        $9::boolean;`
 
 	TxClusterPropertyServiceDelete = `
-DELETE FROM soma.cluster_service_properties
+DELETE FROM soma.cluster_service_property
 WHERE       instance_id = $1::uuid;`
 
 	TxClusterPropertySystemCreate = `
@@ -799,13 +803,13 @@ DELETE FROM soma.bucket_oncall_properties
 WHERE       instance_id = $1::uuid;`
 
 	TxBucketPropertyServiceCreate = `
-INSERT INTO soma.bucket_service_properties (
+INSERT INTO soma.bucket_service_property (
             instance_id,
             source_instance_id,
             bucket_id,
             view,
-            service_property,
-            organizational_team_id,
+            service_id,
+            team_id,
             repository_id,
             inheritance_enabled,
             children_only)
@@ -813,14 +817,14 @@ SELECT $1::uuid,
        $2::uuid,
        $3::uuid,
        $4::varchar,
-       $5::varchar,
+       $5::uuid,
        $6::uuid,
        $7::uuid,
        $8::boolean,
        $9::boolean;`
 
 	TxBucketPropertyServiceDelete = `
-DELETE FROM soma.bucket_service_properties
+DELETE FROM soma.bucket_service_property
 WHERE       instance_id = $1::uuid;`
 
 	TxBucketPropertySystemCreate = `
@@ -884,12 +888,12 @@ JOIN   soma.check_instances sci
   ON   sc.check_id = sci.check_id
 JOIN   soma.check_instance_configurations scic
   ON   sci.check_instance_id = scic.check_instance_id
-WHERE  scic.status = 'awaiting_computation'
+WHERE  scic.status = '` + proto.DeploymentAwaitingComputation + `'::varchar
   AND  sc.repository_id = $1::uuid;`
 
 	TxDeployDetailsUpdate = `
 UPDATE soma.check_instance_configurations
-SET    status = 'computed',
+SET    status = '` + proto.DeploymentComputed + `'::varchar,
        deployment_details = $1::jsonb,
        monitoring_id = $2::uuid,
        status_last_updated_at = NOW()::timestamptz
@@ -1068,25 +1072,34 @@ WHERE  sgop.group_id = $1::uuid
 AND    (sgop.view = $2::varchar OR sgop.view = 'any');`
 
 	TxDeployDetailsGroupService = `
-SELECT service_property,
-       organizational_team_id
-FROM   soma.group_service_properties
-WHERE  instance_id = $1::uuid
-AND    (view = $2::varchar OR view = 'any');`
+SELECT sgsp.service_id,
+       ssp.name,
+       sgsp.team_id
+FROM   soma.group_service_property sgsp
+JOIN   soma.service_property ssp
+  ON   sgsp.service_id = ssp.id
+WHERE  sgsp.instance_id = $1::uuid
+AND    (sgsp.view = $2::varchar OR sgsp.view = 'any');`
 
 	TxDeployDetailsClusterService = `
-SELECT service_property,
-       organizational_team_id
-FROM   soma.cluster_service_properties
-WHERE  instance_id = $1::uuid
-AND    (view = $2::varchar OR view = 'any');`
+SELECT scsp.service_id,
+       ssp.name,
+       scsp.team_id
+FROM   soma.cluster_service_property scsp
+JOIN   soma.service_property ssp
+  ON   scsp.service_id = ssp.id
+WHERE  scsp.instance_id = $1::uuid
+AND    (scsp.view = $2::varchar OR scsp.view = 'any');`
 
 	TxDeployDetailsNodeService = `
-SELECT service_property,
-       organizational_team_id
-FROM   soma.node_service_properties
-WHERE  instance_id = $1::uuid
-AND    (view = $2::varchar OR view = 'any');`
+SELECT snsp.service_id,
+       ssp.name,
+       snsp.team_id
+FROM   soma.node_service_property snsp
+JOIN   soma.service_property ssp
+  ON   snsp.service_id = ssp.id
+WHERE  snsp.instance_id = $1::uuid
+AND    (snsp.view = $2::varchar OR snsp.view = 'any');`
 
 	TxDeployDetailsGroupSysProp = `
 SELECT system_property,

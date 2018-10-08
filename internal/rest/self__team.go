@@ -22,7 +22,7 @@ func (x *Rest) TeamShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
 	request.Action = msg.ActionShow
 	request.User.ID = params.ByName(`teamID`)
@@ -54,7 +54,7 @@ func (x *Rest) TeamSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionTeam
 	request.Action = msg.ActionSearch
 	request.Search.Team.Name = cReq.Filter.Team.Name

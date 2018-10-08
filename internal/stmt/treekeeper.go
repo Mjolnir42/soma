@@ -1,6 +1,6 @@
 /*-
- * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2016,2018, 1&1 Internet SE
+ * Copyright (c) 2016, Jörg Pernfuß <code.jpe@gmail.com>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -8,6 +8,10 @@
  */
 
 package stmt
+
+import (
+	"github.com/mjolnir42/soma/lib/proto"
+)
 
 const (
 	TreekeeperStatements = ``
@@ -33,7 +37,7 @@ JOIN   soma.check_instances sci
   ON   sc.check_id = sci.check_id
 JOIN   soma.check_instance_configurations scic
   ON   sci.check_instance_id = scic.check_instance_id
-WHERE  scic.status = 'computed'
+WHERE  scic.status = '` + proto.DeploymentComputed + `'::varchar
   AND  sc.repository_id = $1::uuid;`
 
 	TreekeeperGetPreviousDeployment = `
@@ -42,8 +46,8 @@ SELECT check_instance_config_id,
        status,
        deployment_details
 FROM   soma.check_instance_configurations
-WHERE  status != 'computed'
-AND    status != 'awaiting_computation'
+WHERE  status != '` + proto.DeploymentComputed + `'::varchar
+AND    status != '` + proto.DeploymentAwaitingComputation + `'::varchar
 AND    check_instance_id = $1::uuid
 ORDER  BY version DESC
 LIMIT  1;`

@@ -7,30 +7,42 @@
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
+// Status describes the possible status descriptions a check instance
+// can be in
 type Status struct {
 	Name    string         `json:"name,omitempty"`
 	Details *StatusDetails `json:"details,omitempty"`
 }
 
+// Clone returns a copy of s
 func (s *Status) Clone() Status {
-	return Status{
-		Name:    s.Name,
-		Details: s.Details.Clone(),
+	clone := Status{
+		Name: s.Name,
 	}
+	if s.Details != nil {
+		clone.Details = s.Details.Clone()
+	}
+	return clone
 }
 
+// StatusDetails contains metadata about a Status
 type StatusDetails struct {
-	DetailsCreation
+	Creation *DetailsCreation `json:"creation,omitempty"`
 }
 
+// Clone returns a copy of s
 func (s *StatusDetails) Clone() *StatusDetails {
-	return &StatusDetails{
-		DetailsCreation: *s.DetailsCreation.Clone(),
+	clone := &StatusDetails{}
+	if s.Creation != nil {
+		clone.Creation = s.Creation.Clone()
 	}
+	return clone
 }
 
+// NewStatusRequest returns a new Request with fields preallocated
+// for filling in Status data, ensuring no nilptr-deref takes place.
 func NewStatusRequest() Request {
 	return Request{
 		Flags:  &Flags{},
@@ -38,6 +50,8 @@ func NewStatusRequest() Request {
 	}
 }
 
+// NewStatusResult returns a new Result with fields preallocated
+// for filling in Status data, ensuring no nilptr-deref takes place.
 func NewStatusResult() Result {
 	return Result{
 		Errors: &[]string{},

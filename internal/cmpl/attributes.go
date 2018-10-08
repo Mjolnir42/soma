@@ -2,7 +2,7 @@ package cmpl
 
 import "github.com/codegangsta/cli"
 
-func AttributeCreate(c *cli.Context) {
+func AttributeAdd(c *cli.Context) {
 	Generic(c, []string{`cardinality`})
 }
 

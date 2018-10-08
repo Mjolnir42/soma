@@ -1,6 +1,6 @@
 /*-
- * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2016,2018, 1&1 Internet SE
+ * Copyright (c) 2016, Jörg Pernfuß <code.jpe@gmail.com>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -8,6 +8,10 @@
  */
 
 package stmt
+
+import (
+	"github.com/mjolnir42/soma/lib/proto"
+)
 
 const (
 	LifecycleStatements = ``
@@ -59,8 +63,8 @@ ON     scic.monitoring_id = sms.monitoring_id
 JOIN   soma.check_instances sci
 ON     scic.check_instance_id = sci.check_instance_id
 AND    scic.check_instance_config_id = sci.current_instance_config_id
-WHERE  (  scic.status = 'awaiting_rollout'
-       OR scic.status = 'awaiting_deprovision' )
+WHERE  (  scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
+       OR scic.status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar)
 AND    sms.monitoring_callback_uri IS NOT NULL
 AND    sci.update_available;`
 
@@ -74,10 +78,10 @@ ON     scic.monitoring_id = sms.monitoring_id
 JOIN   soma.check_instances sci
 ON     scic.check_instance_id = sci.check_instance_id
 AND    scic.check_instance_config_id = sci.current_instance_config_id
-WHERE  (  scic.status = 'rollout_in_progress'
-       OR scic.status = 'awaiting_rollout'
-       OR scic.status = 'awaiting_deprovision'
-       OR scic.status = 'deprovision_in_progress' )
+WHERE  (  scic.status = '` + proto.DeploymentRolloutInProgress + `'::varchar
+       OR scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
+       OR scic.status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar
+       OR scic.status = '` + proto.DeploymentDeprovisionInProgress + `'::varchar)
 AND    sms.monitoring_callback_uri IS NOT NULL
 AND    scic.status_last_updated_at IS NOT NULL
 AND    scic.notified_at IS NOT NULL
@@ -107,46 +111,46 @@ JOIN   soma.check_instance_configurations scic
 JOIN   soma.check_instance_configuration_dependencies scicd
   ON   scic.check_instance_config_id = scicd.blocked_instance_config_id
 WHERE  sci.deleted
-  AND  scic.status = 'blocked';`
+  AND  scic.status = '` + proto.DeploymentBlocked + `'::varchar;`
 
 	LifecycleConfigAwaitingDeletion = `
 UPDATE soma.check_instance_configurations
-SET    status = 'awaiting_deletion'::varchar,
-       next_status = 'none'::varchar,
+SET    status = '` + proto.DeploymentAwaitingDeletion + `'::varchar,
+       next_status = '` + proto.DeploymentNone + `'::varchar,
        awaiting_deletion = 'yes'::boolean
 WHERE  check_instance_config_id = $1::uuid;`
 
 	LifecycleDeleteGhosts = `
 UPDATE soma.check_instance_configurations scic
-SET    status = 'awaiting_deletion'::varchar,
-       next_status = 'none'::varchar,
+SET    status = '` + proto.DeploymentAwaitingDeletion + `'::varchar,
+       next_status = '` + proto.DeploymentNone + `'::varchar,
        awaiting_deletion = 'yes'::boolean
 FROM   soma.check_instances sci
 WHERE  scic.check_instance_id = sci.check_instance_id
-AND    scic.status = 'awaiting_rollout'
+AND    scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
 AND    sci.deleted
 AND    sci.update_available;`
 
 	LifecycleDeleteFailedRollouts = `
 UPDATE soma.check_instance_configurations scic
-SET    status = 'awaiting_deletion'::varchar,
-       next_status = 'none'::varchar,
+SET    status = '` + proto.DeploymentAwaitingDeletion + `'::varchar,
+       next_status = '` + proto.DeploymentNone + `'::varchar,
        awaiting_deletion = 'yes'::boolean
 FROM   soma.check_instances sci
 WHERE  scic.check_instance_id = sci.check_instance_id
 AND    sci.deleted
-AND    scic.status = 'rollout_failed';`
+AND    scic.status = '` + proto.DeploymentRolloutFailed + `'::varchar;`
 
 	LifecycleDeleteDeprovisioned = `
 UPDATE soma.check_instance_configurations scic
-SET    status = 'awaiting_deletion'::varchar,
-       next_status = 'none'::varchar,
+SET    status = '` + proto.DeploymentAwaitingDeletion + `'::varchar,
+       next_status = '` + proto.DeploymentNone + `'::varchar,
        awaiting_deletion = 'yes'::boolean
 FROM   soma.check_instances sci
 WHERE  scic.check_instance_id = sci.check_instance_id
 AND    sci.deleted
-AND    scic.status = 'deprovisioned'
-AND    scic.next_status = 'none';`
+AND    scic.status = '` + proto.DeploymentDeprovisioned + `'::varchar
+AND    scic.next_status = '` + proto.DeploymentNone + `'::varchar;`
 
 	LifecycleDeprovisionDeletedActive = `
 SELECT scic.check_instance_config_id,
@@ -155,13 +159,13 @@ FROM   soma.check_instance_configurations scic
 JOIN   soma.check_instances sci
   ON   scic.check_instance_id = sci.check_instance_id
 WHERE  sci.deleted
-  AND  scic.status = 'active'
-  AND  scic.next_status = 'none';`
+  AND  scic.status = '` + proto.DeploymentActive + `'::varchar
+  AND  scic.next_status = '` + proto.DeploymentNone + `'::varchar;`
 
 	LifecycleDeprovisionConfiguration = `
 UPDATE soma.check_instance_configurations
-SET    status = 'awaiting_deprovision'::varchar,
-       next_status = 'deprovision_in_progress'::varchar
+SET    status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar,
+       next_status = '` + proto.DeploymentDeprovisionInProgress + `'::varchar
 WHERE  check_instance_config_id = $1::uuid;`
 
 	LifecycleDeadLockResolver = `
@@ -173,7 +177,7 @@ JOIN   check_instance_configurations cic
  AND   ci.current_instance_config_id = cic.check_instance_config_id
 JOIN   check_instance_configuration_dependencies cicd
   ON   ci.current_instance_config_id = cicd.blocking_instance_config_id
-WHERE  cic.status = 'active';`
+WHERE  cic.status = '` + proto.DeploymentActive + `'::varchar;`
 )
 
 func init() {

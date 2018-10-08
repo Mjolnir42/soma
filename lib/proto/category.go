@@ -7,13 +7,15 @@
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
+// Category represents a permission scope
 type Category struct {
 	Name    string           `json:"name,omitempty"`
 	Details *CategoryDetails `json:"details,omitempty"`
 }
 
+// Clone returns a copy of c
 func (c *Category) Clone() Category {
 	clone := Category{
 		Name: c.Name,
@@ -24,10 +26,12 @@ func (c *Category) Clone() Category {
 	return clone
 }
 
+// CategoryDetails contains metadata about a Category
 type CategoryDetails struct {
 	Creation *DetailsCreation `json:"creation,omitempty"`
 }
 
+// Clone returns a copy of c
 func (c *CategoryDetails) Clone() *CategoryDetails {
 	clone := &CategoryDetails{}
 	if c.Creation != nil {
@@ -36,6 +40,8 @@ func (c *CategoryDetails) Clone() *CategoryDetails {
 	return clone
 }
 
+// NewCategoryRequest returns a new Request with fields preallocated
+// for filling in Category data, ensuring no nilptr-deref takes place.
 func NewCategoryRequest() Request {
 	return Request{
 		Flags:    &Flags{},
@@ -43,6 +49,8 @@ func NewCategoryRequest() Request {
 	}
 }
 
+// NewCategoryResult returns a new Result with fields preallocated
+// for filling in Category data, ensuring no nilptr-deref takes place.
 func NewCategoryResult() Result {
 	return Result{
 		Errors:     &[]string{},

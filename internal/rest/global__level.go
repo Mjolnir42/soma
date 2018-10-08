@@ -21,7 +21,7 @@ func (x *Rest) LevelList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionLevel
 	request.Action = msg.ActionList
 
@@ -40,7 +40,7 @@ func (x *Rest) LevelShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionLevel
 	request.Action = msg.ActionShow
 	request.Level = proto.Level{
@@ -68,7 +68,7 @@ func (x *Rest) LevelSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionLevel
 	request.Action = msg.ActionSearch
 	request.Search.Level = proto.Level{
@@ -97,7 +97,7 @@ func (x *Rest) LevelAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionLevel
 	request.Action = msg.ActionAdd
 	request.Level = proto.Level{
@@ -121,7 +121,7 @@ func (x *Rest) LevelRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionLevel
 	request.Action = msg.ActionRemove
 	request.Level = proto.Level{

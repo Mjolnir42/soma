@@ -20,7 +20,7 @@ func (x *Rest) JobMgmtWait(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionJobMgmt
 	request.Action = msg.ActionWait
 	request.Job.ID = params.ByName(`jobID`)
@@ -41,7 +41,7 @@ func (x *Rest) JobMgmtList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionJobMgmt
 	request.Action = msg.ActionList
 	request.Flag.Unscoped = true

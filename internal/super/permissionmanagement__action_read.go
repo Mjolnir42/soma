@@ -33,7 +33,9 @@ func (s *Supervisor) actionList(q *msg.Request, mr *msg.Result) {
 		actionID, actionName, sectionID string
 	)
 
-	if rows, err = s.stmtActionList.Query(); err != nil {
+	if rows, err = s.stmtActionList.Query(
+		q.ActionObj.SectionID,
+	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
 		return
@@ -98,9 +100,11 @@ func (s *Supervisor) actionShow(q *msg.Request, mr *msg.Result) {
 		SectionID:   sectionID,
 		SectionName: sectionName,
 		Category:    category,
-		Details: &proto.DetailsCreation{
-			CreatedBy: user,
-			CreatedAt: ts.Format(msg.RFC3339Milli),
+		Details: &proto.ActionDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedBy: user,
+				CreatedAt: ts.Format(msg.RFC3339Milli),
+			},
 		},
 	})
 	mr.OK()
@@ -115,8 +119,8 @@ func (s *Supervisor) actionSearch(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = s.stmtActionSearch.Query(
-		q.ActionObj.Name,
-		q.ActionObj.SectionID,
+		q.Search.ActionObj.Name,
+		q.Search.ActionObj.SectionID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)

@@ -20,7 +20,7 @@ func (x *Rest) DatacenterList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDatacenter
 	request.Action = msg.ActionList
 
@@ -39,7 +39,7 @@ func (x *Rest) DatacenterSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDatacenter
 	request.Action = msg.ActionSync
 
@@ -58,7 +58,7 @@ func (x *Rest) DatacenterShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDatacenter
 	request.Action = msg.ActionShow
 	request.Datacenter = proto.Datacenter{
@@ -86,7 +86,7 @@ func (x *Rest) DatacenterAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDatacenter
 	request.Action = msg.ActionAdd
 	request.Datacenter = cReq.Datacenter.Clone()
@@ -106,7 +106,7 @@ func (x *Rest) DatacenterRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDatacenter
 	request.Action = msg.ActionRemove
 	request.Datacenter = proto.Datacenter{
@@ -134,7 +134,7 @@ func (x *Rest) DatacenterRename(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionDatacenter
 	request.Action = msg.ActionRename
 	request.Datacenter = proto.Datacenter{

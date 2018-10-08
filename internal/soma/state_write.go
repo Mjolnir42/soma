@@ -155,7 +155,7 @@ func (w *StateWrite) rename(q *msg.Request, mr *msg.Result) {
 		res sql.Result
 	)
 
-	if res, err = w.stmtDelete.Exec(
+	if res, err = w.stmtRename.Exec(
 		q.Update.State.Name,
 		q.State.Name,
 	); err != nil {

@@ -16,7 +16,8 @@ const (
 SELECT action_id,
        action_name,
        section_id
-FROM   soma.actions;`
+FROM   soma.actions
+WHERE  section_id = $1::uuid;`
 
 	ActionSearch = `
 SELECT action_id,

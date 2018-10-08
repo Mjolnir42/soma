@@ -23,7 +23,7 @@ func (x *Rest) MonitoringMgmtAll(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoringMgmt
 	request.Action = msg.ActionAll
 	request.Flag.Unscoped = true
@@ -54,7 +54,7 @@ func (x *Rest) MonitoringMgmtSearchAll(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoringMgmt
 	request.Action = msg.ActionSearchAll
 	request.Flag.Unscoped = true
@@ -87,7 +87,7 @@ func (x *Rest) MonitoringMgmtAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoringMgmt
 	request.Action = msg.ActionAdd
 	request.Monitoring.Name = cReq.Monitoring.Name
@@ -111,7 +111,7 @@ func (x *Rest) MonitoringMgmtRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoringMgmt
 	request.Action = msg.ActionRemove
 	request.Monitoring.ID = params.ByName(`monitoring`)

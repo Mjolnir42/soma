@@ -68,9 +68,10 @@ func (w *PropertyWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 func (w *PropertyWrite) RegisterRequests(hmap *handler.Map) {
 	for _, section := range []string{
 		// XXX INCOMPLETE
-		msg.SectionPropertySystem,
-		msg.SectionPropertyNative,
 		msg.SectionPropertyCustom,
+		msg.SectionPropertyNative,
+		msg.SectionPropertyService,
+		msg.SectionPropertySystem,
 	} {
 		for _, action := range []string{
 			msg.ActionAdd,
@@ -232,11 +233,13 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	q.Property.Service.ID = uuid.Must(uuid.NewV4()).String()
 	switch q.Property.Type {
 	case `service`:
 		if res, err = tx.Stmt(w.stmtAddService).Exec(
-			q.Property.Service.TeamID,
+			q.Property.Service.ID,
 			q.Property.Service.Name,
+			q.Property.Service.TeamID,
 		); err != nil {
 			mr.ServerError(err, q.Section)
 			tx.Rollback()
@@ -244,6 +247,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 		}
 	case `template`:
 		if res, err = tx.Stmt(w.stmtAddTemplate).Exec(
+			q.Property.Service.ID,
 			q.Property.Service.Name,
 		); err != nil {
 			mr.ServerError(err, q.Section)
@@ -271,7 +275,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 			}
 		case `template`:
 			if res, err = tx.Stmt(w.stmtAddTemplateAttr).Exec(
-				q.Property.Service.Name,
+				q.Property.Service.ID,
 				attr.Name,
 				attr.Value,
 			); err != nil {
@@ -378,8 +382,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 	switch q.Property.Type {
 	case `service`:
 		if res, err = tx.Stmt(w.stmtRemoveServiceAttr).Exec(
-			q.Property.Service.TeamID,
-			q.Property.Service.Name,
+			q.Property.Service.ID,
 		); err != nil {
 			mr.ServerError(err, q.Section)
 			tx.Rollback()
@@ -387,8 +390,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 		}
 	case `template`:
 		if res, err = tx.Stmt(w.stmtRemoveTemplateAttr).Exec(
-			q.Property.Service.TeamID,
-			q.Property.Service.Name,
+			q.Property.Service.ID,
 		); err != nil {
 			mr.ServerError(err, q.Section)
 			tx.Rollback()
@@ -401,8 +403,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 	switch q.Property.Type {
 	case `service`:
 		if res, err = tx.Stmt(w.stmtRemoveService).Exec(
-			q.Property.Service.TeamID,
-			q.Property.Service.Name,
+			q.Property.Service.ID,
 		); err != nil {
 			mr.ServerError(err, q.Section)
 			tx.Rollback()
@@ -410,7 +411,7 @@ func (w *PropertyWrite) removeService(q *msg.Request, mr *msg.Result) {
 		}
 	case `template`:
 		if res, err = tx.Stmt(w.stmtRemoveTemplate).Exec(
-			q.Property.Service.Name,
+			q.Property.Service.ID,
 		); err != nil {
 			mr.ServerError(err, q.Section)
 			tx.Rollback()

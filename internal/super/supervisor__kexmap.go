@@ -80,6 +80,7 @@ func (k *kexMap) interateUnlocked() chan auth.Kex {
 		ret <- k.KMap[id]
 	}
 
+	close(ret)
 	return ret
 }
 

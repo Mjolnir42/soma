@@ -22,7 +22,7 @@ func (x *Rest) BucketList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionList
 
@@ -53,7 +53,7 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionList
 	request.Search.Bucket.ID = cReq.Filter.Bucket.ID
@@ -83,7 +83,7 @@ func (x *Rest) BucketShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionShow
 	request.Bucket = proto.Bucket{
@@ -105,7 +105,7 @@ func (x *Rest) BucketTree(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionTree
 	request.Tree = proto.Tree{
@@ -148,7 +148,7 @@ func (x *Rest) BucketCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionCreate
 	request.Bucket = cReq.Bucket.Clone()
@@ -216,7 +216,7 @@ func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionPropertyCreate
 	request.TargetEntity = msg.EntityBucket
@@ -238,7 +238,7 @@ func (x *Rest) BucketPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionPropertyDestroy
 	request.TargetEntity = msg.EntityBucket

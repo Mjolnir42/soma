@@ -21,7 +21,7 @@ func (x *Rest) UserShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUser
 	request.Action = msg.ActionShow
 	request.User.ID = params.ByName(`userID`)
@@ -47,7 +47,7 @@ func (x *Rest) UserSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUser
 	request.Action = msg.ActionSearch
 	request.Search.User.UserName = cReq.Filter.User.UserName

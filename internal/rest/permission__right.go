@@ -70,7 +70,7 @@ func (x *Rest) RightSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionRight
 	request.Action = msg.ActionSearch
 	request.Search.Grant.RecipientType = crq.Filter.Grant.RecipientType

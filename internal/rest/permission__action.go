@@ -22,11 +22,11 @@ func (x *Rest) ActionList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionList
 	request.ActionObj = proto.Action{
-		SectionID: params.ByName(`section`),
+		SectionID: params.ByName(`sectionID`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -45,12 +45,12 @@ func (x *Rest) ActionShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionShow
 	request.ActionObj = proto.Action{
-		ID:        params.ByName(`action`),
-		SectionID: params.ByName(`section`),
+		ID:        params.ByName(`actionID`),
+		SectionID: params.ByName(`sectionID`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -75,19 +75,17 @@ func (x *Rest) ActionSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Action.SectionID == `` || cReq.Action.Name == `` {
+	if cReq.Filter.Action.SectionID == `` || cReq.Filter.Action.Name == `` {
 		dispatchBadRequest(&w,
 			fmt.Errorf(`Invalid action search specification`))
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionSearch
-	request.ActionObj = proto.Action{
-		Name:      cReq.Action.Name,
-		SectionID: cReq.Action.SectionID,
-	}
+	request.Search.ActionObj.Name = cReq.Filter.Action.Name
+	request.Search.ActionObj.SectionID = cReq.Filter.Action.SectionID
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -110,18 +108,19 @@ func (x *Rest) ActionAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Action.SectionID != params.ByName(`section`) {
+	if cReq.Action.SectionID != params.ByName(`sectionID`) {
 		dispatchBadRequest(&w, fmt.Errorf("SectionId mismatch: %s, %s",
-			cReq.Action.SectionID, params.ByName(`section`)))
+			cReq.Action.SectionID, params.ByName(`sectionID`)))
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionAdd
 	request.ActionObj = proto.Action{
 		Name:      cReq.Action.Name,
 		SectionID: cReq.Action.SectionID,
+		Category:  params.ByName(`category`),
 	}
 
 	if !x.isAuthorized(&request) {
@@ -139,12 +138,13 @@ func (x *Rest) ActionRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionAction
 	request.Action = msg.ActionRemove
 	request.ActionObj = proto.Action{
-		ID:        params.ByName(`action`),
-		SectionID: params.ByName(`section`),
+		ID:        params.ByName(`actionID`),
+		SectionID: params.ByName(`sectionID`),
+		Category:  params.ByName(`category`),
 	}
 
 	if !x.isAuthorized(&request) {

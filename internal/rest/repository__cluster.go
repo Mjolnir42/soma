@@ -22,7 +22,7 @@ func (x *Rest) ClusterList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionList
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -54,7 +54,7 @@ func (x *Rest) ClusterSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionSearch
 	request.Search.Cluster.Name = cReq.Filter.Cluster.Name
@@ -86,7 +86,7 @@ func (x *Rest) ClusterShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionShow
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -108,7 +108,7 @@ func (x *Rest) ClusterTree(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionTree
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -145,7 +145,7 @@ func (x *Rest) ClusterCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionCreate
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -167,7 +167,7 @@ func (x *Rest) ClusterDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionDestroy
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -189,7 +189,7 @@ func (x *Rest) ClusterMemberList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionMemberList
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -217,7 +217,7 @@ func (x *Rest) ClusterMemberAssign(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionMemberAssign
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -241,7 +241,7 @@ func (x *Rest) ClusterMemberUnassign(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionMemberUnassign
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -301,7 +301,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionPropertyCreate
 	request.TargetEntity = msg.EntityCluster
@@ -347,7 +347,7 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionPropertyDestroy
 	request.TargetEntity = msg.EntityCluster
@@ -403,7 +403,7 @@ func (x *Rest) ClusterRename(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionRename
 	request.Repository.ID = params.ByName(`repositoryID`)

@@ -23,7 +23,7 @@ func (x *Rest) UserMgmtList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionList
 	request.Flag.Unscoped = true
@@ -43,7 +43,7 @@ func (x *Rest) UserMgmtShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionShow
 	request.User.ID = params.ByName(`userID`)
@@ -64,7 +64,7 @@ func (x *Rest) UserMgmtSync(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionSync
 	request.Flag.Unscoped = true
@@ -90,7 +90,7 @@ func (x *Rest) UserMgmtSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionSearch
 	request.Search.User.UserName = cReq.Filter.User.UserName
@@ -122,7 +122,7 @@ func (x *Rest) UserMgmtAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionAdd
 	request.User.UserName = cReq.User.UserName
@@ -166,7 +166,7 @@ func (x *Rest) UserMgmtUpdate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionUpdate
 	request.User.ID = cReq.User.ID
@@ -198,7 +198,7 @@ func (x *Rest) UserMgmtRemove(w http.ResponseWriter, r *http.Request,
 		dispatchBadRequest(&w, err)
 		return
 	}
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	switch cReq.Flags.Purge {
 	case true:

@@ -44,7 +44,7 @@ func (x *Rest) PropertyMgmtCustomAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyCustom
 	request.Action = msg.ActionAdd
 	request.Property = cReq.Property.Clone()
@@ -70,7 +70,7 @@ func (x *Rest) PropertyMgmtCustomRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyCustom
 	request.Action = msg.ActionRemove
 	request.Property.Type = msg.PropertyCustom

@@ -64,7 +64,7 @@ func (r *ClusterRead) oncallProperties(cluster *proto.Cluster) error {
 func (r *ClusterRead) serviceProperties(cluster *proto.Cluster) error {
 	var (
 		instanceID, sourceInstanceID string
-		serviceName, view            string
+		serviceID, view              string
 		rows                         *sql.Rows
 		err                          error
 	)
@@ -80,7 +80,7 @@ func (r *ClusterRead) serviceProperties(cluster *proto.Cluster) error {
 			&instanceID,
 			&sourceInstanceID,
 			&view,
-			&serviceName,
+			&serviceID,
 		); err != nil {
 			rows.Close()
 			return err
@@ -93,7 +93,7 @@ func (r *ClusterRead) serviceProperties(cluster *proto.Cluster) error {
 				SourceInstanceID: sourceInstanceID,
 				View:             view,
 				Service: &proto.PropertyService{
-					Name: serviceName,
+					ID: serviceID,
 				},
 			},
 		)

@@ -36,6 +36,7 @@ type Config struct {
 	PrintChannels bool       `json:"startup.print.channel.errors,string"`
 	ShutdownDelay uint64     `json:"shutdown.delay.seconds,string"`
 	InstanceName  string     `json:"instance.name"`
+	LogLevel      string     `json:"log.level"`
 	LogPath       string     `json:"log.path"`
 	QueueLen      int        `json:"handler.queue.length,string"`
 	Version       string     `json:"version"`
@@ -134,6 +135,11 @@ func (c *Config) ReadConfigFile(fname string) error {
 		}
 	}
 
+	if c.LogLevel == `` {
+		log.Println(`Setting default value for log.level: info`)
+		c.LogLevel = `info`
+	}
+
 	if c.Environment == `` {
 		log.Println(`Setting default value for environment: production`)
 		c.Environment = `production`
@@ -161,9 +167,17 @@ func (c *Config) ReadConfigFile(fname string) error {
 	if c.Auth.Activation == `ldap` && !c.Ldap.TLS {
 		log.Println(`Account activation via LDAP configured, but LDAP/TLS disabled!`)
 	}
+
 	if c.ShutdownDelay == 0 {
 		log.Println(`Setting default value for shutdown.delay.seconds: 5`)
 		c.ShutdownDelay = 5
+	}
+
+	switch c.LogLevel {
+	case `debug`, `info`, `warn`, `error`, `fatal`, `panic`:
+	default:
+		log.Fatal(`Invalid log.level specified: `, c.LogLevel, `. Valid levels are: `,
+			`debug, info (default), warn, error, fatal, panic`)
 	}
 
 	return nil

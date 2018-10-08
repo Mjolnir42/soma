@@ -86,12 +86,6 @@ func (x *Rest) ModeRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewModeRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionMode
 	request.Action = msg.ActionRemove

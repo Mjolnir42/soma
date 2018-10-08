@@ -22,7 +22,7 @@ func (x *Rest) MonitoringList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoring
 	request.Action = msg.ActionList
 
@@ -52,7 +52,7 @@ func (x *Rest) MonitoringSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoring
 	request.Action = msg.ActionSearch
 	request.Search.Monitoring.Name = cReq.Filter.Monitoring.Name
@@ -72,7 +72,7 @@ func (x *Rest) MonitoringShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoring
 	request.Action = msg.ActionShow
 	request.Monitoring.ID = params.ByName(`monitoring`)

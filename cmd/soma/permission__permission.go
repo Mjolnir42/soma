@@ -26,7 +26,7 @@ func registerPermissions(app cli.App) *cli.App {
 			{
 				Name:        `permission`,
 				Usage:       `SUBCOMMANDS for permissions`,
-				Description: help.Text(`permission`),
+				Description: help.Text(`permission::`),
 				Subcommands: []cli.Command{
 					{
 						Name:         `add`,
@@ -119,6 +119,20 @@ func cmdPermissionRemove(c *cli.Context) error {
 	uniqueOptions := []string{`from`}
 	mandatoryOptions := []string{}
 
+	var permission, category, permissionID string
+	permissionSlice := strings.Split(c.Args().First(), `::`)
+	switch len(permissionSlice) {
+	case 1:
+		permission = permissionSlice[0]
+		mandatoryOptions = append(mandatoryOptions, `from`)
+	case 2:
+		permission = permissionSlice[1]
+		category = permissionSlice[0]
+		if err := adm.ValidateCategory(category); err != nil {
+			return err
+		}
+	}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
@@ -129,37 +143,20 @@ func cmdPermissionRemove(c *cli.Context) error {
 		return err
 	}
 
-	var permission, category, permissionID string
-	permissionSlice := strings.Split(c.Args().First(), `::`)
-	switch len(permissionSlice) {
-	case 1:
-		permission = permissionSlice[0]
-	case 2:
-		permission = permissionSlice[0]
-		category = permissionSlice[1]
-		if err := adm.ValidateCategory(category); err != nil {
-			return err
-		}
-	}
-	if _, ok := opts[`from`]; !ok {
-		// if the optional argument was not provided, then category must
-		// have been set via splitting permissionSlice
-		if category == `` {
-			return fmt.Errorf(`Missing category information`)
-		}
-	}
 	if category == `` {
 		category = opts[`from`][0]
 		if err := adm.ValidateCategory(category); err != nil {
 			return err
 		}
 	} else {
-		if category != opts[`from`][0] {
-			// example: somaadm permission remove self::information from global
-			return fmt.Errorf("Mismatching category information: %s vs %s",
-				category,
-				opts[`from`][0],
-			)
+		if _, ok := opts[`from`]; ok {
+			if category != opts[`from`][0] {
+				// example: somaadm permission remove self::information from global
+				return fmt.Errorf("Mismatching category information: %s vs %s",
+					category,
+					opts[`from`][0],
+				)
+			}
 		}
 	}
 
@@ -211,6 +208,20 @@ func cmdPermissionShow(c *cli.Context) error {
 	uniqueOptions := []string{`in`}
 	mandatoryOptions := []string{}
 
+	var permission, category, permissionID string
+	permissionSlice := strings.Split(c.Args().First(), `::`)
+	switch len(permissionSlice) {
+	case 1:
+		permission = permissionSlice[0]
+		mandatoryOptions = append(mandatoryOptions, `in`)
+	case 2:
+		permission = permissionSlice[1]
+		category = permissionSlice[0]
+		if err := adm.ValidateCategory(category); err != nil {
+			return err
+		}
+	}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
@@ -221,36 +232,19 @@ func cmdPermissionShow(c *cli.Context) error {
 		return err
 	}
 
-	var permission, category, permissionID string
-	permissionSlice := strings.Split(c.Args().First(), `::`)
-	switch len(permissionSlice) {
-	case 1:
-		permission = permissionSlice[0]
-	case 2:
-		permission = permissionSlice[0]
-		category = permissionSlice[1]
-		if err := adm.ValidateCategory(category); err != nil {
-			return err
-		}
-	}
-	if _, ok := opts[`in`]; !ok {
-		// if the optional argument was not provided, then category must
-		// have been set via splitting permissionSlice
-		if category == `` {
-			return fmt.Errorf(`Missing category information`)
-		}
-	}
 	if category == `` {
 		category = opts[`in`][0]
 		if err := adm.ValidateCategory(category); err != nil {
 			return err
 		}
 	} else {
-		if category != opts[`in`][0] {
-			return fmt.Errorf("Mismatching category information: %s vs %s",
-				category,
-				opts[`in`][0],
-			)
+		if _, ok := opts[`in`]; ok {
+			if category != opts[`in`][0] {
+				return fmt.Errorf("Mismatching category information: %s vs %s",
+					category,
+					opts[`in`][0],
+				)
+			}
 		}
 	}
 

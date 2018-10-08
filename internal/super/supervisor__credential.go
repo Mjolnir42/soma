@@ -115,6 +115,7 @@ func (c *credentialMap) iterateUnlocked() chan credential {
 		ret <- c.CMap[user]
 	}
 
+	close(ret)
 	return ret
 }
 

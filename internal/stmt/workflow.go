@@ -1,6 +1,6 @@
 /*-
- * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2016,2018, 1&1 Internet SE
+ * Copyright (c) 2016, Jörg Pernfuß <code.jpe@gmail.com>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -8,6 +8,10 @@
  */
 
 package stmt
+
+import (
+	"github.com/mjolnir42/soma/lib/proto"
+)
 
 const (
 	WorkflowStatements = ``
@@ -61,7 +65,7 @@ SELECT sci.check_instance_id,
        scic.deprovisioned_at,
        scic.status_last_updated_at,
        scic.notified_at,
-	   (sc.object_id = sc.source_object_id)::boolean
+       (sc.object_id = sc.source_object_id)::boolean
 FROM   soma.check_instances sci
 JOIN   soma.checks sc
   ON   sci.check_id = sc.check_id
@@ -74,17 +78,21 @@ WHERE  NOT sci.deleted
 	// configuration rollout
 	WorkflowRetry = `
 UPDATE soma.check_instance_configurations scic
-SET    status = (CASE status
-                 WHEN 'rollout_failed'     THEN 'awaiting_rollout'
-                 WHEN 'deprovision_failed' THEN 'awaiting_deprovision'
-                 END),
-       next_status = (CASE status
-                      WHEN 'rollout_failed'     THEN 'rollout_in_progress'
-                      WHEN 'deprovision_failed' THEN 'deprovision_in_progress'
-                      END)
+SET    status = (
+           CASE status
+           WHEN '` + proto.DeploymentRolloutFailed + `'::varchar     THEN '` + proto.DeploymentAwaitingRollout + `'::varchar
+           WHEN '` + proto.DeploymentDeprovisionFailed + `'::varchar THEN '` + proto.DeploymentAwaitingDeprovision + `'::varchar
+           END),
+       next_status = (
+           CASE status
+           WHEN '` + proto.DeploymentRolloutFailed + `'::varchar     THEN '` + proto.DeploymentRolloutInProgress + `'::varchar
+           WHEN '` + proto.DeploymentDeprovisionFailed + `'::varchar THEN '` + proto.DeploymentDeprovisionInProgress + `'::varchar
+           END)
 FROM   soma.check_instances sci
 WHERE  sci.current_instance_config_id = scic.check_instance_config_id
-  AND  scic.status IN ( 'rollout_failed', 'deprovision_failed' )
+  AND  scic.status IN (
+         '` + proto.DeploymentRolloutFailed + `'::varchar,
+         '` + proto.DeploymentDeprovisionFailed + `'::varchar )
   AND  sci.check_instance_id = $1::uuid;`
 
 	// Set update available flag for check instance

@@ -80,8 +80,8 @@ WHERE  op.group_id = $1::uuid;`
 SELECT sp.instance_id,
        sp.source_instance_id,
        sp.view,
-       sp.service_property
-FROM   soma.group_service_properties sp
+       sp.service_id
+FROM   soma.group_service_property sp
 WHERE  sp.group_id = $1::uuid;`
 
 	GroupSysProps = `
@@ -138,11 +138,11 @@ WHERE  sgop.source_instance_id = $1::uuid
 
 	GroupServicePropertyForDelete = `
 SELECT sgsp.view,
-       sgsp.service_property
-FROM   soma.group_service_properties sgsp
-JOIN   soma.team_service_properties stsp
-  ON   sgsp.organizational_team_id = stsp.organizational_team_id
- AND   sgsp.service_property = stsp.service_property
+       sgsp.service_id
+FROM   soma.group_service_property sgsp
+JOIN   soma.service_property ssp
+  ON   sgsp.team_id = ssp.team_id
+ AND   sgsp.service_id = ssp.id
 WHERE  sgsp.source_instance_id = $1::uuid
   AND  sgsp.source_instance_id = sgsp.instance_id;`
 )

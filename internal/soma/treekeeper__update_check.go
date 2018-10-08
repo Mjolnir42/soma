@@ -76,7 +76,7 @@ func (tk *TreeKeeper) convertCheck(conf *proto.CheckConfig) (*tree.Check, error)
 			ncon.Key = constr.Native.Name
 			ncon.Value = constr.Native.Value
 		case msg.ConstraintOncall:
-			ncon.Key = "OncallId"
+			ncon.Key = `OncallId`
 			ncon.Value = constr.Oncall.ID
 		case msg.ConstraintCustom:
 			ncon.Key = constr.Custom.ID
@@ -85,8 +85,8 @@ func (tk *TreeKeeper) convertCheck(conf *proto.CheckConfig) (*tree.Check, error)
 			ncon.Key = constr.System.Name
 			ncon.Value = constr.System.Value
 		case msg.ConstraintService:
-			ncon.Key = "name"
-			ncon.Value = constr.Service.Name
+			ncon.Key = `id`
+			ncon.Value = constr.Service.ID
 		case msg.ConstraintAttribute:
 			ncon.Key = constr.Attribute.Name
 			ncon.Value = constr.Attribute.Value

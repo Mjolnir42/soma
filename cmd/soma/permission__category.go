@@ -24,7 +24,7 @@ func registerCategories(app cli.App) *cli.App {
 			{
 				Name:        `category`,
 				Usage:       `SUBCOMMANDS for permission scope categories`,
-				Description: help.Text(`category`),
+				Description: help.Text(`category::`),
 				Subcommands: []cli.Command{
 					{
 						Name:        `add`,

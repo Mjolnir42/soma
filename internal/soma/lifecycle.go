@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016,2018 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -255,8 +255,8 @@ idloop:
 		}
 
 		switch next {
-		case "awaiting_rollout":
-			nextNG = "rollout_in_progress"
+		case proto.DeploymentAwaitingRollout:
+			nextNG = proto.DeploymentRolloutInProgress
 		default:
 			lc.errLog.Printf("LifeCycle.unblock() error: blocked: %s, blocking %s, next: %s, instanceID: %s\n",
 				blockedID, blockingID, next, instanceID)
@@ -327,8 +327,8 @@ func (lc *LifeCycle) deadlockResolver() {
 			return
 		}
 		lc.conn.Exec(stmt.LifecycleUpdateConfig,
-			`awaiting_deprovision`,
-			`deprovision_in_progress`,
+			proto.DeploymentAwaitingDeprovision,
+			proto.DeploymentDeprovisionInProgress,
 			false,
 			chkInstConfigID,
 		)

@@ -7,9 +7,9 @@
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
-// An Entity is a Type without the golang keyword problem
+// Entity is a Type without the golang keyword problem
 type Entity struct {
 	Name    string         `json:"name,omitempty"`
 	Details *EntityDetails `json:"details,omitempty"`

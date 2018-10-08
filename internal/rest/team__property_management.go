@@ -44,7 +44,7 @@ func (x *Rest) PropertyMgmtServiceAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyService
 	request.Action = msg.ActionAdd
 	request.Property = cReq.Property.Clone()
@@ -70,12 +70,12 @@ func (x *Rest) PropertyMgmtServiceRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyService
 	request.Action = msg.ActionRemove
 	request.Property.Type = msg.PropertyService
 	request.Property.Service = &proto.PropertyService{
-		Name:   params.ByName(`propertyID`),
+		ID:     params.ByName(`propertyID`),
 		TeamID: params.ByName(`teamID`),
 	}
 

@@ -74,12 +74,10 @@ func (x *Rest) ViewAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
-	request.Section = msg.SectionAttribute
+	request := msg.New(r, params)
+	request.Section = msg.SectionView
 	request.Action = msg.ActionAdd
-	request.View = proto.View{
-		Name: cReq.View.Name,
-	}
+	request.View.Name = cReq.View.Name
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -99,9 +97,7 @@ func (x *Rest) ViewRemove(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionView
 	request.Action = msg.ActionRemove
-	request.View = proto.View{
-		Name: params.ByName(`view`),
-	}
+	request.View.Name = params.ByName(`view`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -129,15 +125,11 @@ func (x *Rest) ViewRename(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
-	request.Section = msg.SectionAttribute
+	request := msg.New(r, params)
+	request.Section = msg.SectionView
 	request.Action = msg.ActionRename
-	request.View = proto.View{
-		Name: params.ByName(`view`),
-	}
-	request.Update.View = proto.View{
-		Name: cReq.View.Name,
-	}
+	request.View.Name = params.ByName(`view`)
+	request.Update.View.Name = cReq.View.Name
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

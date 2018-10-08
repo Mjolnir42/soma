@@ -21,7 +21,7 @@ func (x *Rest) CategoryList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCategory
 	request.Action = msg.ActionList
 
@@ -40,7 +40,7 @@ func (x *Rest) CategoryShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCategory
 	request.Action = msg.ActionShow
 	request.Category = proto.Category{
@@ -68,7 +68,7 @@ func (x *Rest) CategoryAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCategory
 	request.Action = msg.ActionAdd
 	request.Category = cReq.Category.Clone()
@@ -88,7 +88,7 @@ func (x *Rest) CategoryRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionCategory
 	request.Action = msg.ActionRemove
 	request.Category = proto.Category{

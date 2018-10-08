@@ -27,8 +27,8 @@ WHERE  op.bucket_id = $1::uuid;`
 SELECT sp.instance_id,
        sp.source_instance_id,
        sp.view,
-       sp.service_property
-FROM   soma.bucket_service_properties sp
+       sp.service_id
+FROM   soma.bucket_service_property sp
 WHERE  sp.bucket_id = $1::uuid;`
 
 	BucketSysProps = `
@@ -85,11 +85,11 @@ WHERE  sbop.source_instance_id = $1::uuid
 
 	BucketServicePropertyForDelete = `
 SELECT sbsp.view,
-       sbsp.service_property
-FROM   soma.bucket_service_properties sbsp
-JOIN   soma.team_service_properties stsp
-  ON   sbsp.organizational_team_id = stsp.organizational_team_id
- AND   sbsp.service_property = stsp.service_property
+       sbsp.service_id
+FROM   soma.bucket_service_property sbsp
+JOIN   soma.service_property ssp
+  ON   sbsp.team_id = ssp.team_id
+ AND   sbsp.service_id = ssp.id
 WHERE  sbsp.source_instance_id = $1::uuid
   AND  sbsp.source_instance_id = sbsp.instance_id;`
 

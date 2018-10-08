@@ -89,7 +89,7 @@ func (g *GuidePost) RegisterRequests(hmap *handler.Map) {
 		Action  string
 	}{
 		{Section: msg.SectionSystem, Action: msg.ActionRepoStop},
-		{Section: msg.SectionRepositoryMgmt, Action: msg.ActionRename},
+		{Section: msg.SectionRepository, Action: msg.ActionRename},
 		{Section: msg.SectionRepository, Action: msg.ActionDestroy},
 		{Section: msg.SectionRepositoryConfig, Action: msg.ActionPropertyCreate},
 		{Section: msg.SectionRepositoryConfig, Action: msg.ActionPropertyDestroy},

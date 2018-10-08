@@ -52,6 +52,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	}
 
 	// extract category
+	// XXX BUG nilptr crash if section is not found
 	category = c.section.getByName(q.Super.Authorize.Section).Category
 
 	// lookup sectionID and actionID of the Request, abort for

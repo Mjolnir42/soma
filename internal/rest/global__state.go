@@ -66,7 +66,7 @@ func (x *Rest) StateAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionState
 	request.Action = msg.ActionAdd
 	request.State.Name = cReq.State.Name
@@ -86,7 +86,7 @@ func (x *Rest) StateRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionState
 	request.Action = msg.ActionRemove
 	request.State.Name = params.ByName(`state`)
@@ -112,7 +112,7 @@ func (x *Rest) StateRename(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionState
 	request.Action = msg.ActionRename
 	request.Update.State.Name = cReq.State.Name

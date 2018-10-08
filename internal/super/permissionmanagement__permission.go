@@ -24,7 +24,7 @@ func (s *Supervisor) permission(q *msg.Request) {
 		WithField(`Action`, q.Action)
 
 	switch q.Action {
-	case msg.ActionList, msg.ActionSearchByName, msg.ActionShow:
+	case msg.ActionList, msg.ActionSearch, msg.ActionShow:
 		s.permissionRead(q, &result)
 	case msg.ActionAdd, msg.ActionRemove,
 		msg.ActionMap, msg.ActionUnmap:

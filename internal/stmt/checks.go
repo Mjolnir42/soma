@@ -1,6 +1,6 @@
 /*-
- * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2016,2018, 1&1 Internet SE
+ * Copyright (c) 2016, Jörg Pernfuß <code.jpe@gmail.com>
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -8,6 +8,10 @@
  */
 
 package stmt
+
+import (
+	"github.com/mjolnir42/soma/lib/proto"
+)
 
 const (
 	CheckStatements = ``
@@ -140,7 +144,7 @@ JOIN   soma.checks sc
 JOIN   soma.check_instance_configurations scic
   ON   sci.current_instance_config_id = scic.check_instance_config_id
 WHERE  scc.configuration_id = $1::uuid
-  AND  scic.status != 'awaiting_deletion';`
+  AND  scic.status != '` + proto.DeploymentAwaitingDeletion + `'::varchar;`
 
 	CheckConfigObjectInstanceInfo = `
 SELECT sci.check_instance_id,
@@ -157,7 +161,7 @@ JOIN   soma.check_instance_configurations scic
   ON   sci.current_instance_config_id = scic.check_instance_config_id
 WHERE  scc.configuration_id = $1::uuid
   AND  sc.object_id = $2::uuid
-  AND  scic.status != 'awaiting_deletion';`
+  AND  scic.status != '` + proto.DeploymentAwaitingDeletion + `'::varchar;`
 
 	CheckConfigForChecksOnObject = `
 SELECT sc.configuration_id

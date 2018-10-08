@@ -35,19 +35,15 @@ package rest // import "github.com/mjolnir42/soma/internal/rest"
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/satori/go.uuid"
 
 	"github.com/julienschmidt/httprouter"
 )
-
-// XXX logging
 
 // BasicAuth handles HTTP BasicAuth on requests
 func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
@@ -63,10 +59,22 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 			Value: requestID.String(),
 		})
 
+		// record the request URI
+		ps = append(ps, httprouter.Param{
+			Key:   `RequestURI`,
+			Value: r.RequestURI,
+		})
+
+		logEntry := x.reqLog.WithField(`RequestID`, requestID.String()).
+			WithField(`RequestURI`, r.RequestURI).
+			WithField(`Phase`, `basic-auth`)
+
 		// if the supervisor is not available, no requests are accepted
 		if supervisor = x.handlerMap.Get(`supervisor`); supervisor == nil {
 			http.Error(w, `Authentication supervisor not available`,
 				http.StatusServiceUnavailable)
+			logEntry.WithField(`Code`, http.StatusServiceUnavailable).
+				Warn(`Authentication supervisor not available`)
 			return
 		}
 
@@ -89,7 +97,7 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 			if err == nil {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
 				if len(pair) == 2 {
-					request := newRequest(r, ps)
+					request := msg.New(r, ps)
 					request.Section = msg.SectionSupervisor
 					request.Action = msg.ActionAuthenticate
 					request.Super = &msg.Supervisor{
@@ -107,15 +115,9 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 					result := <-request.Reply
 					if result.Error != nil {
 						// log authentication errors
-						log.Printf(msg.LogStrErr,
-							result.Section,
-							fmt.Sprintf("%s (%s)",
-								result.Action,
-								string(pair[0]),
-							),
-							result.Code,
-							result.Error.Error(),
-						)
+						logEntry = logEntry.WithField(`AuthenticationUser`, string(pair[0])).
+							WithField(`AuthenticationError`, result.Error.Error())
+						goto unauthorized
 					}
 					if result.Super.Verdict == 200 {
 						// record the authenticated user
@@ -128,6 +130,13 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 							Key:   `AuthenticatedToken`,
 							Value: string(pair[1]),
 						})
+
+						// log successful basic auth requests only at debug level
+						// since they will also be logged by rest.send()
+						logEntry.WithField(`AuthenticationUser`, string(pair[0])).
+							WithField(`Code`, int(result.Super.Verdict)).
+							Debug(http.StatusText(int(result.Super.Verdict)))
+
 						// Delegate request to given handle
 						h(w, r, ps)
 						return
@@ -135,11 +144,19 @@ func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
 					}
 				}
 			}
+		} else {
+			logEntry = logEntry.WithField(
+				`AuthenticationError`,
+				`Invalid BasicAuth authorization header`,
+			)
 		}
 
+	unauthorized:
 		w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
 		http.Error(w, http.StatusText(http.StatusUnauthorized),
 			http.StatusUnauthorized)
+		logEntry.WithField(`Code`, http.StatusUnauthorized).
+			Info(http.StatusText(http.StatusUnauthorized))
 	}
 }
 

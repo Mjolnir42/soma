@@ -143,13 +143,13 @@ FROM   soma.permissions sp
 JOIN   soma.permission_map spm
   ON   sp.permission_id = spm.permission_id
 JOIN   soma.sections ss
-  ON   sp.section_id = ss.section_id
+  ON   spm.section_id = ss.section_id
 JOIN   soma.actions sa
-  ON   sp.action_id = sa.action_id
+  ON   spm.action_id = sa.action_id
 WHERE  sp.permission_id = $1::uuid
-  AND  sp.category = $2::uuid
+  AND  sp.category = $2::varchar
   AND  spm.action_id IS NOT NULL
-  AND  sa.section_id = sp.section_id;`
+  AND  sa.section_id = spm.section_id;`
 
 	PermissionMappedSections = `
 SELECT ss.section_id,
@@ -159,9 +159,9 @@ FROM   soma.permissions sp
 JOIN   soma.permission_map spm
   ON   sp.permission_id = spm.permission_id
 JOIN   soma.sections ss
-  ON   sp.section_id = ss.section_id
+  ON   spm.section_id = ss.section_id
 WHERE  sp.permission_id = $1::uuid
-  AND  sp.category = $2::uuid
+  AND  sp.category = $2::varchar
   AND  spm.action_id IS NULL;`
 
 	PermissionMapEntry = `

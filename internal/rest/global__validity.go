@@ -21,7 +21,7 @@ func (x *Rest) ValidityList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionValidity
 	request.Action = msg.ActionList
 
@@ -40,7 +40,7 @@ func (x *Rest) ValidityShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionValidity
 	request.Action = msg.ActionShow
 	request.Validity = proto.Validity{
@@ -68,7 +68,7 @@ func (x *Rest) ValidityAdd(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request := newRequest(r, params)
+	request := msg.New(r, params)
 	request.Section = msg.SectionValidity
 	request.Action = msg.ActionAdd
 	request.Validity = *cReq.Validity

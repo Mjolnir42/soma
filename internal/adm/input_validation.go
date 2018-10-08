@@ -232,7 +232,7 @@ func ValidatePredicate(s string) error {
 		return err
 	}
 
-	if res.Predicates != nil || len(*res.Predicates) == 0 {
+	if res.Predicates == nil || len(*res.Predicates) == 0 {
 		return fmt.Errorf(`no object returned`)
 	}
 
@@ -251,7 +251,7 @@ func ValidateCategory(s string) error {
 		return err
 	}
 
-	if res.Categories != nil || len(*res.Categories) == 0 {
+	if res.Categories == nil || len(*res.Categories) == 0 {
 		return fmt.Errorf(`no object returned`)
 	}
 
@@ -337,10 +337,11 @@ func ValidateCheckConstraints(repoID, teamID string,
 		case `service`:
 			service := proto.PropertyService{}
 			var err error
-			if service.Name, err = LookupServicePropertyID(
+			if service.ID, err = LookupServicePropertyID(
 				prop.Service.Name, teamID); err != nil {
 				return nil, err
 			}
+			service.Name = prop.Service.Name
 			service.TeamID = teamID
 			valid = append(valid, proto.CheckConfigConstraint{
 				ConstraintType: prop.ConstraintType,

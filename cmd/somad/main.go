@@ -51,6 +51,7 @@ func main() {
 		hm                                          *handler.Map
 		lm                                          soma.LogHandleMap
 		rst                                         *rest.Rest
+		lvl                                         logrus.Level
 	)
 
 	// Daemon command line flags
@@ -81,6 +82,21 @@ func main() {
 	}
 	SomaCfg.Version = somaVersion
 
+	switch SomaCfg.LogLevel {
+	case `debug`:
+		lvl = logrus.DebugLevel
+	case `info`:
+		lvl = logrus.InfoLevel
+	case `warn`:
+		lvl = logrus.WarnLevel
+	case `error`:
+		lvl = logrus.ErrorLevel
+	case `fatal`:
+		lvl = logrus.FatalLevel
+	case `panic`:
+		lvl = logrus.PanicLevel
+	}
+
 	// Open logfiles
 	if lfhGlobal, err = reopen.NewFileWriter(
 		filepath.Join(SomaCfg.LogPath, `global.log`),
@@ -88,6 +104,7 @@ func main() {
 		logrus.Fatalf("Unable to open global output log: %s", err)
 	}
 	logrus.SetOutput(lfhGlobal)
+	logrus.SetLevel(lvl)
 	logFileMap[`global`] = lfhGlobal
 
 	appLog = logrus.New()
@@ -96,6 +113,7 @@ func main() {
 	); err != nil {
 		logrus.Fatalf("Unable to open application log: %s", err)
 	}
+	appLog.SetLevel(lvl)
 	appLog.Out = lfhApp
 	appLog.Formatter = &logrus.TextFormatter{
 		DisableColors: true,
@@ -109,6 +127,7 @@ func main() {
 	); err != nil {
 		logrus.Fatalf("Unable to open request log: %s", err)
 	}
+	reqLog.SetLevel(lvl)
 	reqLog.Out = lfhReq
 	reqLog.Formatter = &logrus.TextFormatter{
 		DisableColors: true,
@@ -122,6 +141,8 @@ func main() {
 	); err != nil {
 		logrus.Fatalf("Unable to open error log: %s", err)
 	}
+	// it is called errorlog for a reason
+	errLog.SetLevel(logrus.ErrorLevel)
 	errLog.Out = lfhErr
 	errLog.Formatter = &logrus.TextFormatter{
 		DisableColors: true,
@@ -135,6 +156,7 @@ func main() {
 	); err != nil {
 		logrus.Fatalf("Unable to open audit log: %s", err)
 	}
+	auditLog.SetLevel(lvl)
 	auditLog.Out = lfhAudit
 	auditLog.Formatter = &logrus.TextFormatter{
 		DisableColors: true,

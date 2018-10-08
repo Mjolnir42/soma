@@ -285,7 +285,7 @@ func LookupSectionID(s string) (string, error) {
 // LookupActionID looks up the UUID of the action with the name
 // a in section s. Return immediately if a is a UUID.
 func LookupActionID(a, s string) (string, error) {
-	if IsUUID(s) {
+	if IsUUID(a) {
 		return a, nil
 	}
 	var sID string
@@ -837,7 +837,7 @@ func permissionIDByName(perm, cat string, id *string) error {
 	req.Filter.Permission.Name = perm
 	req.Filter.Permission.Category = cat
 
-	res, err := fetchFilter(req, `/filter/permission/`)
+	res, err := fetchFilter(req, `/search/permission/`)
 	if err != nil {
 		goto abort
 	}
