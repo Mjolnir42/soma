@@ -16,7 +16,7 @@ type Attribute struct {
 	Details     *AttributeDetails `json:"details,omitempty"`
 }
 
-// Clone retrurns a copy of e
+// Clone returns a copy of e
 func (a *Attribute) Clone() Attribute {
 	clone := Attribute{
 		Name:        a.Name,
