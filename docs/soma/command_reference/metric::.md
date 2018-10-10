@@ -13,3 +13,5 @@ soma metric remove ${metric}
 soma metric list
 soma metric show ${metric}
 ```
+
+See `soma metric help ${command}` for detailed help.
