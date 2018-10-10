@@ -101,6 +101,9 @@ func cmdPermissionAdd(c *cli.Context) error {
 	if err := adm.ValidateCategory(opts[`to`][0]); err != nil {
 		return err
 	}
+	if err := adm.ValidateNoSlash(opts[`to`][0]); err != nil {
+		return err
+	}
 
 	esc := url.QueryEscape(opts[`to`][0])
 	req := proto.NewPermissionRequest()
@@ -166,6 +169,10 @@ func cmdPermissionRemove(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(category); err != nil {
+		return err
+	}
+
 	path := fmt.Sprintf("/category/%s/permission/%s",
 		url.QueryEscape(category),
 		url.QueryEscape(permissionID))
@@ -191,6 +198,9 @@ func cmdPermissionList(c *cli.Context) error {
 	}
 
 	if err := adm.ValidateCategory(opts[`in`][0]); err != nil {
+		return err
+	}
+	if err := adm.ValidateNoSlash(opts[`in`][0]); err != nil {
 		return err
 	}
 
@@ -251,6 +261,10 @@ func cmdPermissionShow(c *cli.Context) error {
 	if err := adm.LookupPermIDRef(permission, category,
 		&permissionID,
 	); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(category); err != nil {
 		return err
 	}
 
@@ -392,6 +406,10 @@ func cmdPermissionEdit(c *cli.Context, cmd string) error {
 				Category: category,
 			},
 		}
+	}
+
+	if err := adm.ValidateNoSlash(category); err != nil {
+		return err
 	}
 
 	esc := url.QueryEscape(category)

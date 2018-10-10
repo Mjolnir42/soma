@@ -81,6 +81,10 @@ func cmdPermissionCategoryRemove(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	esc := url.QueryEscape(c.Args().First())
 	path := fmt.Sprintf("/category/%s", esc)
 	return adm.Perform(`delete`, path, `command`, nil, c)
@@ -98,6 +102,10 @@ func cmdPermissionCategoryList(c *cli.Context) error {
 // cmdPermissionCategoryShow function -- somaadm category show ${name}
 func cmdPermissionCategoryShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 

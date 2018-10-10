@@ -85,6 +85,10 @@ func cmdSectionAdd(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(opts[`to`][0]); err != nil {
+		return err
+	}
+
 	req := proto.NewSectionRequest()
 	req.Section.Name = c.Args().First()
 	req.Section.Category = opts[`to`][0]
@@ -137,6 +141,10 @@ func cmdSectionRemove(c *cli.Context) error {
 		}
 	}
 
+	if err := adm.ValidateNoSlash(category); err != nil {
+		return err
+	}
+
 	path := fmt.Sprintf("/category/%s/section/%s", category, sectionID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
 }
@@ -159,6 +167,10 @@ func cmdSectionList(c *cli.Context) error {
 	}
 
 	if err := adm.ValidateCategory(opts[`in`][0]); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(opts[`in`][0]); err != nil {
 		return err
 	}
 
@@ -209,6 +221,10 @@ func cmdSectionShow(c *cli.Context) error {
 				category,
 			)
 		}
+	}
+
+	if err := adm.ValidateNoSlash(category); err != nil {
+		return err
 	}
 
 	path := fmt.Sprintf("/category/%s/section/%s", category, sectionID)

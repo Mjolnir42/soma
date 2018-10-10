@@ -72,6 +72,10 @@ func cmdEntityAdd(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	req := proto.NewEntityRequest()
 	req.Entity.Name = c.Args().First()
 
@@ -82,6 +86,10 @@ func cmdEntityAdd(c *cli.Context) error {
 // somaadm entity remove ${entity}
 func cmdEntityRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 
@@ -107,6 +115,13 @@ func cmdEntityRename(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+	if err := adm.ValidateNoSlash(opts[`to`][0]); err != nil {
+		return err
+	}
+
 	req := proto.NewEntityRequest()
 	req.Entity.Name = opts[`to`][0]
 
@@ -128,6 +143,10 @@ func cmdEntityList(c *cli.Context) error {
 // somaadm entity show ${entity}
 func cmdEntityShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 

@@ -84,6 +84,10 @@ func cmdAttributeAdd(c *cli.Context) error {
 			" Accepted: once, multi", opts[`cardinality`][0])
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	req := proto.NewAttributeRequest()
 	req.Attribute.Name = c.Args().First()
 	req.Attribute.Cardinality = opts[`cardinality`][0]
@@ -106,6 +110,10 @@ func cmdAttributeRemove(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	esc := url.QueryEscape(c.Args().First())
 	path := fmt.Sprintf("/attribute/%s", esc)
 	return adm.Perform(`delete`, path, `command`, nil, c)
@@ -125,6 +133,10 @@ func cmdAttributeList(c *cli.Context) error {
 // soma attribute show ${attribute}
 func cmdAttributeShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 

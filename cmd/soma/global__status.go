@@ -64,6 +64,10 @@ func cmdStatusAdd(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	req := proto.NewStatusRequest()
 	req.Status.Name = c.Args().First()
 
@@ -74,6 +78,10 @@ func cmdStatusAdd(c *cli.Context) error {
 // soma status remove ${status}
 func cmdStatusRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 
@@ -96,6 +104,10 @@ func cmdStatusList(c *cli.Context) error {
 // soma status show ${status}
 func cmdStatusShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 

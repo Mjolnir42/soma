@@ -75,6 +75,10 @@ func cmdStateAdd(c *cli.Context) error {
 	req := proto.NewStateRequest()
 	req.State.Name = c.Args().First()
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	return adm.Perform(`postbody`, `/state/`, `command`, req, c)
 }
 
@@ -82,6 +86,10 @@ func cmdStateAdd(c *cli.Context) error {
 // somaadm state remove ${state}
 func cmdStateRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 
@@ -108,6 +116,13 @@ func cmdStateRename(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+	if err := adm.ValidateNoSlash(opts[`to`][0]); err != nil {
+		return err
+	}
+
 	req := proto.NewStateRequest()
 	req.State.Name = opts[`to`][0]
 
@@ -130,6 +145,10 @@ func cmdStateList(c *cli.Context) error {
 // somaadm state show ${state}
 func cmdStateShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 

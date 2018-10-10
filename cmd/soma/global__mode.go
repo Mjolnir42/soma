@@ -64,6 +64,10 @@ func cmdModeAdd(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	req := proto.NewModeRequest()
 	req.Mode.Mode = c.Args().First()
 
@@ -74,6 +78,10 @@ func cmdModeAdd(c *cli.Context) error {
 // soma mode remove ${mode}
 func cmdModeRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 
@@ -95,6 +103,10 @@ func cmdModeList(c *cli.Context) error {
 // soma mode show ${mode}
 func cmdModeShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 

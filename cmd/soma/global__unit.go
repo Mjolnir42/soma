@@ -77,6 +77,10 @@ func cmdUnitAdd(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	req := proto.NewUnitRequest()
 	req.Unit.Unit = c.Args().First()
 	req.Unit.Name = opts[`name`][0]
@@ -88,6 +92,10 @@ func cmdUnitAdd(c *cli.Context) error {
 // soma unit remove ${unit}
 func cmdUnitRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 
@@ -110,6 +118,10 @@ func cmdUnitList(c *cli.Context) error {
 // soma unit show ${unit}
 func cmdUnitShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 

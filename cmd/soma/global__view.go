@@ -73,6 +73,10 @@ func cmdViewAdd(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	req := proto.Request{}
 	req.View = &proto.View{}
 	req.View.Name = c.Args().First()
@@ -87,6 +91,10 @@ func cmdViewAdd(c *cli.Context) error {
 // somaadm view remove ${view}
 func cmdViewRemove(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 
@@ -112,6 +120,13 @@ func cmdViewRename(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+	if err := adm.ValidateNoSlash(opts[`to`][0]); err != nil {
+		return err
+	}
+
 	req := proto.NewViewRequest()
 	req.View.Name = opts[`to`][0]
 
@@ -133,6 +148,10 @@ func cmdViewList(c *cli.Context) error {
 // somaadm view show ${view}
 func cmdViewShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
 		return err
 	}
 
