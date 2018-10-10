@@ -2,7 +2,7 @@ package cmpl
 
 import "github.com/codegangsta/cli"
 
-func MetricCreate(c *cli.Context) {
+func MetricAdd(c *cli.Context) {
 	GenericMulti(c, []string{`unit`, `description`}, []string{`package`})
 }
 
