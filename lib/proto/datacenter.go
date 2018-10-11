@@ -6,9 +6,9 @@
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
-// Datacenter ...
+// Datacenter is the definition of a datacenter
 type Datacenter struct {
 	LoCode  string             `json:"loCode,omitempty"`
 	Details *DatacenterDetails `json:"details,omitempty"`
@@ -25,7 +25,7 @@ func (d *Datacenter) Clone() Datacenter {
 	return clone
 }
 
-// DatacenterDetails ...
+// DatacenterDetails contains metadata about a datacenter
 type DatacenterDetails struct {
 	Creation *DetailsCreation `json:"creation,omitempty"`
 }
@@ -39,7 +39,8 @@ func (d *DatacenterDetails) Clone() *DatacenterDetails {
 	return clone
 }
 
-// NewDatacenterRequest ...
+// NewDatacenterRequest returns a new Request with fields preallocated
+// for filling in Datacenter data, ensuring no nilptr-deref takes place.
 func NewDatacenterRequest() Request {
 	return Request{
 		Flags:      &Flags{},
@@ -47,7 +48,8 @@ func NewDatacenterRequest() Request {
 	}
 }
 
-// NewDatacenterResult ...
+// NewDatacenterResult returns a new Result with fields preallocated
+// for filling in Datacenter data, ensuring no nilptr-deref takes place.
 func NewDatacenterResult() Result {
 	return Result{
 		Errors:      &[]string{},
