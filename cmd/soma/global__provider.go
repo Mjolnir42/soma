@@ -107,6 +107,10 @@ func cmdProviderShow(c *cli.Context) error {
 		return err
 	}
 
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
 	esc := url.QueryEscape(c.Args().First())
 	path := fmt.Sprintf("/provider/%s", esc)
 	return adm.Perform(`get`, path, `show`, nil, c)
