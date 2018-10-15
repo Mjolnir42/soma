@@ -12,6 +12,7 @@ Permission names must not contain the : character.
 ```
 soma permission add ${permission} to ${category}
 ```
+
 # ARGUMENT TYPES
 
 Name | Type |     Description   | Default | Optional

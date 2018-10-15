@@ -2,6 +2,8 @@
 
 This command is used to add unit definitions to SOMA.
 
+The unit glyph string may not contain / characters.
+
 # SYNOPSIS
 
 ```
