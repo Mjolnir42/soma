@@ -127,7 +127,7 @@ func cmdDatacenterRename(c *cli.Context) error {
 
 	esc := url.QueryEscape(c.Args().First())
 	path := fmt.Sprintf("/datacenter/%s", esc)
-	return adm.Perform(`put`, path, `command`, nil, c)
+	return adm.Perform(`putbody`, path, `command`, req, c)
 }
 
 // cmdDatacenterList function

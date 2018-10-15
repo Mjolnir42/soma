@@ -165,7 +165,7 @@ func (w *DatacenterWrite) rename(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	if mr.RowCnt(res.RowsAffected()) {
-		mr.Datacenter = append(mr.Datacenter, q.Datacenter)
+		mr.Datacenter = append(mr.Datacenter, q.Update.Datacenter)
 	}
 }
 
