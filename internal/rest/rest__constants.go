@@ -78,7 +78,7 @@ const (
 	rtSearchCustomProperty       = `/search/repository/:repositoryID/property-mgmt/:propertyType/`
 	rtSearchNode                 = `/search/node/`
 	rtSearchPermission           = `/search/permission/`
-	rtSearchGLobalProperty       = `/search/property-mgmt/:propertyType/`
+	rtSearchGlobalProperty       = `/search/property-mgmt/:propertyType/`
 	rtSearchRight                = `/search/right/`
 	rtSearchServiceProperty      = `/search/team/:teamID/property-mgmt/:propertyType/`
 	rtSyncNode                   = `/sync/node/`

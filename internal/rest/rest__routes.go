@@ -139,7 +139,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(rtSearchBucket, x.Verify(x.BucketSearch))
 	router.POST(rtSearchCluster, x.Verify(x.ClusterSearch))
 	router.POST(rtSearchCustomProperty, x.Verify(x.PropertyMgmtSearch))
-	router.POST(rtSearchGLobalProperty, x.Verify(x.PropertyMgmtSearch))
+	router.POST(rtSearchGlobalProperty, x.Verify(x.PropertyMgmtSearch))
 	router.POST(rtSearchGroup, x.Verify(x.GroupSearch))
 	router.POST(rtSearchNode, x.Verify(x.NodeSearch))
 	router.POST(rtSearchPermission, x.Verify(x.PermissionSearch))
