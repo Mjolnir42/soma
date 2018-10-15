@@ -6,6 +6,10 @@ func Team(c *cli.Context) {
 	Generic(c, []string{`team`})
 }
 
+func TeamDirect(c *cli.Context) {
+	GenericDirect(c, []string{`team`})
+}
+
 func Repository(c *cli.Context) {
 	Generic(c, []string{`repository`})
 }
