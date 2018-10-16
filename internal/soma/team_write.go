@@ -60,7 +60,7 @@ func (w *TeamWrite) RegisterRequests(hmap *handler.Map) {
 		msg.ActionRemove,
 		msg.ActionUpdate,
 	} {
-		hmap.Request(msg.SectionTeam, action, w.handlerName)
+		hmap.Request(msg.SectionTeamMgmt, action, w.handlerName)
 	}
 }
 

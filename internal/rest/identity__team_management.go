@@ -187,7 +187,7 @@ func (x *Rest) TeamMgmtRemove(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	request := msg.New(r, params)
-	request.Section = msg.SectionCapability
+	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionRemove
 	request.Team = proto.Team{
 		ID: params.ByName(`teamID`),

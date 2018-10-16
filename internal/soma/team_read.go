@@ -53,10 +53,19 @@ func (r *TeamRead) Register(c *sql.DB, l ...*logrus.Logger) {
 // RegisterRequests links the handler inside the handlermap to the requests
 // it processes
 func (r *TeamRead) RegisterRequests(hmap *handler.Map) {
+	// Category: identity
 	for _, action := range []string{
 		msg.ActionList,
+		msg.ActionSearch,
 		msg.ActionShow,
 		msg.ActionSync,
+	} {
+		hmap.Request(msg.SectionTeamMgmt, action, r.handlerName)
+	}
+	// Category: self
+	for _, action := range []string{
+		msg.ActionShow,
+		msg.ActionSearch,
 	} {
 		hmap.Request(msg.SectionTeam, action, r.handlerName)
 	}
