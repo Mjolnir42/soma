@@ -266,6 +266,16 @@ func NewPropertyRequest() Request {
 	}
 }
 
+func NewSystemPropertyRequest() Request {
+	return Request{
+		Flags: &Flags{},
+		Property: &Property{
+			Type:   PropertyTypeSystem,
+			System: &PropertySystem{},
+		},
+	}
+}
+
 func NewPropertyFilter() Request {
 	return Request{
 		Filter: &Filter{
@@ -280,5 +290,10 @@ func NewPropertyResult() Result {
 		Properties: &[]Property{},
 	}
 }
+
+// Property types
+const (
+	PropertyTypeSystem   = `system`
+)
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

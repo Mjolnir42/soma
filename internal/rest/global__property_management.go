@@ -89,6 +89,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 		request.Property.Service.ID = params.ByName(`propertyID`)
 	case msg.PropertySystem:
 		request.Section = msg.SectionPropertySystem
+		request.Property.System = &proto.PropertySystem{}
 		request.Property.System.Name = params.ByName(`propertyID`)
 	case msg.PropertyCustom:
 		request.Section = msg.SectionPropertyCustom
@@ -338,6 +339,8 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 		request.Property.Native.Name = params.ByName(`propertyID`)
 	case msg.PropertySystem:
 		request.Section = msg.SectionPropertySystem
+		request.Property.System = &proto.PropertySystem{}
+		request.Property.System.Name = params.ByName(`propertyID`)
 	case msg.PropertyCustom:
 		fallthrough
 	case msg.PropertyService:
