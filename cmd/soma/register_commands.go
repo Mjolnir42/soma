@@ -39,7 +39,6 @@ func registerCommands(app cli.App) *cli.App {
 	app = *registerOncall(app)
 	app = *registerPermissions(app)
 	app = *registerPredicates(app)
-	app = *registerProperty(app)
 	app = *registerProviders(app)
 	app = *registerRepository(app)
 	app = *registerRights(app)
