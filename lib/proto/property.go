@@ -276,6 +276,16 @@ func NewSystemPropertyRequest() Request {
 	}
 }
 
+func NewNativePropertyRequest() Request {
+	return Request{
+		Flags: &Flags{},
+		Property: &Property{
+			Type:   PropertyTypeNative,
+			Native: &PropertyNative{},
+		},
+	}
+}
+
 func NewPropertyFilter() Request {
 	return Request{
 		Filter: &Filter{
@@ -293,6 +303,7 @@ func NewPropertyResult() Result {
 
 // Property types
 const (
+	PropertyTypeNative   = `native`
 	PropertyTypeSystem   = `system`
 )
 

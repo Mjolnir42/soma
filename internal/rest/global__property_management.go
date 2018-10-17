@@ -83,6 +83,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 	switch request.Property.Type {
 	case msg.PropertyNative:
 		request.Section = msg.SectionPropertyNative
+		request.Property.Native = &proto.PropertyNative{}
 		request.Property.Native.Name = params.ByName(`propertyID`)
 	case msg.PropertyTemplate:
 		request.Section = msg.SectionPropertyTemplate
@@ -333,6 +334,7 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 	switch request.Property.Type {
 	case msg.PropertyNative:
 		request.Section = msg.SectionPropertyNative
+		request.Property.Native = &proto.PropertyNative{}
 		request.Property.Native.Name = params.ByName(`propertyID`)
 	case msg.PropertyTemplate:
 		request.Section = msg.SectionPropertyTemplate

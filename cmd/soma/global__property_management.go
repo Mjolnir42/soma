@@ -29,6 +29,37 @@ func registerProperty(app cli.App) *cli.App {
 				Description: help.Text(`property-mgmt::`),
 				Subcommands: []cli.Command{
 					{
+						Name:        `native`,
+						Usage:       `SUBCOMMANDS for native introspection property management`,
+						Description: help.Text(`property-native::`),
+						Subcommands: []cli.Command{
+							{
+								Name:        `add`,
+								Usage:       `Add a new global native introspection property`,
+								Description: help.Text(`property-native::add`),
+								Action:      runtime(propertyMgmtNativeAdd),
+							},
+							{
+								Name:        `remove`,
+								Usage:       `Remove a native introspection property`,
+								Description: help.Text(`property-native::remove`),
+								Action:      runtime(propertyMgmtNativeRemove),
+							},
+							{
+								Name:        `show`,
+								Usage:       `Show details about a native introspection property`,
+								Description: help.Text(`property-native::show`),
+								Action:      runtime(propertyMgmtNativeShow),
+							},
+							{
+								Name:        `list`,
+								Usage:       `List all native introspection properties`,
+								Description: help.Text(`property-native::list`),
+								Action:      runtime(propertyMgmtNativeList),
+							},
+						},
+					},
+					{
 						Name:        `system`,
 						Usage:       `SUBCOMMANDS for global system property management`,
 						Description: help.Text(`property-system::`),
@@ -130,6 +161,68 @@ func propertyMgmtSystemList(c *cli.Context) error {
 	}
 
 	path := fmt.Sprintf("/property-mgmt/%s/", proto.PropertyTypeSystem)
+	return adm.Perform(`get`, path, `list`, nil, c)
+}
+
+// NATIVE PROPERTIES
+
+// propertyMgmtNativeAdd function
+// soma property-mgmt native add ${property}
+func propertyMgmtNativeAdd(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
+	req := proto.NewNativePropertyRequest()
+	req.Property.Native.Name = c.Args().First()
+
+	path := fmt.Sprintf("/property-mgmt/%s/",
+		url.QueryEscape(proto.PropertyTypeNative),
+	)
+	return adm.Perform(`postbody`, path, `command`, req, c)
+}
+
+// propertyMgmtNativeRemove function
+// soma property-mgmt native remove ${property}
+func propertyMgmtNativeRemove(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/property-mgmt/%s/%s",
+		url.QueryEscape(proto.PropertyTypeNative),
+		url.QueryEscape(c.Args().First()),
+	)
+	return adm.Perform(`delete`, path, `command`, nil, c)
+}
+
+// propertyMgmtNativeShow function
+// soma property-mgmt native show ${property}
+func propertyMgmtNativeShow(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+	path := fmt.Sprintf("/property-mgmt/%s/%s",
+		url.QueryEscape(proto.PropertyTypeNative),
+		url.QueryEscape(c.Args().First()),
+	)
+	return adm.Perform(`get`, path, `show`, nil, c)
+}
+
+// propertyMgmtNativeList function
+// soma property-mgmt native list
+func propertyMgmtNativeList(c *cli.Context) error {
+	if err := adm.VerifyNoArgument(c); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/property-mgmt/%s/",
+		url.QueryEscape(proto.PropertyTypeNative),
+	)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
