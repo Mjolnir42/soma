@@ -95,7 +95,7 @@ func ValidateMailAddress(s string) error {
 	return nil
 }
 
-// ValidateBool tests that string s represents and bool and sets
+// ValidateBool tests that string s represents a bool and sets
 // its value in b.
 // Returns error if s could not be parsed as bool.
 func ValidateBool(s string, b *bool) error {
