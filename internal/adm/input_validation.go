@@ -432,7 +432,7 @@ func fetchObjList(path string) (*proto.Result, error) {
 	if resp, err = GetReq(path); err != nil {
 		return nil, err
 	}
-	if res, err = decodeResponse(resp); err != nil {
+	if err = decodeResponse(resp, res); err != nil {
 		return nil, err
 	}
 	if err = checkApplicationError(res); err != nil {

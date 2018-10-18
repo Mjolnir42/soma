@@ -24,11 +24,11 @@ func attributeFetch() []proto.Attribute {
 	var (
 		err  error
 		resp *resty.Response
-		res  *proto.Result
 	)
+	res := &proto.Result{}
 
 	// fetch list of possible service attributes
-	if resp, err = adm.GetReq(`/attributes/`); err != nil {
+	if resp, err = adm.GetReq(`/attribute/`); err != nil {
 		pushError(err)
 		return []proto.Attribute{}
 	}
@@ -40,6 +40,11 @@ func attributeFetch() []proto.Attribute {
 	}
 
 	// check result
+	if res == nil {
+		pushError(fmt.Errorf(`adm.DecodedResponse returned nil object`))
+		return []proto.Attribute{}
+	}
+
 	if res.Attributes == nil || len(*res.Attributes) == 0 {
 		pushError(fmt.Errorf(`server returned no attributes for parsing`))
 		return []proto.Attribute{}

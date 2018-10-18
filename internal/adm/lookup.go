@@ -1042,7 +1042,7 @@ func nodeConfigByID(node string) (*proto.NodeConfig, error) {
 	if resp, err = GetReq(path); err != nil {
 		goto abort
 	}
-	if res, err = decodeResponse(resp); err != nil {
+	if err = decodeResponse(resp, res); err != nil {
 		goto abort
 	}
 	if res.StatusCode == 404 {
@@ -1177,8 +1177,8 @@ func propertyIDByName(pType, pName, refID string) (string, error) {
 	var (
 		path string
 		err  error
-		res  *proto.Result
 	)
+	res := &proto.Result{}
 
 	switch pType {
 	case `custom`:
@@ -1276,14 +1276,15 @@ func fetchFilter(req proto.Request, path string) (*proto.Result, error) {
 	var (
 		err  error
 		resp *resty.Response
-		res  *proto.Result
 	)
+	res := &proto.Result{}
+
 	if resp, err = PostReqBody(req, path); err != nil {
 		// transport errors
 		return nil, err
 	}
 
-	if res, err = decodeResponse(resp); err != nil {
+	if err = decodeResponse(resp, res); err != nil {
 		// http code errors
 		return nil, err
 	}

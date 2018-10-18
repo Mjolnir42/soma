@@ -53,9 +53,7 @@ noattachment:
 }
 
 func DecodedResponse(resp *resty.Response, res *proto.Result) error {
-	var err error
-	res, err = decodeResponse(resp)
-	if err != nil {
+	if err := decodeResponse(resp, res); err != nil {
 		return err
 	}
 	return checkApplicationError(res)
@@ -119,7 +117,7 @@ func handleRequestOptions(resp *resty.Response, err error) (*resty.Response, err
 	}
 
 	var result *proto.Result
-	if result, err = decodeResponse(resp); err != nil {
+	if err = decodeResponse(resp, result); err != nil {
 		return nil, err
 	}
 
@@ -149,15 +147,9 @@ func asyncWait(result *proto.Result) {
 	}
 }
 
-func decodeResponse(resp *resty.Response) (*proto.Result, error) {
-	result := proto.Result{}
+func decodeResponse(resp *resty.Response, res *proto.Result) error {
 	decoder := json.NewDecoder(bytes.NewReader(resp.Body()))
-	err := decoder.Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-
-	return &result, nil
+	return decoder.Decode(res)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
