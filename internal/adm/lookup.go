@@ -10,6 +10,7 @@ package adm
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -383,7 +384,7 @@ func LookupTemplatePropertyID(s string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	return propertyIDByName(`template`, s, `none`)
+	return propertyIDByName(proto.PropertyTypeTemplate, s, `none`)
 }
 
 // LookupLevelName looks up the long name of a level s, where s
@@ -1187,8 +1188,10 @@ func propertyIDByName(pType, pName, refID string) (string, error) {
 	case `service`:
 		path = fmt.Sprintf("/filter/property/service/team/%s/",
 			refID)
-	case `template`:
-		path = `/filter/property/service/global/`
+	case proto.PropertyTypeTemplate:
+		path = fmt.Sprintf("/search/property-mgmt/%s/",
+			url.QueryEscape(proto.PropertyTypeTemplate),
+		)
 	default:
 		err = fmt.Errorf("Unknown property type: %s", pType)
 		goto abort
@@ -1223,13 +1226,13 @@ func propertyIDByName(pType, pName, refID string) (string, error) {
 			goto abort
 		}
 		fallthrough
-	case `template`:
+	case proto.PropertyTypeTemplate:
 		if pName != (*res.Properties)[0].Service.Name {
 			err = fmt.Errorf("Name mismatch: %s vs %s",
 				pName, (*res.Properties)[0].Service.Name)
 			goto abort
 		}
-		return (*res.Properties)[0].Service.Name, nil
+		return (*res.Properties)[0].Service.ID, nil
 	default:
 		err = fmt.Errorf("Unknown property type: %s", pType)
 	}

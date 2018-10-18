@@ -152,7 +152,7 @@ type PropertyService struct {
 	ID         string             `json:"ID,omitempty"`
 	Name       string             `json:"name,omitempty"`
 	TeamID     string             `json:"teamID,omitempty"`
-	Attributes []ServiceAttribute `json:"attributes"`
+	Attributes []ServiceAttribute `json:"attributes,omitempty"`
 }
 
 func (t *PropertyService) Clone() *PropertyService {
@@ -286,6 +286,18 @@ func NewNativePropertyRequest() Request {
 	}
 }
 
+func NewTemplatePropertyRequest() Request {
+	return Request{
+		Flags: &Flags{},
+		Property: &Property{
+			Type: PropertyTypeTemplate,
+			Service: &PropertyService{
+				Attributes: []ServiceAttribute{},
+			},
+		},
+	}
+}
+
 func NewPropertyFilter() Request {
 	return Request{
 		Filter: &Filter{
@@ -305,6 +317,7 @@ func NewPropertyResult() Result {
 const (
 	PropertyTypeNative   = `native`
 	PropertyTypeSystem   = `system`
+	PropertyTypeTemplate = `template`
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

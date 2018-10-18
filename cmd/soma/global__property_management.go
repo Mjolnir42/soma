@@ -90,6 +90,38 @@ func registerProperty(app cli.App) *cli.App {
 							},
 						},
 					},
+					{
+						Name:        `template`,
+						Usage:       `SUBCOMMANDS for global service property templates`,
+						Description: help.Text(`property-template::`),
+						Subcommands: []cli.Command{
+							{
+								Name:         `add`,
+								Usage:        `Add a new global service template`,
+								Description:  help.Text(`property-template::add`),
+								Action:       runtime(propertyMgmtTemplateAdd),
+								BashComplete: comptime(bashCompServiceAdd),
+							},
+							{
+								Name:        `remove`,
+								Usage:       `Remove a global service property template`,
+								Description: help.Text(`property-template::remove`),
+								Action:      runtime(propertyMgmtTemplateRemove),
+							},
+							{
+								Name:        `show`,
+								Usage:       `Show details about a service property template`,
+								Description: help.Text(`property-template::show`),
+								Action:      runtime(propertyMgmtTemplateShow),
+							},
+							{
+								Name:        `list`,
+								Usage:       `List all service property templates`,
+								Description: help.Text(`property-template::list`),
+								Action:      runtime(propertyMgmtTemplateList),
+							},
+						},
+					},
 				},
 			},
 		}...,
@@ -222,6 +254,135 @@ func propertyMgmtNativeList(c *cli.Context) error {
 
 	path := fmt.Sprintf("/property-mgmt/%s/",
 		url.QueryEscape(proto.PropertyTypeNative),
+	)
+	return adm.Perform(`get`, path, `list`, nil, c)
+}
+
+// TEMPLATE PROPERTIES
+
+// propertyMgmtTemplateAdd function
+func propertyMgmtTemplateAdd(c *cli.Context) error {
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{}
+	mandatoryOptions := []string{}
+
+	// sort attributes based on their cardinality so we can use them
+	// for command line parsing
+	for _, attr := range attributeFetch() {
+		switch attr.Cardinality {
+		case `once`:
+			uniqueOptions = append(uniqueOptions, attr.Name)
+		case `multi`:
+			multipleAllowed = append(multipleAllowed, attr.Name)
+		default:
+			return fmt.Errorf("Unknown attribute cardinality: %s",
+				attr.Cardinality)
+		}
+	}
+
+	// check deferred errors
+	if err := popError(); err != nil {
+		return err
+	}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail(),
+	); err != nil {
+		return err
+	}
+
+	// construct request body
+	req := proto.NewTemplatePropertyRequest()
+	req.Property.Service.Name = c.Args().First()
+	if err := adm.ValidateRuneCount(
+		req.Property.Service.Name, 128); err != nil {
+		return err
+	}
+
+	// fill attributes into request body
+	for oName := range opts {
+		for _, oVal := range opts[oName] {
+			if err := adm.ValidateRuneCount(oName, 128); err != nil {
+				return err
+			}
+			if err := adm.ValidateRuneCount(oVal, 128); err != nil {
+				return err
+			}
+			req.Property.Service.Attributes = append(
+				req.Property.Service.Attributes,
+				proto.ServiceAttribute{
+					Name:  oName,
+					Value: oVal,
+				},
+			)
+		}
+	}
+
+	path := fmt.Sprintf("/property-mgmt/%s/",
+		url.QueryEscape(proto.PropertyTypeTemplate),
+	)
+	return adm.Perform(`postbody`, path, `command`, req, c)
+}
+
+// propertyMgmtTemplateRemove function
+func propertyMgmtTemplateRemove(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
+	propertyID, err := adm.LookupTemplatePropertyID(c.Args().First())
+	if err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/property-mgmt/%s/%s",
+		url.QueryEscape(proto.PropertyTypeTemplate),
+		url.QueryEscape(propertyID),
+	)
+	return adm.Perform(`delete`, path, `command`, nil, c)
+}
+
+// propertyMgmtTemplateShow function
+// soma property-mgmt template show ${property}
+func propertyMgmtTemplateShow(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if err := adm.ValidateNoSlash(c.Args().First()); err != nil {
+		return err
+	}
+
+	propertyID, err := adm.LookupTemplatePropertyID(c.Args().First())
+	if err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/property-mgmt/%s/%s",
+		url.QueryEscape(proto.PropertyTypeTemplate),
+		url.QueryEscape(propertyID),
+	)
+	return adm.Perform(`get`, path, `show`, nil, c)
+}
+
+// propertyMgmtTemplateList function
+// soma property-mgmt template list
+func propertyMgmtTemplateList(c *cli.Context) error {
+	if err := adm.VerifyNoArgument(c); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/property-mgmt/%s/",
+		url.QueryEscape(proto.PropertyTypeTemplate),
 	)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }

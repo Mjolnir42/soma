@@ -71,6 +71,7 @@ func (r *PropertyRead) RegisterRequests(hmap *handler.Map) {
 		for _, action := range []string{
 			msg.ActionList,
 			msg.ActionShow,
+			msg.ActionSearch,
 		} {
 			hmap.Request(section, action, r.handlerName)
 		}

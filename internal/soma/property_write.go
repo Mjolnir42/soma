@@ -72,6 +72,7 @@ func (w *PropertyWrite) RegisterRequests(hmap *handler.Map) {
 		msg.SectionPropertyNative,
 		msg.SectionPropertyService,
 		msg.SectionPropertySystem,
+		msg.SectionPropertyTemplate,
 	} {
 		for _, action := range []string{
 			msg.ActionAdd,

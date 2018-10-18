@@ -87,6 +87,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 		request.Property.Native.Name = params.ByName(`propertyID`)
 	case msg.PropertyTemplate:
 		request.Section = msg.SectionPropertyTemplate
+		request.Property.Service = &proto.PropertyService{}
 		request.Property.Service.ID = params.ByName(`propertyID`)
 	case msg.PropertySystem:
 		request.Section = msg.SectionPropertySystem
@@ -133,6 +134,11 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionSearch
 
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
 	if cReq.Filter.Property.Type != params.ByName(`propertyType`) {
 		dispatchBadRequest(&w, fmt.Errorf(
 			"Mismatched propertyType %s vs %s",
@@ -141,10 +147,14 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	request.Property.Type = params.ByName(`propertyType`)
+
 	switch cReq.Filter.Property.Type {
 	case msg.PropertyNative:
 		request.Search.Property.Native.Name = cReq.Filter.Property.Name
 	case msg.PropertyTemplate:
+		request.Section = msg.SectionPropertyTemplate
+		request.Search.Property.Service = &proto.PropertyService{}
 		request.Search.Property.Service.Name = cReq.Filter.Property.Name
 	case msg.PropertySystem:
 		request.Search.Property.System.Name = cReq.Filter.Property.Name
@@ -177,13 +187,9 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	request.Property.Type = params.ByName(`propertyType`)
-
 	switch request.Property.Type {
 	case msg.PropertyNative:
 		request.Section = msg.SectionPropertyNative
-	case msg.PropertyTemplate:
-		request.Section = msg.SectionPropertyTemplate
 	case msg.PropertySystem:
 		request.Section = msg.SectionPropertySystem
 	case msg.PropertyCustom:
@@ -192,11 +198,6 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		request.Section = msg.SectionPropertyService
 	default:
 		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
-		return
-	}
-
-	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
 		return
 	}
 
@@ -338,7 +339,8 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 		request.Property.Native.Name = params.ByName(`propertyID`)
 	case msg.PropertyTemplate:
 		request.Section = msg.SectionPropertyTemplate
-		request.Property.Native.Name = params.ByName(`propertyID`)
+		request.Property.Service = &proto.PropertyService{}
+		request.Property.Service.ID = params.ByName(`propertyID`)
 	case msg.PropertySystem:
 		request.Section = msg.SectionPropertySystem
 		request.Property.System = &proto.PropertySystem{}
