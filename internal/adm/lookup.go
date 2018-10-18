@@ -503,7 +503,7 @@ func teamIDByName(team string) (string, error) {
 	req := proto.NewTeamFilter()
 	req.Filter.Team.Name = team
 
-	res, err := fetchFilter(req, `/search/teams/`)
+	res, err := fetchFilter(req, `/search/team/`)
 	if err != nil {
 		goto abort
 	}

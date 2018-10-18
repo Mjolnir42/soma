@@ -89,7 +89,7 @@ func (c *Cache) Perform(q *msg.Request) {
 		c.performRight(q.Cache)
 	case msg.SectionSection:
 		c.performSection(q.Cache)
-	case msg.SectionTeam:
+	case msg.SectionTeam, msg.SectionTeamMgmt:
 		c.performTeam(q.Cache)
 	case msg.SectionUser:
 		c.performUser(q.Cache)

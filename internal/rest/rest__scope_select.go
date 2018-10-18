@@ -185,7 +185,7 @@ func (x *Rest) ScopeSelectTeamSearch(w http.ResponseWriter,
 	defer panicCatcher(w)
 
 	cReq := proto.NewTeamFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
+	if err := peekJSONBody(r, &cReq); err != nil {
 		dispatchBadRequest(&w, err)
 		return
 	}

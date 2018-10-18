@@ -9,8 +9,10 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"reflect"
@@ -35,6 +37,29 @@ func panicCatcher(w http.ResponseWriter) {
 		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
+}
+
+func peekJSONBody(r *http.Request, s interface{}) error {
+	var err error
+	body, _ := ioutil.ReadAll(r.Body)
+
+	decoder := json.NewDecoder(
+		ioutil.NopCloser(bytes.NewReader(body)),
+	)
+	r.Body = ioutil.NopCloser(bytes.NewReader(body))
+
+	switch s.(type) {
+	case *proto.Request:
+		c := s.(*proto.Request)
+		err = decoder.Decode(c)
+	case *auth.Kex:
+		c := s.(*auth.Kex)
+		err = decoder.Decode(c)
+	default:
+		rt := reflect.TypeOf(s)
+		err = fmt.Errorf("DecodeJsonBody: Unhandled request type: %s", rt)
+	}
+	return err
 }
 
 func decodeJSONBody(r *http.Request, s interface{}) error {
