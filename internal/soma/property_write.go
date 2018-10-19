@@ -246,7 +246,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 			tx.Rollback()
 			return
 		}
-	case `template`:
+	case msg.PropertyTemplate:
 		if res, err = tx.Stmt(w.stmtAddTemplate).Exec(
 			q.Property.Service.ID,
 			q.Property.Service.Name,
@@ -274,7 +274,7 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 				tx.Rollback()
 				return
 			}
-		case `template`:
+		case msg.PropertyTemplate:
 			if res, err = tx.Stmt(w.stmtAddTemplateAttr).Exec(
 				q.Property.Service.ID,
 				attr.Name,
