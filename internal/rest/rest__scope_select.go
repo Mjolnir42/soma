@@ -142,7 +142,7 @@ func (x *Rest) ScopeSelectUserSearch(w http.ResponseWriter,
 	defer panicCatcher(w)
 
 	cReq := proto.NewUserFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
+	if err := peekJSONBody(r, &cReq); err != nil {
 		dispatchBadRequest(&w, err)
 		return
 	}
