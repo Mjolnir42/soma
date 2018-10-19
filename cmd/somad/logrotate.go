@@ -22,14 +22,21 @@ func logrotate(sigChan chan os.Signal, handlerMap *handler.Map) {
 	for {
 		select {
 		case <-sigChan:
+			locked := true
 		fileloop:
-			for name, lfHandle := range logFileMap {
+			for name, lfHandle := range logFileMap.Range() {
 				// treekeeper startup logs do not get rotated
 				if strings.HasPrefix(name, `startup_`) {
 					continue
 				}
+
+				// reopen logfile handle
 				err := lfHandle.Reopen()
+
 				if err != nil {
+					logFileMap.RangeUnlock()
+					locked = false
+
 					log.Printf("Error rotating logfile %s: %s\n", name, err)
 					log.Println(`Shutting down system`)
 
@@ -46,6 +53,9 @@ func logrotate(sigChan chan os.Signal, handlerMap *handler.Map) {
 					<-returnChannel
 					break fileloop
 				}
+			}
+			if locked {
+				logFileMap.RangeUnlock()
 			}
 		}
 	}

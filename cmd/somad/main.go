@@ -29,7 +29,7 @@ var (
 	// config file runtime configuration
 	SomaCfg config.Config
 	// lookup table of logfile handles for logrotate reopen
-	logFileMap = make(map[string]*reopen.FileWriter)
+	logFileMap *soma.LogHandleMap
 	// Global metrics registry
 	Metrics = make(map[string]metrics.Registry)
 	// version string set at compile time
@@ -38,6 +38,7 @@ var (
 
 func init() {
 	logrus.SetOutput(os.Stderr)
+	logFileMap = soma.NewLogHandleMap()
 }
 
 func main() {
@@ -49,7 +50,6 @@ func main() {
 		lfhGlobal, lfhApp, lfhReq, lfhErr, lfhAudit *reopen.FileWriter
 		app                                         *soma.Soma
 		hm                                          *handler.Map
-		lm                                          soma.LogHandleMap
 		rst                                         *rest.Rest
 		lvl                                         logrus.Level
 	)
@@ -105,7 +105,7 @@ func main() {
 	}
 	logrus.SetOutput(lfhGlobal)
 	logrus.SetLevel(lvl)
-	logFileMap[`global`] = lfhGlobal
+	logFileMap.Add(`global`, lfhGlobal)
 
 	appLog = logrus.New()
 	if lfhApp, err = reopen.NewFileWriter(
@@ -119,7 +119,7 @@ func main() {
 		DisableColors: true,
 		FullTimestamp: true,
 	}
-	logFileMap[`application`] = lfhApp
+	logFileMap.Add(`application`, lfhApp)
 
 	reqLog = logrus.New()
 	if lfhReq, err = reopen.NewFileWriter(
@@ -133,7 +133,7 @@ func main() {
 		DisableColors: true,
 		FullTimestamp: true,
 	}
-	logFileMap[`request`] = lfhReq
+	logFileMap.Add(`request`, lfhReq)
 
 	errLog = logrus.New()
 	if lfhErr, err = reopen.NewFileWriter(
@@ -148,7 +148,7 @@ func main() {
 		DisableColors: true,
 		FullTimestamp: true,
 	}
-	logFileMap[`error`] = lfhErr
+	logFileMap.Add(`error`, lfhErr)
 
 	auditLog = logrus.New()
 	if lfhAudit, err = reopen.NewFileWriter(
@@ -162,7 +162,7 @@ func main() {
 		DisableColors: true,
 		FullTimestamp: true,
 	}
-	logFileMap[`audit`] = lfhAudit
+	logFileMap.Add(`audit`, lfhAudit)
 
 	hm = handler.NewMap()
 
@@ -245,9 +245,7 @@ func main() {
 	connectToDatabase(appLog, errLog)
 	go pingDatabase(errLog)
 
-	lm = soma.LogHandleMap{}
-
-	app = soma.New(hm, &lm, conn, &SomaCfg, appLog, reqLog, errLog, auditLog)
+	app = soma.New(hm, logFileMap, conn, &SomaCfg, appLog, reqLog, errLog, auditLog)
 	app.Start()
 
 	rst = rest.New(super.IsAuthorized, hm, &SomaCfg, reqLog, errLog)
