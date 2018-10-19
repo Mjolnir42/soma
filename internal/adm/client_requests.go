@@ -109,7 +109,7 @@ func handleRequestOptions(resp *resty.Response, err error) (*resty.Response, err
 	}
 
 	if resp.StatusCode() >= 300 {
-		return resp, fmt.Errorf("Request error: %s", resp.Status())
+		return resp, fmt.Errorf("Request error: %s, %s", resp.Status(), resp.String())
 	}
 
 	if !(async || jobSave) {
