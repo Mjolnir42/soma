@@ -153,12 +153,16 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 
 	switch cReq.Filter.Property.Type {
 	case msg.PropertyNative:
+		request.Section = msg.SectionPropertyNative
+		request.Search.Property.Native = &proto.PropertyNative{}
 		request.Search.Property.Native.Name = cReq.Filter.Property.Name
 	case msg.PropertyTemplate:
 		request.Section = msg.SectionPropertyTemplate
 		request.Search.Property.Service = &proto.PropertyService{}
 		request.Search.Property.Service.Name = cReq.Filter.Property.Name
 	case msg.PropertySystem:
+		request.Section = msg.SectionPropertySystem
+		request.Search.Property.System = &proto.PropertySystem{}
 		request.Search.Property.System.Name = cReq.Filter.Property.Name
 	case msg.PropertyCustom:
 		request.Repository.ID = params.ByName(`repositoryID`)
@@ -192,15 +196,8 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	switch request.Property.Type {
-	case msg.PropertyNative:
-		request.Section = msg.SectionPropertyNative
-	case msg.PropertySystem:
-		request.Section = msg.SectionPropertySystem
 	case msg.PropertyCustom:
 		request.Section = msg.SectionPropertyCustom
-	default:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
-		return
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
