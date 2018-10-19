@@ -45,8 +45,15 @@ func (x *Rest) PropertyMgmtServiceAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	request := msg.New(r, params)
-	request.Section = msg.SectionPropertyService
+	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionAdd
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	request.Section = msg.SectionPropertyService
 	request.Property = cReq.Property.Clone()
 
 	if !x.isAuthorized(&request) {
@@ -71,8 +78,15 @@ func (x *Rest) PropertyMgmtServiceRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	request := msg.New(r, params)
-	request.Section = msg.SectionPropertyService
+	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionRemove
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	request.Section = msg.SectionPropertyService
 	request.Property.Type = msg.PropertyService
 	request.Property.Service = &proto.PropertyService{
 		ID:     params.ByName(`propertyID`),

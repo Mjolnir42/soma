@@ -1185,9 +1185,11 @@ func propertyIDByName(pType, pName, refID string) (string, error) {
 		// custom properties are per-repository
 		req.Filter.Property.RepositoryID = refID
 		path = fmt.Sprintf("/filter/property/custom/%s/", refID)
-	case `service`:
-		path = fmt.Sprintf("/filter/property/service/team/%s/",
-			refID)
+	case proto.PropertyTypeService:
+		path = fmt.Sprintf("/search/team/%s/property-mgmt/%s/",
+			url.QueryEscape(refID),
+			url.QueryEscape(proto.PropertyTypeService),
+		)
 	case proto.PropertyTypeTemplate:
 		path = fmt.Sprintf("/search/property-mgmt/%s/",
 			url.QueryEscape(proto.PropertyTypeTemplate),
@@ -1219,7 +1221,7 @@ func propertyIDByName(pType, pName, refID string) (string, error) {
 			goto abort
 		}
 		return (*res.Properties)[0].Custom.ID, nil
-	case `service`:
+	case proto.PropertyTypeService:
 		if refID != (*res.Properties)[0].Service.TeamID {
 			err = fmt.Errorf("TeamID mismatch: %s vs %s",
 				refID, (*res.Properties)[0].Service.TeamID)

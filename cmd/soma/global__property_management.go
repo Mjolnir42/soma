@@ -60,6 +60,41 @@ func registerProperty(app cli.App) *cli.App {
 						},
 					},
 					{
+						Name:        `service`,
+						Usage:       `SUBCOMMANDS for per-team service property management`,
+						Description: help.Text(`property-service::`),
+						Subcommands: []cli.Command{
+							{
+								Name:         `add`,
+								Usage:        `Add a new per-team service property`,
+								Description:  help.Text(`property-service::add`),
+								Action:       runtime(propertyMgmtServiceAdd),
+								BashComplete: comptime(bashCompServiceAdd),
+							},
+							{
+								Name:         `remove`,
+								Usage:        `Remove a per-team service property`,
+								Description:  help.Text(`property-service::remove`),
+								Action:       runtime(propertyMgmtServiceRemove),
+								BashComplete: cmpl.Team,
+							},
+							{
+								Name:         `show`,
+								Usage:        `Show a per-team service property`,
+								Description:  help.Text(`property-service::show`),
+								Action:       runtime(propertyMgmtServiceShow),
+								BashComplete: cmpl.Team,
+							},
+							{
+								Name:         `list`,
+								Usage:        `List per-team service properties of a team`,
+								Description:  help.Text(`property-service::list`),
+								Action:       runtime(propertyMgmtServiceList),
+								BashComplete: cmpl.TeamDirect,
+							},
+						},
+					},
+					{
 						Name:        `system`,
 						Usage:       `SUBCOMMANDS for global system property management`,
 						Description: help.Text(`property-system::`),

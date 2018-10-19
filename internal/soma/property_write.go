@@ -263,10 +263,10 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 
 	for _, attr = range q.Property.Service.Attributes {
 		switch q.Property.Type {
-		case `service`:
+		case msg.PropertyService:
 			if res, err = tx.Stmt(w.stmtAddServiceAttr).Exec(
 				q.Property.Service.TeamID,
-				q.Property.Service.Name,
+				q.Property.Service.ID,
 				attr.Name,
 				attr.Value,
 			); err != nil {

@@ -286,6 +286,18 @@ func NewNativePropertyRequest() Request {
 	}
 }
 
+func NewServicePropertyRequest() Request {
+	return Request{
+		Flags: &Flags{},
+		Property: &Property{
+			Type: PropertyTypeService,
+			Service: &PropertyService{
+				Attributes: []ServiceAttribute{},
+			},
+		},
+	}
+}
+
 func NewTemplatePropertyRequest() Request {
 	return Request{
 		Flags: &Flags{},
@@ -316,6 +328,7 @@ func NewPropertyResult() Result {
 // Property types
 const (
 	PropertyTypeNative   = `native`
+	PropertyTypeService  = `service`
 	PropertyTypeSystem   = `system`
 	PropertyTypeTemplate = `template`
 )

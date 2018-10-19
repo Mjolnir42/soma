@@ -134,8 +134,7 @@ func (r *PropertyRead) process(q *msg.Request) {
 	case msg.ActionShow:
 		r.show(q, &result)
 	case msg.ActionSearch:
-		// XXX BUG handle correctly
-		r.list(q, &result)
+		r.search(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -537,6 +536,62 @@ func (r *PropertyRead) showTemplate(q *msg.Request, mr *msg.Result) {
 		Type:    q.Property.Type,
 		Service: &template,
 	})
+	mr.OK()
+}
+
+// search routes search requests
+func (r *PropertyRead) search(q *msg.Request, mr *msg.Result) {
+	switch q.Property.Type {
+	case msg.PropertyCustom:
+		r.listCustom(q, mr) // XXX BUG
+	case msg.PropertyNative:
+		r.listNative(q, mr) // XXX BUG
+	case msg.PropertyService:
+		r.searchService(q, mr)
+	case msg.PropertySystem:
+		r.listSystem(q, mr) // XXX BUG
+	case msg.PropertyTemplate:
+		r.listTemplate(q, mr) // XXX BUG
+	default:
+		mr.NotImplemented(fmt.Errorf("Unknown property type: %s",
+			q.Property.Type))
+	}
+}
+
+// searchService returns all service properties for a team
+func (r *PropertyRead) searchService(q *msg.Request, mr *msg.Result) {
+	var (
+		id, name, teamID string
+		rows             *sql.Rows
+		err              error
+	)
+
+	if rows, err = r.stmtListService.Query(
+		q.Search.Property.Service.TeamID,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(&id, &name, &teamID); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		mr.Property = append(mr.Property, proto.Property{
+			Type: q.Property.Type,
+			Service: &proto.PropertyService{
+				ID:     id,
+				Name:   name,
+				TeamID: teamID,
+			},
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
 	mr.OK()
 }
 

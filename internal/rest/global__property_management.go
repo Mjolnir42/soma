@@ -48,6 +48,7 @@ func (x *Rest) PropertyMgmtList(w http.ResponseWriter, r *http.Request,
 	case msg.PropertyService:
 		request.Section = msg.SectionPropertyService
 		request.Team.ID = params.ByName(`teamID`)
+		request.Property.Service = &proto.PropertyService{}
 		request.Property.Service.TeamID = request.Team.ID
 	default:
 		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
@@ -102,6 +103,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 	case msg.PropertyService:
 		request.Section = msg.SectionPropertyService
 		request.Team.ID = params.ByName(`teamID`)
+		request.Property.Service = &proto.PropertyService{}
 		request.Property.Service.TeamID = request.Team.ID
 		request.Property.Service.ID = params.ByName(`propertyID`)
 	default:
@@ -170,7 +172,9 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 			return
 		}
 	case msg.PropertyService:
+		request.Section = msg.SectionPropertyService
 		request.Team.ID = params.ByName(`teamID`)
+		request.Search.Property.Service = &proto.PropertyService{}
 		request.Search.Property.Service.TeamID = request.Team.ID
 		request.Search.Property.Service.Name = cReq.Filter.Property.Name
 
@@ -194,8 +198,6 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		request.Section = msg.SectionPropertySystem
 	case msg.PropertyCustom:
 		request.Section = msg.SectionPropertyCustom
-	case msg.PropertyService:
-		request.Section = msg.SectionPropertyService
 	default:
 		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
 		return
