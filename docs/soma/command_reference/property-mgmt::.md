@@ -9,6 +9,7 @@ The synopsis overview for every property type can be seen with these
 commands:
 
 ```
+soma property-mgmt custom help
 soma property-mgmt native help
 soma property-mgmt service help
 soma property-mgmt system help

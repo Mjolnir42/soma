@@ -543,7 +543,7 @@ func (r *PropertyRead) showTemplate(q *msg.Request, mr *msg.Result) {
 func (r *PropertyRead) search(q *msg.Request, mr *msg.Result) {
 	switch q.Property.Type {
 	case msg.PropertyCustom:
-		r.listCustom(q, mr) // XXX BUG
+		r.searchCustom(q, mr)
 	case msg.PropertyNative:
 		r.listNative(q, mr) // XXX BUG
 	case msg.PropertyService:
@@ -556,6 +556,43 @@ func (r *PropertyRead) search(q *msg.Request, mr *msg.Result) {
 		mr.NotImplemented(fmt.Errorf("Unknown property type: %s",
 			q.Property.Type))
 	}
+}
+
+// searchCustom returns all custom properties for a repository
+func (r *PropertyRead) searchCustom(q *msg.Request, mr *msg.Result) {
+	var (
+		property, repository, id string
+		rows                     *sql.Rows
+		err                      error
+	)
+
+	if rows, err = r.stmtListCustom.Query(
+		q.Search.Property.Custom.RepositoryID,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(&id, &repository, &property); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		mr.Property = append(mr.Property, proto.Property{
+			Type: q.Property.Type,
+			Custom: &proto.PropertyCustom{
+				ID:           id,
+				RepositoryID: repository,
+				Name:         property,
+			},
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	mr.OK()
 }
 
 // searchService returns all service properties for a team

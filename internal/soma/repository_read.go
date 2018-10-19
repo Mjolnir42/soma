@@ -117,7 +117,7 @@ func (r *RepositoryRead) process(q *msg.Request) {
 	logRequest(r.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionList:
+	case msg.ActionList, msg.ActionSearch:
 		r.list(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)

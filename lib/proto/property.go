@@ -310,6 +310,16 @@ func NewTemplatePropertyRequest() Request {
 	}
 }
 
+func NewCustomPropertyRequest() Request {
+	return Request{
+		Flags: &Flags{},
+		Property: &Property{
+			Type:   PropertyTypeCustom,
+			Custom: &PropertyCustom{},
+		},
+	}
+}
+
 func NewPropertyFilter() Request {
 	return Request{
 		Filter: &Filter{
@@ -327,6 +337,7 @@ func NewPropertyResult() Result {
 
 // Property types
 const (
+	PropertyTypeCustom   = `custom`
 	PropertyTypeNative   = `native`
 	PropertyTypeService  = `service`
 	PropertyTypeSystem   = `system`

@@ -44,6 +44,7 @@ func (x *Rest) PropertyMgmtList(w http.ResponseWriter, r *http.Request,
 		request.Section = msg.SectionPropertyCustom
 		request.Repository.ID = params.ByName(`repositoryID`)
 		request.Property.RepositoryID = request.Repository.ID
+		request.Property.Custom = &proto.PropertyCustom{}
 		request.Property.Custom.RepositoryID = request.Repository.ID
 	case msg.PropertyService:
 		request.Section = msg.SectionPropertyService
@@ -98,6 +99,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 		request.Section = msg.SectionPropertyCustom
 		request.Repository.ID = params.ByName(`repositoryID`)
 		request.Property.RepositoryID = request.Repository.ID
+		request.Property.Custom = &proto.PropertyCustom{}
 		request.Property.Custom.RepositoryID = request.Repository.ID
 		request.Property.Custom.ID = params.ByName(`propertyID`)
 	case msg.PropertyService:
@@ -165,13 +167,22 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		request.Search.Property.System = &proto.PropertySystem{}
 		request.Search.Property.System.Name = cReq.Filter.Property.Name
 	case msg.PropertyCustom:
-		request.Repository.ID = params.ByName(`repositoryID`)
-		request.Search.Property.RepositoryID = request.Repository.ID
+		request.Section = msg.SectionPropertyCustom
+		request.Repository.ID = cReq.Filter.Property.RepositoryID
+		request.Search.Property.RepositoryID = cReq.Filter.Property.RepositoryID
+		request.Search.Property.Custom = &proto.PropertyCustom{}
 		request.Search.Property.Custom.Name = cReq.Filter.Property.Name
+		request.Search.Property.Custom.RepositoryID = cReq.Filter.Property.RepositoryID
 		if cReq.Filter.Property.RepositoryID != request.Repository.ID {
 			dispatchBadRequest(&w, fmt.Errorf(
 				"PropertyMgmtSearch with mismatched repositoryID %s vs %s",
 				cReq.Filter.Property.RepositoryID, request.Repository.ID,
+			))
+			return
+		}
+		if request.Repository.ID == `` {
+			dispatchBadRequest(&w, fmt.Errorf(
+				"PropertyMgmtSearch with empty repositoryID",
 			))
 			return
 		}
@@ -193,11 +204,6 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
 		return
-	}
-
-	switch request.Property.Type {
-	case msg.PropertyCustom:
-		request.Section = msg.SectionPropertyCustom
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request

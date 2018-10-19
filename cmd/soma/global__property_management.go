@@ -29,6 +29,41 @@ func registerProperty(app cli.App) *cli.App {
 				Description: help.Text(`property-mgmt::`),
 				Subcommands: []cli.Command{
 					{
+						Name:        `custom`,
+						Usage:       `SUBCOMMANDS for per-repository custom properties`,
+						Description: help.Text(`property-custom::`),
+						Subcommands: []cli.Command{
+							{
+								Name:         `add`,
+								Usage:        `Add a per-repository custom property`,
+								Description:  help.Text(`property-custom::add`),
+								Action:       runtime(propertyMgmtCustomAdd),
+								BashComplete: cmpl.To,
+							},
+							{
+								Name:         `remove`,
+								Usage:        `Remove a per-repository custom property`,
+								Description:  help.Text(`property-custom::remove`),
+								Action:       runtime(propertyMgmtCustomRemove),
+								BashComplete: cmpl.From,
+							},
+							{
+								Name:         `show`,
+								Usage:        `Show details about a per-repository custom property`,
+								Description:  help.Text(`property-custom::show`),
+								Action:       runtime(propertyMgmtCustomShow),
+								BashComplete: cmpl.In,
+							},
+							{
+								Name:         `list`,
+								Usage:        `List all custom properties of a repository`,
+								Description:  help.Text(`property-custom::list`),
+								Action:       runtime(propertyMgmtCustomList),
+								BashComplete: cmpl.DirectIn,
+							},
+						},
+					},
+					{
 						Name:        `native`,
 						Usage:       `SUBCOMMANDS for native introspection property management`,
 						Description: help.Text(`property-native::`),
