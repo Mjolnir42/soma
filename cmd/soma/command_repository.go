@@ -1,4 +1,12 @@
-package main
+/*-
+ * Copyright (c) 2015-2018, Jörg Pernfuß
+ * Copyright (c) 2016, 1&1 Internet SE
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"fmt"
@@ -17,12 +25,6 @@ func registerRepository(app cli.App) *cli.App {
 				Name:  "repository",
 				Usage: "SUBCOMMANDS for repository",
 				Subcommands: []cli.Command{
-					{
-						Name:         "create",
-						Usage:        "Create a new repository",
-						Action:       runtime(cmdRepositoryCreate),
-						BashComplete: cmpl.Team,
-					},
 					{
 						Name:   "destroy",
 						Usage:  "Destroy an existing repository",
@@ -125,35 +127,6 @@ func registerRepository(app cli.App) *cli.App {
 		}...,
 	)
 	return &app
-}
-
-func cmdRepositoryCreate(c *cli.Context) error {
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		[]string{`team`},
-		[]string{`team`},
-		adm.AllArguments(c)); err != nil {
-		return err
-	}
-
-	teamID, err := adm.LookupTeamID(opts[`team`][0])
-	if err != nil {
-		return err
-	}
-
-	var req proto.Request
-	req.Repository = &proto.Repository{}
-	req.Repository.Name = c.Args().Get(0)
-	req.Repository.TeamID = teamID
-
-	if err := adm.ValidateRuneCountRange(req.Repository.Name,
-		4, 128); err != nil {
-		return err
-	}
-
-	return adm.Perform(`postbody`, `/repository/`, `command`, req, c)
 }
 
 func cmdRepositoryDestroy(c *cli.Context) error {

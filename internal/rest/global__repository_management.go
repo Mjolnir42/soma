@@ -30,7 +30,7 @@ func (x *Rest) RepositoryMgmtCreate(w http.ResponseWriter, r *http.Request,
 
 	nameLen := utf8.RuneCountInString(cReq.Repository.Name)
 	if nameLen < 4 || nameLen > 128 {
-		dispatchBadRequest(&w, fmt.Errorf(`Illegal repository name length (4 < x <= 128)`))
+		dispatchBadRequest(&w, fmt.Errorf(`Illegal repository name length (valid: 4 <= len <= 128)`))
 		return
 	}
 
