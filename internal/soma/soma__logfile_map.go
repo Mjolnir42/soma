@@ -20,6 +20,13 @@ type LogHandleMap struct {
 	sync.RWMutex
 }
 
+// New returns an initialized LogHandleMap
+func NewLogHandleMap() *LogHandleMap {
+	lm := &LogHandleMap{}
+	lm.hmap = make(map[string]*reopen.FileWriter)
+	return lm
+}
+
 // Add registers a new filehandle
 func (l *LogHandleMap) Add(key string, fh *reopen.FileWriter) {
 	l.Lock()
@@ -39,6 +46,19 @@ func (l *LogHandleMap) Del(key string) {
 	l.Lock()
 	defer l.Unlock()
 	delete(l.hmap, key)
+}
+
+// Range locks l and returns the embedded map. Unlocking must
+// be done by the caller via RangeUnlock()
+func (l *LogHandleMap) Range() map[string]*reopen.FileWriter {
+	l.Lock()
+	return l.hmap
+}
+
+// RangeUnlock unlocks l. It is required to be called after Range() once
+// the caller is finished with the map.
+func (l *LogHandleMap) RangeUnlock() {
+	l.Unlock()
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
