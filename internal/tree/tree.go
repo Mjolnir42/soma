@@ -14,13 +14,14 @@ import (
 )
 
 type Tree struct {
-	ID     uuid.UUID
-	Name   string
-	Type   string
-	Child  *Repository
-	Snap   *Repository
-	Action chan *Action `json:"-"`
-	log    *log.Logger
+	ID      uuid.UUID
+	Name    string
+	Type    string
+	Child   *Repository
+	Snap    *Repository
+	Action  chan *Action `json:"-"`
+	log     *log.Logger
+	errChan chan *Error
 }
 
 type Spec struct {
@@ -96,12 +97,22 @@ func (st *Tree) GetType() string {
 }
 
 //
-func (st *Tree) SetError(c chan *Error) {
+func (st *Tree) RegisterErrChan(c chan *Error) {
+	st.errChan = c
+}
+
+//
+func (st *Tree) SetError() {
 	if st.Child != nil {
-		st.Child.setError(c)
+		st.Child.setError(st.errChan)
 		return
 	}
-	panic(`tree.SetError called without attached child`)
+	go func() {
+		st.errChan <- &Error{
+			Action: `SetError()`,
+			Text:   `tree.SetError called without attached child`,
+		}
+	}()
 }
 
 func (st *Tree) GetErrors() []error {

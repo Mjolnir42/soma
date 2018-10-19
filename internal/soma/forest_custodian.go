@@ -164,7 +164,7 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 		Action: actionChan,
 		Log:    f.appLog,
 	})
-	sTree.SetError(errChan)
+	sTree.RegisterErrChan(errChan)
 
 	tree.NewRepository(tree.RepositorySpec{
 		ID:      q.Repository.ID,
@@ -177,6 +177,7 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 		ParentType: "root",
 		ParentID:   sTree.GetID(),
 	})
+	sTree.SetError()
 
 	// there should not be anything on the error channel
 	// during tree creation

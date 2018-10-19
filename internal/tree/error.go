@@ -12,6 +12,7 @@ import "fmt"
 
 type Error struct {
 	Action string `json:",omitempty"`
+	Text   string `json:",omitempty"`
 }
 
 func (e Error) String() string {

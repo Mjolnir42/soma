@@ -86,7 +86,8 @@ func (f *ForestCustodian) loadSomaTree(q *msg.Request) error {
 		Action: actionChan,
 		Log:    f.appLog,
 	})
-	sTree.SetError(errChan)
+	sTree.RegisterErrChan(errChan)
+
 	tree.NewRepository(tree.RepositorySpec{
 		ID:      q.Repository.ID,
 		Name:    q.Repository.Name,
@@ -98,6 +99,8 @@ func (f *ForestCustodian) loadSomaTree(q *msg.Request) error {
 		ParentType: "root",
 		ParentID:   sTree.GetID(),
 	})
+	sTree.SetError()
+
 	// errors during tree loading are not a good sign
 	for i := len(errChan); i > 0; i-- {
 		e := <-errChan
