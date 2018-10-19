@@ -185,6 +185,7 @@ func (f *ForestCustodian) spawnTreeKeeper(q *msg.Request, s *tree.Tree,
 	tK.treeLog.Out = lfh
 	tK.startLog = logrus.New()
 	tK.startLog.Out = sfh
+	tK.soma = f.soma
 	// startup logs are not rotated, the logrotate map is
 	// just used to keep acccess to the filehandle
 	f.soma.logMap.Add(keeperName, lfh)
