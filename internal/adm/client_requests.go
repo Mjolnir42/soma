@@ -52,6 +52,11 @@ noattachment:
 	return fmt.Errorf(`Missing body to client request that requires it.`)
 }
 
+func MockOK(tmpl string, c *cli.Context) error {
+	mock := `{"statusCode":200,"statusText":"OK","errors":[]}`
+	return FormatOut(c, []byte(mock), tmpl)
+}
+
 func DecodedResponse(resp *resty.Response, res *proto.Result) error {
 	if err := decodeResponse(resp, res); err != nil {
 		return err
