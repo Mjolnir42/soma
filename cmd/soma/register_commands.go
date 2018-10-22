@@ -35,6 +35,7 @@ func registerCommands(app cli.App) *cli.App {
 			Name:   "experiment",
 			Usage:  "Test cli.Action functionality",
 			Action: runtime(cmdExperiment),
+			Hidden: true,
 		},
 	}
 
