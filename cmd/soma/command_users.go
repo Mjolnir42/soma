@@ -508,7 +508,7 @@ func cmdUserLogin(c *cli.Context) error {
 	}
 
 	path := `/authenticate/validate`
-	return adm.Perform(`head`, path, `list`, nil, c)
+	return adm.Perform(`head`, path, `command`, nil, c)
 }
 
 func cmdUserLogout(c *cli.Context) error {
@@ -527,7 +527,7 @@ func cmdUserLogout(c *cli.Context) error {
 	case false:
 		path = `/tokens/self/active`
 	}
-	return adm.Perform(`delete`, path, `list`, nil, c)
+	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
