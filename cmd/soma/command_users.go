@@ -516,6 +516,10 @@ func cmdUserLogout(c *cli.Context) error {
 		return err
 	}
 
+	if c.GlobalBool(`doublelogout`) {
+		return adm.MockOK(`command`, c)
+	}
+
 	var path string
 	switch c.Bool(`all`) {
 	case true:

@@ -138,6 +138,12 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 			// load token from BoltDB
 			token, err = store.GetActiveToken(Cfg.Auth.User)
 			if err == bolt.ErrBucketNotFound {
+				// re-login for logout only if logout --all is called,
+				// otherwise set hidden doublelogout flag and skip
+				if c.Parent().Args().First() == `logout` && !c.Bool(`all`) {
+					c.GlobalSet(`doublelogout`, `true`)
+					goto skipForLogout
+				}
 				// no token in cache
 				for Cfg.Auth.Pass == `` {
 					if Cfg.Auth.Pass, err = adm.Read(`password`); err == liner.ErrPromptAborted {
@@ -176,6 +182,8 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 					); err != nil {
 						return err
 					}
+					err = nil
+					token = ``
 					goto reload
 				}
 			}
@@ -183,6 +191,7 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 			token = Cfg.Auth.Token
 		}
 
+	skipForLogout:
 		// set token for basic auth
 		Client = Client.SetBasicAuth(Cfg.Auth.User, token)
 

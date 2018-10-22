@@ -43,6 +43,11 @@ func registerFlags(app cli.App) *cli.App {
 			Name:  "volatile, o",
 			Usage: "Do not ensure that the BoltDB structure exists",
 		},
+		cli.BoolFlag{
+			Name:   `doublelogout`,
+			Usage:  `(internal) logout called without actually being logged in`,
+			Hidden: true,
+		},
 	}
 	return &app
 }
