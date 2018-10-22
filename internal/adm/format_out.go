@@ -7,6 +7,10 @@ import (
 )
 
 func FormatOut(c *cli.Context, data []byte, cmd string) error {
+	if string(data) == `` {
+		return nil
+	}
+
 	if c.GlobalBool(`json`) {
 		fmt.Println(string(data))
 		return nil
