@@ -43,6 +43,7 @@ type tokenMap struct {
 func newTokenMap() *tokenMap {
 	m := tokenMap{}
 	m.TMap = make(map[string]token)
+	m.Expire = make(map[string]time.Time)
 	return &m
 }
 
