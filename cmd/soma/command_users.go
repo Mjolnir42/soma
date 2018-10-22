@@ -95,24 +95,6 @@ func registerUsers(app cli.App) *cli.App {
 					},
 				},
 			}, // end users
-			{
-				Name:        `login`,
-				Usage:       `Authenticate with the SOMA middleware`,
-				Description: help.Text(`Login`),
-				Action:      runtime(cmdUserLogin),
-			},
-			{
-				Name:        `logout`,
-				Usage:       `Revoke currently used password token`,
-				Action:      runtime(cmdUserLogout),
-				Description: help.Text(`Logout`),
-				Flags: []cli.Flag{
-					cli.BoolFlag{
-						Name:  `all, a`,
-						Usage: `Revoke all active tokens for the account`,
-					},
-				},
-			},
 		}...,
 	)
 	return &app

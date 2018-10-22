@@ -1,6 +1,9 @@
 package main
 
-import "github.com/codegangsta/cli"
+import (
+	"github.com/codegangsta/cli"
+	"github.com/mjolnir42/soma/internal/help"
+)
 
 func registerCommands(app cli.App) *cli.App {
 
@@ -9,6 +12,24 @@ func registerCommands(app cli.App) *cli.App {
 			Name:   "init",
 			Usage:  "Initialize local client files",
 			Action: cmdClientInit,
+		},
+		{
+			Name:        `login`,
+			Usage:       `Authenticate with the SOMA middleware`,
+			Description: help.Text(`Login`),
+			Action:      runtime(cmdUserLogin),
+		},
+		{
+			Name:        `logout`,
+			Usage:       `Revoke currently used password token`,
+			Action:      runtime(cmdUserLogout),
+			Description: help.Text(`Logout`),
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  `all, a`,
+					Usage: `Revoke all active tokens for the account`,
+				},
+			},
 		},
 		{
 			Name:   "experiment",
