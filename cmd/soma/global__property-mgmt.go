@@ -11,7 +11,6 @@ package main // import "github.com/mjolnir42/soma/cmd/soma"
 import (
 	"fmt"
 	"net/url"
-	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
