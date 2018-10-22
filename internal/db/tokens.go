@@ -80,7 +80,7 @@ func (d *DB) DeleteToken(user, token string) error {
 	}
 	defer d.Close()
 
-	if err := d.db.Update(func(tx *bolt.Tx) error {
+	return d.db.Update(func(tx *bolt.Tx) error {
 		// build cursor seek position
 		var k, v []byte
 		min := []byte(time.Now().UTC().Format(rfc3339Milli))
@@ -101,10 +101,7 @@ func (d *DB) DeleteToken(user, token string) error {
 			}
 		}
 		return nil
-	}); err != nil {
-		return err
-	}
-	return bolt.ErrBucketNotFound
+	})
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
