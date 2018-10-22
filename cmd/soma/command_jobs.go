@@ -158,7 +158,7 @@ func cmdJobLocalUpdate(c *cli.Context) error {
 				err.Error())
 		}
 	}
-	return adm.FormatOut(c, resp, `list`)
+	return adm.FormatOut(c, resp.Body(), `list`)
 }
 
 func cmdJobLocalList(c *cli.Context) error {

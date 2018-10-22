@@ -46,7 +46,7 @@ func Perform(rqType, path, tmpl string, body interface{}, c *cli.Context) error 
 	if err != nil {
 		return err
 	}
-	return FormatOut(c, resp, tmpl)
+	return FormatOut(c, resp.Body(), tmpl)
 
 noattachment:
 	return fmt.Errorf(`Missing body to client request that requires it.`)

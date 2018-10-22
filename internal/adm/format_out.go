@@ -4,17 +4,16 @@ import (
 	"fmt"
 
 	"github.com/codegangsta/cli"
-	"gopkg.in/resty.v0"
 )
 
-func FormatOut(c *cli.Context, resp *resty.Response, cmd string) error {
+func FormatOut(c *cli.Context, data []byte, cmd string) error {
 	if c.GlobalBool(`json`) {
-		fmt.Println(resp)
+		fmt.Println(string(data))
 		return nil
 	}
 
 	// hardwire JSON output for now
-	fmt.Println(resp)
+	fmt.Println(string(data))
 
 	/* TODO
 	switch cmd {
