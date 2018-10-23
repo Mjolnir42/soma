@@ -119,14 +119,8 @@ func (x *Rest) EnvironmentRename(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionEnvironment
 	request.Action = msg.ActionRename
-	request.Environment = proto.Environment{
-		Name: cReq.Environment.Name,
-	}
-	request.Update = msg.UpdateData{
-		Environment: proto.Environment{
-			Name: cReq.Environment.Name,
-		},
-	}
+	request.Environment.Name = params.ByName(`environment`)
+	request.Update.Environment.Name = cReq.Environment.Name
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
