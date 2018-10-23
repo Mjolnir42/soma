@@ -389,8 +389,8 @@ func LookupTemplatePropertyID(s string) (string, error) {
 
 // LookupLevelName looks up the long name of a level s, where s
 // can be the level's long or short name.
-func LookupLevelName(s string) (string, error) {
-	return levelByName(s)
+func LookupLevelName(s string, name *string) error {
+	return levelByName(s, name)
 }
 
 // LookupCheckObjectID looks up the UUID for whichever object a
@@ -1248,7 +1248,7 @@ abort:
 
 // levelByName implements the actual lookup of the level details
 // from the server
-func levelByName(lvl string) (string, error) {
+func levelByName(lvl string, name *string) error {
 	req := proto.NewLevelFilter()
 	req.Filter.Level.Name = lvl
 	req.Filter.Level.ShortName = lvl
@@ -1269,10 +1269,11 @@ func levelByName(lvl string) (string, error) {
 			lvl, (*res.Levels)[0].Name, (*res.Levels)[0].ShortName)
 		goto abort
 	}
-	return (*res.Levels)[0].Name, nil
+	*name = (*res.Levels)[0].Name
+	return nil
 
 abort:
-	return ``, fmt.Errorf("LevelName lookup failed: %s",
+	return fmt.Errorf("LevelName lookup failed: %s",
 		err.Error())
 }
 

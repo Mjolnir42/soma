@@ -393,8 +393,10 @@ func ValidateThresholds(thresholds []proto.CheckConfigThreshold) (
 			Predicate: proto.Predicate{},
 			Level:     proto.Level{},
 		}
-		if t.Level.Name, err = LookupLevelName(
-			thr.Level.Name); err != nil {
+		if err = LookupLevelName(
+			thr.Level.Name,
+			&t.Level.Name,
+		); err != nil {
 			return nil, err
 		}
 		if err = ValidatePredicate(thr.Predicate.Symbol); err != nil {
