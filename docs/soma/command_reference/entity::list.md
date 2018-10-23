@@ -28,4 +28,3 @@ global | entity | list | yes | no
 ```
 soma entity list
 ```
-

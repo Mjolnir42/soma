@@ -28,4 +28,3 @@ global | mode | list | yes | no
 ```
 soma mode list
 ```
-

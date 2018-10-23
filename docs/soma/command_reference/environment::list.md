@@ -28,4 +28,3 @@ global | environment | list | yes | no
 ```
 soma environment list
 ```
-
