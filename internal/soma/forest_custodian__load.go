@@ -188,10 +188,11 @@ func (f *ForestCustodian) spawnTreeKeeper(q *msg.Request, s *tree.Tree,
 	tK.soma = f.soma
 	// startup logs are not rotated, the logrotate map is
 	// just used to keep acccess to the filehandle
-	f.soma.logMap.Add(keeperName, lfh)
+	f.soma.logMap.Add(keeperName, lfh, tK.treeLog)
 	f.soma.logMap.Add(
 		fmt.Sprintf("startup_%s", keeperName),
 		sfh,
+		tK.startLog,
 	)
 
 	// during rebuild the treekeeper will not run in background

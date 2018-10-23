@@ -9,10 +9,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
+	"time"
 
-	log "github.com/Sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	uuid "github.com/satori/go.uuid"
@@ -34,11 +36,11 @@ func logrotate(sigChan chan os.Signal, handlerMap *handler.Map) {
 				err := lfHandle.Reopen()
 
 				if err != nil {
+					logFileMap.GetLogger(`error`).Errorf("Error rotating logfile %s: %s\n", name, err)
+					logFileMap.GetLogger(`application`).Infoln(`Shutting down system`)
+
 					logFileMap.RangeUnlock()
 					locked = false
-
-					log.Printf("Error rotating logfile %s: %s\n", name, err)
-					log.Println(`Shutting down system`)
 
 					returnChannel := make(chan msg.Result, 1)
 					request := msg.Request{
@@ -53,6 +55,14 @@ func logrotate(sigChan chan os.Signal, handlerMap *handler.Map) {
 					<-returnChannel
 					break fileloop
 				}
+				lg := logFileMap.GetLogger(name)
+				lvl := lg.Level
+				lg.SetLevel(logrus.InfoLevel)
+				lg.Infoln(fmt.Sprintf("Reopened logfile `%s` for logrotate at %s",
+					name,
+					time.Now().UTC().Format(time.RFC3339),
+				))
+				lg.SetLevel(lvl)
 			}
 			if locked {
 				logFileMap.RangeUnlock()

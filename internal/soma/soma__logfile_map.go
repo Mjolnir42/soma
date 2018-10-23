@@ -10,6 +10,7 @@ package soma
 import (
 	"sync"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/client9/reopen"
 )
 
@@ -17,6 +18,7 @@ import (
 // filehandles of active logfiles
 type LogHandleMap struct {
 	hmap map[string]*reopen.FileWriter
+	lmap map[string]*logrus.Logger
 	sync.RWMutex
 }
 
@@ -24,14 +26,16 @@ type LogHandleMap struct {
 func NewLogHandleMap() *LogHandleMap {
 	lm := &LogHandleMap{}
 	lm.hmap = make(map[string]*reopen.FileWriter)
+	lm.lmap = make(map[string]*logrus.Logger)
 	return lm
 }
 
 // Add registers a new filehandle
-func (l *LogHandleMap) Add(key string, fh *reopen.FileWriter) {
+func (l *LogHandleMap) Add(key string, fh *reopen.FileWriter, lg *logrus.Logger) {
 	l.Lock()
 	defer l.Unlock()
 	l.hmap[key] = fh
+	l.lmap[key] = lg
 }
 
 // Get retrieves a filehandle
@@ -46,6 +50,12 @@ func (l *LogHandleMap) Del(key string) {
 	l.Lock()
 	defer l.Unlock()
 	delete(l.hmap, key)
+}
+
+// GetLogger retrieves a Logger without locking. This should be used
+// inside an active Range() lock.
+func (l *LogHandleMap) GetLogger(key string) *logrus.Logger {
+	return l.lmap[key]
 }
 
 // Range locks l and returns the embedded map. Unlocking must

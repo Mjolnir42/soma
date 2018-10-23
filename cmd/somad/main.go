@@ -105,7 +105,7 @@ func main() {
 	}
 	logrus.SetOutput(lfhGlobal)
 	logrus.SetLevel(lvl)
-	logFileMap.Add(`global`, lfhGlobal)
+	logFileMap.Add(`global`, lfhGlobal, logrus.StandardLogger())
 
 	appLog = logrus.New()
 	if lfhApp, err = reopen.NewFileWriter(
@@ -119,7 +119,7 @@ func main() {
 		DisableColors: true,
 		FullTimestamp: true,
 	}
-	logFileMap.Add(`application`, lfhApp)
+	logFileMap.Add(`application`, lfhApp, appLog)
 
 	reqLog = logrus.New()
 	if lfhReq, err = reopen.NewFileWriter(
@@ -133,7 +133,7 @@ func main() {
 		DisableColors: true,
 		FullTimestamp: true,
 	}
-	logFileMap.Add(`request`, lfhReq)
+	logFileMap.Add(`request`, lfhReq, reqLog)
 
 	errLog = logrus.New()
 	if lfhErr, err = reopen.NewFileWriter(
@@ -148,7 +148,7 @@ func main() {
 		DisableColors: true,
 		FullTimestamp: true,
 	}
-	logFileMap.Add(`error`, lfhErr)
+	logFileMap.Add(`error`, lfhErr, errLog)
 
 	auditLog = logrus.New()
 	if lfhAudit, err = reopen.NewFileWriter(
@@ -162,7 +162,7 @@ func main() {
 		DisableColors: true,
 		FullTimestamp: true,
 	}
-	logFileMap.Add(`audit`, lfhAudit)
+	logFileMap.Add(`audit`, lfhAudit, auditLog)
 
 	hm = handler.NewMap()
 
