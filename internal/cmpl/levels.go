@@ -4,7 +4,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func LevelCreate(c *cli.Context) {
+func LevelAdd(c *cli.Context) {
 	Generic(c, []string{`shortname`, `numeric`})
 }
 
