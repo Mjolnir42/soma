@@ -114,6 +114,24 @@ func (r *Result) RowCnt(i int64, err error) bool {
 	return false
 }
 
+func (r *Result) RowCntMany(i int64, err error) bool {
+	if err != nil {
+		r.ServerError(err)
+		return false
+	}
+	switch {
+	case i == 0:
+		r.OK()
+		r.SetError(fmt.Errorf(`No rows affected`))
+	case i >= 1:
+		r.OK()
+		return true
+	default:
+		r.ServerError(fmt.Errorf("Invalid number of rows affected: %d", i))
+	}
+	return false
+}
+
 func (r *Result) Clear(s string) {
 	switch s {
 	case `action`:

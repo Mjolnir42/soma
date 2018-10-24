@@ -116,9 +116,9 @@ func (r *ValidityRead) process(q *msg.Request) {
 // list returns all validity definitions
 func (r *ValidityRead) list(q *msg.Request, mr *msg.Result) {
 	var (
-		systemProperty, objectType string
-		rows                       *sql.Rows
-		err                        error
+		systemProperty, entity string
+		rows                   *sql.Rows
+		err                    error
 	)
 
 	if rows, err = r.stmtList.Query(); err != nil {
@@ -129,7 +129,7 @@ func (r *ValidityRead) list(q *msg.Request, mr *msg.Result) {
 	for rows.Next() {
 		if err = rows.Scan(
 			&systemProperty,
-			&objectType,
+			&entity,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
@@ -137,7 +137,7 @@ func (r *ValidityRead) list(q *msg.Request, mr *msg.Result) {
 		}
 		mr.Validity = append(mr.Validity, proto.Validity{
 			SystemProperty: systemProperty,
-			ObjectType:     objectType,
+			Entity:         entity,
 		})
 	}
 	if err = rows.Err(); err != nil {
@@ -150,10 +150,10 @@ func (r *ValidityRead) list(q *msg.Request, mr *msg.Result) {
 // show returns all validity definitions for a specific system property
 func (r *ValidityRead) show(q *msg.Request, mr *msg.Result) {
 	var (
-		systemProperty, objectType string
-		isInherited                bool
-		rows                       *sql.Rows
-		err                        error
+		systemProperty, entity string
+		isInherited            bool
+		rows                   *sql.Rows
+		err                    error
 	)
 
 	if rows, err = r.stmtShow.Query(
@@ -163,26 +163,38 @@ func (r *ValidityRead) show(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
+	data := make(map[string]map[string]bool)
 	for rows.Next() {
 		if err = rows.Scan(
 			&systemProperty,
-			&objectType,
+			&entity,
 			&isInherited,
 		); err != nil {
 			rows.Close()
 			mr.ServerError(err, q.Section)
 			return
 		}
-		mr.Validity = append(mr.Validity, proto.Validity{
-			SystemProperty: systemProperty,
-			ObjectType:     objectType,
-			Direct:         !isInherited,
-			Inherited:      isInherited,
-		})
+		if data[entity] == nil {
+			data[entity] = make(map[string]bool)
+		}
+		if isInherited {
+			data[entity][`inherited`] = true
+		} else {
+			data[entity][`direct`] = true
+		}
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err, q.Section)
 		return
+	}
+
+	for entObj := range data {
+		mr.Validity = append(mr.Validity, proto.Validity{
+			SystemProperty: q.Validity.SystemProperty,
+			Entity:         entObj,
+			Direct:         data[entObj][`direct`],
+			Inherited:      data[entObj][`inherited`],
+		})
 	}
 	mr.OK()
 }

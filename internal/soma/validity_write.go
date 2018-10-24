@@ -115,19 +115,61 @@ func (w *ValidityWrite) add(q *msg.Request, mr *msg.Result) {
 	var (
 		err error
 		res sql.Result
+		tx  *sql.Tx
 	)
 
-	if res, err = w.stmtAdd.Exec(
-		q.Validity.SystemProperty,
-		q.Validity.ObjectType,
-		q.Validity.Inherited,
-	); err != nil {
+	if tx, err = w.conn.Begin(); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
-	if mr.RowCnt(res.RowsAffected()) {
-		mr.Validity = append(mr.Validity, q.Validity)
+	txStmtAdd := tx.Stmt(w.stmtAdd)
+
+	// every record inside the table is a validity that either
+	// represents a direct validity (inherited == false) or an
+	// inherited validity (inherited == true).
+	// Invalidity is the absence of data causing a foreign key
+	// constraint violation.
+
+	// insert direct validity
+	if q.Validity.Direct {
+		if res, err = txStmtAdd.Exec(
+			q.Validity.SystemProperty,
+			q.Validity.Entity,
+			false,
+		); err != nil {
+			tx.Rollback()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		if !mr.RowCnt(res.RowsAffected()) {
+			tx.Rollback()
+			return
+		}
 	}
+	// insert inherited validity
+	if q.Validity.Inherited {
+		if res, err = txStmtAdd.Exec(
+			q.Validity.SystemProperty,
+			q.Validity.Entity,
+			true,
+		); err != nil {
+			tx.Rollback()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		if !mr.RowCnt(res.RowsAffected()) {
+			tx.Rollback()
+			return
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		tx.Rollback()
+		mr.ServerError(err, q.Section)
+		return
+	}
+	mr.Validity = append(mr.Validity, q.Validity)
+	mr.OK()
 }
 
 // remove deletes a validity definition
@@ -139,13 +181,11 @@ func (w *ValidityWrite) remove(q *msg.Request, mr *msg.Result) {
 
 	if res, err = w.stmtRemove.Exec(
 		q.Validity.SystemProperty,
-		q.Validity.ObjectType,
-		q.Validity.Inherited,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
-	if mr.RowCnt(res.RowsAffected()) {
+	if mr.RowCntMany(res.RowsAffected()) {
 		mr.Validity = append(mr.Validity, q.Validity)
 	}
 }

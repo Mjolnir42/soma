@@ -58,7 +58,7 @@ func TripleFromOn(c *cli.Context) {
 	GenericTriple(c, []string{`from`, `on`})
 }
 
-func ValidityCreate(c *cli.Context) {
+func ValidityAdd(c *cli.Context) {
 	Generic(c, []string{`on`, `direct`, `inherited`})
 }
 

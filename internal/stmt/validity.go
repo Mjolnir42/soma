@@ -15,7 +15,8 @@ const (
 	ValidityList = `
 SELECT system_property,
        object_type
-FROM   soma.system_property_validity;`
+FROM   soma.system_property_validity
+GROUP  BY system_property, object_type;`
 
 	ValidityShow = `
 SELECT system_property,
@@ -42,9 +43,7 @@ WHERE  NOT EXISTS (
 
 	ValidityDel = `
 DELETE FROM soma.system_property_validity
-WHERE       system_property = $1::varchar
-AND         object_type = $2::varchar
-AND         inherited = $3::boolean;`
+WHERE       system_property = $1::varchar;`
 )
 
 func init() {
