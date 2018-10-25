@@ -22,7 +22,7 @@ func logRequest(l *logrus.Logger, q *msg.Request) {
 		WithField(`Action`, q.Action).
 		WithField(`Request`, fmt.Sprintf("%s::%s", q.Section, q.Action)).
 		WithField(`Phase`, `request`).
-		Infoln(`received`)
+		Debug(`received:soma`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

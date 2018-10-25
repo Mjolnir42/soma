@@ -38,35 +38,20 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/satori/go.uuid"
-
-	"github.com/julienschmidt/httprouter"
 )
 
-// BasicAuth handles HTTP BasicAuth on requests
-func (x *Rest) BasicAuth(h httprouter.Handle) httprouter.Handle {
+// basicAuth handles HTTP BasicAuth on requests
+func (x *Rest) basicAuth(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request,
 		ps httprouter.Params) {
 		const basicAuthPrefix string = "Basic "
 		var supervisor handler.Handler
 
-		// generate and record the requestID
-		requestID := uuid.Must(uuid.NewV4())
-		ps = append(ps, httprouter.Param{
-			Key:   `RequestID`,
-			Value: requestID.String(),
-		})
-
-		// record the request URI
-		ps = append(ps, httprouter.Param{
-			Key:   `RequestURI`,
-			Value: r.RequestURI,
-		})
-
-		logEntry := x.reqLog.WithField(`RequestID`, requestID.String()).
-			WithField(`RequestURI`, r.RequestURI).
+		logEntry := x.reqLog.WithField(`RequestID`, ps.ByName(`RequestID`)).
+			WithField(`RequestURI`, ps.ByName(`RequestURI`)).
 			WithField(`Phase`, `basic-auth`)
 
 		// if the supervisor is not available, no requests are accepted
