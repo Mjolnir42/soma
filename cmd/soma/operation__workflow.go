@@ -6,13 +6,15 @@
  * that can be found in the LICENSE file.
  */
 
-package main
+package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"fmt"
 
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
+	"github.com/mjolnir42/soma/internal/cmpl"
+	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -20,33 +22,40 @@ func registerWorkflow(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `workflow`,
-				Usage: `SUBCOMMANDS for workflow inquiry`,
+				Name:        `workflow`,
+				Usage:       `SUBCOMMANDS for workflow inquiry`,
+				Description: help.Text(`workflow::`),
 				Subcommands: []cli.Command{
 					{
-						Name:   `summary`,
-						Usage:  `Show summary of workflow status`,
-						Action: runtime(cmdWorkflowSummary),
+						Name:        `summary`,
+						Usage:       `Show summary of workflow status`,
+						Description: help.Text(`workflow::summary`),
+						Action:      runtime(workflowSummary),
 					},
 					{
-						Name:   `list`,
-						Usage:  `List instances in a all workflow states`,
-						Action: runtime(cmdWorkflowList),
+						Name:        `list`,
+						Usage:       `List instances in all workflow states`,
+						Description: help.Text(`workflow::list`),
+						Action:      runtime(workflowList),
 					},
 					{
-						Name:   `search`,
-						Usage:  `Search for instances in a specific workflow state`,
-						Action: runtime(cmdWorkflowSearch),
+						Name:        `search`,
+						Usage:       `Search for instances in a specific workflow state`,
+						Description: help.Text(`workflow::search`),
+						Action:      runtime(workflowSearch),
 					},
 					{
-						Name:   `retry`,
-						Usage:  `Reschedule an instance in a failed state`,
-						Action: runtime(cmdWorkflowRetry),
+						Name:        `retry`,
+						Usage:       `Reschedule an instance in a failed state`,
+						Description: help.Text(`workflow::retry`),
+						Action:      runtime(workflowRetry),
 					},
 					{
-						Name:   `set`,
-						Usage:  `Hard-set an instance's worflow status`,
-						Action: runtime(cmdWorkflowSet),
+						Name:         `set`,
+						Usage:        `Hard-set an instance's worflow status`,
+						Description:  help.Text(`workflow::set`),
+						Action:       runtime(workflowSet),
+						BashComplete: cmpl.WorkflowSet,
 						Flags: []cli.Flag{
 							cli.BoolFlag{
 								Name:  `force, f`,
@@ -61,7 +70,9 @@ func registerWorkflow(app cli.App) *cli.App {
 	return &app
 }
 
-func cmdWorkflowSummary(c *cli.Context) error {
+// workflowSummary function
+// soma workflow summary
+func workflowSummary(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
 	}
@@ -69,7 +80,9 @@ func cmdWorkflowSummary(c *cli.Context) error {
 	return adm.Perform(`get`, `/workflow/summary`, `list`, nil, c)
 }
 
-func cmdWorkflowList(c *cli.Context) error {
+// workflowList function
+// soma workflow list
+func workflowList(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
 	}
@@ -77,7 +90,9 @@ func cmdWorkflowList(c *cli.Context) error {
 	return adm.Perform(`get`, `/workflow/`, `list`, nil, c)
 }
 
-func cmdWorkflowSearch(c *cli.Context) error {
+// workflowSearch function
+// soma workflow search ${status}
+func workflowSearch(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -91,7 +106,9 @@ func cmdWorkflowSearch(c *cli.Context) error {
 	return adm.Perform(`postbody`, `/search/workflow/`, `list`, req, c)
 }
 
-func cmdWorkflowRetry(c *cli.Context) error {
+// workflowRetry function XXX UNTESTED
+// soma workflow retry ${instanceID}
+func workflowRetry(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -106,7 +123,9 @@ func cmdWorkflowRetry(c *cli.Context) error {
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
-func cmdWorkflowSet(c *cli.Context) error {
+// workflowSet function XXX UNTESTED
+// soma workflow set ${instanceConfigID} status ${current} next ${nextStatus}
+func workflowSet(c *cli.Context) error {
 	unique := []string{`status`, `next`}
 	required := []string{`status`, `next`}
 	opts := map[string][]string{}

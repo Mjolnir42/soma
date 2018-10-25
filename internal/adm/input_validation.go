@@ -429,8 +429,8 @@ func fetchObjList(path string) (*proto.Result, error) {
 	var (
 		err  error
 		resp *resty.Response
-		res  *proto.Result
 	)
+	res := &proto.Result{}
 	if resp, err = GetReq(path); err != nil {
 		return nil, err
 	}

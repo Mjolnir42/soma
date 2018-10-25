@@ -59,6 +59,7 @@ func (r *WorkflowRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionSummary,
 		msg.ActionList,
+		msg.ActionSearch,
 	} {
 		hmap.Request(msg.SectionWorkflow, action, r.handlerName)
 	}
