@@ -279,6 +279,13 @@ func ValidateMode(s string) error {
 	return fmt.Errorf("Invalid mode: %s", s)
 }
 
+// ValidateIsRequestURI attempts to parse s via url.ParseRequestURI to
+// check if s is a valid RequestURI
+func ValidateIsRequestURI(s string) error {
+	_, err := url.ParseRequestURI(s)
+	return err
+}
+
 // ValidateNoColon asserts that the string s does not contain a
 // colon (:) character
 func ValidateNoColon(s string) error {
