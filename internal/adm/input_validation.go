@@ -261,6 +261,24 @@ func ValidateCategory(s string) error {
 	return fmt.Errorf("Invalid category requested: %s", s)
 }
 
+// ValidateMode tests against the server if s is a valid mode
+func ValidateMode(s string) error {
+	esc := url.QueryEscape(s)
+	res, err := fetchObjList(fmt.Sprintf("/mode/%s", esc))
+	if err != nil {
+		return err
+	}
+
+	if res.Modes == nil || len(*res.Modes) == 0 {
+		return fmt.Errorf(`no mode object for validation returned`)
+	}
+
+	if s == (*res.Modes)[0].Mode {
+		return nil
+	}
+	return fmt.Errorf("Invalid mode: %s", s)
+}
+
 // ValidateNoColon asserts that the string s does not contain a
 // colon (:) character
 func ValidateNoColon(s string) error {
