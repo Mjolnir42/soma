@@ -97,6 +97,10 @@ func monitoringMgmtAdd(c *cli.Context) error {
 		return err
 	}
 
+	if err = adm.ValidateMode(opts[`mode`][0]); err != nil {
+		return err
+	}
+
 	req := proto.NewMonitoringRequest()
 	req.Monitoring.Name = c.Args().First()
 	req.Monitoring.Mode = opts[`mode`][0]
@@ -115,6 +119,9 @@ func monitoringMgmtAdd(c *cli.Context) error {
 
 	// optional arguments
 	if _, ok := opts[`callback`]; ok {
+		if err = adm.ValidateIsRequestURI(opts[`callback`][0]); err != nil {
+			return err
+		}
 		req.Monitoring.Callback = opts[`callback`][0]
 	}
 
