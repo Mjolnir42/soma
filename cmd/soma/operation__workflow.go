@@ -10,6 +10,7 @@ package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
@@ -154,8 +155,10 @@ func workflowSet(c *cli.Context) error {
 	req.Workflow.Status = opts[`status`][0]
 	req.Workflow.NextStatus = opts[`next`][0]
 
-	path := fmt.Sprintf("/workflow/set/%s",
-		c.Args().First())
+	path := fmt.Sprintf(
+		"/workflow/set/%s",
+		url.QueryEscape(c.Args().First()),
+	)
 	return adm.Perform(`patchbody`, path, `command`, req, c)
 }
 
