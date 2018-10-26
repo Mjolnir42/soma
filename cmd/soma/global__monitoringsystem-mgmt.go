@@ -44,19 +44,19 @@ func registerMonitoringMgmt(app cli.App) *cli.App {
 						Name:        `list`,
 						Usage:       `List monitoring systems`,
 						Description: help.Text(`monitoringsystem::list`),
-						Action:      runtime(cmdMonitoringList),
+						Action:      runtime(monitoringList),
 					},
 					{
 						Name:        `show`,
 						Usage:       `Show details about a monitoring system`,
 						Description: help.Text(`monitoringsystem::show`),
-						Action:      runtime(cmdMonitoringShow),
+						Action:      runtime(monitoringShow),
 					},
 					{
 						Name:        `search`,
 						Usage:       `Lookup a monitoring system ID by name`,
 						Description: help.Text(`monitoringsystem::search`),
-						Action:      runtime(cmdMonitoringSearch),
+						Action:      runtime(monitoringSearch),
 					},
 				},
 			},
@@ -66,8 +66,8 @@ func registerMonitoringMgmt(app cli.App) *cli.App {
 }
 
 // monitoringMgmtAdd function
-// soma monitoringsystem-mgmt add ${name} mode $mode contact $user \
-//      team $team [ callback $callback ]
+// soma monitoringsystem-mgmt add ${name} mode ${mode} contact ${user} \
+//      team ${team} [ callback ${callback} ]
 func monitoringMgmtAdd(c *cli.Context) error {
 	var err error
 	opts := map[string][]string{}

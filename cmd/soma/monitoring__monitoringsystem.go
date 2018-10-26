@@ -16,7 +16,9 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-func cmdMonitoringList(c *cli.Context) error {
+// monitoringList function
+// soma monitoringsystem-mgmt list
+func monitoringList(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
 	}
@@ -24,7 +26,9 @@ func cmdMonitoringList(c *cli.Context) error {
 	return adm.Perform(`get`, `/monitoringsystem/`, `list`, nil, c)
 }
 
-func cmdMonitoringShow(c *cli.Context) error {
+// monitoringShow function
+// soma monitoringsystem-mgmt show ${name}
+func monitoringShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -37,7 +41,9 @@ func cmdMonitoringShow(c *cli.Context) error {
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
-func cmdMonitoringSearch(c *cli.Context) error {
+// monitoringSearch function
+// soma monitoringsystem-mgmt search ${name}
+func monitoringSearch(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
