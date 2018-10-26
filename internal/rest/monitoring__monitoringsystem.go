@@ -75,7 +75,7 @@ func (x *Rest) MonitoringShow(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoring
 	request.Action = msg.ActionShow
-	request.Monitoring.ID = params.ByName(`monitoring`)
+	request.Monitoring.ID = params.ByName(`monitoringID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

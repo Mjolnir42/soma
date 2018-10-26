@@ -114,7 +114,7 @@ func (x *Rest) MonitoringMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoringMgmt
 	request.Action = msg.ActionRemove
-	request.Monitoring.ID = params.ByName(`monitoring`)
+	request.Monitoring.ID = params.ByName(`monitoringID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

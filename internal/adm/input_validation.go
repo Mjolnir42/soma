@@ -279,6 +279,15 @@ func ValidateNoSlash(s string) error {
 	return nil
 }
 
+// ValidateNoDot asserts that the string s does not contain a
+// dot (.) character
+func ValidateNoDot(s string) error {
+	if strings.Contains(s, `.`) {
+		return fmt.Errorf("String %s is not allowed to contain a . character.", s)
+	}
+	return nil
+}
+
 // ValidateCheckConstraints tests that all specified check constraints
 // resolve to a valid property or attribute.
 func ValidateCheckConstraints(repoID, teamID string,

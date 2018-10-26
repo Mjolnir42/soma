@@ -55,12 +55,18 @@ func (r *MonitoringRead) Register(c *sql.DB, l ...*logrus.Logger) {
 // RegisterRequests links the handler inside the handlermap to the requests
 // it processes
 func (r *MonitoringRead) RegisterRequests(hmap *handler.Map) {
+	// global scoped requests
+	for _, action := range []string{
+		msg.ActionAll,
+		msg.ActionSearchAll,
+	} {
+		hmap.Request(msg.SectionMonitoringMgmt, action, r.handlerName)
+	}
+	// per monitoring system scoped requests
 	for _, action := range []string{
 		msg.ActionList,
-		msg.ActionAll,
 		msg.ActionShow,
 		msg.ActionSearch,
-		msg.ActionSearchAll,
 	} {
 		hmap.Request(msg.SectionMonitoring, action, r.handlerName)
 	}

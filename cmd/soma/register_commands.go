@@ -56,7 +56,7 @@ func registerCommands(app cli.App) *cli.App {
 	app = *registerLevels(app)
 	app = *registerMetrics(app)
 	app = *registerModes(app)
-	app = *registerMonitoring(app)
+	app = *registerMonitoringMgmt(app)
 	app = *registerNodes(app)
 	app = *registerOncall(app)
 	app = *registerPermissions(app)

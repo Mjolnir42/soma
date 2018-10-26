@@ -162,7 +162,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.DELETE(`/level/:level`, x.Authenticated(x.LevelRemove))
 			router.DELETE(`/metric/:metric`, x.Authenticated(x.MetricRemove))
 			router.DELETE(`/mode/:mode`, x.Authenticated(x.ModeRemove))
-			router.DELETE(`/monitoringsystem/:monitoring`, x.Authenticated(x.MonitoringMgmtRemove))
+			router.DELETE(`/monitoringsystem/:monitoringID`, x.Authenticated(x.MonitoringMgmtRemove))
 			router.DELETE(`/oncall/:oncall`, x.Authenticated(x.OncallRemove))
 			router.DELETE(`/predicate/:predicate`, x.Authenticated(x.PredicateRemove))
 			router.DELETE(`/provider/:provider`, x.Authenticated(x.ProviderRemove))

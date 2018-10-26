@@ -2,7 +2,7 @@ package cmpl
 
 import "github.com/codegangsta/cli"
 
-func MonitoringCreate(c *cli.Context) {
+func MonitoringMgmtAdd(c *cli.Context) {
 	Generic(c, []string{`mode`, `contact`, `team`, `callback`})
 }
 
