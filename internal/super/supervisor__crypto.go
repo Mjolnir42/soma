@@ -98,7 +98,6 @@ func (s *Supervisor) encrypt(kex *auth.Kex, token *auth.Token, mr *msg.Result) e
 func (s *Supervisor) kexInit(q *msg.Request) {
 	result := msg.FromRequest(q)
 	result.Super.Verdict = 401
-	q.Log(s.reqLog)
 
 	kex := q.Super.Kex
 	var err error
