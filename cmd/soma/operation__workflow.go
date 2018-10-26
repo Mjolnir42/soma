@@ -127,18 +127,21 @@ func workflowRetry(c *cli.Context) error {
 // workflowSet function XXX UNTESTED
 // soma workflow set ${instanceConfigID} status ${current} next ${nextStatus}
 func workflowSet(c *cli.Context) error {
-	unique := []string{`status`, `next`}
-	required := []string{`status`, `next`}
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`status`, `next`}
+	mandatoryOptions := []string{`status`, `next`}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		[]string{},
-		unique,
-		required,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail(),
 	); err != nil {
 		return err
 	}
+
 	if !adm.IsUUID(c.Args().First()) {
 		return fmt.Errorf("Argument is not a UUID: %s",
 			c.Args().First())
