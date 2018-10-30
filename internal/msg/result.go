@@ -88,6 +88,10 @@ func FromRequest(rq *Request) Result {
 }
 
 func (r *Result) IsOK() bool {
+	if r.Error != nil {
+		return false
+	}
+
 	switch r.Code {
 	case 200:
 		return true
