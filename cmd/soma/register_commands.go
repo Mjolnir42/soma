@@ -9,8 +9,8 @@ func registerCommands(app cli.App) *cli.App {
 
 	app.Commands = []cli.Command{
 		{
-			Name:   "init",
-			Usage:  "Initialize local client files",
+			Name:   `init`,
+			Usage:  `Initialize local SOMA client files`,
 			Action: cmdClientInit,
 		},
 		{
@@ -32,8 +32,8 @@ func registerCommands(app cli.App) *cli.App {
 			},
 		},
 		{
-			Name:   "experiment",
-			Usage:  "Test cli.Action functionality",
+			Name:   `experimental`,
+			Usage:  `Test cli.Action functionality`,
 			Action: runtime(cmdExperiment),
 			Hidden: true,
 		},
