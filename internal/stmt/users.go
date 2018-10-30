@@ -88,7 +88,8 @@ SET    user_uid = $1::varchar,
        user_mail_address = $5::text,
        user_is_deleted = $6::boolean,
        organizational_team_id = $7::uuid
-WHERE  user_id = $8::uuid;`
+WHERE  user_id = $8::uuid
+  AND  ($6::boolean OR(user_is_deleted = $6::boolean));`
 
 	UserDel = `
 UPDATE inventory.users
