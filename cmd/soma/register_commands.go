@@ -72,7 +72,7 @@ func registerCommands(app cli.App) *cli.App {
 	app = *registerStatus(app)
 	app = *registerTeams(app)
 	app = *registerUnits(app)
-	app = *registerUsers(app)
+	app = *registerUserMgmt(app)
 	app = *registerValidity(app)
 	app = *registerViews(app)
 	app = *registerWorkflow(app)

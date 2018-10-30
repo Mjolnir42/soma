@@ -2,11 +2,11 @@ package cmpl
 
 import "github.com/codegangsta/cli"
 
-func UserAdd(c *cli.Context) {
-	Generic(c, []string{`firstname`, `lastname`, `employeenr`, `mailaddr`, `team`, `deleted`, `active`, `system`})
+func UserMgmtAdd(c *cli.Context) {
+	Generic(c, []string{`firstname`, `lastname`, `employeenr`, `mailaddr`, `team`, `system`})
 }
 
-func UserUpdate(c *cli.Context) {
+func UserMgmtUpdate(c *cli.Context) {
 	Generic(c, []string{`username`, `firstname`, `lastname`, `employeenr`, `mailaddr`, `team`, `deleted`})
 }
 

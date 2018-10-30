@@ -69,7 +69,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(`/team/`, x.Authenticated(x.TeamMgmtList))
 	router.GET(`/unit/:unit`, x.Authenticated(x.UnitShow))
 	router.GET(`/unit/`, x.Authenticated(x.UnitList))
-	router.GET(`/user/:user`, x.Authenticated(x.ScopeSelectUserShow))
+	router.GET(`/user/:userID`, x.Authenticated(x.ScopeSelectUserShow))
 	router.GET(`/user/`, x.Authenticated(x.UserMgmtList))
 	router.GET(`/validity/:property`, x.Authenticated(x.ValidityShow))
 	router.GET(`/validity/`, x.Authenticated(x.ValidityList))

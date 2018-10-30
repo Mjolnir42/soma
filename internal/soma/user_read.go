@@ -54,11 +54,19 @@ func (r *UserRead) Register(c *sql.DB, l ...*logrus.Logger) {
 // RegisterRequests links the handler inside the handlermap to the requests
 // it processes
 func (r *UserRead) RegisterRequests(hmap *handler.Map) {
+	// category identity
 	for _, action := range []string{
 		msg.ActionList,
 		msg.ActionSearch,
 		msg.ActionShow,
 		msg.ActionSync,
+	} {
+		hmap.Request(msg.SectionUserMgmt, action, r.handlerName)
+	}
+	// category self
+	for _, action := range []string{
+		msg.ActionSearch,
+		msg.ActionShow,
 	} {
 		hmap.Request(msg.SectionUser, action, r.handlerName)
 	}
