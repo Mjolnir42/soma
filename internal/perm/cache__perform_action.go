@@ -343,4 +343,35 @@ func (c *Cache) performUserRemove(q *msg.Request) {
 	c.lock.Unlock()
 }
 
+// performUserUpdate updates a user's information
+func (c *Cache) performUserUpdate(q *msg.Request) {
+	c.lock.Lock()
+	old := c.user.getByID(q.User.ID)
+	if old == nil {
+		panic(`Update on non-existing user -- supervisor corruption`)
+	}
+	// user switched teams
+	if old.TeamID != q.Update.User.TeamID {
+		c.team.rmMember(
+			old.TeamID,
+			q.User.ID,
+		)
+		c.team.addMember(
+			q.Update.User.TeamID,
+			q.User.ID,
+		)
+	}
+	// add methods overwrite and can thus be used for updates
+	c.user.add(
+		q.User.ID,
+		q.Update.User.UserName,
+		q.Update.User.TeamID,
+	)
+	c.lock.Unlock()
+	// this update may delete the user
+	if q.Update.User.IsDeleted {
+		c.performUserRemove(q)
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

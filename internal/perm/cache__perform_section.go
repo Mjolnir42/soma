@@ -121,7 +121,7 @@ func (c *Cache) performUser(q *msg.Request) {
 	case msg.ActionRemove, msg.ActionPurge:
 		c.performUserRemove(q)
 	case msg.ActionUpdate:
-		// XXX TODO
+		c.performUserUpdate(q)
 	}
 }
 
