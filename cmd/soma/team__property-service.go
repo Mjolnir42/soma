@@ -58,7 +58,7 @@ func propertyMgmtServiceAdd(c *cli.Context) error {
 		return err
 	}
 
-	if teamID, err = adm.LookupTeamID(opts[`team`][0]); err != nil {
+	if err = adm.LookupTeamID(opts[`team`][0], &teamID); err != nil {
 		return err
 	}
 
@@ -120,8 +120,8 @@ func propertyMgmtServiceRemove(c *cli.Context) error {
 		return err
 	}
 
-	teamID, err := adm.LookupTeamID(opts[`team`][0])
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamID(opts[`team`][0], &teamID); err != nil {
 		return err
 	}
 	propertyID, err := adm.LookupServicePropertyID(
@@ -156,8 +156,8 @@ func propertyMgmtServiceShow(c *cli.Context) error {
 		return err
 	}
 
-	teamID, err := adm.LookupTeamID(opts[`team`][0])
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamID(opts[`team`][0], &teamID); err != nil {
 		return err
 	}
 	propertyID, err := adm.LookupServicePropertyID(
@@ -192,8 +192,8 @@ func propertyMgmtServiceList(c *cli.Context) error {
 		return err
 	}
 
-	teamID, err := adm.LookupTeamID(opts[`team`][0])
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamID(opts[`team`][0], &teamID); err != nil {
 		return err
 	}
 

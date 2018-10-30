@@ -57,8 +57,8 @@ func repositoryMgmtCreate(c *cli.Context) error {
 		return err
 	}
 
-	teamID, err := adm.LookupTeamID(opts[`team`][0])
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamID(opts[`team`][0], &teamID); err != nil {
 		return err
 	}
 

@@ -219,8 +219,10 @@ func cmdNodeAdd(c *cli.Context) error {
 		return err
 	}
 	req.Node.Name = opts[`name`][0]
-	if req.Node.TeamID, err = adm.LookupTeamID(
-		opts[`team`][0]); err != nil {
+	if err = adm.LookupTeamID(
+		opts[`team`][0],
+		&req.Node.TeamID,
+	); err != nil {
 		return nil
 	}
 
@@ -268,8 +270,10 @@ func cmdNodeUpdate(c *cli.Context) error {
 		&req.Node.AssetID, 1); err != nil {
 		return err
 	}
-	if req.Node.TeamID, err = adm.LookupTeamID(
-		opts[`team`][0]); err != nil {
+	if err = adm.LookupTeamID(
+		opts[`team`][0],
+		&req.Node.TeamID,
+	); err != nil {
 		return err
 	}
 	path := fmt.Sprintf("/node/%s", req.Node.ID)
@@ -385,7 +389,7 @@ func cmdNodeRepo(c *cli.Context) error {
 		if id, err = adm.LookupNodeID(c.Args().First()); err != nil {
 			return err
 		}
-		if teamID, err = adm.LookupTeamID(opts[`to`][0]); err != nil {
+		if err = adm.LookupTeamID(opts[`to`][0], &teamID); err != nil {
 			return err
 		}
 	}

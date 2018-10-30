@@ -123,8 +123,8 @@ func teamMgmtUpdate(c *cli.Context) error {
 		return err
 	}
 
-	teamID, err := adm.LookupTeamID(c.Args().First())
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamID(c.Args().First(), &teamID); err != nil {
 		return err
 	}
 
@@ -152,8 +152,8 @@ func teamMgmtRemove(c *cli.Context) error {
 		return err
 	}
 
-	teamID, err := adm.LookupTeamID(c.Args().First())
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamID(c.Args().First(), &teamID); err != nil {
 		return err
 	}
 
@@ -190,8 +190,8 @@ func teamMgmtShow(c *cli.Context) error {
 		return err
 	}
 
-	teamID, err := adm.LookupTeamID(c.Args().First())
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamID(c.Args().First(), &teamID); err != nil {
 		return err
 	}
 

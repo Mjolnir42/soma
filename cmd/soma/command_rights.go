@@ -155,8 +155,9 @@ func cmdRightGrant(c *cli.Context) error {
 			switch opts[`on`][0][0] {
 			case msg.EntityTeam:
 				req.Grant.ObjectType = msg.EntityTeam
-				if req.Grant.ObjectID, err = adm.LookupTeamID(
+				if err = adm.LookupTeamID(
 					opts[`on`][0][1],
+					&req.Grant.ObjectID,
 				); err != nil {
 					return err
 				}

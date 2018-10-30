@@ -57,12 +57,14 @@ func LookupUserID(s string) (string, error) {
 // LookupTeamID looks up the UUID for a team on the server
 // with teamname s. Error is set if no such team was found
 // or an error occurred.
-// If s is already a UUID, then s is immediately returned.
-func LookupTeamID(s string) (string, error) {
+// If such a team is found, r is set to the UUID of the team.
+// If s is already a UUID, then r is immediately set.
+func LookupTeamID(s string, r *string) error {
 	if IsUUID(s) {
-		return s, nil
+		*r = s
+		return nil
 	}
-	return teamIDByName(s)
+	return teamIDByName(s, r)
 }
 
 // LookupTeamByRepo looks up the UUID for the team that is the
@@ -369,12 +371,10 @@ func LookupServicePropertyID(s, team string) (string, error) {
 	if IsUUID(s) {
 		return s, nil
 	}
-	var tID, t string
-	var err error
-	if t, err = LookupTeamID(team); err != nil {
+	var tID string
+	if err := teamIDByName(team, &tID); err != nil {
 		return ``, err
 	}
-	tID = t
 	return propertyIDByName(`service`, s, tID)
 }
 
@@ -499,7 +499,7 @@ abort:
 
 // teamIDByName implements the actual serverside lookup of the
 // team's UUID
-func teamIDByName(team string) (string, error) {
+func teamIDByName(team string, id *string) error {
 	req := proto.NewTeamFilter()
 	req.Filter.Team.Name = team
 
@@ -519,10 +519,11 @@ func teamIDByName(team string) (string, error) {
 			team, (*res.Teams)[0].Name)
 		goto abort
 	}
-	return (*res.Teams)[0].ID, nil
+	*id = (*res.Teams)[0].ID
+	return nil
 
 abort:
-	return ``, fmt.Errorf("TeamID lookup failed: %s", err.Error())
+	return fmt.Errorf("TeamID lookup failed for %s: %s", team, err.Error())
 }
 
 // teamIDByRepoID implements the actual serverside lookup of

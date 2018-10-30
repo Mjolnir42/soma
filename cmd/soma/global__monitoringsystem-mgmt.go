@@ -111,8 +111,9 @@ func monitoringMgmtAdd(c *cli.Context) error {
 		return err
 	}
 
-	if req.Monitoring.TeamID, err = adm.LookupTeamID(
+	if err = adm.LookupTeamID(
 		opts[`team`][0],
+		&req.Monitoring.TeamID,
 	); err != nil {
 		return err
 	}
