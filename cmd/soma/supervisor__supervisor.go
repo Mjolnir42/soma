@@ -18,9 +18,9 @@ import (
 	"github.com/mjolnir42/soma/lib/auth"
 )
 
-// supervisor
-
-func cmdUserLogin(c *cli.Context) error {
+// supervisorLogin function
+// soma login
+func supervisorLogin(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
 	}
@@ -29,7 +29,9 @@ func cmdUserLogin(c *cli.Context) error {
 	return adm.Perform(`head`, path, `command`, nil, c)
 }
 
-func cmdUserLogout(c *cli.Context) error {
+// supervisorLogout function
+// soma logout
+func supervisorLogout(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
 	}

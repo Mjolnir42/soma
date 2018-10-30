@@ -17,12 +17,12 @@ func registerCommands(app cli.App) *cli.App {
 			Name:        `login`,
 			Usage:       `Authenticate with the SOMA middleware`,
 			Description: help.Text(`supervisor::login`),
-			Action:      runtime(cmdUserLogin),
+			Action:      runtime(supervisorLogin),
 		},
 		{
 			Name:        `logout`,
 			Usage:       `Revoke currently used password token`,
-			Action:      runtime(cmdUserLogout),
+			Action:      runtime(supervisorLogout),
 			Description: help.Text(`supervisor::logout`),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
