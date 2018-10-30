@@ -313,6 +313,7 @@ func (c *Cache) performUserRemove(q *msg.Request) {
 	c.lock.Lock()
 	u := c.user.getByID(q.User.ID)
 	if u == nil {
+		c.lock.Unlock()
 		return
 	}
 	// revoke all global grants for the user
