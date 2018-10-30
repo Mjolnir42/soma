@@ -15,7 +15,8 @@ const (
 	ListUsers = `
 SELECT user_id,
        user_uid
-FROM   inventory.users;`
+FROM   inventory.users
+WHERE  NOT user_is_deleted;`
 
 	SearchUsers = `
 SELECT user_id,
