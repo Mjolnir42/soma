@@ -91,7 +91,7 @@ func (c *Cache) Perform(q *msg.Request) {
 		c.performSection(q.Cache)
 	case msg.SectionTeam, msg.SectionTeamMgmt:
 		c.performTeam(q.Cache)
-	case msg.SectionUser:
+	case msg.SectionUser, msg.SectionUserMgmt:
 		c.performUser(q.Cache)
 	default:
 		panic(fmt.Sprintf(
