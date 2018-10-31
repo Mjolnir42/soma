@@ -458,6 +458,15 @@ func VerifyPermissionTarget(target string) error {
 		target)
 }
 
+// ValidateNotUUID verifies that s is not a UUID. It returns an error if
+// it is and nil otherwise
+func ValidateNotUUID(s string) error {
+	if IsUUID(s) {
+		return fmt.Errorf("%s must not be formatted like a UUID", s)
+	}
+	return nil
+}
+
 // fetchObjList is a helper for ValidateUnit and ValidateProvider
 func fetchObjList(path string) (*proto.Result, error) {
 	var (
