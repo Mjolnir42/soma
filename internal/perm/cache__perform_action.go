@@ -348,6 +348,14 @@ func (c *Cache) performUserUpdate(q *msg.Request) {
 	c.lock.Lock()
 	old := c.user.getByID(q.User.ID)
 	if old == nil {
+		// this may be an update on a deleted user that is rewriting old
+		// data. accept not knowing the user if the update is for a
+		// deleted user
+		if q.Update.User.IsDeleted {
+			c.lock.Unlock()
+			return
+		}
+		// a non-deleted update must match a known user
 		panic(`Update on non-existing user -- supervisor corruption`)
 	}
 	// user switched teams
