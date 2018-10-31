@@ -121,7 +121,7 @@ func (c *Config) ReadConfigFile(fname string) error {
 
 	if c.LogPath == `` {
 		c.LogPath = filepath.Join(`/srv/soma`, c.InstanceName, `log`)
-		log.Printf("Setting default value for log.path: %s\n",
+		log.Printf("Setting default value for log.path: %s",
 			c.LogPath)
 	}
 	for _, p := range []string{
