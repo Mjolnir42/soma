@@ -62,15 +62,15 @@ func isUint64(s string) (bool, uint64) {
 	return true, u
 }
 
-// ValidateOncallNumber tests if a string is a 4 digit number
+// ValidateOncallNumber tests if a string is a 4 or 5 digit number
 func ValidateOncallNumber(n string) error {
 	num, err := strconv.Atoi(n)
 	if err != nil {
 		return fmt.Errorf("Syntax error, argument is not a number: %s", err.Error())
 	}
 
-	if num <= 0 || num > 9999 {
-		return fmt.Errorf("Phone number must be 4-digit extension")
+	if num <= 0 || num > 99999 {
+		return fmt.Errorf("Phone number must be 4 or 5 digit extension number")
 	}
 	return nil
 }
