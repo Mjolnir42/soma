@@ -87,7 +87,7 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
 		Task:            msg.TaskInvalidateAccount,
-		RevokeTokensFor: params.ByName(`account`),
+		RevokeForName: params.ByName(`account`),
 	}
 
 	if !x.isAuthorized(&request) {

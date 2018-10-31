@@ -104,11 +104,15 @@ func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 	}
 
 	// check the user to revoke exists and is active
-	if victimID, err = s.checkUser(
-		q.Super.RevokeTokensFor,
-		mr,
-		true,
-	); err != nil {
+	switch {
+	case q.Super.RevokeForName != ``:
+		victimID, err = s.checkUser(
+			q.Super.RevokeForName,
+			mr,
+			true,
+		)
+	}
+	if err != nil {
 		return
 	}
 
@@ -147,7 +151,7 @@ func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 	}
 
 	// add revocation to in-memory map
-	s.tokens.expireAccount(q.Super.RevokeTokensFor)
+	s.tokens.expireAccount(q.Super.RevokeForName)
 
 	mr.Super.Verdict = 200
 	mr.OK()

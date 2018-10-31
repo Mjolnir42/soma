@@ -36,8 +36,8 @@ type Supervisor struct {
 	Authorize *Request
 	// AuditLog Entry for this supervisor task
 	Audit *logrus.Entry
-	// User for whom all tokens should be revoked
-	RevokeTokensFor string
+	// User for whom should be revoked
+	RevokeForName string
 	// XXX Everything below is deprecated
 	// Fields for map update notifications
 	Object string

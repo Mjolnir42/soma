@@ -90,7 +90,7 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
 		Task:            msg.TaskInvalidateAccount,
-		RevokeTokensFor: params.ByName(`AuthenticatedUser`),
+		RevokeForName: params.ByName(`AuthenticatedUser`),
 	}
 
 	// authorization to invalidate all tokens is implicit from being
