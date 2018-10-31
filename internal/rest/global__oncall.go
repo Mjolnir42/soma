@@ -43,7 +43,7 @@ func (x *Rest) OncallShow(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionOncall
 	request.Action = msg.ActionShow
-	request.Oncall.ID = params.ByName(`oncall`)
+	request.Oncall.ID = params.ByName(`oncallID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -124,7 +124,7 @@ func (x *Rest) OncallUpdate(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionUpdate
 	request.Update.Oncall = cReq.Oncall.Clone()
 	request.Update.Oncall.Sanitize()
-	request.Oncall.ID = params.ByName(`oncall`)
+	request.Oncall.ID = params.ByName(`oncallID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
@@ -144,7 +144,7 @@ func (x *Rest) OncallRemove(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionOncall
 	request.Action = msg.ActionRemove
-	request.Oncall.ID = params.ByName(`oncall`)
+	request.Oncall.ID = params.ByName(`oncallID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

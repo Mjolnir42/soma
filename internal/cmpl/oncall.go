@@ -2,11 +2,11 @@ package cmpl
 
 import "github.com/codegangsta/cli"
 
-func OnCallAdd(c *cli.Context) {
+func OncallAdd(c *cli.Context) {
 	Generic(c, []string{`phone`})
 }
 
-func OnCallUpdate(c *cli.Context) {
+func OncallUpdate(c *cli.Context) {
 	Generic(c, []string{`phone`, `name`})
 }
 

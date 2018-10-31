@@ -168,14 +168,14 @@ func (w *OncallWrite) update(q *msg.Request, mr *msg.Result) {
 
 	// our update statement uses NULL to check which of the values
 	// should be updated - can be both
-	if q.Oncall.Name != "" {
-		name = sql.NullString{String: q.Oncall.Name, Valid: true}
+	if q.Update.Oncall.Name != `` {
+		name = sql.NullString{String: q.Update.Oncall.Name, Valid: true}
 	} else {
-		name = sql.NullString{String: "", Valid: false}
+		name = sql.NullString{String: ``, Valid: false}
 	}
 
-	if q.Oncall.Number != "" {
-		if n, err = strconv.Atoi(q.Oncall.Number); err != nil {
+	if q.Update.Oncall.Number != `` {
+		if n, err = strconv.Atoi(q.Update.Oncall.Number); err != nil {
 			mr.ServerError(err, q.Section)
 			return
 		}
