@@ -69,7 +69,7 @@ func ValidateOncallNumber(n string) error {
 		return fmt.Errorf("Syntax error, argument is not a number: %s", err.Error())
 	}
 
-	if num <= 0 || num > 99999 {
+	if num < 1000 || num > 99999 {
 		return fmt.Errorf("Phone number must be 4 or 5 digit extension number")
 	}
 	return nil
