@@ -91,10 +91,10 @@ func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result) {
 // invalidate-on-use
 func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 	var (
-		userID, victimID string
-		err              error
-		res              sql.Result
-		cnt              int64
+		userID string
+		err    error
+		res    sql.Result
+		cnt    int64
 	)
 
 	// check the user exists and is active, this is for updating
@@ -106,8 +106,14 @@ func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 	// check the user to revoke exists and is active
 	switch {
 	case q.Super.RevokeForName != ``:
-		victimID, err = s.checkUser(
+		q.Super.RevokeForID, err = s.checkUser(
 			q.Super.RevokeForName,
+			mr,
+			true,
+		)
+	case q.Super.RevokeForID != ``:
+		q.Super.RevokeForName, err = s.checkUserByID(
+			q.Super.RevokeForID,
 			mr,
 			true,
 		)
@@ -120,12 +126,14 @@ func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 	mr.Super.Audit = mr.Super.Audit.
 		WithField(`UserName`, q.AuthUser).
 		WithField(`UserID`, userID).
-		WithField(`KexID`, `none`)
+		WithField(`KexID`, `none`).
+		WithField(`RevokedUserName`, q.Super.RevokeForName).
+		WithField(`RevokedUserID`, q.Super.RevokeForID)
 
 	// insert revocation into database
 	if res, err = s.conn.Exec(
 		stmt.RevokeTokensForUser,
-		victimID,
+		q.Super.RevokeForID,
 		time.Now().UTC(),
 	); err != nil {
 		mr.ServerError(err, q.Section)
@@ -158,10 +166,7 @@ func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 	mr.Super.Audit.
 		WithField(`Verdict`, mr.Super.Verdict).
 		WithField(`Code`, mr.Code).
-		Infof(
-			"Successfully marked tokens for %s as revoked",
-			q.Super.RevokeTokensFor,
-		)
+		Info(`Successfully marked tokens as revoked`)
 }
 
 // tokenInvalidateGlobal invalidates all tokens

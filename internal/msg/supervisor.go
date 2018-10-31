@@ -38,6 +38,7 @@ type Supervisor struct {
 	Audit *logrus.Entry
 	// User for whom should be revoked
 	RevokeForName string
+	RevokeForID   string
 	// XXX Everything below is deprecated
 	// Fields for map update notifications
 	Object string
