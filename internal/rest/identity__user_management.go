@@ -213,6 +213,21 @@ func (x *Rest) UserMgmtRemove(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	switch request.Action {
+	case msg.ActionRemove:
+		// expire user's tokens
+		tokenInval := msg.New(r, params)
+		tokenInval.Section = msg.SectionSupervisor
+		tokenInval.Action = msg.ActionToken
+		tokenInval.Super = &msg.Supervisor{
+			Task:        msg.TaskInvalidateAccount,
+			RevokeForID: params.ByName(`userID`),
+		}
+		x.handlerMap.MustLookup(&request).Intake() <- tokenInval
+		<-tokenInval.Reply
+	default:
+	}
+
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
 	x.send(&w, &result)
