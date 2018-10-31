@@ -48,6 +48,7 @@ type Supervisor struct {
 	permCache                         *perm.Cache
 	stmtTokenSelect                   *sql.Stmt
 	stmtFindUserID                    *sql.Stmt
+	stmtFindUserName                  *sql.Stmt
 	stmtCheckUserActive               *sql.Stmt
 	stmtCategoryList                  *sql.Stmt
 	stmtCategoryShow                  *sql.Stmt
@@ -218,6 +219,7 @@ func (s *Supervisor) Run() {
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
 		stmt.SelectToken:                   &s.stmtTokenSelect,
+		stmt.FindUserName:                  &s.stmtFindUserName,
 		stmt.FindUserID:                    &s.stmtFindUserID,
 		stmt.CategoryList:                  &s.stmtCategoryList,
 		stmt.CategoryShow:                  &s.stmtCategoryShow,

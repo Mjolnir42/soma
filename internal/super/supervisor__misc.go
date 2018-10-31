@@ -88,7 +88,8 @@ func (s *Supervisor) checkIV(iv string) error {
 }
 
 // checkUser verifies that a user exists and is either active or
-// inactive depending on the target state
+// inactive depending on the target state. It returns the userID of the
+// user.
 func (s *Supervisor) checkUser(name string, mr *msg.Result, target bool) (string, error) {
 	var (
 		userID string
@@ -159,6 +160,81 @@ func (s *Supervisor) checkUser(name string, mr *msg.Result, target bool) (string
 	}
 
 	return userID, nil
+}
+
+// checkUserByID verifies that a user exists and is either active or
+// inactive depending on the target state. It returns the name of the
+// user.
+func (s *Supervisor) checkUserByID(userID string, mr *msg.Result, target bool) (string, error) {
+	var (
+		name   string
+		active bool
+		err    error
+		cred   *credential
+	)
+
+	// verify the user to activate exists
+	if err = s.stmtFindUserName.QueryRow(
+		userID,
+	).Scan(
+		&name,
+	); err == sql.ErrNoRows {
+		str := fmt.Sprintf("Unknown user ID: %s", userID)
+		mr.NotFound(fmt.Errorf(str), mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	} else if err != nil {
+		mr.ServerError(err, mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	}
+
+	// query user active status
+	if err = s.stmtCheckUserActive.QueryRow(
+		userID,
+	).Scan(
+		&active,
+	); err == sql.ErrNoRows {
+		str := fmt.Sprintf("Unknown user: %s", name)
+		mr.NotFound(fmt.Errorf(str), mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	} else if err != nil {
+		mr.ServerError(err, mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	}
+
+	// verify the user is not already in target state
+	if active != target {
+		str := fmt.Sprintf("User %s (%s) is active: %t",
+			name, userID, target)
+		mr.BadRequest(fmt.Errorf(str), mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	}
+
+	// if the user should already be active, it should also
+	// be in the credentials cache and active there as well
+	if target {
+		if cred = s.credentials.read(name); cred == nil {
+			str := fmt.Sprintf("Active user not found in credentials"+
+				" cache: %s (%s)", name, userID)
+			mr.ServerError(fmt.Errorf(str), mr.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+			return ``, mr.Error
+		}
+
+		if !cred.isActive {
+			str := fmt.Sprintf("Active user inactive in credentials"+
+				" cache: %s (%s)", name, userID)
+			mr.ServerError(fmt.Errorf(str), mr.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+			return ``, mr.Error
+		}
+	}
+
+	return name, nil
 }
 
 // saveToken persists a newly generated token

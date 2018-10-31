@@ -33,6 +33,12 @@ FROM   inventory.users
 WHERE  user_uid = $1::varchar
 AND    NOT user_is_deleted;`
 
+	FindUserName = `
+SELECT user_uid
+FROM   inventory.users
+WHERE  user_id = $1::uuid
+AND    NOT user_is_deleted;`
+
 	CheckUserActive = `
 SELECT user_is_active
 FROM   inventory.users
@@ -75,6 +81,7 @@ func init() {
 	m[ActivateUser] = `ActivateUser`
 	m[CheckUserActive] = `CheckUserActive`
 	m[FindUserID] = `FindUserID`
+	m[FindUserName] = `FindUserName`
 	m[InvalidateUserCredential] = `InvalidateUserCredential`
 	m[LoadAllUserCredentials] = `LoadAllUserCredentials`
 	m[SetUserCredential] = `SetUserCredential`
