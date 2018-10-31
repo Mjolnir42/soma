@@ -61,6 +61,7 @@ func (s *Supervisor) password(q *msg.Request) {
 	switch q.Super.Task {
 	case msg.TaskReset:
 	case msg.TaskChange:
+	case msg.TaskRevoke:
 	default:
 		result.UnknownTask(q)
 		result.Super.Audit.
@@ -73,6 +74,11 @@ func (s *Supervisor) password(q *msg.Request) {
 	switch q.Super.Task {
 	case msg.TaskReset, msg.TaskChange:
 		s.passwordModify(q, &result)
+	case msg.TaskRevoke:
+		// TaskRevoke is internal and not connected to the user
+		// interface, no need to add the processing delay
+		s.passwordRevoke(q, &result)
+		goto returnImmediate
 	}
 
 	// wait for delay timer to trigger

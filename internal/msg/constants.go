@@ -200,6 +200,7 @@ const (
 	TaskNone              = `none`
 	TaskRequest           = `request`
 	TaskReset             = `reset`
+	TaskRevoke            = `revoke`
 	TaskUser              = `user`
 )
 
