@@ -215,6 +215,17 @@ func (x *Rest) UserMgmtRemove(w http.ResponseWriter, r *http.Request,
 
 	switch request.Action {
 	case msg.ActionRemove:
+		// expire user's credentials
+		credInval := msg.New(r, params)
+		credInval.Section = msg.SectionSupervisor
+		credInval.Action = msg.ActionPassword
+		credInval.Super = &msg.Supervisor{
+			Task:        msg.TaskRevoke,
+			RevokeForID: params.ByName(`userID`),
+		}
+		x.handlerMap.MustLookup(&request).Intake() <- credInval
+		<-credInval.Reply
+
 		// expire user's tokens
 		tokenInval := msg.New(r, params)
 		tokenInval.Section = msg.SectionSupervisor
