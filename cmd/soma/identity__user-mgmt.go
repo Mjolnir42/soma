@@ -110,7 +110,7 @@ func registerUserMgmt(app cli.App) *cli.App {
 //      employeenr ${num} \
 //      mailaddr ${addr} \
 //      team ${team} \
-//      [ system ${bool} ]
+//      [system ${bool}]
 func userMgmtAdd(c *cli.Context) error {
 	opts := map[string][]string{}
 	multipleAllowed := []string{}
@@ -188,7 +188,7 @@ func userMgmtAdd(c *cli.Context) error {
 //      employeenr ${num} \
 //      mailaddr ${addr} \
 //      team ${team} \
-//      deleted ${bool}
+//      [deleted ${bool}]
 func userMgmtUpdate(c *cli.Context) error {
 	opts := map[string][]string{}
 	multipleAllowed := []string{}
