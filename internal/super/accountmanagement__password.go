@@ -59,8 +59,8 @@ func (s *Supervisor) password(q *msg.Request) {
 
 	// filter requests with invalid task
 	switch q.Super.Task {
-	case msg.TaskReset:
 	case msg.TaskChange:
+	case msg.TaskReset:
 	case msg.TaskRevoke:
 	default:
 		result.UnknownTask(q)
