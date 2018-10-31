@@ -146,6 +146,9 @@ func userMgmtAdd(c *cli.Context) error {
 	if err := adm.ValidateMailAddress(opts[`mailaddr`][0]); err != nil {
 		return err
 	}
+	if err := adm.ValidateNotUUID(c.Args().First()); err != nil {
+		return err
+	}
 
 	req := proto.NewUserRequest()
 	req.User.UserName = c.Args().First()
