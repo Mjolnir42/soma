@@ -61,8 +61,9 @@ func registerOncall(app cli.App) *cli.App {
 						Action:      runtime(oncallShow),
 					},
 					{
-						Name:  `member`,
-						Usage: `SUBCOMMANDS to manipulate oncall duty membership`,
+						Name:        `member`,
+						Usage:       `SUBCOMMANDS to manipulate oncall duty membership`,
+						Description: help.Text(`oncall::`),
 						Subcommands: []cli.Command{
 							{
 								Name:         `assign`,
