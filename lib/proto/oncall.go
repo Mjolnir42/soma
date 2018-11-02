@@ -88,8 +88,8 @@ func (o *OncallDetails) Clone() *OncallDetails {
 
 // OncallMember describes a member of an oncall duty team
 type OncallMember struct {
-	UserName string `json:"userName,omitempty"`
 	UserID   string `json:"userID,omitempty"`
+	UserName string `json:"userName,omitempty"`
 }
 
 // Clone returns a copy of o
