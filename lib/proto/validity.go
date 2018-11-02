@@ -36,7 +36,6 @@ func (v *Validity) Clone() Validity {
 // ValidityDetails contains metadata about a Validity definition
 type ValidityDetails struct {
 	Creation *DetailsCreation `json:"creation,omitempty"`
-	DetailsCreation
 }
 
 // Clone returns a copy of v
