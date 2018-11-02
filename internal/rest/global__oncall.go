@@ -1,5 +1,6 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
+ * Copyright (c) 2018, 1&1 IONOS SE
  * Copyright (c) 2016-2018, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license

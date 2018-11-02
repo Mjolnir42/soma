@@ -1,12 +1,13 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
+ * Copyright (c) 2018, 1&1 IONOS SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
