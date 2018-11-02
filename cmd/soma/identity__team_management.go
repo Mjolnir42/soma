@@ -1,6 +1,7 @@
 /*-
  * Copyright (c) 2015-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
+ * Copyright (c) 2018, 1&1 IONOS SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -65,6 +66,19 @@ func registerTeams(app cli.App) *cli.App {
 						Usage:       `Export a list of all teams suitable for sync`,
 						Description: help.Text(`team-mgmt::sync`),
 						Action:      runtime(teamMgmtSync),
+					},
+					{
+						Name:        `member`,
+						Usage:       `SUBCOMMANDS about team membership`,
+						Description: help.Text(`team-mgmt::`),
+						Subcommands: []cli.Command{
+							{
+								Name:        `list`,
+								Usage:       `List the users from a specific team`,
+								Description: help.Text(`team-mgmt::member-list`),
+								Action:      runtime(teamMgmtMemberList),
+							},
+						},
 					},
 				},
 			},
@@ -199,6 +213,24 @@ func teamMgmtShow(c *cli.Context) error {
 		url.QueryEscape(teamID),
 	)
 	return adm.Perform(`get`, path, `show`, nil, c)
+}
+
+// teamMgmtMemberList function
+// soma team-mgmt member list ${team}
+func teamMgmtMemberList(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	var teamID string
+	if err := adm.LookupTeamID(c.Args().First(), &teamID); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/team/%s/member/",
+		url.QueryEscape(teamID),
+	)
+	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

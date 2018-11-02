@@ -1,6 +1,7 @@
 /*-
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016-2017, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2018, 1&1 IONOS SE
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -169,8 +170,14 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	case msg.SectionTeam:
 		fallthrough
 	case msg.SectionTeamMgmt:
-		result = proto.NewTeamResult()
-		*result.Teams = append(*result.Teams, r.Team...)
+		switch r.Action {
+		case msg.ActionMemberList:
+			result = proto.NewUserResult()
+			*result.Users = append(*result.Users, r.User...)
+		default:
+			result = proto.NewTeamResult()
+			*result.Teams = append(*result.Teams, r.Team...)
+		}
 	case msg.SectionUser:
 		fallthrough
 	case msg.SectionUserMgmt:

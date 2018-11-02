@@ -12,6 +12,8 @@ soma team-mgmt remove ${team}
 soma team-mgmt show ${team}
 soma team-mgmt list
 soma team-mgmt sync
+soma team-mgmt member list ${team}
 ```
 
-See `soma team-mgmt help ${command}` for detailed help.
+See `soma team-mgmt help ${command}` or `soma team-mgmt member help list`
+for detailed help.

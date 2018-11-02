@@ -67,6 +67,7 @@ const (
 	rtRightID                    = `/category/:category/permission/:permissionID/grant/:grantID`
 	rtPropertyMgmt               = `/property-mgmt/:propertyType/`
 	rtPropertyMgmtID             = `/property-mgmt/:propertyType/:propertyID`
+	rtTeamMember                 = `/team/:teamID/member/`
 	rtTeamRepositoryID           = `/team/:teamID/repository/:repositoryID`
 	rtTeamRepositoryIDAudit      = `/team/:teamID/repository/:repositoryID/audit`
 	rtTeamPropertyMgmt           = `/team/:teamID/property-mgmt/:propertyType/`

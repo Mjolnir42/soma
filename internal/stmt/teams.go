@@ -1,6 +1,7 @@
 /*-
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2018, 1&1 IONOS SE
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -58,6 +59,15 @@ WHERE  organizational_team_id = $4::uuid;`
 DELETE FROM inventory.organizational_teams
 WHERE       organizational_team_id = $1;`
 
+	TeamMembers = `
+SELECT iu.user_id,
+       iu.user_uid
+FROM   inventory.organizational_teams iot
+JOIN   inventory.users iu
+  ON   iot.organizational_team_id = iu.organizational_team_id
+WHERE  iot.organizational_team_id = $1::uuid
+  AND  NOT iu.user_is_deleted;`
+
 	TeamLoad = `
 SELECT organizational_team_id,
        organizational_team_name,
@@ -73,6 +83,7 @@ func init() {
 	m[TeamAdd] = `TeamAdd`
 	m[TeamDel] = `TeamDel`
 	m[TeamLoad] = `TeamLoad`
+	m[TeamMembers] = `TeamMembers`
 	m[TeamUpdate] = `TeamUpdate`
 }
 

@@ -122,6 +122,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(rtRight, x.Authenticated(x.RightList))
 	router.GET(rtRightID, x.Authenticated(x.RightShow))
 	router.GET(rtSyncNode, x.Authenticated(x.NodeMgmtSync))
+	router.GET(rtTeamMember, x.Authenticated(x.TeamMgmtMemberList))
 	router.GET(rtTeamPropertyMgmt, x.Authenticated(x.PropertyMgmtList))
 	router.GET(rtTeamPropertyMgmtID, x.Authenticated(x.PropertyMgmtShow))
 	router.HEAD(`/authenticate/validate`, x.Authenticated(x.SupervisorValidate))

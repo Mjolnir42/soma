@@ -1,6 +1,7 @@
 /*-
- * Copyright (c) 2016, 1&1 Internet SE
  * Copyright (c) 2016-2018, Jörg Pernfuß
+ * Copyright (c) 2016, 1&1 Internet SE
+ * Copyright (c) 2018, 1&1 IONOS SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -192,6 +193,26 @@ func (x *Rest) TeamMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.Team = proto.Team{
 		ID: params.ByName(`teamID`),
 	}
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
+}
+
+// TeamMgmtMemberList function
+func (x *Rest) TeamMgmtMemberList(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionTeamMgmt
+	request.Action = msg.ActionMemberList
+	request.Team.ID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)

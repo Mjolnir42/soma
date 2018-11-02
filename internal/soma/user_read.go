@@ -1,12 +1,13 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2018, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
+ * Copyright (c) 2018, 1&1 IONOS SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package soma
+package soma // import "github.com/mjolnir42/soma/internal/soma"
 
 import (
 	"database/sql"
@@ -26,6 +27,7 @@ type UserRead struct {
 	handlerName string
 	conn        *sql.DB
 	stmtList    *sql.Stmt
+	stmtMembers *sql.Stmt
 	stmtSearch  *sql.Stmt
 	stmtShow    *sql.Stmt
 	stmtSync    *sql.Stmt
@@ -63,6 +65,11 @@ func (r *UserRead) RegisterRequests(hmap *handler.Map) {
 	} {
 		hmap.Request(msg.SectionUserMgmt, action, r.handlerName)
 	}
+	for _, action := range []string{
+		msg.ActionMemberList,
+	} {
+		hmap.Request(msg.SectionTeamMgmt, action, r.handlerName)
+	}
 	// category self
 	for _, action := range []string{
 		msg.ActionSearch,
@@ -91,6 +98,7 @@ func (r *UserRead) Run() {
 		stmt.SearchUsers: &r.stmtSearch,
 		stmt.ShowUsers:   &r.stmtShow,
 		stmt.SyncUsers:   &r.stmtSync,
+		stmt.TeamMembers: &r.stmtMembers,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`user`, err, stmt.Name(statement))
@@ -125,6 +133,8 @@ func (r *UserRead) process(q *msg.Request) {
 		r.show(q, &result)
 	case msg.ActionSync:
 		r.sync(q, &result)
+	case msg.ActionMemberList:
+		r.members(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -273,6 +283,42 @@ func (r *UserRead) search(q *msg.Request, mr *msg.Result) {
 
 	if rows, err = r.stmtSearch.Query(
 		q.Search.User.UserName,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&userID,
+			&userName,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		mr.User = append(mr.User, proto.User{
+			ID:       userID,
+			UserName: userName,
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	mr.OK()
+}
+
+// members returns all users from a specific team
+func (r *UserRead) members(q *msg.Request, mr *msg.Result) {
+	var (
+		userID, userName string
+		rows             *sql.Rows
+		err              error
+	)
+
+	if rows, err = r.stmtMembers.Query(
+		q.Team.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
