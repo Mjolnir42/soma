@@ -59,12 +59,39 @@ WHERE  oncall_duty_id = $3::uuid;`
 	OncallDel = `
 DELETE FROM inventory.oncall_duty_teams
 WHERE  oncall_duty_id = $1::uuid;`
+
+	OncallMemberAssign = `
+INSERT INTO inventory.oncall_duty_membership (
+            oncall_duty_id,
+            user_id)
+SELECT $1::uuid, $2::uuid
+WHERE NOT EXISTS (
+   SELECT oncall_duty_id
+   FROM   inventory.oncall_duty_membership
+   WHERE  oncall_duty_id = $1::uuid
+     AND  user_id = $2::uuid);`
+
+	OncallMemberUnassign = `
+DELETE FROM inventory.oncall_duty_membership
+WHERE  oncall_duty_id = $1::uuid
+  AND  user_id = $2::uuid;`
+
+	OncallMemberList = `
+SELECT iodm.user_id,
+       iu.user_uid
+FROM   inventory.oncall_duty_membership iodm
+JOIN   inventory.users iu
+  ON   iodm.user_id = iu.user_id
+WHERE  iodm.oncall_duty_id = $1::uuid;`
 )
 
 func init() {
 	m[OncallAdd] = `OncallAdd`
 	m[OncallDel] = `OncallDel`
 	m[OncallList] = `OncallList`
+	m[OncallMemberAssign] = `OncallMemberAssign`
+	m[OncallMemberList] = `OncallMemberList`
+	m[OncallMemberUnassign] = `OncallMemberUnassign`
 	m[OncallSearch] = `OncallSearch`
 	m[OncallShow] = `OncallShow`
 	m[OncallUpdate] = `OncallUpdate`

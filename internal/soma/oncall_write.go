@@ -22,16 +22,18 @@ import (
 
 // OncallWrite handles write requests for oncall
 type OncallWrite struct {
-	Input       chan msg.Request
-	Shutdown    chan struct{}
-	handlerName string
-	conn        *sql.DB
-	stmtAdd     *sql.Stmt
-	stmtUpdate  *sql.Stmt
-	stmtRemove  *sql.Stmt
-	appLog      *logrus.Logger
-	reqLog      *logrus.Logger
-	errLog      *logrus.Logger
+	Input        chan msg.Request
+	Shutdown     chan struct{}
+	handlerName  string
+	conn         *sql.DB
+	stmtAdd      *sql.Stmt
+	stmtAssign   *sql.Stmt
+	stmtRemove   *sql.Stmt
+	stmtUnassign *sql.Stmt
+	stmtUpdate   *sql.Stmt
+	appLog       *logrus.Logger
+	reqLog       *logrus.Logger
+	errLog       *logrus.Logger
 }
 
 // newOncallWrite return a new OncallWrite handler with input buffer of
@@ -57,6 +59,8 @@ func (w *OncallWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 func (w *OncallWrite) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionAdd,
+		msg.ActionMemberAssign,
+		msg.ActionMemberUnassign,
 		msg.ActionRemove,
 		msg.ActionUpdate,
 	} {
@@ -79,9 +83,11 @@ func (w *OncallWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.OncallAdd:    &w.stmtAdd,
-		stmt.OncallUpdate: &w.stmtUpdate,
-		stmt.OncallDel:    &w.stmtRemove,
+		stmt.OncallAdd:            &w.stmtAdd,
+		stmt.OncallDel:            &w.stmtRemove,
+		stmt.OncallMemberAssign:   &w.stmtAssign,
+		stmt.OncallMemberUnassign: &w.stmtUnassign,
+		stmt.OncallUpdate:         &w.stmtUpdate,
 	} {
 		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`oncall`, err, stmt.Name(statement))
@@ -108,6 +114,10 @@ func (w *OncallWrite) process(q *msg.Request) {
 	switch q.Action {
 	case msg.ActionAdd:
 		w.add(q, &result)
+	case msg.ActionMemberAssign:
+		w.assign(q, &result)
+	case msg.ActionMemberUnassign:
+		w.unassign(q, &result)
 	case msg.ActionRemove:
 		w.remove(q, &result)
 	case msg.ActionUpdate:
@@ -130,6 +140,40 @@ func (w *OncallWrite) add(q *msg.Request, mr *msg.Result) {
 		q.Oncall.ID,
 		q.Oncall.Name,
 		q.Oncall.Number,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	if mr.RowCnt(res.RowsAffected()) {
+		mr.Oncall = append(mr.Oncall, q.Oncall)
+	}
+}
+
+// assign adds a user to an oncall duty team
+func (w *OncallWrite) assign(q *msg.Request, mr *msg.Result) {
+	var res sql.Result
+	var err error
+
+	if res, err = w.stmtAssign.Exec(
+		q.Oncall.ID,
+		(*q.Oncall.Members)[0].UserID,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	if mr.RowCnt(res.RowsAffected()) {
+		mr.Oncall = append(mr.Oncall, q.Oncall)
+	}
+}
+
+// unassign removes a user from an oncall duty team
+func (w *OncallWrite) unassign(q *msg.Request, mr *msg.Result) {
+	var res sql.Result
+	var err error
+
+	if res, err = w.stmtUnassign.Exec(
+		q.Oncall.ID,
+		(*q.Oncall.Members)[0].UserID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

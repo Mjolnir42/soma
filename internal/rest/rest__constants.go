@@ -89,6 +89,8 @@ const (
 	rtDeploymentStateID          = `/monitoringsystem/:monitoringID/deployment/state/:state`
 	rtAliasDeploymentID          = `/deployment/id/:deploymentID`
 	rtAliasDeploymentIDAction    = `/deployment/id/:deploymentID/:action`
+	rtOncallMember               = `/oncall/:oncallID/member/`
+	rtOncallMemberID             = `/oncall/:oncallID/member/:userID`
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

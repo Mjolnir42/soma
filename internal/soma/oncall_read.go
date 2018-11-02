@@ -28,6 +28,7 @@ type OncallRead struct {
 	conn        *sql.DB
 	stmtList    *sql.Stmt
 	stmtShow    *sql.Stmt
+	stmtMembers *sql.Stmt
 	stmtSearch  *sql.Stmt
 	appLog      *logrus.Logger
 	reqLog      *logrus.Logger
@@ -57,6 +58,7 @@ func (r *OncallRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
 		msg.ActionShow,
+		msg.ActionMemberList,
 		msg.ActionSearch,
 	} {
 		hmap.Request(msg.SectionOncall, action, r.handlerName)
@@ -78,9 +80,10 @@ func (r *OncallRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.OncallList:   &r.stmtList,
-		stmt.OncallSearch: &r.stmtSearch,
-		stmt.OncallShow:   &r.stmtShow,
+		stmt.OncallList:       &r.stmtList,
+		stmt.OncallMemberList: &r.stmtMembers,
+		stmt.OncallSearch:     &r.stmtSearch,
+		stmt.OncallShow:       &r.stmtShow,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`oncall`, err, stmt.Name(statement))
@@ -113,6 +116,8 @@ func (r *OncallRead) process(q *msg.Request) {
 		r.search(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
+	case msg.ActionMemberList:
+		r.members(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -209,6 +214,47 @@ func (r *OncallRead) show(q *msg.Request, mr *msg.Result) {
 		Name:   oncallName,
 		Number: strconv.Itoa(oncallNumber),
 	})
+	mr.OK()
+}
+
+// members returns the members of an oncall duty
+func (r *OncallRead) members(q *msg.Request, mr *msg.Result) {
+	var (
+		userID, userUID string
+		rows            *sql.Rows
+		err             error
+	)
+
+	if rows, err = r.stmtMembers.Query(
+		q.Oncall.ID,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	oncall := proto.Oncall{}
+	oncall.ID = q.Oncall.ID
+	oncall.Members = &[]proto.OncallMember{}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&userID,
+			&userUID,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		*oncall.Members = append(*oncall.Members, proto.OncallMember{
+			UserID:   userID,
+			UserName: userUID,
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	mr.Oncall = append(mr.Oncall, oncall)
 	mr.OK()
 }
 
