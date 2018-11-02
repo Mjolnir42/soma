@@ -7,8 +7,9 @@
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
+// Oncall defines an oncall duty team
 type Oncall struct {
 	ID      string          `json:"id,omitempty"`
 	Name    string          `json:"name,omitempty"`
@@ -17,13 +18,16 @@ type Oncall struct {
 	Details *OncallDetails  `json:"details,omitempty"`
 }
 
+// Clone returns a copy of o
 func (o *Oncall) Clone() Oncall {
 	clone := Oncall{
 		ID:      o.ID,
 		Name:    o.Name,
 		Number:  o.Number,
 		Members: &[]OncallMember{},
-		Details: o.Details.Clone(),
+	}
+	if o.Details != nil {
+		clone.Details = o.Details.Clone()
 	}
 	if o.Members != nil {
 		for i := range *o.Members {
@@ -36,46 +40,97 @@ func (o *Oncall) Clone() Oncall {
 	return clone
 }
 
+// Sanitize resets some fields in o
 func (o *Oncall) Sanitize() {
 	o.ID = ``
 	o.Members = nil
 	o.Details = nil
 }
 
-type OncallDetails struct {
-	DetailsCreation
-}
-
-func (d *OncallDetails) Clone() *OncallDetails {
-	return &OncallDetails{
-		DetailsCreation: *d.DetailsCreation.Clone(),
+// DeepCompare returns true if o and a are equal, excluding details
+func (o *Oncall) DeepCompare(a *Oncall) bool {
+	if o.ID != a.ID || o.Name != a.Name || o.Number != a.Number {
+		return false
 	}
+
+memberloop:
+	for _, member := range *o.Members {
+		if member.DeepCompareSlice(a.Members) {
+			continue memberloop
+		}
+		return false
+	}
+
+revmemberloop:
+	for _, member := range *a.Members {
+		if member.DeepCompareSlice(o.Members) {
+			continue revmemberloop
+		}
+		return false
+	}
+
+	return true
 }
 
+// OncallDetails contains metadata about an oncall duty team
+type OncallDetails struct {
+	Creation *DetailsCreation `json:"creation,omitempty"`
+}
+
+// Clone returns a copy of o
+func (o *OncallDetails) Clone() *OncallDetails {
+	clone := &OncallDetails{}
+	if o.Creation != nil {
+		clone.Creation = o.Creation.Clone()
+	}
+	return clone
+}
+
+// OncallMember describes a member of an oncall duty team
 type OncallMember struct {
 	UserName string `json:"userName,omitempty"`
-	UserID   string `json:"userId,omitempty"`
+	UserID   string `json:"userID,omitempty"`
 }
 
-func (m *OncallMember) Clone() OncallMember {
+// Clone returns a copy of o
+func (o *OncallMember) Clone() OncallMember {
 	return OncallMember{
-		UserName: m.UserName,
-		UserID:   m.UserID,
+		UserName: o.UserName,
+		UserID:   o.UserID,
 	}
 }
 
-type OncallFilter struct {
-	Name   string `json:"name,omitempty"`
-	Number string `json:"number,omitempty"`
-}
-
-func (p *Oncall) DeepCompare(a *Oncall) bool {
-	if p.ID != a.ID || p.Name != a.Name || p.Number != a.Number {
+// DeepCompare returns true if o and a are equal
+func (o *OncallMember) DeepCompare(a *OncallMember) bool {
+	if o.UserName != a.UserName || o.UserID != a.UserID {
 		return false
 	}
 	return true
 }
 
+// DeepCompareSlice returns true if o is equal to an oncall member
+// contained in slice a
+func (o *OncallMember) DeepCompareSlice(a *[]OncallMember) bool {
+	if a == nil || *a == nil {
+		return false
+	}
+	for _, member := range *a {
+		if o.DeepCompare(&member) {
+			return true
+		}
+	}
+	return false
+}
+
+// OncallFilter defines by which attributes an oncall duty team can be
+// searched for
+type OncallFilter struct {
+	Name   string `json:"name,omitempty"`
+	Number string `json:"number,omitempty"`
+}
+
+// NewOncallRequest returns a new Request with fields preallocated
+// for filling in Oncall data, ensuring no nilptr-deref takes place.
 func NewOncallRequest() Request {
 	return Request{
 		Flags:  &Flags{},
@@ -83,6 +138,8 @@ func NewOncallRequest() Request {
 	}
 }
 
+// NewOncallFilter returns a new Request with fields preallocated
+// for filling in an Oncall filter, ensuring no nilptr-deref takes place.
 func NewOncallFilter() Request {
 	return Request{
 		Filter: &Filter{
@@ -91,6 +148,8 @@ func NewOncallFilter() Request {
 	}
 }
 
+// NewOncallResult returns a new Result with fields preallocated
+// for filling in Oncall data, ensuring no nilptr-deref takes place.
 func NewOncallResult() Result {
 	return Result{
 		Errors:  &[]string{},
