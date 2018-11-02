@@ -27,9 +27,9 @@ type OncallRead struct {
 	handlerName string
 	conn        *sql.DB
 	stmtList    *sql.Stmt
-	stmtShow    *sql.Stmt
 	stmtMembers *sql.Stmt
 	stmtSearch  *sql.Stmt
+	stmtShow    *sql.Stmt
 	appLog      *logrus.Logger
 	reqLog      *logrus.Logger
 	errLog      *logrus.Logger
@@ -57,9 +57,9 @@ func (r *OncallRead) Register(c *sql.DB, l ...*logrus.Logger) {
 func (r *OncallRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
-		msg.ActionShow,
 		msg.ActionMemberList,
 		msg.ActionSearch,
+		msg.ActionShow,
 	} {
 		hmap.Request(msg.SectionOncall, action, r.handlerName)
 	}
