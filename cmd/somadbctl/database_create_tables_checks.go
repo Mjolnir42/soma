@@ -179,7 +179,7 @@ create table if not exists soma.constraints_service_property (
 	queryMap["createTableCheckConstraintsServiceAttributes"] = `
 create table if not exists soma.constraints_service_attribute (
     configuration_id            uuid            NOT NULL REFERENCES soma.check_configurations ( configuration_id ) DEFERRABLE,
-    attribute                   varchar(128)    NOT NULL REFERENCES soma.service_property_attributes ( service_property_attribute ) DEFERRABLE,
+    attribute                   varchar(128)    NOT NULL REFERENCES soma.attribute ( attribute ) DEFERRABLE,
     value                       varchar(512)
 );`
 	queries[idx] = "createTableCheckConstraintsServiceAttributes"
