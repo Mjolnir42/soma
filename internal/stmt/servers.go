@@ -78,7 +78,8 @@ SET    server_asset_id = $2::numeric,
        server_name = $5::varchar,
        server_online = $6::boolean,
        server_deleted = $7::boolean
-WHERE  server_id = $1::uuid;`
+WHERE  server_id = $1::uuid
+  AND  ($7::boolean OR (server_deleted = $7::boolean));`
 
 	DeleteServers = `
 UPDATE inventory.servers
