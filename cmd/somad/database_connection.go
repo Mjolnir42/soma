@@ -57,7 +57,7 @@ func connectToDatabase(appLog, errLog *log.Logger) {
 		"inventory": 201605060001,
 		"root":      201605160001,
 		"auth":      201711080001,
-		"soma":      201809260001,
+		"soma":      201811060001,
 	}
 
 	if rows, err = conn.Query(stmt.DatabaseSchemaVersion); err != nil {

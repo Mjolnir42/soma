@@ -121,8 +121,8 @@ ON     scop.oncall_duty_id = iodt.oncall_duty_id
 WHERE  scop.configuration_id = $1::uuid;`
 
 	TkStartLoadCheckConstraintAttribute = `
-SELECT service_property_attribute,
-       attribute_value,
+SELECT attribute,
+       value,
        'squirrel'
 FROM   soma.constraints_service_attribute
 WHERE  configuration_id = $1::uuid;`

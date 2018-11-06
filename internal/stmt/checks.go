@@ -102,8 +102,8 @@ WHERE  scc.configuration_id = $1::uuid;`
 
 	CheckConfigShowConstrService = `
 SELECT scc.configuration_id,
-       scsvp.organizational_team_id,
-       scsvp.service_property
+       scsvp.team_id,
+       scsvp.name
 FROM   soma.check_configurations scc
 JOIN   soma.constraints_service_property scsvp
 ON     scc.configuration_id = scsvp.configuration_id
@@ -111,8 +111,8 @@ WHERE  scc.configuration_id = $1::uuid;`
 
 	CheckConfigShowConstrAttribute = `
 SELECT scc.configuration_id,
-       scsa.service_property_attribute,
-       scsa.attribute_value
+       scsa.attribute,
+       scsa.value
 FROM   soma.check_configurations scc
 JOIN   soma.constraints_service_attribute scsa
 ON     scc.configuration_id = scsa.configuration_id

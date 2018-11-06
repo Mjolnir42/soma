@@ -175,8 +175,8 @@ SELECT $1::uuid,
 	TxCreateCheckConfigurationConstraintService = `
 INSERT INTO soma.constraints_service_property (
             configuration_id,
-            organizational_team_id,
-            service_property)
+            team_id,
+            name)
 SELECT $1::uuid,
        $2::uuid,
        $3::varchar;`
@@ -184,8 +184,8 @@ SELECT $1::uuid,
 	TxCreateCheckConfigurationConstraintAttribute = `
 INSERT INTO soma.constraints_service_attribute (
             configuration_id,
-            service_property_attribute,
-            attribute_value)
+            attribute,
+            value)
 SELECT $1::uuid,
        $2::varchar,
        $3::varchar;`
