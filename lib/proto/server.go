@@ -1,14 +1,16 @@
 /*-
+ * Copyright (c) 2015-2018, Jörg Pernfuß
  * Copyright (c) 2015-2016, 1&1 Internet SE
- * Copyright (c) 2015-2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2018, 1&1 IONOS SE
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
+// Server defines a physical server
 type Server struct {
 	ID         string         `json:"ID,omitempty"`
 	AssetID    uint64         `json:"assetID,omitempty"`
@@ -20,8 +22,9 @@ type Server struct {
 	Details    *ServerDetails `json:"details,omitempty"`
 }
 
+// Clone returns a copy of s
 func (s *Server) Clone() Server {
-	return Server{
+	clone := Server{
 		ID:         s.ID,
 		AssetID:    s.AssetID,
 		Datacenter: s.Datacenter,
@@ -29,23 +32,36 @@ func (s *Server) Clone() Server {
 		Name:       s.Name,
 		IsOnline:   s.IsOnline,
 		IsDeleted:  s.IsDeleted,
-		Details:    s.Details.Clone(),
 	}
+	if s.Details != nil {
+		clone.Details = s.Details.Clone()
+	}
+	return clone
 }
 
+// DeepCompare returns true if s and a are equal, excluding details
+func (s *Server) DeepCompare(a *Server) bool {
+	if s.ID != a.ID || s.AssetID != a.AssetID || s.Datacenter != a.Datacenter ||
+		s.Location != a.Location || s.Name != a.Name || s.IsOnline != a.IsOnline ||
+		s.IsDeleted != a.IsDeleted {
+		return false
+	}
+	return true
+}
+
+// ServerDetails contains metadata about a server
 type ServerDetails struct {
-	Creation *DetailsCreation
-	/*
-		Nodes     []string `json:"nodes,omitempty"`
-	*/
+	Creation *DetailsCreation `json:"creation,omitempty"`
 }
 
-func (d *ServerDetails) Clone() *ServerDetails {
+// Clone returns a copy of s
+func (s *ServerDetails) Clone() *ServerDetails {
 	return &ServerDetails{
 		Creation: d.Creation.Clone(),
 	}
 }
 
+// ServerFilter defines by which attributes a server ca be searched
 type ServerFilter struct {
 	IsOnline   bool   `json:"isOnline,omitempty"`
 	NotOnline  bool   `json:"notOnline,omitempty"`
@@ -56,15 +72,8 @@ type ServerFilter struct {
 	AssetID    uint64 `json:"assetID,omitempty"`
 }
 
-func (s *Server) DeepCompare(a *Server) bool {
-	if s.ID != a.ID || s.AssetID != a.AssetID || s.Datacenter != a.Datacenter ||
-		s.Location != a.Location || s.Name != a.Name || s.IsOnline != a.IsOnline ||
-		s.IsDeleted != a.IsDeleted {
-		return false
-	}
-	return true
-}
-
+// NewServerRequest returns a new Request with fields preallocated
+// for filling in Server data, ensuring no nilptr-deref takes place.
 func NewServerRequest() Request {
 	return Request{
 		Flags:  &Flags{},
@@ -72,6 +81,8 @@ func NewServerRequest() Request {
 	}
 }
 
+// NewServerFilter returns a new Request with fields preallocated
+// for filling in an Server filter, ensuring no nilptr-deref takes place.
 func NewServerFilter() Request {
 	return Request{
 		Filter: &Filter{
@@ -80,6 +91,8 @@ func NewServerFilter() Request {
 	}
 }
 
+// NewServerResult returns a new Result with fields preallocated
+// for filling in Server data, ensuring no nilptr-deref takes place.
 func NewServerResult() Result {
 	return Result{
 		Errors:  &[]string{},

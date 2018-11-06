@@ -2,7 +2,7 @@ package cmpl
 
 import "github.com/codegangsta/cli"
 
-func ServerCreate(c *cli.Context) {
+func ServerAdd(c *cli.Context) {
 	Generic(c, []string{`assetid`, `datacenter`, `location`, `online`})
 }
 
