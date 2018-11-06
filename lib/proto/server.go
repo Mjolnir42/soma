@@ -57,7 +57,7 @@ type ServerDetails struct {
 // Clone returns a copy of s
 func (s *ServerDetails) Clone() *ServerDetails {
 	return &ServerDetails{
-		Creation: d.Creation.Clone(),
+		Creation: s.Creation.Clone(),
 	}
 }
 
