@@ -170,8 +170,7 @@ create table if not exists soma.constraints_native_property (
 create table if not exists soma.constraints_service_property (
     configuration_id            uuid            NOT NULL REFERENCES soma.check_configurations ( configuration_id ) DEFERRABLE,
     team_id                     uuid            NOT NULL,
-    name                        varchar(128)    NOT NULL,
-    FOREIGN KEY( organizational_team_id, service_property ) REFERENCES soma.team_service_properties ( organizational_team_id, service_property ) DEFERRABLE
+    name                        varchar(128)    NOT NULL
 );`
 	queries[idx] = "createTableCheckConstraintsServiceProperty"
 	idx++
