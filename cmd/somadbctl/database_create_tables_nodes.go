@@ -63,7 +63,7 @@ create table if not exists soma.node_oncall_property (
 	idx++
 
 	queryMap["createTableNodeServiceProperty"] = `
-create table if not exists soma.node_service_properties (
+create table if not exists soma.node_service_property (
     instance_id                 uuid            NOT NULL REFERENCES soma.property_instances ( instance_id ) DEFERRABLE,
     source_instance_id          uuid            NOT NULL,
     node_id                     uuid            NOT NULL REFERENCES soma.nodes ( node_id ) DEFERRABLE,
