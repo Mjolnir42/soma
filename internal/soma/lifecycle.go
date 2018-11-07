@@ -150,7 +150,7 @@ func (lc *LifeCycle) discardDeletedBlocked() error {
 	)
 
 	if deps, err = lc.stmtDeleteBlocked.Query(); err != nil {
-		lc.errLog.Printf("LifeCycle: %s\n", err.Error())
+		lc.errLog.Printf("LifeCycle: %s", err.Error())
 		return err
 	}
 	defer deps.Close()
@@ -258,7 +258,7 @@ idloop:
 		case proto.DeploymentAwaitingRollout:
 			nextNG = proto.DeploymentRolloutInProgress
 		default:
-			lc.errLog.Printf("LifeCycle.unblock() error: blocked: %s, blocking %s, next: %s, instanceID: %s\n",
+			lc.errLog.Printf("LifeCycle.unblock() error: blocked: %s, blocking %s, next: %s, instanceID: %s",
 				blockedID, blockingID, next, instanceID)
 			tx.Rollback()
 			continue idloop

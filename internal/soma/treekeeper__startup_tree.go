@@ -41,7 +41,7 @@ bucketloop:
 			if err == sql.ErrNoRows {
 				break bucketloop
 			}
-			tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+			tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 			tk.status.isBroken = true
 			return
 		}
@@ -96,7 +96,7 @@ grouploop:
 			if err == sql.ErrNoRows {
 				break grouploop
 			}
-			tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+			tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 			tk.status.isBroken = true
 			return
 		}
@@ -144,7 +144,7 @@ memberloop:
 			if err == sql.ErrNoRows {
 				break memberloop
 			}
-			tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+			tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 			tk.status.isBroken = true
 			return
 		}
@@ -194,7 +194,7 @@ clusterloop:
 			if err == sql.ErrNoRows {
 				break clusterloop
 			}
-			tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+			tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 			tk.status.isBroken = true
 			return
 		}
@@ -245,7 +245,7 @@ clusterloop:
 			if err == sql.ErrNoRows {
 				break clusterloop
 			}
-			tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+			tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 			tk.status.isBroken = true
 			return
 		}
@@ -305,7 +305,7 @@ nodeloop:
 			if err == sql.ErrNoRows {
 				break nodeloop
 			}
-			tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+			tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 			tk.status.isBroken = true
 			return
 		}

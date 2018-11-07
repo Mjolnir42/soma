@@ -195,7 +195,7 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 		if name == `grimreaper` {
 			continue
 		}
-		grim.appLog.Printf("GrimReaper: %s is still running\n", name)
+		grim.appLog.Printf("GrimReaper: %s is still running", name)
 	}
 
 	return true

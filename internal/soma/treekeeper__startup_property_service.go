@@ -67,7 +67,7 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 				if err == sql.ErrNoRows {
 					break serviceloop
 				}
-				tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+				tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 				tk.status.isBroken = true
 				return
 			}
@@ -106,7 +106,7 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 					if err == sql.ErrNoRows {
 						break attributeloop
 					}
-					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+					tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
@@ -149,12 +149,12 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 
 				var propObjectID, propInstanceID uuid.UUID
 				if propObjectID, err = uuid.FromString(inObjID); err != nil {
-					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+					tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
 				if propInstanceID, err = uuid.FromString(inInstanceID); err != nil {
-					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+					tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}

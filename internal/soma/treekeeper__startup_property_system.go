@@ -55,7 +55,7 @@ func (tk *TreeKeeper) startupSystemProperties(stMap map[string]*sql.Stmt) {
 				if err == sql.ErrNoRows {
 					break systemloop
 				}
-				tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+				tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 				tk.status.isBroken = true
 				return
 			}
@@ -95,19 +95,19 @@ func (tk *TreeKeeper) startupSystemProperties(stMap map[string]*sql.Stmt) {
 					if err == sql.ErrNoRows {
 						break inproploop
 					}
-					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+					tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
 
 				var propObjectID, propInstanceID uuid.UUID
 				if propObjectID, err = uuid.FromString(inObjID); err != nil {
-					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+					tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}
 				if propInstanceID, err = uuid.FromString(inInstanceID); err != nil {
-					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+					tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}

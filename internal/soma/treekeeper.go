@@ -260,7 +260,7 @@ broken:
 			case <-tickTack:
 				tk.appLog.Printf(
 					"TK[%s]: BROKEN REPOSITORY %s flying"+
-						" holding patterns!\n",
+						" holding patterns!",
 					tk.meta.repoName, tk.meta.repoID)
 
 			case <-tk.Shutdown:
@@ -273,14 +273,14 @@ broken:
 		return
 	}
 
-	tk.appLog.Printf("TK[%s]: ready for service!\n", tk.meta.repoName)
+	tk.appLog.Printf("TK[%s]: ready for service!", tk.meta.repoName)
 	tk.status.isReady = true
 
 	// in observer mode, the TreeKeeper does nothing after loading
 	// the tree
 	if tk.soma.conf.Observer {
 		tk.appLog.Printf(
-			"TreeKeeper [%s] entered observer mode\n", tk.meta.repoName)
+			"TreeKeeper [%s] entered observer mode", tk.meta.repoName)
 
 		select {
 		case <-tk.Stop:
@@ -390,15 +390,15 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 	if !tk.status.requiresRebuild {
 		_, err = tk.stmtStartJob.Exec(q.JobID.String(), time.Now().UTC())
 		if err != nil {
-			tk.treeLog.Printf("Failed starting job %s: %s\n",
+			tk.treeLog.Printf("Failed starting job %s: %s",
 				q.JobID.String(),
 				err)
 			jobNeverStarted = true
 			goto bailout
 		}
-		tk.appLog.Printf("Processing job: %s\n", q.JobID.String())
+		tk.appLog.Printf("Processing job: %s", q.JobID.String())
 	} else {
-		tk.appLog.Printf("Processing rebuild job: %s\n", q.JobID.String())
+		tk.appLog.Printf("Processing rebuild job: %s", q.JobID.String())
 	}
 	if lfh, err = os.Create(filepath.Join(
 		tk.soma.conf.LogPath,
@@ -409,7 +409,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 			q.JobID.String(),
 		),
 	)); err != nil {
-		tk.treeLog.Printf("Failed opening joblog %s: %s\n",
+		tk.treeLog.Printf("Failed opening joblog %s: %s",
 			q.JobID.String(),
 			err)
 	}
@@ -629,7 +629,7 @@ actionloop:
 	if err = tx.Commit(); err != nil {
 		goto bailout
 	}
-	tk.appLog.Printf("SUCCESS - Finished job: %s\n", q.JobID.String())
+	tk.appLog.Printf("SUCCESS - Finished job: %s", q.JobID.String())
 
 	// accept tree changes
 	tk.tree.Commit()
@@ -656,10 +656,10 @@ actionloop:
 	return
 
 bailout:
-	tk.appLog.Printf("FAILED - Finished job: %s\n", q.JobID.String())
-	tk.treeLog.Printf("Job-Error(%s): %s\n", q.JobID.String(), err)
+	tk.appLog.Printf("FAILED - Finished job: %s", q.JobID.String())
+	tk.treeLog.Printf("Job-Error(%s): %s", q.JobID.String(), err)
 	if hasJobLog {
-		jobLog.Printf("Aborting error: %s\n", err)
+		jobLog.Printf("Aborting error: %s", err)
 	}
 
 	// if this was a rebuild, the tree will not persist and the
@@ -683,7 +683,7 @@ unauthorized:
 		a := <-tk.actions
 		jB, _ := json.Marshal(a)
 		if hasJobLog {
-			jobLog.Printf("Cleaned message: %s\n", string(jB))
+			jobLog.Printf("Cleaned message: %s", string(jB))
 		}
 	}
 	return

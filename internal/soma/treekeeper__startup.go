@@ -122,7 +122,7 @@ jobloop:
 			if err == sql.ErrNoRows {
 				break jobloop
 			}
-			tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+			tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 			tk.status.isBroken = true
 			return
 		}
@@ -133,12 +133,12 @@ jobloop:
 		tr := msg.Request{}
 		err = json.Unmarshal([]byte(job), &tr)
 		if err != nil {
-			tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+			tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 			tk.status.isBroken = true
 			return
 		}
 		tk.Input <- tr
-		tk.startLog.Printf("TK[%s] Loaded job %s (%s)\n", tk.meta.repoName, tr.JobID, tr.Action)
+		tk.startLog.Printf("TK[%s] Loaded job %s (%s)", tk.meta.repoName, tr.JobID, tr.Action)
 	}
 }
 
