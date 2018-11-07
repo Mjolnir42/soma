@@ -28,7 +28,7 @@ func (tk *TreeKeeper) startupSystemProperties(stMap map[string]*sql.Stmt) {
 		`node`:       `LoadPropNodeSystem`,
 	} {
 
-		tk.startLog.Printf("TK[%s]: loading %s system properties\n", tk.meta.repoName, loopType)
+		tk.startLog.Printf("TK[%s]: loading %s system properties", tk.meta.repoName, loopType)
 		rows, err = stMap[loopStmt].Query(tk.meta.repoID)
 		if err != nil {
 			tk.startLog.Printf("TK[%s] Error loading %s system properties: %s", tk.meta.repoName, loopType, err.Error())

@@ -18,7 +18,7 @@ func (tk *TreeKeeper) startupBuckets(stMap map[string]*sql.Stmt) {
 		err                                       error
 	)
 
-	tk.startLog.Printf("TK[%s]: loading buckets\n", tk.meta.repoName)
+	tk.startLog.Printf("TK[%s]: loading buckets", tk.meta.repoName)
 	rows, err = stMap[`LoadBucket`].Query(tk.meta.repoID)
 	if err != nil {
 		tk.startLog.Printf("TK[%s] Error loading buckets: %s", tk.meta.repoName, err.Error())
@@ -75,7 +75,7 @@ func (tk *TreeKeeper) startupGroups(stMap map[string]*sql.Stmt) {
 		err                                  error
 	)
 
-	tk.startLog.Printf("TK[%s]: loading groups\n", tk.meta.repoName)
+	tk.startLog.Printf("TK[%s]: loading groups", tk.meta.repoName)
 	rows, err = stMap[`LoadGroup`].Query(tk.meta.repoID)
 	if err != nil {
 		tk.startLog.Printf("TK[%s] Error loading groups: %s", tk.meta.repoName, err.Error())
@@ -125,7 +125,7 @@ func (tk *TreeKeeper) startupGroupMemberGroups(stMap map[string]*sql.Stmt) {
 		err                   error
 	)
 
-	tk.startLog.Printf("TK[%s]: loading group-member-groups\n", tk.meta.repoName)
+	tk.startLog.Printf("TK[%s]: loading group-member-groups", tk.meta.repoName)
 	rows, err = stMap[`LoadGroupMbrGroup`].Query(tk.meta.repoID)
 	if err != nil {
 		tk.startLog.Printf("TK[%s] Error loading groups: %s", tk.meta.repoName, err.Error())
@@ -173,7 +173,7 @@ func (tk *TreeKeeper) startupGroupedClusters(stMap map[string]*sql.Stmt) {
 		clusterID, clusterName, teamID, groupID string
 	)
 
-	tk.startLog.Printf("TK[%s]: loading grouped-clusters\n", tk.meta.repoName)
+	tk.startLog.Printf("TK[%s]: loading grouped-clusters", tk.meta.repoName)
 	rows, err = stMap[`LoadGroupMbrCluster`].Query(tk.meta.repoID)
 	if err != nil {
 		tk.startLog.Printf("TK[%s] Error loading clusters: %s", tk.meta.repoName, err.Error())
@@ -224,7 +224,7 @@ func (tk *TreeKeeper) startupClusters(stMap map[string]*sql.Stmt) {
 		clusterID, clusterName, bucketID, teamID string
 	)
 
-	tk.startLog.Printf("TK[%s]: loading clusters\n", tk.meta.repoName)
+	tk.startLog.Printf("TK[%s]: loading clusters", tk.meta.repoName)
 	rows, err = stMap[`LoadCluster`].Query(tk.meta.repoID)
 	if err != nil {
 		tk.startLog.Printf("TK[%s] Error loading clusters: %s", tk.meta.repoName, err.Error())
@@ -278,7 +278,7 @@ func (tk *TreeKeeper) startupNodes(stMap map[string]*sql.Stmt) {
 		clusterID, groupID                           sql.NullString
 	)
 
-	tk.startLog.Printf("TK[%s]: loading nodes\n", tk.meta.repoName)
+	tk.startLog.Printf("TK[%s]: loading nodes", tk.meta.repoName)
 	rows, err = stMap[`LoadNode`].Query(tk.meta.repoID)
 	if err != nil {
 		tk.startLog.Printf("TK[%s] Error loading nodes: %s", tk.meta.repoName, err.Error())

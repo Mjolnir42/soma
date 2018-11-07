@@ -40,7 +40,7 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 			`LoadPropNodeSvcAttr`},
 	} {
 
-		tk.startLog.Printf("TK[%s]: loading %s service properties\n", tk.meta.repoName, loopType)
+		tk.startLog.Printf("TK[%s]: loading %s service properties", tk.meta.repoName, loopType)
 		rows, err = stMap[loopStmt[0]].Query(tk.meta.repoID)
 		if err != nil {
 			tk.startLog.Printf("TK[%s] Error loading %s service properties: %s", tk.meta.repoName, loopType, err.Error())
@@ -140,7 +140,7 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 					if err == sql.ErrNoRows {
 						break inproploop
 					}
-					tk.startLog.Printf("TK[%s] Error: %s\n", tk.meta.repoName, err.Error())
+					tk.startLog.Printf("TK[%s] Error: %s", tk.meta.repoName, err.Error())
 					tk.status.isBroken = true
 					return
 				}

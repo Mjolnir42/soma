@@ -28,7 +28,7 @@ func (tk *TreeKeeper) startupCustomProperties(stMap map[string]*sql.Stmt) {
 		`node`:       `LoadPropNodeCustom`,
 	} {
 
-		tk.startLog.Printf("TK[%s]: loading %s custom properties\n", tk.meta.repoName, loopType)
+		tk.startLog.Printf("TK[%s]: loading %s custom properties", tk.meta.repoName, loopType)
 		rows, err = stMap[loopStmt].Query(tk.meta.repoID)
 		if err != nil {
 			tk.startLog.Printf("TK[%s] Error loading %s custom properties: %s", tk.meta.repoName, loopType, err.Error())

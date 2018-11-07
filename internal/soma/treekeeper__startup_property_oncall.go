@@ -28,7 +28,7 @@ func (tk *TreeKeeper) startupOncallProperties(stMap map[string]*sql.Stmt) {
 		`node`:       `LoadPropNodeOncall`,
 	} {
 
-		tk.startLog.Printf("TK[%s]: loading %s oncall properties\n", tk.meta.repoName, loopType)
+		tk.startLog.Printf("TK[%s]: loading %s oncall properties", tk.meta.repoName, loopType)
 		rows, err = stMap[loopStmt].Query(tk.meta.repoID)
 		if err != nil {
 			tk.startLog.Printf("TK[%s] Error loading %s oncall properties: %s", tk.meta.repoName, loopType, err.Error())

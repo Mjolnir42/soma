@@ -15,7 +15,7 @@ func (tk *TreeKeeper) startupChecks(stMap map[string]*sql.Stmt) {
 	if tk.status.isBroken {
 		return
 	}
-	tk.startLog.Printf("TK[%s]: loading checks\n", tk.meta.repoName)
+	tk.startLog.Printf("TK[%s]: loading checks", tk.meta.repoName)
 
 	//
 	// load checks for the entire tree, in order from root to leaf.

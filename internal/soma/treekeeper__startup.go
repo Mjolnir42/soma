@@ -104,7 +104,7 @@ func (tk *TreeKeeper) startupJobs(stMap map[string]*sql.Stmt) {
 		job  string
 	)
 
-	tk.startLog.Printf("TK[%s]: loading pending jobs\n", tk.meta.repoName)
+	tk.startLog.Printf("TK[%s]: loading pending jobs", tk.meta.repoName)
 	rows, err = stMap[`LoadJob`].Query(tk.meta.repoID)
 	if err != nil {
 		tk.startLog.Printf("TK[%s] Error loading clusters: %s", tk.meta.repoName, err.Error())
