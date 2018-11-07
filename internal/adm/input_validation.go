@@ -279,6 +279,24 @@ func ValidateMode(s string) error {
 	return fmt.Errorf("Invalid mode: %s", s)
 }
 
+// ValidateView tests against the server if s is a valid view
+func ValidateView(s string) error {
+	esc := url.QueryEscape(s)
+	res, err := fetchObjList(fmt.Sprintf("/view/%s", esc))
+	if err != nil {
+		return err
+	}
+
+	if res.Views == nil || len(*res.Views) == 0 {
+		return fmt.Errorf(`no mode object for validation returned`)
+	}
+
+	if s == (*res.Views)[0].Name {
+		return nil
+	}
+	return fmt.Errorf("Invalid view: %s", s)
+}
+
 // ValidateIsRequestURI attempts to parse s via url.ParseRequestURI to
 // check if s is a valid RequestURI
 func ValidateIsRequestURI(s string) error {
