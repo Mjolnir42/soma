@@ -24,7 +24,7 @@ type Request struct {
 	RemoteAddr    string
 	AuthUser      string
 	RequestURI    string
-	Reply         chan Result
+	Reply         chan Result `json:"-"`
 	JobID         uuid.UUID
 	Search        Filter
 	Update        UpdateData
