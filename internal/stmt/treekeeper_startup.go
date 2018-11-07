@@ -705,7 +705,7 @@ SELECT sgsp.instance_id,
        sgsp.team_id,
        sgsp.inheritance_enabled,
        sgsp.children_only,
-       ssp.name,
+       ssp.name
 FROM   soma.group_service_property sgsp
 JOIN   soma.service_property ssp
   ON   sgsp.service_id = ssp.id
@@ -728,7 +728,7 @@ SELECT scsp.instance_id,
        scsp.team_id,
        scsp.inheritance_enabled,
        scsp.children_only,
-       ssp.name,
+       ssp.name
 FROM   soma.cluster_service_property scsp
 JOIN   soma.service_property ssp
   ON   scsp.service_id = ssp.id
