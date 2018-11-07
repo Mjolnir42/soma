@@ -371,6 +371,11 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		jobLog                                *logrus.Logger
 		lfh                                   *os.File
 	)
+	tk.treeLog.Infof("Processing job %s for RequestID %s",
+		q.JobID.String(),
+		q.ID.String(),
+	)
+
 	// check if the user is still permitted to issue the asynchronous
 	// request at execution time
 	if !super.IsAuthorized(q) {
