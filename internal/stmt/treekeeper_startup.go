@@ -128,8 +128,8 @@ FROM   soma.constraints_service_attribute
 WHERE  configuration_id = $1::uuid;`
 
 	TkStartLoadCheckConstraintService = `
-SELECT organizational_team_id,
-       service_property,
+SELECT team_id,
+       name,
        'squirrel'
 FROM   soma.constraints_service_property
 WHERE  configuration_id = $1::uuid;`
@@ -657,12 +657,12 @@ SELECT srsp.instance_id,
        srsp.view,
        srsp.service_id,
        ssp.name,
-       srsp.organizational_team_id,
+       srsp.team_id,
        srsp.inheritance_enabled,
        srsp.children_only
 FROM   soma.repository_service_property srsp
 JOIN   soma.service_property ssp
-  ON   srsp.svc_id = ssp.id
+  ON   srsp.service_id = ssp.id
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 
@@ -678,14 +678,14 @@ SELECT sbsp.instance_id,
        sbsp.source_instance_id,
        sbsp.bucket_id,
        sbsp.view,
-       sbsp.svc_id,
+       sbsp.service_id,
        ssp.name,
-       sbsp.organizational_team_id,
+       sbsp.team_id,
        sbsp.inheritance_enabled,
        sbsp.children_only
 FROM   soma.bucket_service_property sbsp
 JOIN   soma.service_property ssp
-  ON   sbsp.svc_id = ssp.id
+  ON   sbsp.service_id = ssp.id
 WHERE  instance_id = source_instance_id
 AND    repository_id = $1::uuid;`
 
@@ -693,7 +693,7 @@ AND    repository_id = $1::uuid;`
 SELECT attribute,
        value
 FROM   soma.service_property_value
-WHERE  organizational_team_id = $1::uuid
+WHERE  team_id = $1::uuid
 AND    service_id = $2::uuid;`
 
 	TkStartLoadGroupSvcProp = `
@@ -701,8 +701,8 @@ SELECT instance_id,
        source_instance_id,
        group_id,
        view,
-       service_property,
-       organizational_team_id,
+       service_id,
+       team_id,
        inheritance_enabled,
        children_only
 FROM   soma.group_service_property
@@ -721,8 +721,8 @@ SELECT instance_id,
        source_instance_id,
        cluster_id,
        view,
-       service_property,
-       organizational_team_id,
+       service_id,
+       team_id,
        inheritance_enabled,
        children_only
 FROM   soma.cluster_service_property
@@ -741,8 +741,8 @@ SELECT instance_id,
        source_instance_id,
        node_id,
        view,
-       service_property,
-       organizational_team_id,
+       service_id,
+       team_id,
        inheritance_enabled,
        children_only
 FROM   soma.node_service_property
