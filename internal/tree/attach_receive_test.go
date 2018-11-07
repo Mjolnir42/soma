@@ -27,6 +27,7 @@ func TestAttachRepository(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -40,7 +41,7 @@ func TestAttachRepository(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	close(actionC)
 	close(errC)
@@ -69,6 +70,7 @@ func TestAttachBucket(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -82,7 +84,7 @@ func TestAttachBucket(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -127,6 +129,7 @@ func TestAttachGroup(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -140,7 +143,7 @@ func TestAttachGroup(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -197,6 +200,7 @@ func TestAttachGroupToGroup(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -210,7 +214,7 @@ func TestAttachGroupToGroup(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -277,6 +281,7 @@ func TestAttachCluster(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -290,7 +295,7 @@ func TestAttachCluster(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -347,6 +352,7 @@ func TestAttachNode(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -360,7 +366,7 @@ func TestAttachNode(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -422,6 +428,7 @@ func TestAttachNodeToGroup(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -435,7 +442,7 @@ func TestAttachNodeToGroup(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -509,6 +516,7 @@ func TestMoveNodeToGroup(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -522,7 +530,7 @@ func TestMoveNodeToGroup(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -607,6 +615,7 @@ func TestMoveClusterToGroup(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -620,7 +629,7 @@ func TestMoveClusterToGroup(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -701,6 +710,7 @@ func TestMoveGroupToGroup(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -714,7 +724,7 @@ func TestMoveGroupToGroup(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -796,6 +806,7 @@ func TestMoveNodeToCluster(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -809,7 +820,7 @@ func TestMoveNodeToCluster(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -894,6 +905,7 @@ func TestDetachGroupToBucket(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -907,7 +919,7 @@ func TestDetachGroupToBucket(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -994,6 +1006,7 @@ func TestDetachClusterToBucket(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -1007,7 +1020,7 @@ func TestDetachClusterToBucket(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -1096,6 +1109,7 @@ func TestDetachNodeToBucket(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -1109,7 +1123,7 @@ func TestDetachNodeToBucket(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -1223,6 +1237,7 @@ func TestDestroyRepository(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -1236,7 +1251,7 @@ func TestDestroyRepository(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -1354,6 +1369,7 @@ func TestDestroyBucket(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -1367,7 +1383,7 @@ func TestDestroyBucket(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -1481,6 +1497,7 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -1494,7 +1511,7 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{

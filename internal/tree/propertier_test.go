@@ -35,6 +35,7 @@ func TestSetProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -48,7 +49,7 @@ func TestSetProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// set property on repository
 	sTree.Find(FindRequest{
@@ -242,6 +243,8 @@ func TestUpdateProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
+
 	NewRepository(RepositorySpec{
 		ID:      repoID,
 		Name:    `testrepo`,
@@ -253,7 +256,7 @@ func TestUpdateProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
@@ -462,6 +465,8 @@ func TestDeleteProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
+
 	NewRepository(RepositorySpec{
 		ID:      repoID,
 		Name:    `testrepo`,
@@ -473,7 +478,7 @@ func TestDeleteProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
@@ -679,6 +684,8 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
+
 	NewRepository(RepositorySpec{
 		ID:      repoID,
 		Name:    `testrepo`,
@@ -690,7 +697,7 @@ func TestDeletePropertyNoInheritance(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
@@ -873,6 +880,8 @@ func TestOverwriteProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
+
 	NewRepository(RepositorySpec{
 		ID:      repoID,
 		Name:    `testrepo`,
@@ -884,7 +893,7 @@ func TestOverwriteProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
@@ -1114,6 +1123,8 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
+
 	NewRepository(RepositorySpec{
 		ID:      repoID,
 		Name:    `testrepo`,
@@ -1125,7 +1136,7 @@ func TestUpdateAfterOverwriteProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	sTree.Find(FindRequest{
 		ElementType: `repository`,
@@ -1439,6 +1450,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -1452,7 +1464,7 @@ func TestSetAboveSetProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -1714,6 +1726,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -1727,7 +1740,7 @@ func TestDeleteAboveSetProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -1965,6 +1978,8 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
+
 	NewRepository(RepositorySpec{
 		ID:      repoID,
 		Name:    `testrepo`,
@@ -1976,7 +1991,7 @@ func TestUpdatePropertyInheritanceFalseToTrue(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -2197,6 +2212,8 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
+
 	NewRepository(RepositorySpec{
 		ID:      repoID,
 		Name:    `testrepo`,
@@ -2208,7 +2225,7 @@ func TestUpdatePropertyInheritanceTrueToFalse(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -2439,6 +2456,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -2452,7 +2470,7 @@ func TestDeletePropertyAllLocal(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -2733,6 +2751,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -2746,7 +2765,7 @@ func TestDeletePropertyAllInherited(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -3027,6 +3046,7 @@ func TestDeletePropertyAll(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -3040,7 +3060,7 @@ func TestDeletePropertyAll(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -3293,6 +3313,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -3306,7 +3327,7 @@ func TestBackflowAfterDeleteSetProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -3547,6 +3568,8 @@ func TestCloneAfterProperty(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
+
 	// create repository
 	NewRepository(RepositorySpec{
 		ID:      repoID,
@@ -3559,7 +3582,7 @@ func TestCloneAfterProperty(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// set property on repository
 	sTree.Find(FindRequest{
@@ -3757,6 +3780,7 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionChan,
 	})
+	sTree.RegisterErrChan(errChan)
 
 	// create repository
 	NewRepository(RepositorySpec{
@@ -3770,7 +3794,7 @@ func TestSetPropertyDuplicateDetectOnBucket(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   treeID,
 	})
-	sTree.SetError(errChan)
+	sTree.SetError()
 
 	// create bucket
 	NewBucket(BucketSpec{

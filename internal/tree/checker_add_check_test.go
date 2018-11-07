@@ -305,6 +305,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 		Action: actionC,
 		Log:    discardLog,
 	})
+	sTree.RegisterErrChan(errC)
 
 	NewRepository(RepositorySpec{
 		ID:      repoID,
@@ -317,7 +318,7 @@ func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 
 	NewBucket(BucketSpec{
 		ID:          buckID,

@@ -31,6 +31,7 @@ func TestErrorChannelNode(t *testing.T) {
 		Name:   `root_testing`,
 		Action: actionC,
 	})
+	sTree.RegisterErrChan(errC)
 
 	// create repository
 	repo := NewRepository(RepositorySpec{
@@ -45,7 +46,7 @@ func TestErrorChannelNode(t *testing.T) {
 		ParentType: `root`,
 		ParentID:   rootID,
 	})
-	sTree.SetError(errC)
+	sTree.SetError()
 	if repo.Fault.Error == nil {
 		t.Errorf(`Repository.Fault.Error is nil`)
 	} else {
