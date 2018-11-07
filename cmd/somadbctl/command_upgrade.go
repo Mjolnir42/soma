@@ -741,6 +741,7 @@ func upgradeSomaTo201811060001(curr int, tool string, printOnly bool) int {
 		`ALTER TABLE soma.constraints_service_attribute RENAME attribute_value TO value;`,
 		`ALTER TABLE soma.constraints_service_property RENAME organizational_team_id TO team_id;`,
 		`ALTER TABLE soma.constraints_service_property RENAME service_property TO name;`,
+		`INSERT INTO soma.job_types ( job_type ) VALUES ( 'repository::rename' );`,
 	}
 	stmts = append(stmts,
 		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201811060001, 'Upgrade - somadbctl %s');", tool),

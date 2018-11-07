@@ -162,7 +162,8 @@ INSERT INTO soma.job_types (
             ( 'node-config::property-update' ),
             ( 'repository-config::property-create' ),
             ( 'repository-config::property-destroy' ),
-            ( 'repository-config::property-update' )
+            ( 'repository-config::property-update' ),
+            ( 'repository::rename' )
 ;`
 	queries[idx] = "insertJobTypes"
 	idx++
