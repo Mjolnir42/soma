@@ -209,7 +209,9 @@ func (g *GuidePost) process(q *msg.Request) {
 		q.Action,
 		q.AuthUser)
 
-	j, _ = json.Marshal(q)
+	if j, err = json.Marshal(q); err != nil {
+		goto bailout
+	}
 	if res, err = g.stmtJobSave.Exec(
 		q.JobID.String(),
 		`queued`,
