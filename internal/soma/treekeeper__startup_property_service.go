@@ -17,7 +17,7 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 		err                                          error
 		instanceID, srcInstanceID, objectID, view    string
 		inInstanceID, inObjectType, inObjID, attrKey string
-		serviceProperty, teamID, attrValue           string
+		serviceID, serviceName, teamID, attrValue    string
 		inheritance, childrenOnly                    bool
 		rows, attributeRows, instanceRows            *sql.Rows
 	)
@@ -57,10 +57,11 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 				&srcInstanceID,
 				&objectID,
 				&view,
-				&serviceProperty,
+				&serviceID,
 				&teamID,
 				&inheritance,
 				&childrenOnly,
+				&serviceName,
 			)
 			if err != nil {
 				if err == sql.ErrNoRows {
@@ -73,18 +74,19 @@ func (tk *TreeKeeper) startupServiceProperties(stMap map[string]*sql.Stmt) {
 
 			// build the property
 			prop := tree.PropertyService{
+				ID:           uuid.Must(uuid.FromString(instanceID)),
 				Inheritance:  inheritance,
 				ChildrenOnly: childrenOnly,
 				View:         view,
-				Service:      serviceProperty,
+				ServiceID:    uuid.Must(uuid.FromString(serviceID)),
+				ServiceName:  serviceName,
 			}
-			prop.ID, _ = uuid.FromString(instanceID)
 			prop.Attributes = make([]proto.ServiceAttribute, 0)
 			prop.Instances = make([]tree.PropertyInstance, 0)
 
 			attributeRows, err = stMap[loopStmt[1]].Query(
 				teamID,
-				serviceProperty,
+				serviceID,
 			)
 			if err != nil {
 				tk.startLog.Printf("TK[%s] Error loading %s service properties: %s", tk.meta.repoName, loopType, err.Error())

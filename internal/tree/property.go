@@ -222,7 +222,7 @@ type PropertyService struct {
 	ChildrenOnly  bool
 	View          string
 	ServiceID     uuid.UUID
-	Service       string
+	ServiceName   string
 	Attributes    []proto.ServiceAttribute
 	Instances     []PropertyInstance
 }
@@ -268,7 +268,7 @@ func (p *PropertyService) GetKey() string {
 }
 
 func (p *PropertyService) GetValue() string {
-	return p.Service
+	return p.ServiceName
 }
 
 func (p *PropertyService) GetInstanceID(objType string, objID uuid.UUID, l *log.Logger) uuid.UUID {
@@ -319,11 +319,11 @@ func (p PropertyService) Clone() Property {
 		Inheritance:  p.Inheritance,
 		ChildrenOnly: p.ChildrenOnly,
 		View:         p.View,
-		Service:      p.Service,
+		ServiceName:  p.ServiceName,
 	}
-	cl.ID, _ = uuid.FromString(p.ID.String())
-	cl.SourceID, _ = uuid.FromString(p.SourceID.String())
-	cl.InheritedFrom, _ = uuid.FromString(p.InheritedFrom.String())
+	cl.ID = uuid.Must(uuid.FromString(p.ID.String()))
+	cl.SourceID = uuid.Must(uuid.FromString(p.SourceID.String()))
+	cl.InheritedFrom = uuid.Must(uuid.FromString(p.InheritedFrom.String()))
 	cl.Attributes = make([]proto.ServiceAttribute, 0)
 	for _, attr := range p.Attributes {
 		a := proto.ServiceAttribute{
@@ -351,7 +351,8 @@ func (p *PropertyService) MakeAction() Action {
 			ChildrenOnly:     p.isChildrenOnly(),
 			View:             p.GetView(),
 			Service: &proto.PropertyService{
-				Name: p.Service,
+				ID:   p.ServiceID.String(),
+				Name: p.ServiceName,
 			},
 		},
 	}

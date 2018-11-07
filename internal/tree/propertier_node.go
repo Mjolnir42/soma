@@ -41,10 +41,11 @@ func (ten *Node) SetProperty(p Property) {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			ten.deletePropertyInherited(&PropertyService{
-				SourceID:  srcUUID,
-				View:      prop.GetView(),
-				Inherited: true,
-				Service:   prop.GetKey(),
+				SourceID:    srcUUID,
+				View:        prop.GetView(),
+				Inherited:   true,
+				ServiceID:   uuid.Must(uuid.FromString(prop.GetKey())),
+				ServiceName: prop.GetValue(),
 			})
 		case `system`:
 			ten.deletePropertyInherited(&PropertySystem{

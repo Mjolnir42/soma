@@ -43,10 +43,11 @@ func (teb *Bucket) SetProperty(p Property) {
 			// GetValue for serviceproperty returns the uuid to never
 			// match, we do not set it
 			teb.deletePropertyInherited(&PropertyService{
-				SourceID:  srcUUID,
-				View:      prop.GetView(),
-				Inherited: true,
-				Service:   prop.GetKey(),
+				SourceID:    srcUUID,
+				View:        prop.GetView(),
+				Inherited:   true,
+				ServiceID:   uuid.Must(uuid.FromString(prop.GetKey())),
+				ServiceName: prop.GetValue(),
 			})
 		case `system`:
 			teb.deletePropertyInherited(&PropertySystem{
@@ -249,7 +250,8 @@ func (teb *Bucket) switchProperty(p Property) bool {
 				SourceID:    srcUUID,
 				View:        curr.GetView(),
 				Inherited:   true,
-				Service:     curr.GetKey(),
+				ServiceID:   uuid.Must(uuid.FromString(curr.GetKey())),
+				ServiceName: curr.GetValue(),
 				Inheritance: true,
 			})
 		case `system`:
