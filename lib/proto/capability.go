@@ -19,9 +19,9 @@ type Capability struct {
 	Metric       string                   `json:"metric,omitempty"`
 	View         string                   `json:"view,omitempty"`
 	Thresholds   uint64                   `json:"thresholds,omitempty"`
-	Demux        *[]string               `json:"demux,omitempty"`
-	Constraints  *[]CapabilityConstraint `json:"constraints,omitempty"`
-	Details      *CapabilityDetails      `json:"details,omitempty"`
+	Demux        *[]Attribute             `json:"demux,omitempty"`
+	Constraints  *[]CheckConfigConstraint `json:"constraints,omitempty"`
+	Details      *CapabilityDetails       `json:"details,omitempty"`
 }
 
 // Clone returns a copy of c
@@ -40,12 +40,6 @@ func (c *Capability) Clone() Capability {
 	// XXX Demux
 	// XXX Constraints
 	return clone
-}
-
-type CapabilityConstraint struct {
-	Type  string
-	Name  string
-	Value string
 }
 
 // DeepCompare returns true if c and a are equal, excluding details
