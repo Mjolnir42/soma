@@ -48,6 +48,9 @@ func (tef *Fault) Detach() {
 func (tef *Fault) ReAttach(a AttachRequest) {
 }
 
+func (tef *Fault) SetName(s string) {
+}
+
 //
 // Interface: RepositoryAttacher
 func (tef *Fault) attachToRepository(a AttachRequest) {

@@ -120,6 +120,11 @@ func (ten *Node) Detach() {
 	ten.Parent.(Propertier).syncProperty(ten.ID.String())
 }
 
+func (ten *Node) SetName(s string) {
+	ten.Name = s
+	ten.actionRename()
+}
+
 //
 // Interface: BucketAttacher
 func (ten *Node) attachToBucket(a AttachRequest) {

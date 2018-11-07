@@ -286,6 +286,14 @@ func (ten *Node) actionDelete() {
 	}
 }
 
+func (ten *Node) actionRename() {
+	ten.Action <- &Action{
+		Action: ActionRename,
+		Type:   ten.Type,
+		Node:   ten.export(),
+	}
+}
+
 //
 func (ten *Node) actionPropertyNew(a Action) {
 	a.Action = ActionPropertyNew

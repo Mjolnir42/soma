@@ -899,6 +899,13 @@ SET    status = '` + proto.DeploymentComputed + `'::varchar,
        status_last_updated_at = NOW()::timestamptz
 WHERE  check_instance_config_id = $3::uuid;`
 
+	TxRepositoryRename = `
+UPDATE soma.repositories
+SET    repository_name = $2::varchar,
+       created_by = ( SELECT user_id FROM inventory.users
+                      WHERE user_uid = $3::varchar)
+WHERE  repository_id = $1::uuid;`
+
 	TxDeployDetailsCheckInstance = `
 SELECT scic.version,
        scic.check_instance_id,
@@ -1266,6 +1273,7 @@ func init() {
 	m[TxRepositoryPropertySystemCreate] = `TxRepositoryPropertySystemCreate`
 	m[TxRepositoryPropertySystemDelete] = `TxRepositoryPropertySystemDelete`
 	m[TxUpdateNodeState] = `TxUpdateNodeState`
+	m[TxRepositoryRename] = `TxRepositoryRename`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

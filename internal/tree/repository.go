@@ -316,6 +316,14 @@ func (ter *Repository) actionDelete() {
 	}
 }
 
+func (ter *Repository) actionRename() {
+	ter.Action <- &Action{
+		Action:     ActionRename,
+		Type:       ter.Type,
+		Repository: ter.export(),
+	}
+}
+
 func (ter *Repository) actionPropertyNew(a Action) {
 	a.Action = ActionPropertyNew
 	ter.actionProperty(a)

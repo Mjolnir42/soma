@@ -124,6 +124,13 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 			return ``, ``
 		}
 		return q.Repository.ID, ``
+	case msg.SectionRepository:
+		switch q.Action {
+		case msg.ActionRename:
+		default:
+			return ``, ``
+		}
+		return q.Repository.ID, ``
 	}
 	return ``, ``
 }

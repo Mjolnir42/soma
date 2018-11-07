@@ -72,6 +72,11 @@ func (ter *Repository) Detach() {
 	ter.Destroy()
 }
 
+func (ter *Repository) SetName(s string) {
+	ter.Name = s
+	ter.actionRename()
+}
+
 // Interface: RootAttacher
 func (ter *Repository) attachToRoot(a AttachRequest) {
 	a.Root.Receive(ReceiveRequest{

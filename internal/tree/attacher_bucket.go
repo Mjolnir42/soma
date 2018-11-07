@@ -69,6 +69,11 @@ func (teb *Bucket) Detach() {
 	teb.Destroy()
 }
 
+func (teb *Bucket) SetName(s string) {
+	teb.Name = s
+	teb.actionRename()
+}
+
 func (teb *Bucket) clearParent() {
 	teb.Parent = nil
 	teb.State = "floating"

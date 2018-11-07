@@ -131,6 +131,11 @@ func (teg *Group) Detach() {
 	teg.Parent.(Propertier).syncProperty(teg.ID.String())
 }
 
+func (teg *Group) SetName(s string) {
+	teg.Name = s
+	teg.actionRename()
+}
+
 //
 // Interface: BucketAttacher
 func (teg *Group) attachToBucket(a AttachRequest) {

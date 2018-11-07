@@ -310,6 +310,14 @@ func (teb *Bucket) actionDelete() {
 	}
 }
 
+func (teb *Bucket) actionRename() {
+	teb.Action <- &Action{
+		Action: ActionRename,
+		Type:   teb.Type,
+		Bucket: teb.export(),
+	}
+}
+
 func (teb *Bucket) actionAssignNode(a Action) {
 	a.Action = ActionNodeAssignment
 	a.Type = teb.Type

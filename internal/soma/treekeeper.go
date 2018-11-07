@@ -463,6 +463,8 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		tk.treeGroup(q)
 	case q.Section == msg.SectionBucket && q.Action == msg.ActionCreate:
 		tk.treeBucket(q)
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionRename:
+		tk.treeRepository(q)
 	}
 
 	// check if we accumulated an error in one of the switch cases
@@ -590,6 +592,7 @@ actionloop:
 			tree.ActionMemberNew,
 			tree.ActionMemberRemoved,
 			tree.ActionNodeAssignment,
+			tree.ActionRename,
 			tree.ActionUpdate:
 			if err = tk.txTree(a, stm, q.AuthUser); err != nil {
 				break actionloop
@@ -745,6 +748,7 @@ func (tk *TreeKeeper) startTx() (
 		`RepositoryPropertySystemDelete`:  stmt.TxRepositoryPropertySystemDelete,
 		`RepositoryPropertyCustomCreate`:  stmt.TxRepositoryPropertyCustomCreate,
 		`RepositoryPropertyCustomDelete`:  stmt.TxRepositoryPropertyCustomDelete,
+		`repository::rename`:              stmt.TxRepositoryRename,
 		`BucketPropertyOncallCreate`:      stmt.TxBucketPropertyOncallCreate,
 		`BucketPropertyOncallDelete`:      stmt.TxBucketPropertyOncallDelete,
 		`BucketPropertyServiceCreate`:     stmt.TxBucketPropertyServiceCreate,

@@ -37,7 +37,7 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 		); err != nil {
 			return nf, err
 		}
-	case msg.SectionRepositoryConfig:
+	case msg.SectionRepositoryConfig, msg.SectionRepository:
 		// since repository ids are the routing information,
 		// it is unnecessary to check that the object is where the
 		// routing would point to
@@ -88,6 +88,11 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 	case msg.ActionDestroy:
 		switch q.Section {
 		case msg.SectionCheckConfig:
+			return false, nil
+		}
+	case msg.ActionRename:
+		switch q.Section {
+		case msg.SectionRepository:
 			return false, nil
 		}
 	}

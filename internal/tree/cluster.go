@@ -356,6 +356,14 @@ func (tec *Cluster) actionDelete() {
 	}
 }
 
+func (tec *Cluster) actionRename() {
+	tec.Action <- &Action{
+		Action:  ActionRename,
+		Type:    tec.Type,
+		Cluster: tec.export(),
+	}
+}
+
 func (tec *Cluster) actionMemberNew(a Action) {
 	a.Action = ActionMemberNew
 	a.Type = tec.Type

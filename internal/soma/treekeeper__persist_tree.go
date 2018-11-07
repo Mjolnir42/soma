@@ -21,6 +21,8 @@ func (tk *TreeKeeper) txTree(a *tree.Action,
 	switch a.Action {
 	case tree.ActionCreate:
 		return tk.txTreeCreate(a, stm, user)
+	case tree.ActionRename:
+		return tk.txTreeRename(a, stm, user)
 	case tree.ActionUpdate:
 		return tk.txTreeUpdate(a, stm)
 	case tree.ActionDelete:
@@ -65,6 +67,20 @@ func (tk *TreeKeeper) txTreeCreate(a *tree.Action,
 			a.Cluster.BucketID,
 			a.Cluster.ObjectState,
 			a.Cluster.TeamID,
+			user,
+		)
+	}
+	return err
+}
+
+func (tk *TreeKeeper) txTreeRename(a *tree.Action,
+	stm map[string]*sql.Stmt, user string) error {
+	var err error
+	switch a.Type {
+	case msg.EntityRepository:
+		_, err = stm[`repository::rename`].Exec(
+			a.Repository.ID,
+			a.Repository.Name,
 			user,
 		)
 	}

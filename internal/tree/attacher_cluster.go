@@ -131,6 +131,11 @@ func (tec *Cluster) Detach() {
 	tec.Parent.(Propertier).syncProperty(tec.ID.String())
 }
 
+func (tec *Cluster) SetName(s string) {
+	tec.Name = s
+	tec.actionRename()
+}
+
 //
 // Interface: BucketAttacher
 func (tec *Cluster) attachToBucket(a AttachRequest) {

@@ -14,6 +14,17 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+func (tk *TreeKeeper) treeRepository(q *msg.Request) {
+	if q.Section == msg.SectionRepository && q.Action == msg.ActionRename {
+		tk.tree.Find(tree.FindRequest{
+			ElementID:   q.Repository.ID,
+			ElementType: `repository`,
+		}, true).SetName(
+			q.Update.Repository.Name,
+		)
+	}
+}
+
 func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 	//XXX BUG validate bucket request
 	//XXX BUG generate Bucket.UUID in Guidepost

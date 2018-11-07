@@ -391,6 +391,14 @@ func (teg *Group) actionDelete() {
 	}
 }
 
+func (teg *Group) actionRename() {
+	teg.Action <- &Action{
+		Action: ActionRename,
+		Type:   teg.Type,
+		Group:  teg.export(),
+	}
+}
+
 func (teg *Group) actionMemberNew(a Action) {
 	a.Action = ActionMemberNew
 	a.Type = teg.Type

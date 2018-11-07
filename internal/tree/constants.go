@@ -22,6 +22,7 @@ const (
 	ActionPropertyDelete      = `property_delete`
 	ActionPropertyNew         = `property_new`
 	ActionPropertyUpdate      = `property_update`
+	ActionRename              = `rename`
 	ActionUpdate              = `update`
 )
 

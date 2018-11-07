@@ -18,6 +18,7 @@ type Attacher interface {
 	Destroy()
 	Detach()
 	GetName() string
+	SetName(s string)
 	ComputeCheckInstances()
 	ClearLoadInfo()
 
