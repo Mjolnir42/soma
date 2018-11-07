@@ -28,6 +28,31 @@ func (a *Attribute) Clone() Attribute {
 	return clone
 }
 
+// DeepCompare return true if a and c are equal excluding Details
+func (a *Attribute) DeepCompare(c *Attribute) bool {
+	if a == nil {
+		return false
+	}
+	if a.Name != c.Name || a.Cardinality != c.Cardinality {
+		return false
+	}
+	return true
+}
+
+// DeepCompareSlice returns true if a is contained in s
+func (a *Attribute) DeepCompareSlice(s *[]Attribute) bool {
+	if s == nil || *s == nil {
+		return false
+	}
+
+	for _, attr := range *s {
+		if a.DeepCompare(&attr) {
+			return true
+		}
+	}
+	return false
+}
+
 // AttributeDetails contains metadata about an attribute
 type AttributeDetails struct {
 	Creation *DetailsCreation `json:"creation,omitempty"`
