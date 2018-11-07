@@ -107,6 +107,9 @@ func capabilityDeclare(c *cli.Context) error {
 	if err = adm.ValidateNoDot(c.Args().First()); err != nil {
 		return err
 	}
+	if err = adm.ValidateView(opts[`view`][0]); err != nil {
+		return err
+	}
 	if err = adm.ValidateNoSlash(opts[`metric`][0]); err != nil {
 		return err
 	}
