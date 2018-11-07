@@ -57,8 +57,8 @@ func (w *CapabilityWrite) Register(c *sql.DB, l ...*logrus.Logger) {
 // it processes
 func (w *CapabilityWrite) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
-		msg.ActionAdd,
-		msg.ActionRemove,
+		msg.ActionDeclare,
+		msg.ActionRevoke,
 	} {
 		hmap.Request(msg.SectionCapability, action, w.handlerName)
 	}
@@ -108,18 +108,18 @@ func (w *CapabilityWrite) process(q *msg.Request) {
 	logRequest(w.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionAdd:
-		w.add(q, &result)
-	case msg.ActionRemove:
-		w.remove(q, &result)
+	case msg.ActionDeclare:
+		w.declare(q, &result)
+	case msg.ActionRevoke:
+		w.revoke(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
 	q.Reply <- result
 }
 
-// add inserts a new capability
-func (w *CapabilityWrite) add(q *msg.Request, mr *msg.Result) {
+// declare inserts a new capability
+func (w *CapabilityWrite) declare(q *msg.Request, mr *msg.Result) {
 	var (
 		inputVal string
 		res      sql.Result
@@ -191,8 +191,8 @@ func (w *CapabilityWrite) add(q *msg.Request, mr *msg.Result) {
 	}
 }
 
-// remove deletes a capability
-func (w *CapabilityWrite) remove(q *msg.Request, mr *msg.Result) {
+// revoke deletes a capability
+func (w *CapabilityWrite) revoke(q *msg.Request, mr *msg.Result) {
 	var (
 		res sql.Result
 		err error

@@ -55,6 +55,7 @@ func (r *CapabilityRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
 		msg.ActionShow,
+		msg.ActionSearch,
 	} {
 		hmap.Request(msg.SectionCapability, action, r.handlerName)
 	}
@@ -109,6 +110,7 @@ func (r *CapabilityRead) process(q *msg.Request) {
 		r.show(q, &result)
 	case msg.ActionSearch:
 		// XXX BUG r.search(q, &result)
+		r.list(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}

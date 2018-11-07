@@ -1,26 +1,30 @@
 /*-
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2016, Jörg Pernfuß <joerg.pernfuss@1und1.de>
+ * Copyright (c) 2016-2018, Jörg Pernfuß
+ * Copyright (c) 2018, 1&1 IONOS SE
  * All rights reserved
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
+// Capability defines a metric that can be monitored by a specific
+// monitoring system
 type Capability struct {
-	ID           string                  `json:"ID,omitempty"`
-	Name         string                  `json:"name,omitempty"`
-	MonitoringID string                  `json:"monitoringID,omitempty"`
-	Metric       string                  `json:"metric,omitempty"`
-	View         string                  `json:"view,omitempty"`
-	Thresholds   uint64                  `json:"thresholds,omitempty"`
+	ID           string                   `json:"ID,omitempty"`
+	Name         string                   `json:"name,omitempty"`
+	MonitoringID string                   `json:"monitoringID,omitempty"`
+	Metric       string                   `json:"metric,omitempty"`
+	View         string                   `json:"view,omitempty"`
+	Thresholds   uint64                   `json:"thresholds,omitempty"`
 	Demux        *[]string               `json:"demux,omitempty"`
 	Constraints  *[]CapabilityConstraint `json:"constraints,omitempty"`
 	Details      *CapabilityDetails      `json:"details,omitempty"`
 }
 
+// Clone returns a copy of c
 func (c *Capability) Clone() Capability {
 	clone := Capability{
 		ID:           c.ID,
@@ -38,31 +42,13 @@ func (c *Capability) Clone() Capability {
 	return clone
 }
 
-type CapabilityFilter struct {
-	MonitoringID   string `json:"monitoringID,omitempty"`
-	MonitoringName string `json:"monitoringName,omitempty"`
-	Metric         string `json:"metric,omitempty"`
-	View           string `json:"view,omitempty"`
-}
-
 type CapabilityConstraint struct {
 	Type  string
 	Name  string
 	Value string
 }
 
-type CapabilityDetails struct {
-	Creation *DetailsCreation `json:"creation,omitempty"`
-}
-
-func (c *CapabilityDetails) Clone() *CapabilityDetails {
-	clone := &CapabilityDetails{}
-	if c.Creation != nil {
-		clone.Creation = c.Creation.Clone()
-	}
-	return clone
-}
-
+// DeepCompare returns true if c and a are equal, excluding details
 func (c *Capability) DeepCompare(a *Capability) bool {
 	if c.ID != a.ID {
 		return false
@@ -82,94 +68,81 @@ func (c *Capability) DeepCompare(a *Capability) bool {
 	if c.Thresholds != a.Thresholds {
 		return false
 	}
-	/*
-		if c.Demux != nil {
-		demuxloop:
-			for _, str := range *c.Demux {
-				if c.DeepCompareSlice(str, a.Demux) {
-					continue demuxloop
-				}
-				return false
+	if c.Demux != nil {
+	demuxloop:
+		for i := range *c.Demux {
+			if (*c.Demux)[i].DeepCompareSlice(a.Demux) {
+				continue demuxloop
 			}
-		}
-		if a.Demux != nil {
-		revdemuxloop:
-			for _, str := range *a.Demux {
-				if c.DeepCompareSlice(str, c.Demux) {
-					continue revdemuxloop
-				}
-				return false
-			}
-		}
-		if c.Constraints != nil {
-		constraintloop:
-			for _, cstr := range *c.Constraints {
-				if cstr.DeepCompareSlice(a.Constraints) {
-					continue constraintloop
-				}
-				return false
-			}
-		}
-		if a.Constraints != nil {
-		revconstraintloop:
-			for _, cstr := range *a.Constraints {
-				if cstr.DeepCompareSlice(c.Constraints) {
-					continue revconstraintloop
-				}
-				return false
-			}
-		}
-	*/
-	return true
-}
-
-func (c *Capability) DeepCompareSlice(s string, a *[]string) bool {
-	if a == nil || *a == nil {
-		return false
-	}
-
-	for _, str := range *a {
-		if s == str {
-			return true
+			return false
 		}
 	}
-	return false
-}
-
-func (c *CapabilityConstraint) DeepCompare(a *CapabilityConstraint) bool {
-	if a == nil {
-		return false
+	if a.Demux != nil {
+	revdemuxloop:
+		for i := range *a.Demux {
+			if (*a.Demux)[i].DeepCompareSlice(c.Demux) {
+				continue revdemuxloop
+			}
+			return false
+		}
 	}
-
-	if c.Type != a.Type || c.Name != a.Type || c.Value != a.Value {
-		return false
+	if c.Constraints != nil {
+	constraintloop:
+		for i := range *c.Constraints {
+			if (*c.Constraints)[i].DeepCompareSlice(*a.Constraints) {
+				continue constraintloop
+			}
+			return false
+		}
+	}
+	if a.Constraints != nil {
+	revconstraintloop:
+		for i := range *a.Constraints {
+			if (*a.Constraints)[i].DeepCompareSlice(*c.Constraints) {
+				continue revconstraintloop
+			}
+			return false
+		}
 	}
 	return true
 }
 
-func (c *CapabilityConstraint) DeepCompareSlice(a *[]CapabilityConstraint) bool {
-	if a == nil || *a == nil {
-		return false
-	}
-
-	for _, cstr := range *a {
-		if c.DeepCompare(&cstr) {
-			return true
-		}
-	}
-	return false
+// CapabilityDetails contains metadata about a capability
+type CapabilityDetails struct {
+	Creation *DetailsCreation `json:"creation,omitempty"`
 }
 
+// Clone returns a copy of c
+func (c *CapabilityDetails) Clone() *CapabilityDetails {
+	clone := &CapabilityDetails{}
+	if c.Creation != nil {
+		clone.Creation = c.Creation.Clone()
+	}
+	return clone
+}
+
+// CapabilityFilter defines by what a capability can be searched by
+type CapabilityFilter struct {
+	MonitoringID   string `json:"monitoringID,omitempty"`
+	MonitoringName string `json:"monitoringName,omitempty"`
+	Metric         string `json:"metric,omitempty"`
+	View           string `json:"view,omitempty"`
+}
+
+// NewCapabilityRequest returns a new Request with fields preallocated
+// for filling in Capability data, ensuring no nilptr-deref takes place.
 func NewCapabilityRequest() Request {
 	return Request{
 		Flags: &Flags{},
 		Capability: &Capability{
-			Demux:       &[]string{},
-			Constraints: &[]CapabilityConstraint{},
+			Demux:       &[]Attribute{},
+			Constraints: &[]CheckConfigConstraint{},
 		},
 	}
 }
 
+// NewCapabilityFilter returns a new Request with fields preallocated
+// for filling in an Capability filter, ensuring no nilptr-deref takes place.
 func NewCapabilityFilter() Request {
 	return Request{
 		Filter: &Filter{
@@ -178,6 +151,8 @@ func NewCapabilityFilter() Request {
 	}
 }
 
+// NewCapabilityResult returns a new Result with fields preallocated
+// for filling in Capability data, ensuring no nilptr-deref takes place.
 func NewCapabilityResult() Result {
 	return Result{
 		Errors:       &[]string{},

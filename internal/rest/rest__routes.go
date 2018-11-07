@@ -154,7 +154,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 		if !x.conf.Observer {
 			router.DELETE(`/accounts/tokens/:account`, x.Authenticated(x.SupervisorTokenInvalidateAccount))
 			router.DELETE(`/attribute/:attribute`, x.Authenticated(x.AttributeRemove))
-			router.DELETE(`/capability/:capabilityID`, x.Authenticated(x.CapabilityRemove))
+			router.DELETE(`/capability/:capabilityID`, x.Authenticated(x.CapabilityRevoke))
 			router.DELETE(`/category/:category/section/:sectionID/action/:actionID`, x.Authenticated(x.ActionRemove))
 			router.DELETE(`/category/:category/section/:sectionID`, x.Authenticated(x.SectionRemove))
 			router.DELETE(`/category/:category`, x.Authenticated(x.CategoryRemove))
@@ -218,7 +218,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PATCH(rtPermissionID, x.Authenticated(x.PermissionEdit))
 			router.PATCH(rtTeamRepositoryID, x.Authenticated(x.RepositoryRename))
 			router.POST(`/attribute/`, x.Authenticated(x.AttributeAdd))
-			router.POST(`/capability/`, x.Authenticated(x.CapabilityAdd))
+			router.POST(`/capability/`, x.Authenticated(x.CapabilityDeclare))
 			router.POST(`/category/:category/section/:sectionID/action/`, x.Authenticated(x.ActionAdd))
 			router.POST(`/category/:category/section/`, x.Authenticated(x.SectionAdd))
 			router.POST(`/category/`, x.Authenticated(x.CategoryAdd))

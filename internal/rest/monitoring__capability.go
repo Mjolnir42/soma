@@ -107,8 +107,8 @@ func (x *Rest) CapabilityShow(w http.ResponseWriter, r *http.Request,
 	x.send(&w, &result)
 }
 
-// CapabilityAdd function
-func (x *Rest) CapabilityAdd(w http.ResponseWriter, r *http.Request,
+// CapabilityDeclare function
+func (x *Rest) CapabilityDeclare(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
@@ -120,7 +120,7 @@ func (x *Rest) CapabilityAdd(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
-	request.Action = msg.ActionAdd
+	request.Action = msg.ActionDeclare
 	request.Capability = cReq.Capability.Clone()
 
 	if !x.isAuthorized(&request) {
@@ -133,14 +133,14 @@ func (x *Rest) CapabilityAdd(w http.ResponseWriter, r *http.Request,
 	x.send(&w, &result)
 }
 
-// CapabilityRemove function
-func (x *Rest) CapabilityRemove(w http.ResponseWriter, r *http.Request,
+// CapabilityRevoke function
+func (x *Rest) CapabilityRevoke(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
-	request.Action = msg.ActionRemove
+	request.Action = msg.ActionRevoke
 	request.Capability = proto.Capability{
 		ID: params.ByName(`capabilityID`),
 	}
