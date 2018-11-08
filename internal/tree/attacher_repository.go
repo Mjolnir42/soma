@@ -8,7 +8,10 @@
 
 package tree
 
-import "sync"
+import (
+	"strings"
+	"sync"
+)
 
 //
 // Interface: Attacher
@@ -72,8 +75,18 @@ func (ter *Repository) Detach() {
 	ter.Destroy()
 }
 
-func (ter *Repository) SetName(s string) {
-	ter.Name = s
+func (ter *Repository) SetName(newRepoName string) {
+	for i := range ter.Children {
+		newBucketName := strings.Replace(
+			ter.Children[i].GetName(),
+			ter.Name,
+			newRepoName,
+			1,
+		)
+		ter.Children[i].SetName(newBucketName)
+	}
+
+	ter.Name = newRepoName
 	ter.actionRename()
 }
 
