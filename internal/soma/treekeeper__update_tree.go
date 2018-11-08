@@ -28,7 +28,8 @@ func (tk *TreeKeeper) treeRepository(q *msg.Request) {
 func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 	//XXX BUG validate bucket request
 	//XXX BUG generate Bucket.UUID in Guidepost
-	if q.Section == msg.SectionBucket && q.Action == msg.ActionCreate {
+	switch {
+	case q.Section == msg.SectionBucket && q.Action == msg.ActionCreate:
 		tree.NewBucket(tree.BucketSpec{
 			ID:          uuid.Must(uuid.NewV4()).String(),
 			Name:        q.Bucket.Name,
@@ -43,6 +44,13 @@ func (tk *TreeKeeper) treeBucket(q *msg.Request) {
 			ParentID:   tk.meta.repoID,
 			ParentName: tk.meta.repoName,
 		})
+	case q.Section == msg.SectionBucket && q.Action == msg.ActionRename:
+		tk.tree.Find(tree.FindRequest{
+			ElementID:   q.Bucket.ID,
+			ElementType: `bucket`,
+		}, true).SetName(
+			q.Update.Bucket.Name,
+		)
 	}
 }
 

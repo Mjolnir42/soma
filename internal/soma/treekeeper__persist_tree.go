@@ -83,6 +83,12 @@ func (tk *TreeKeeper) txTreeRename(a *tree.Action,
 			a.Repository.Name,
 			user,
 		)
+	case msg.EntityBucket:
+		_, err = stm[`bucket::rename`].Exec(
+			a.Bucket.ID,
+			a.Bucket.Name,
+			user,
+		)
 	}
 	return err
 }

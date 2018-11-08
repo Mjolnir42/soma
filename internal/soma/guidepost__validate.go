@@ -60,6 +60,8 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 		switch q.Action {
 		case msg.ActionCreate:
 			return g.validateBucketName(q)
+		case msg.ActionRename:
+			return g.validateBucketName(q)
 		}
 	}
 
@@ -423,8 +425,18 @@ func (g *GuidePost) validateCheckThresholds(q *msg.Request) (bool, error) {
 func (g *GuidePost) validateBucketName(q *msg.Request) (bool, error) {
 	_, repoName, _, _ := g.extractRouting(q)
 
+	var name string
+	switch q.Action {
+	case msg.ActionCreate:
+		name = q.Bucket.Name
+	case msg.ActionRename:
+		name = q.Update.Bucket.Name
+	default:
+		name = `...INVALID....`
+	}
+
 	if !strings.HasPrefix(
-		q.Bucket.Name,
+		name,
 		fmt.Sprintf("%s_", repoName),
 	) {
 		return false, fmt.Errorf("Illegal bucket name format, " +

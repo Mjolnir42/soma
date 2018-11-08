@@ -468,6 +468,8 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		tk.treeGroup(q)
 	case q.Section == msg.SectionBucket && q.Action == msg.ActionCreate:
 		tk.treeBucket(q)
+	case q.Section == msg.SectionBucket && q.Action == msg.ActionRename:
+		tk.treeBucket(q)
 	case q.Section == msg.SectionRepository && q.Action == msg.ActionRename:
 		tk.treeRepository(q)
 	}
@@ -754,6 +756,7 @@ func (tk *TreeKeeper) startTx() (
 		`RepositoryPropertyCustomCreate`:  stmt.TxRepositoryPropertyCustomCreate,
 		`RepositoryPropertyCustomDelete`:  stmt.TxRepositoryPropertyCustomDelete,
 		`repository::rename`:              stmt.TxRepositoryRename,
+		`bucket::rename`:                  stmt.TxBucketRename,
 		`BucketPropertyOncallCreate`:      stmt.TxBucketPropertyOncallCreate,
 		`BucketPropertyOncallDelete`:      stmt.TxBucketPropertyOncallDelete,
 		`BucketPropertyServiceCreate`:     stmt.TxBucketPropertyServiceCreate,

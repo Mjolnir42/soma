@@ -169,6 +169,34 @@ func (x *Rest) BucketDestroy(w http.ResponseWriter, r *http.Request,
 	// TODO
 }
 
+// BucketRename function
+func (x *Rest) BucketRename(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	cReq := proto.NewBucketRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
+		return
+	}
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionBucket
+	request.Action = msg.ActionRename
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Update.Bucket.Name = cReq.Bucket.Name
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
+}
+
 // BucketMemberList function
 func (x *Rest) BucketMemberList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

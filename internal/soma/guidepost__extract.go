@@ -106,7 +106,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		return ``, q.Group.BucketID
 	case msg.SectionBucket:
 		switch q.Action {
-		case msg.ActionCreate:
+		case msg.ActionCreate, msg.ActionRename:
 			return q.Bucket.RepositoryID, ``
 		}
 		switch q.Action {

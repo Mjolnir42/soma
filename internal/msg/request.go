@@ -108,6 +108,7 @@ type Filter struct {
 }
 
 type UpdateData struct {
+	Bucket      proto.Bucket
 	Cluster     proto.Cluster
 	Datacenter  proto.Datacenter
 	Entity      proto.Entity
