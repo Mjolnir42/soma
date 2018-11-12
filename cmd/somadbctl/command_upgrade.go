@@ -39,6 +39,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 		201809140001: upgradeSomaTo201809140002,
 		201809140002: upgradeSomaTo201809260001,
 		201809260001: upgradeSomaTo201811060001,
+		201811060001: upgradeSomaTo201811120001,
 	},
 	"root": map[int]func(int, string, bool) int{
 		000000000001: installRoot201605150001,
@@ -741,13 +742,30 @@ func upgradeSomaTo201811060001(curr int, tool string, printOnly bool) int {
 		`ALTER TABLE soma.constraints_service_attribute RENAME attribute_value TO value;`,
 		`ALTER TABLE soma.constraints_service_property RENAME organizational_team_id TO team_id;`,
 		`ALTER TABLE soma.constraints_service_property RENAME service_property TO name;`,
-		`INSERT INTO soma.job_types ( job_type ) VALUES ( 'repository::rename' );`,
 	}
 	stmts = append(stmts,
 		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201811060001, 'Upgrade - somadbctl %s');", tool),
 	)
 	executeUpgrades(stmts, printOnly)
 	return 201811060001
+}
+
+func upgradeSomaTo201811120001(curr int, tool string, printOnly bool) int {
+	if curr != 201811060001 {
+		return 0
+	}
+	stmts := []string{
+		`ALTER TABLE soma.constraints_service_property DROP CONSTRAINT constraints_service_property_organizational_team_id_fkey;`,
+		`INSERT INTO soma.job_types ( job_type ) VALUES ( 'repository::rename' );`,
+		`INSERT INTO soma.job_types ( job_type ) VALUES ( 'repository::destroy' );`,
+		`INSERT INTO soma.job_types ( job_type ) VALUES ( 'bucket::rename' );`,
+		`INSERT INTO soma.job_types ( job_type ) VALUES ( 'bucket::destroy' );`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201811120001, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+	return 201811120001
 }
 
 func installRoot201605150001(curr int, tool string, printOnly bool) int {

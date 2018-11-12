@@ -163,7 +163,10 @@ INSERT INTO soma.job_types (
             ( 'repository-config::property-create' ),
             ( 'repository-config::property-destroy' ),
             ( 'repository-config::property-update' ),
-            ( 'repository::rename' )
+            ( 'repository::rename' ),
+            ( 'repository::destroy' ),
+            ( 'bucket::rename' ),
+            ( 'bucket::destroy' )
 ;`
 	queries[idx] = "insertJobTypes"
 	idx++
@@ -225,7 +228,7 @@ INSERT INTO public.schema_versions (
             description
 ) VALUES (
             'soma',
-            201811060001,
+            201811120001,
             'Initial create - somadbctl %s'
 );`, version)
 	queryMap["insertSomaSchemaVersion"] = somaString
