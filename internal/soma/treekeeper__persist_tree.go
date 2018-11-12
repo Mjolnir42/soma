@@ -129,6 +129,10 @@ func (tk *TreeKeeper) txTreeDelete(a *tree.Action,
 		_, err = stm[`repository::destroy`].Exec(
 			a.Repository.ID,
 		)
+	case msg.EntityBucket:
+		_, err = stm[`bucket::destroy`].Exec(
+			a.Bucket.ID,
+		)
 	case msg.EntityGroup:
 		_, err = stm[`GroupDelete`].Exec(
 			a.Group.ID,

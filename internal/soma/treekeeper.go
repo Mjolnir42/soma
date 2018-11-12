@@ -869,6 +869,7 @@ func (tk *TreeKeeper) startTx() (
 		`NodeUnassignFromBucket`:   stmt.TxNodeUnassignFromBucket,
 		`UpdateNodeState`:          stmt.TxUpdateNodeState,
 		`repository::destroy`:      stmt.TxRepositoryDestroy,
+		`bucket::destroy`:          stmt.TxBucketDestroy,
 	} {
 		if stMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("tk.Prepare(%s) error: %s",

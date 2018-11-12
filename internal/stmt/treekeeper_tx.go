@@ -918,6 +918,11 @@ SET    bucket_name = $2::varchar,
                       WHERE user_uid = $3::varchar)
 WHERE  bucket_id = $1::uuid;`
 
+	TxBucketDestroy = `
+UPDATE soma.buckets
+SET    bucket_deleted = 'true'::boolean
+WHERE  bucket_id = $1::uuid;`
+
 	TxDeployDetailsCheckInstance = `
 SELECT scic.version,
        scic.check_instance_id,
@@ -1288,6 +1293,7 @@ func init() {
 	m[TxRepositoryRename] = `TxRepositoryRename`
 	m[TxRepositoryDestroy] = `TxRepositoryDestroy`
 	m[TxBucketRename] = `TxBucketRename`
+	m[TxBucketDestroy] = `TxBucketDestroy`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
