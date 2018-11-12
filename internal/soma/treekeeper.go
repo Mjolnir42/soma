@@ -755,8 +755,6 @@ func (tk *TreeKeeper) startTx() (
 		`RepositoryPropertySystemDelete`:  stmt.TxRepositoryPropertySystemDelete,
 		`RepositoryPropertyCustomCreate`:  stmt.TxRepositoryPropertyCustomCreate,
 		`RepositoryPropertyCustomDelete`:  stmt.TxRepositoryPropertyCustomDelete,
-		`repository::rename`:              stmt.TxRepositoryRename,
-		`bucket::rename`:                  stmt.TxBucketRename,
 		`BucketPropertyOncallCreate`:      stmt.TxBucketPropertyOncallCreate,
 		`BucketPropertyOncallDelete`:      stmt.TxBucketPropertyOncallDelete,
 		`BucketPropertyServiceCreate`:     stmt.TxBucketPropertyServiceCreate,
@@ -868,7 +866,9 @@ func (tk *TreeKeeper) startTx() (
 		`GroupUpdate`:              stmt.TxGroupUpdate,
 		`NodeUnassignFromBucket`:   stmt.TxNodeUnassignFromBucket,
 		`UpdateNodeState`:          stmt.TxUpdateNodeState,
+		`repository::rename`:       stmt.TxRepositoryRename,
 		`repository::destroy`:      stmt.TxRepositoryDestroy,
+		`bucket::rename`:           stmt.TxBucketRename,
 		`bucket::destroy`:          stmt.TxBucketDestroy,
 	} {
 		if stMap[name], err = tx.Prepare(statement); err != nil {
