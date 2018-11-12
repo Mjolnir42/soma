@@ -125,6 +125,10 @@ func (tk *TreeKeeper) txTreeDelete(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	var err error
 	switch a.Type {
+	case msg.EntityRepository:
+		_, err = stm[`repository::destroy`].Exec(
+			a.Repository.ID,
+		)
 	case msg.EntityGroup:
 		_, err = stm[`GroupDelete`].Exec(
 			a.Group.ID,

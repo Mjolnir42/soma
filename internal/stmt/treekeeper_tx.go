@@ -906,6 +906,11 @@ SET    repository_name = $2::varchar,
                       WHERE user_uid = $3::varchar)
 WHERE  repository_id = $1::uuid;`
 
+	TxRepositoryDestroy = `
+UPDATE soma.repositories
+SET    repository_deleted = 'true'::boolean
+WHERE  repository_id = $1::uuid;`
+
 	TxBucketRename = `
 UPDATE soma.buckets
 SET    bucket_name = $2::varchar,
@@ -1281,6 +1286,7 @@ func init() {
 	m[TxRepositoryPropertySystemDelete] = `TxRepositoryPropertySystemDelete`
 	m[TxUpdateNodeState] = `TxUpdateNodeState`
 	m[TxRepositoryRename] = `TxRepositoryRename`
+	m[TxRepositoryDestroy] = `TxRepositoryDestroy`
 	m[TxBucketRename] = `TxBucketRename`
 }
 
