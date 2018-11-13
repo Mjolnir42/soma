@@ -182,8 +182,6 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 					); err != nil {
 						return err
 					}
-					err = nil
-					token = ``
 					goto reload
 				}
 			}
