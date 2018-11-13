@@ -87,6 +87,9 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		result = proto.NewHostDeploymentResult()
 		*result.Deployments = append(*result.Deployments, r.Deployment...)
 		*result.HostDeployments = append(*result.HostDeployments, r.HostDeployment...)
+	case msg.SectionJobResultMgmt:
+		result = proto.NewJobResultResult()
+		*result.JobResults = append(*result.JobResults, r.JobResult...)
 	case msg.SectionJobTypeMgmt:
 		result = proto.NewJobTypeResult()
 		*result.JobTypes = append(*result.JobTypes, r.JobType...)

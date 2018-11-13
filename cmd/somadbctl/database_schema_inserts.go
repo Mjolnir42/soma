@@ -122,17 +122,6 @@ INSERT INTO soma.job_status (
 	queries[idx] = "insertJobStatus"
 	idx++
 
-	queryMap["insertJobResults"] = `
-INSERT INTO soma.job_results (
-            job_result
-) VALUES
-            ( 'pending' ),
-            ( 'success' ),
-            ( 'failed' )
-;`
-	queries[idx] = "insertJobResults"
-	idx++
-
 	queryMap["insertRootRestricted"] = `
 INSERT INTO root.flags (
             flag,

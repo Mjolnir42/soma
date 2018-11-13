@@ -416,6 +416,15 @@ func LookupCheckObjectID(oType, oName, buck string) (string, error) {
 	return ``, fmt.Errorf("Unknown object type: %s", oType)
 }
 
+// LookupJobResultID looks up the UUID for the JobResult with name s
+// from the server
+func LookupJobResultID(s string) (string, error) {
+	if IsUUID(s) {
+		return s, nil
+	}
+	return jobMetaIDByName(`result`, s)
+}
+
 // LookupJobTypeID looks up the UUID for the JobType with name s from
 // the server
 func LookupJobTypeID(s string) (string, error) {
@@ -1346,6 +1355,10 @@ func jobMetaIDByName(meta, name string) (string, error) {
 	res := &proto.Result{}
 
 	switch meta {
+	case `result`:
+		req = proto.NewJobResultFilter()
+		req.Filter.JobResult.Name = name
+		path = `/search/jobResult/`
 	case `type`:
 		req = proto.NewJobTypeFilter()
 		req.Filter.JobType.Name = name
@@ -1360,6 +1373,19 @@ func jobMetaIDByName(meta, name string) (string, error) {
 	}
 
 	switch meta {
+	case `result`:
+		if res.JobResults == nil || len(*res.JobResults) == 0 {
+			err = fmt.Errorf("no object returned for %s", meta)
+			goto abort
+		}
+		if name != (*res.JobResults)[0].Name {
+			err = fmt.Errorf(
+				"name mismatch: %s vs %s",
+				name, (*res.JobResults)[0].Name,
+			)
+			goto abort
+		}
+		return (*res.JobResults)[0].ID, nil
 	case `type`:
 		if res.JobTypes == nil || len(*res.JobTypes) == 0 {
 			err = fmt.Errorf("no object returned for %s", meta)
