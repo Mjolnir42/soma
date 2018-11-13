@@ -476,6 +476,15 @@ func VerifyPermissionTarget(target string) error {
 		target)
 }
 
+// ValidateUUID verifies that s is a UUID. It returns an error if
+// it is not and nil otherwise
+func ValidateUUID(s string) error {
+	if !IsUUID(s) {
+		return fmt.Errorf("%s is not an accepted UUID format", s)
+	}
+	return nil
+}
+
 // ValidateNotUUID verifies that s is not a UUID. It returns an error if
 // it is and nil otherwise
 func ValidateNotUUID(s string) error {
