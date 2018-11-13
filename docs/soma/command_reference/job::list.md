@@ -35,6 +35,9 @@ omnipotence | | | no | yes
 system | self | | no | yes
 self | job | list | yes | no
 
+The commands `list outstanding` and `list local` require no permissions
+since they only work with the local client cache.
+
 # EXAMPLES
 
 ```
