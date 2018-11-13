@@ -66,4 +66,8 @@ func WorkflowSet(c *cli.Context) {
 	Generic(c, []string{`status`, `next`})
 }
 
+func DirectIdName(c *cli.Context) {
+	GenericDirect(c, []string{`id`, `name`})
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
