@@ -229,7 +229,7 @@ func oncallMemberAssign(c *cli.Context) error {
 	uniqueOptions := []string{`to`}
 	mandatoryOptions := []string{`to`}
 
-	if err := adm.ParseVariadicArguments(
+	if err = adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
 		uniqueOptions,
@@ -267,7 +267,7 @@ func oncallMemberUnassign(c *cli.Context) error {
 	uniqueOptions := []string{`from`}
 	mandatoryOptions := []string{`from`}
 
-	if err := adm.ParseVariadicArguments(
+	if err = adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,
 		uniqueOptions,
