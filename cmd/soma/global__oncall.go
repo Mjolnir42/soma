@@ -284,13 +284,6 @@ func oncallMemberUnassign(c *cli.Context) error {
 		return err
 	}
 
-	if userID, err = adm.LookupUserID(c.Args().First()); err != nil {
-		return err
-	}
-	if oncallID, err = adm.LookupOncallID(opts[`from`][0]); err != nil {
-		return err
-	}
-
 	path := fmt.Sprintf("/oncall/%s/member/%s",
 		url.QueryEscape(oncallID),
 		url.QueryEscape(userID),
