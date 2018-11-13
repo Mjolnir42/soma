@@ -17,11 +17,11 @@ const (
 	TreekeeperStatements = ``
 
 	TreekeeperStartJob = `
-UPDATE soma.jobs
-SET    job_started = $2::timestamptz,
-       job_status = 'in_progress'
-WHERE  job_id = $1::uuid
-AND    job_started IS NULL;`
+UPDATE soma.job
+SET    started_at = $2::timestamptz,
+       status = 'in_progress'
+WHERE  id = $1::uuid
+AND    started_at IS NULL;`
 
 	TreekeeperGetViewFromCapability = `
 SELECT capability_view

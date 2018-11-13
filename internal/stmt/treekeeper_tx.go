@@ -208,12 +208,12 @@ DELETE FROM soma.property_instances
 WHERE       instance_id = $1::uuid;`
 
 	TxFinishJob = `
-UPDATE soma.jobs
-SET    job_finished = $2::timestamptz,
-       job_status = 'processed',
-       job_result = $3::varchar,
-       job_error = $4::text
-WHERE  job_id = $1::uuid;`
+UPDATE soma.job
+SET    finished_at = $2::timestamptz,
+       status = 'processed',
+       result = $3::varchar,
+       error = $4::text
+WHERE  id = $1::uuid;`
 
 	TxDeferAllConstraints = `
 SET CONSTRAINTS ALL DEFERRED;`

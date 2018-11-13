@@ -13,72 +13,72 @@ const (
 	JobStatements = ``
 
 	ListAllOutstandingJobs = `
-SELECT job_id,
-       job_type
-FROM   soma.jobs
-WHERE  job_status != 'processed';`
+SELECT id,
+       type
+FROM   soma.job
+WHERE  status != 'processed';`
 
 	ListScopedOutstandingJobs = `
-SELECT sj.job_id,
-       sj.job_type
+SELECT sj.id,
+       sj.type
 FROM   inventory.users iu
-JOIN   soma.jobs sj
+JOIN   soma.job sj
   ON   iu.user_id = sj.user_id
 WHERE  iu.user_uid = $1::varchar
 UNION
-SELECT sj.job_id,
-       sj.job_type
+SELECT sj.id,
+       sj.type
 FROM   inventory.users iu
-JOIN   soma.jobs sj
-  ON   iu.organizational_team_id = sj.organizational_team_id
+JOIN   soma.job sj
+  ON   iu.organizational_team_id = sj.team_id
 WHERE  iu.user_uid = $1::varchar
   AND  sj.user_id NOT IN
   (    SELECT user_id FROM inventory.users
        WHERE user_uid = $1::varchar);`
 
 	JobResultForID = `
-SELECT job_id,
-       job_status,
-       job_result,
-       job_type,
-       job_serial,
+SELECT id,
+       status,
+       result,
+       type,
+       serial,
        repository_id,
        user_id,
-       organizational_team_id,
-       job_queued,
-       job_started,
-       job_finished,
-       job_error,
+       team_id,
+       queued_at,
+       started_at,
+       finished_at,
+       error,
        job
-FROM   soma.jobs
-WHERE  job_id = $1::uuid;`
+FROM   soma.job
+WHERE  id = $1::uuid;`
 
 	JobResultsForList = `
-SELECT job_id,
-       job_status,
-       job_result,
-       job_type,
-       job_serial,
+SELECT id,
+       status,
+       result,
+       type,
+       serial,
        repository_id,
        user_id,
-       organizational_team_id,
-       job_queued,
-       job_started,
-       job_finished,
-       job_error,
+       team_id,
+       queued_at,
+       started_at,
+       finished_at,
+       error,
        job
-FROM   soma.jobs
-WHERE  job_id = any($1::uuid[]);`
+FROM   soma.job
+WHERE  id = any($1::uuid[]);`
 
 	JobSave = `
-INSERT INTO soma.jobs (
-            job_id,
-            job_status,
-            job_result,
-            job_type,
+INSERT INTO soma.job (
+            id,
+            status,
+            result,
+            type,
             repository_id,
             user_id,
-            organizational_team_id,
+            team_id,
             job)
 SELECT $1::uuid,
        $2::varchar,

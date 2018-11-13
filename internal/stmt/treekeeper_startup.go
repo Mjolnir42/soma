@@ -269,10 +269,10 @@ WHERE     sr.repository_id = $1::uuid`
 
 	TkStartLoadJob = `
 SELECT   job
-FROM     soma.jobs
+FROM     soma.job
 WHERE    repository_id = $1::uuid
-AND      job_status != 'processed'
-ORDER BY job_serial ASC;`
+AND      status != 'processed'
+ORDER BY serial ASC;`
 
 	TkStartLoadSystemPropInstances = `
 SELECT      CASE WHEN srsp.instance_id IS NOT NULL THEN srsp.instance_id
