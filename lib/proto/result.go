@@ -69,6 +69,9 @@ type Result struct {
 	Groups           *[]Group           `json:"groups,omitempty"`
 	HostDeployments  *[]HostDeployment  `json:"hostDeployments,omitempty"`
 	Instances        *[]Instance        `json:"instances,omitempty"`
+	JobResults       *[]JobResult       `json:"jobResults,omitempty"`
+	JobStatus        *[]JobStatus       `json:"jobStatus,omitempty"`
+	JobTypes         *[]JobType         `json:"jobTypes,omitempty"`
 	Jobs             *[]Job             `json:"jobs,omitempty"`
 	Levels           *[]Level           `json:"levels,omitempty"`
 	Metrics          *[]Metric          `json:"metrics,omitempty"`

@@ -27,6 +27,9 @@ type Request struct {
 	Grant           *Grant           `json:"grant,omitempty"`
 	Group           *Group           `json:"group,omitempty"`
 	HostDeployment  *HostDeployment  `json:"hostDeployment,omitempty"`
+	JobResult       *JobResult       `json:"jobResult,omitempty"`
+	JobStatus       *JobStatus       `json:"jobStatus,omitempty"`
+	JobType         *JobType         `json:"jobType,omitempty"`
 	Level           *Level           `json:"level,omitempty"`
 	Metric          *Metric          `json:"metric,omitempty"`
 	Mode            *Mode            `json:"mode,omitempty"`

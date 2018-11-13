@@ -18,6 +18,9 @@ type Filter struct {
 	Grant       *GrantFilter       `json:"grant,omitempty"`
 	Group       *GroupFilter       `json:"group,omitempty"`
 	Job         *JobFilter         `json:"job,omitempty"`
+	JobResult   *JobResultFilter   `json:"jobResult,omitempty"`
+	JobStatus   *JobStatusFilter   `json:"jobStatus,omitempty"`
+	JobType     *JobTypeFilter     `json:"jobType,omitempty"`
 	Level       *LevelFilter       `json:"level,omitempty"`
 	Metric      *MetricFilter      `json:"metric,omitempty"`
 	Monitoring  *MonitoringFilter  `json:"monitoring,omitempty"`
