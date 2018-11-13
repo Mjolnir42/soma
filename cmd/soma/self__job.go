@@ -1,4 +1,12 @@
-package main
+/*-
+ * Copyright (c) 2016-2018, Jörg Pernfuß
+ * Copyright (c) 2016, 1&1 Internet SE
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"encoding/json"
@@ -7,6 +15,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
+	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -14,50 +23,70 @@ func registerJobs(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `jobs`,
-				Usage: `SUBCOMMANDS for job information`,
+				Name:        `job`,
+				Usage:       `SUBCOMMANDS for job information`,
+				Description: help.Text(`job::`),
 				Subcommands: []cli.Command{
 					{
-						Name:   `list`,
-						Usage:  `List outstanding jobs (remote)`,
-						Action: runtime(cmdJobList),
-					},
-					{
-						Name:   `show`,
-						Usage:  `Show details about a job (remote)`,
-						Action: runtime(cmdJobShow),
-					},
-					{
-						Name:  `local`,
-						Usage: `SUBCOMMANDS for locally saved jobs`,
-						Subcommands: []cli.Command{
-							{
-								Name:   `outstanding`,
-								Usage:  `List outstanding locally saved Jobs`,
-								Action: runtime(cmdJobLocalOutstanding),
-							},
-							{
-								Name:   `update`,
-								Usage:  `Check and update status of outstanding locally cached jobs`,
-								Action: runtime(cmdJobLocalUpdate),
-								Flags: []cli.Flag{
-									cli.BoolFlag{
-										Name:  "verbose, v",
-										Usage: "Include full raw job request (admin only)",
-									},
-								},
-							},
-							{
-								Name:   `list`,
-								Usage:  `List all locally cached jobs`,
-								Action: runtime(cmdJobLocalList),
-							},
-							{
-								Name:   `prune`,
-								Usage:  `Delete completed jobs from local cache`,
-								Action: runtime(cmdJobLocalPrune),
+						Name:        `update`,
+						Usage:       `Check and update status of outstanding locally cached jobs`,
+						Description: help.Text(`job::update`),
+						Action:      runtime(clientlocalJobUpdate),
+						Flags: []cli.Flag{
+							cli.BoolFlag{
+								Name:  "verbose, v",
+								Usage: "Include full raw job request (admin only)",
 							},
 						},
+					},
+					{
+						Name:        `show`,
+						Usage:       `Show details about a job`,
+						Description: help.Text(`job::show`),
+						Action:      runtime(jobShow),
+						Flags: []cli.Flag{
+							cli.BoolFlag{
+								Name:  "verbose, v",
+								Usage: "Include full raw job request (admin only)",
+							},
+						},
+					},
+					{
+						Name:        `wait`,
+						Usage:       `Block until a job has completed`,
+						Description: help.Text(`job::wait`),
+						Action:      runtime(jobWait),
+					},
+					{
+						Name:        `list`,
+						Usage:       `SUBCOMMANDS for listing job information`,
+						Description: help.Text(`job::list`),
+						Subcommands: []cli.Command{
+							{
+								Name:        `outstanding`,
+								Usage:       `List outstanding jobs from local cache DB`,
+								Description: help.Text(`job::list`),
+								Action:      runtime(clientlocalJobListOutstanding),
+							},
+							{
+								Name:        `local`,
+								Usage:       `List all jobs from local cache DB`,
+								Description: help.Text(`job::list`),
+								Action:      runtime(clientlocalJobListLocal),
+							},
+							{
+								Name:        `remote`,
+								Usage:       `List all jobs from server`,
+								Description: help.Text(`job::list`),
+								Action:      runtime(jobList),
+							},
+						},
+					},
+					{
+						Name:        `prune`,
+						Usage:       `Delete completed jobs from local cache`,
+						Description: help.Text(`job::prune`),
+						Action:      runtime(clientlocalJobPruneDB),
 					},
 				},
 			},
@@ -66,7 +95,7 @@ func registerJobs(app cli.App) *cli.App {
 	return &app
 }
 
-func cmdJobList(c *cli.Context) error {
+func jobList(c *cli.Context) error {
 	if err := adm.VerifyNoArgument(c); err != nil {
 		return err
 	}
@@ -74,7 +103,7 @@ func cmdJobList(c *cli.Context) error {
 	return adm.Perform(`get`, `/job/`, `list`, nil, c)
 }
 
-func cmdJobShow(c *cli.Context) error {
+func jobShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -88,7 +117,21 @@ func cmdJobShow(c *cli.Context) error {
 	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
-func cmdJobLocalOutstanding(c *cli.Context) error {
+func jobWait(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	if !adm.IsUUID(c.Args().First()) {
+		return fmt.Errorf("Argument is not a UUID: %s",
+			c.Args().First())
+	}
+
+	path := fmt.Sprintf("/job/byID/%s/_processed", c.Args().First())
+	return adm.Perform(`get`, path, `wait`, nil, c)
+}
+
+func clientlocalJobListOutstanding(c *cli.Context) error {
 	jobs, err := store.ActiveJobs()
 	if err != nil && err != bolt.ErrBucketNotFound {
 		return err
@@ -113,7 +156,7 @@ func cmdJobLocalOutstanding(c *cli.Context) error {
 	return nil
 }
 
-func cmdJobLocalUpdate(c *cli.Context) error {
+func clientlocalJobUpdate(c *cli.Context) error {
 	jobs, err := store.ActiveJobs()
 	if err != nil && err != bolt.ErrBucketNotFound {
 		return err
@@ -161,7 +204,7 @@ func cmdJobLocalUpdate(c *cli.Context) error {
 	return adm.FormatOut(c, resp.Body(), `list`)
 }
 
-func cmdJobLocalList(c *cli.Context) error {
+func clientlocalJobListLocal(c *cli.Context) error {
 	active, err := store.ActiveJobs()
 	if err != nil && err != bolt.ErrBucketNotFound {
 		return err
@@ -191,7 +234,7 @@ func cmdJobLocalList(c *cli.Context) error {
 	return nil
 }
 
-func cmdJobLocalPrune(c *cli.Context) error {
+func clientlocalJobPruneDB(c *cli.Context) error {
 	return store.PruneFinishedJobs()
 }
 

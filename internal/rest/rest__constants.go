@@ -82,6 +82,7 @@ const (
 	rtSearchGlobalProperty       = `/search/property-mgmt/:propertyType/`
 	rtSearchRight                = `/search/right/`
 	rtSearchServiceProperty      = `/search/team/:teamID/property-mgmt/:propertyType/`
+	rtSearchJob                  = `/search/job/`
 	rtSyncNode                   = `/sync/node/`
 	rtDeployment                 = `/monitoringsystem/:monitoringID/deployment/`
 	rtDeploymentID               = `/monitoringsystem/:monitoringID/deployment/id/:deploymentID`
@@ -92,6 +93,10 @@ const (
 	rtAliasDeploymentIDAction    = `/deployment/id/:deploymentID/:action`
 	rtOncallMember               = `/oncall/:oncallID/member/`
 	rtOncallMemberID             = `/oncall/:oncallID/member/:userID`
+	rtJob                        = `/job/`
+	rtJobEntry                   = `/job/byID/`
+	rtJobEntryID                 = `/job/byID/:jobID`
+	rtJobEntryWaitID             = `/job/byID/:jobID/_processed`
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
