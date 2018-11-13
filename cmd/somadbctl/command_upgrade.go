@@ -40,6 +40,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 		201809140002: upgradeSomaTo201809260001,
 		201809260001: upgradeSomaTo201811060001,
 		201811060001: upgradeSomaTo201811120001,
+		201811120001: upgradeSomaTo201811120002,
 	},
 	"root": map[int]func(int, string, bool) int{
 		000000000001: installRoot201605150001,
@@ -766,6 +767,83 @@ func upgradeSomaTo201811120001(curr int, tool string, printOnly bool) int {
 	)
 	executeUpgrades(stmts, printOnly)
 	return 201811120001
+}
+
+func upgradeSomaTo201811120002(curr int, tool string, printOnly bool) int {
+	if curr != 201811120001 {
+		return 0
+	}
+	stmts := []string{
+		`ALTER TABLE soma.jobs DROP CONSTRAINT jobs_job_status_fkey;`,
+		`ALTER TABLE soma.job_status DROP CONSTRAINT job_status_pkey;`,
+		`ALTER TABLE soma.job_status ADD COLUMN id uuid NOT NULL DEFAULT gen_random_uuid();`,
+		`ALTER TABLE soma.job_status RENAME job_status TO name;`,
+		`ALTER TABLE soma.job_status ADD CONSTRAINT _job_status_primary_key PRIMARY KEY (id);`,
+		`CREATE UNIQUE INDEX CONCURRENTLY _job_status_unique_name ON soma.job_status ( name ASC );`,
+		`ALTER TABLE soma.jobs DROP CONSTRAINT jobs_job_result_fkey;`,
+		`ALTER TABLE soma.job_results DROP CONSTRAINT job_results_pkey;`,
+		`ALTER TABLE soma.job_results RENAME TO job_result;`,
+		`ALTER TABLE soma.job_result ADD COLUMN id uuid NOT NULL DEFAULT gen_random_uuid();`,
+		`ALTER TABLE soma.job_result RENAME job_result TO name;`,
+		`ALTER TABLE soma.job_result ADD CONSTRAINT _job_result_primary_key PRIMARY KEY (id);`,
+		`CREATE UNIQUE INDEX CONCURRENTLY _job_result_unique_name ON soma.job_result ( name ASC );`,
+		`ALTER TABLE soma.jobs DROP CONSTRAINT jobs_job_type_fkey;`,
+		`ALTER TABLE soma.job_types DROP CONSTRAINT job_types_pkey;`,
+		`ALTER TABLE soma.job_types RENAME TO job_type;`,
+		`ALTER TABLE soma.job_type ADD COLUMN id uuid NOT NULL DEFAULT gen_random_uuid();`,
+		`ALTER TABLE soma.job_type RENAME job_type TO name;`,
+		`ALTER TABLE soma.job_type ADD CONSTRAINT _job_type_primary_key PRIMARY KEY (id);`,
+		`CREATE UNIQUE INDEX CONCURRENTLY _job_type_unique_name ON soma.job_type ( name ASC );`,
+		`ALTER TABLE soma.jobs RENAME TO job;`,
+		`ALTER TABLE soma.job DROP CONSTRAINT jobs_pkey;`,
+		`ALTER TABLE soma.job RENAME job_id TO id; `,
+		`ALTER TABLE soma.job ALTER COLUMN id SET NOT NULL;`,
+		`ALTER TABLE soma.job ALTER COLUMN id SET DEFAULT gen_random_uuid();`,
+		`ALTER TABLE soma.job ADD CONSTRAINT _job_primary_key PRIMARY KEY (id);`,
+		`ALTER TABLE soma.job RENAME job_status TO status;`,
+		`ALTER TABLE soma.job ADD CONSTRAINT _job_status_exists FOREIGN KEY ( status ) REFERENCES soma.job_status ( name ) DEFERRABLE;`,
+		`ALTER TABLE soma.job RENAME job_result TO result;`,
+		`ALTER TABLE soma.job ADD CONSTRAINT _job_result_exists FOREIGN KEY ( result ) REFERENCES soma.job_result ( name ) DEFERRABLE;`,
+		`ALTER TABLE soma.job RENAME job_type TO type;`,
+		`ALTER TABLE soma.job ADD CONSTRAINT _job_type_exists FOREIGN KEY ( type ) REFERENCES soma.job_type ( name ) DEFERRABLE;`,
+		`ALTER TABLE soma.job RENAME job_serial TO serial;`,
+		`ALTER TABLE soma.job DROP CONSTRAINT jobs_organizational_team_id_fkey;`,
+		`ALTER TABLE soma.job RENAME organizational_team_id TO team_id;`,
+		`ALTER TABLE soma.job ADD CONSTRAINT _job_team_exists FOREIGN KEY ( team_id ) REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE;`,
+		`ALTER TABLE soma.job DROP CONSTRAINT jobs_repository_id_fkey;`,
+		`ALTER TABLE soma.job ADD CONSTRAINT _job_repository_exists FOREIGN KEY ( repository_id ) REFERENCES soma.repositories ( repository_id ) DEFERRABLE;`,
+		`ALTER TABLE soma.job DROP CONSTRAINT jobs_user_id_fkey;`,
+		`ALTER TABLE soma.job ADD CONSTRAINT _job_user_exists FOREIGN KEY ( user_id ) REFERENCES inventory.users ( user_id ) DEFERRABLE;`,
+		`ALTER TABLE soma.job RENAME job_error TO error;`,
+		`ALTER TABLE soma.job RENAME job_queued TO queued_at;`,
+		`ALTER TABLE soma.job RENAME job_started TO started_at;`,
+		`ALTER TABLE soma.job RENAME job_finished TO finished_at;`,
+		`ALTER INDEX IF EXISTS _jobs_by_repo RENAME TO _job_by_repository;`,
+		`ALTER INDEX IF EXISTS _not_processed_jobs RENAME TO _job_not_processed;`,
+		`ALTER TABLE soma.job_status ADD COLUMN created_by uuid NULL;`,
+		`ALTER TABLE soma.job_status ADD COLUMN created_at timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3);`,
+		`UPDATE soma.job_status SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
+		`ALTER TABLE soma.job_status ALTER COLUMN created_by SET NOT NULL;`,
+		`ALTER TABLE soma.job_status ADD CONSTRAINT _job_status_user_exists FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE;`,
+		`ALTER TABLE soma.job_status ADD CONSTRAINT _job_status_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' );`,
+		`ALTER TABLE soma.job_result ADD COLUMN created_by uuid NULL;`,
+		`ALTER TABLE soma.job_result ADD COLUMN created_at timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3);`,
+		`UPDATE soma.job_result SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
+		`ALTER TABLE soma.job_result ALTER COLUMN created_by SET NOT NULL;`,
+		`ALTER TABLE soma.job_result ADD CONSTRAINT _job_result_user_exists FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE;`,
+		`ALTER TABLE soma.job_result ADD CONSTRAINT _job_result_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' );`,
+		`ALTER TABLE soma.job_type ADD COLUMN created_by uuid NULL;`,
+		`ALTER TABLE soma.job_type ADD COLUMN created_at timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3);`,
+		`UPDATE soma.job_type SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
+		`ALTER TABLE soma.job_type ALTER COLUMN created_by SET NOT NULL;`,
+		`ALTER TABLE soma.job_type ADD CONSTRAINT _job_type_user_exists FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE;`,
+		`ALTER TABLE soma.job_type ADD CONSTRAINT _job_type_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' );`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201811120002, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+	return 201811120002
 }
 
 func installRoot201605150001(curr int, tool string, printOnly bool) int {

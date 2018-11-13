@@ -8,59 +8,87 @@ func createTablesJobs(printOnly bool, verbose bool) {
 	// resolve successfully
 	queries := make([]string, 10)
 
-	queryMap["createTableJobStatus"] = `
+	queryMap[`createTableJobStatus`] = `
 create table if not exists soma.job_status (
-    job_status                  varchar(32)     PRIMARY KEY
+    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    name                        varchar(32)     NOT NULL,
+    created_by                  uuid            NOT NULL,
+    created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
+    CONSTRAINT _job_status_primary_key          PRIMARY KEY ( id ),
+    CONSTRAINT _job_status_unique_name          UNIQUE ( name ),
+    CONSTRAINT _job_status_user_exists          FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    CONSTRAINT _job_status_timezone_utc         CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' )
 );`
-	queries[idx] = "createTableJobStatus"
+	queries[idx] = `createTableJobStatus`
 	idx++
 
-	queryMap["createTableJobResults"] = `
-create table if not exists soma.job_results (
-    job_result                  varchar(32)     PRIMARY KEY
+	queryMap[`createTableJobResult`] = `
+create table if not exists soma.job_result (
+    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    name                        varchar(32)     NOT NULL,
+    created_by                  uuid            NOT NULL,
+    created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
+    CONSTRAINT _job_result_primary_key          PRIMARY KEY (id),
+    CONSTRAINT _job_result_unique_name          UNIQUE (name),
+    CONSTRAINT _job_result_user_exists          FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    CONSTRAINT _job_result_timezone_utc         CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' )
 );`
-	queries[idx] = "createTableJobResults"
+	queries[idx] = `createTableJobResult`
 	idx++
 
-	queryMap["createTableJobTypes"] = `
-create table if not exists soma.job_types (
-    job_type                    varchar(128)    PRIMARY KEY
+	queryMap[`createTableJobType`] = `
+create table if not exists soma.job_type (
+    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    name                        varchar(128)    NOT NULL,
+    created_by                  uuid            NOT NULL,
+    created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
+    CONSTRAINT _job_type_primary_key            PRIMARY KEY (id),
+    CONSTRAINT _job_type_unique_name            UNIQUE (name),
+    CONSTRAINT _job_type_user_exists            FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    CONSTRAINT _job_type_timezone_utc           CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' )
 );`
-	queries[idx] = "createTableJobTypes"
+	queries[idx] = `createTableJobType`
 	idx++
 
-	queryMap["createTableJobs"] = `
-create table if not exists soma.jobs (
-    job_id                      uuid            PRIMARY KEY,
-    job_status                  varchar(32)     NOT NULL REFERENCES soma.job_status ( job_status ) DEFERRABLE,
-    job_result                  varchar(32)     NOT NULL REFERENCES soma.job_results ( job_result ) DEFERRABLE,
-    job_type                    varchar(128)    NOT NULL REFERENCES soma.job_types ( job_type ) DEFERRABLE,
-    job_serial                  bigserial       NOT NULL,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
-    user_id                     uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
-    job_error                   text            NOT NULL DEFAULT '',
-    job_queued                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
-    job_started                 timestamptz(3),
-    job_finished                timestamptz(3),
-    job                         jsonb           NOT NULL
+	queryMap[`createTableJob`] = `
+create table if not exists soma.job (
+    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    status                      varchar(32)     NOT NULL,
+    result                      varchar(32)     NOT NULL,
+    type                        varchar(128)    NOT NULL,
+    serial                      bigserial       NOT NULL,
+    repository_id               uuid            NOT NULL,
+    user_id                     uuid            NOT NULL,
+    team_id                     uuid            NOT NULL,
+    error                       text            NOT NULL DEFAULT '',
+    queued_at                   timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
+    started_at                  timestamptz(3),
+    finished_at                 timestamptz(3),
+    job                         jsonb           NOT NULL,
+    CONSTRAINT _job_primary_key                 PRIMARY KEY (id),
+    CONSTRAINT _job_status_exists               FOREIGN KEY ( status ) REFERENCES soma.job_status ( name ) DEFERRABLE,
+    CONSTRAINT _job_result_exists               FOREIGN KEY ( result ) REFERENCES soma.job_result ( name ) DEFERRABLE,
+    CONSTRAINT _job_type_exists                 FOREIGN KEY ( type ) REFERENCES soma.job_type ( name ) DEFERRABLE,
+    CONSTRAINT _job_repository_exists           FOREIGN KEY ( repository_id ) REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    CONSTRAINT _job_user_exists                 FOREIGN KEY ( user_id ) REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    CONSTRAINT _job_team_exists                 FOREIGN KEY ( team_id ) REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE
 );`
-	queries[idx] = "createTableJobs"
+	queries[idx] = `createTableJobs`
 	idx++
 
-	queryMap["createIndexJobStatus"] = `
-create index _not_processed_jobs
-    on soma.jobs ( organizational_team_id, user_id, job_status, job_id )
-    where job_status != 'processed'
+	queryMap[`createIndexJobStatus`] = `
+create index _job_not_processed
+    on soma.job ( team_id, user_id, status, id )
+    where status != 'processed'
 ;`
-	queries[idx] = "createIndexJobStatus"
+	queries[idx] = `createIndexJobStatus`
 	idx++
 
-	queryMap["createIndexRepoJobs"] = `
-create index _jobs_by_repo
-    on soma.jobs ( repository_id, job_serial, job_id, job_status )
+	queryMap[`createIndexRepoJob`] = `
+create index _job_by_repository
+    on soma.job ( repository_id, serial, id, status )
 ;`
-	queries[idx] = "createIndexRepoJobs"
+	queries[idx] = `createIndexRepoJob`
 
 	performDatabaseTask(printOnly, verbose, queries, queryMap)
 }
