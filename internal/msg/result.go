@@ -42,6 +42,7 @@ type Result struct {
 	HostDeployment []proto.HostDeployment
 	Instance       []proto.Instance
 	Job            []proto.Job
+	JobType        []proto.JobType
 	Level          []proto.Level
 	Metric         []proto.Metric
 	Mode           []proto.Mode

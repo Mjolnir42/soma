@@ -416,6 +416,15 @@ func LookupCheckObjectID(oType, oName, buck string) (string, error) {
 	return ``, fmt.Errorf("Unknown object type: %s", oType)
 }
 
+// LookupJobTypeID looks up the UUID for the JobType with name s from
+// the server
+func LookupJobTypeID(s string) (string, error) {
+	if IsUUID(s) {
+		return s, nil
+	}
+	return jobMetaIDByName(`type`, s)
+}
+
 // oncallIDByName implements the actual serverside lookup of the
 // oncall duty UUID
 func oncallIDByName(oncall string) (string, error) {
@@ -1324,6 +1333,52 @@ func checkApplicationError(result *proto.Result) error {
 		return fmt.Errorf(combineStrings(m...))
 	}
 	return nil
+}
+
+// jobMetaIDByName implements the actual lookup of job metadata
+// definitions from the server
+func jobMetaIDByName(meta, name string) (string, error) {
+	var (
+		req  proto.Request
+		path string
+		err  error
+	)
+	res := &proto.Result{}
+
+	switch meta {
+	case `type`:
+		req = proto.NewJobTypeFilter()
+		req.Filter.JobType.Name = name
+		path = `/search/jobType/`
+	default:
+		err = fmt.Errorf("unknown meta object: %s", meta)
+		goto abort
+	}
+
+	if res, err = fetchFilter(req, path); err != nil {
+		goto abort
+	}
+
+	switch meta {
+	case `type`:
+		if res.JobTypes == nil || len(*res.JobTypes) == 0 {
+			err = fmt.Errorf("no object returned for %s", meta)
+			goto abort
+		}
+		if name != (*res.JobTypes)[0].Name {
+			err = fmt.Errorf(
+				"name mismatch: %s vs %s",
+				name, (*res.JobTypes)[0].Name,
+			)
+			goto abort
+		}
+		return (*res.JobTypes)[0].ID, nil
+	default:
+		err = fmt.Errorf("unknown meta object: %s", meta)
+	}
+
+abort:
+	return ``, fmt.Errorf("JobMetadataID lookup failed: %s", err.Error())
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

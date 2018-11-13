@@ -83,6 +83,7 @@ const (
 	rtSearchRight                = `/search/right/`
 	rtSearchServiceProperty      = `/search/team/:teamID/property-mgmt/:propertyType/`
 	rtSearchJob                  = `/search/job/`
+	rtSearchJobType              = `/search/jobType/`
 	rtSyncNode                   = `/sync/node/`
 	rtDeployment                 = `/monitoringsystem/:monitoringID/deployment/`
 	rtDeploymentID               = `/monitoringsystem/:monitoringID/deployment/id/:deploymentID`
@@ -97,6 +98,8 @@ const (
 	rtJobEntry                   = `/job/byID/`
 	rtJobEntryID                 = `/job/byID/:jobID`
 	rtJobEntryWaitID             = `/job/byID/:jobID/_processed`
+	rtJobTypeMgmt                = `/job/type-mgmt/`
+	rtJobTypeMgmtID              = `/job/type-mgmt/:typeID`
 )
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

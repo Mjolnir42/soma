@@ -90,6 +90,48 @@ SELECT $1::uuid,
        $7::jsonb
 FROM   inventory.users iu
 WHERE  iu.user_uid = $6::varchar;`
+
+	JobTypeMgmtList = `
+SELECT id
+FROM   soma.job_type;`
+
+	JobTypeMgmtShow = `
+SELECT sjt.id,
+       sjt.name,
+       iu.user_uid,
+       sjt.created_at
+FROM   soma.job_type sjt
+JOIN   inventory.users iu
+  ON   sjt.created_by = iu.user_id
+WHERE  sjt.id = $1::uuid;`
+
+	JobTypeMgmtAdd = `
+INSERT INTO soma.job_type (
+            id,
+            name,
+            created_by)
+SELECT $1::uuid,
+       $2::varchar,
+       ( SELECT user_id
+         FROM   inventory.users
+         WHERE  user_uid = $3::varchar)
+WHERE  NOT EXISTS (
+   SELECT  id
+   FROM    soma.job_type
+   WHERE   id = $1::uuid
+      OR   name = $2::varchar);`
+
+	JobTypeMgmtRemove = `
+DELETE FROM soma.job_type
+WHERE       id = $1::uuid;`
+
+	JobTypeMgmtSearch = `
+SELECT id,
+       name
+FROM   soma.job_type
+WHERE  ( id = $1::uuid OR $1::uuid IS NULL )
+  AND  ( name = $2::varchar OR $2::varchar IS NULL )
+  AND  NOT ( $1::uuid IS NULL AND $2::varchar IS NULL );`
 )
 
 func init() {
@@ -98,6 +140,11 @@ func init() {
 	m[JobSave] = `JobSave`
 	m[ListAllOutstandingJobs] = `ListAllOutstandingJobs`
 	m[ListScopedOutstandingJobs] = `ListScopedOutstandingJobs`
+	m[JobTypeMgmtList] = `JobTypeMgmtList`
+	m[JobTypeMgmtShow] = `JobTypeMgmtShow`
+	m[JobTypeMgmtAdd] = `JobTypeMgmtAdd`
+	m[JobTypeMgmtRemove] = `JobTypeMgmtRemove`
+	m[JobTypeMgmtSearch] = `JobTypeMgmtSearch`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

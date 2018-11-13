@@ -15,6 +15,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
+	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
 )
@@ -87,6 +88,44 @@ func registerJobs(app cli.App) *cli.App {
 						Usage:       `Delete completed jobs from local cache`,
 						Description: help.Text(`job::prune`),
 						Action:      runtime(clientlocalJobPruneDB),
+					},
+					{
+						Name:        `type-mgmt`,
+						Usage:       `SUBCOMMANDS for job type management`,
+						Description: help.Text(`job-type-mgmt::`),
+						Subcommands: []cli.Command{
+							{
+								Name:        `add`,
+								Usage:       `Add a job type`,
+								Description: help.Text(`job-type-mgmt::add`),
+								Action:      runtime(jobTypeMgmtAdd),
+							},
+							{
+								Name:        `remove`,
+								Usage:       `Remove an unused job type`,
+								Description: help.Text(`job-type-mgmt::remove`),
+								Action:      runtime(jobTypeMgmtRemove),
+							},
+							{
+								Name:        `show`,
+								Usage:       `Show details about a job type`,
+								Description: help.Text(`job-type-mgmt::show`),
+								Action:      runtime(jobTypeMgmtShow),
+							},
+							{
+								Name:        `list`,
+								Usage:       `List all defined job types`,
+								Description: help.Text(`job-type-mgmt::list`),
+								Action:      runtime(jobTypeMgmtList),
+							},
+							{
+								Name:         `search`,
+								Usage:        `Search for a defined job types`,
+								Description:  help.Text(`job-type-mgmt::search`),
+								Action:       runtime(jobTypeMgmtSearch),
+								BashComplete: cmpl.DirectIdName,
+							},
+						},
 					},
 				},
 			},

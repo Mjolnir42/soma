@@ -49,6 +49,7 @@ type Request struct {
 	Group       proto.Group
 	Instance    proto.Instance
 	Job         proto.Job
+	JobType     proto.JobType
 	Level       proto.Level
 	Metric      proto.Metric
 	Mode        proto.Mode
@@ -94,6 +95,7 @@ type Filter struct {
 	Grant      proto.Grant
 	Group      proto.Group
 	Job        proto.JobFilter
+	JobType    proto.JobType
 	Level      proto.Level
 	Monitoring proto.Monitoring
 	Node       proto.Node
