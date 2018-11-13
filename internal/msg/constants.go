@@ -38,6 +38,7 @@ const (
 	SectionInstanceMgmt     = `instance-mgmt`
 	SectionJobMgmt          = `job-mgmt`
 	SectionJobResultMgmt    = `job-result-mgmt`
+	SectionJobStatusMgmt    = `job-status-mgmt`
 	SectionJobTypeMgmt      = `job-type-mgmt`
 	SectionLevel            = `level`
 	SectionMetric           = `metric`

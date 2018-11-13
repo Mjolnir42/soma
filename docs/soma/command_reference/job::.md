@@ -20,6 +20,12 @@ soma job type-mgmt show ${type}
 soma job type-mgmt list
 soma job type-mgmt search [id ${uuid}] [name ${type}]
 
+soma job status-mgmt add ${status}
+soma job status-mgmt remove ${status}
+soma job status-mgmt show ${status}
+soma job status-mgmt list
+soma job status-mgmt search [id ${uuid}] [name ${status}]
+
 soma job result-mgmt add ${result}
 soma job result-mgmt remove ${result}
 soma job result-mgmt show ${result}
@@ -27,4 +33,4 @@ soma job result-mgmt list
 soma job result-mgmt search [id ${uuid}] [name ${result}]
 ```
 
-See `soma job help ${command}`, `soma job type-mgmt help ${command}` or `soma job result-mgmt help ${command}` for detailed help.
+See `soma job help ${command}`, `soma job type-mgmt help ${command}`, `soma job status-mgmt help ${command}` or `soma job result-mgmt help ${command}` for detailed help.

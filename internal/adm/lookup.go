@@ -425,6 +425,15 @@ func LookupJobResultID(s string) (string, error) {
 	return jobMetaIDByName(`result`, s)
 }
 
+// LookupJobStatusID looks up the UUID for the JobStatus with name s
+// from the server
+func LookupJobStatusID(s string) (string, error) {
+	if IsUUID(s) {
+		return s, nil
+	}
+	return jobMetaIDByName(`status`, s)
+}
+
 // LookupJobTypeID looks up the UUID for the JobType with name s from
 // the server
 func LookupJobTypeID(s string) (string, error) {
@@ -1359,6 +1368,10 @@ func jobMetaIDByName(meta, name string) (string, error) {
 		req = proto.NewJobResultFilter()
 		req.Filter.JobResult.Name = name
 		path = `/search/jobResult/`
+	case `status`:
+		req = proto.NewJobStatusFilter()
+		req.Filter.JobStatus.Name = name
+		path = `/search/jobStatus/`
 	case `type`:
 		req = proto.NewJobTypeFilter()
 		req.Filter.JobType.Name = name
@@ -1386,6 +1399,19 @@ func jobMetaIDByName(meta, name string) (string, error) {
 			goto abort
 		}
 		return (*res.JobResults)[0].ID, nil
+	case `status`:
+		if res.JobStatus == nil || len(*res.JobStatus) == 0 {
+			err = fmt.Errorf("no object returned for %s", meta)
+			goto abort
+		}
+		if name != (*res.JobStatus)[0].Name {
+			err = fmt.Errorf(
+				"name mismatch: %s vs %s",
+				name, (*res.JobStatus)[0].Name,
+			)
+			goto abort
+		}
+		return (*res.JobStatus)[0].ID, nil
 	case `type`:
 		if res.JobTypes == nil || len(*res.JobTypes) == 0 {
 			err = fmt.Errorf("no object returned for %s", meta)

@@ -111,17 +111,6 @@ INSERT INTO soma.authorizations_global (
 	queries[idx] = "grantOmnipotence"
 	idx++
 
-	queryMap["insertJobStatus"] = `
-INSERT INTO soma.job_status (
-            job_status
-) VALUES
-            ( 'queued' ),
-            ( 'in_progress' ),
-            ( 'processed' )
-;`
-	queries[idx] = "insertJobStatus"
-	idx++
-
 	queryMap["insertRootRestricted"] = `
 INSERT INTO root.flags (
             flag,

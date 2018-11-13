@@ -174,6 +174,48 @@ FROM   soma.job_result
 WHERE  ( id = $1::uuid OR $1::uuid IS NULL )
   AND  ( name = $2::varchar OR $2::varchar IS NULL )
   AND  NOT ( $1::uuid IS NULL AND $2::varchar IS NULL );`
+
+	JobStatusMgmtList = `
+SELECT id
+FROM   soma.job_status;`
+
+	JobStatusMgmtShow = `
+SELECT sjs.id,
+       sjs.name,
+       iu.user_uid,
+       sjs.created_at
+FROM   soma.job_status sjs
+JOIN   inventory.users iu
+  ON   sjs.created_by = iu.user_id
+WHERE  sjs.id = $1::uuid;`
+
+	JobStatusMgmtAdd = `
+INSERT INTO soma.job_status (
+            id,
+            name,
+            created_by)
+SELECT $1::uuid,
+       $2::varchar,
+       ( SELECT user_id
+         FROM   inventory.users
+         WHERE  user_uid = $3::varchar)
+WHERE  NOT EXISTS (
+   SELECT  id
+   FROM    soma.job_status
+   WHERE   id = $1::uuid
+      OR   name = $2::varchar);`
+
+	JobStatusMgmtRemove = `
+DELETE FROM soma.job_status
+WHERE       id = $1::uuid;`
+
+	JobStatusMgmtSearch = `
+SELECT id,
+       name
+FROM   soma.job_status
+WHERE  ( id = $1::uuid OR $1::uuid IS NULL )
+  AND  ( name = $2::varchar OR $2::varchar IS NULL )
+  AND  NOT ( $1::uuid IS NULL AND $2::varchar IS NULL );`
 )
 
 func init() {
@@ -192,6 +234,11 @@ func init() {
 	m[JobResultMgmtAdd] = `JobResultMgmtAdd`
 	m[JobResultMgmtRemove] = `JobResultMgmtRemove`
 	m[JobResultMgmtSearch] = `JobResultMgmtSearch`
+	m[JobStatusMgmtList] = `JobStatusMgmtList`
+	m[JobStatusMgmtShow] = `JobStatusMgmtShow`
+	m[JobStatusMgmtAdd] = `JobStatusMgmtAdd`
+	m[JobStatusMgmtRemove] = `JobStatusMgmtRemove`
+	m[JobStatusMgmtSearch] = `JobStatusMgmtSearch`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

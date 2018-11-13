@@ -85,6 +85,7 @@ const (
 	rtSearchJob                  = `/search/job/`
 	rtSearchJobType              = `/search/jobType/`
 	rtSearchJobResult            = `/search/jobResult/`
+	rtSearchJobStatus            = `/search/jobStatus/`
 	rtSyncNode                   = `/sync/node/`
 	rtDeployment                 = `/monitoringsystem/:monitoringID/deployment/`
 	rtDeploymentID               = `/monitoringsystem/:monitoringID/deployment/id/:deploymentID`
@@ -101,6 +102,8 @@ const (
 	rtJobEntryWaitID             = `/job/byID/:jobID/_processed`
 	rtJobTypeMgmt                = `/job/type-mgmt/`
 	rtJobTypeMgmtID              = `/job/type-mgmt/:typeID`
+	rtJobStatusMgmt              = `/job/status-mgmt/`
+	rtJobStatusMgmtID            = `/job/status-mgmt/:statusID`
 	rtJobResultMgmt              = `/job/result-mgmt/`
 	rtJobResultMgmtID            = `/job/result-mgmt/:resultID`
 )

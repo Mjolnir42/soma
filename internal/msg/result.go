@@ -43,6 +43,7 @@ type Result struct {
 	Instance       []proto.Instance
 	Job            []proto.Job
 	JobResult      []proto.JobResult
+	JobStatus      []proto.JobStatus
 	JobType        []proto.JobType
 	Level          []proto.Level
 	Metric         []proto.Metric

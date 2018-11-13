@@ -50,6 +50,7 @@ type Request struct {
 	Instance    proto.Instance
 	Job         proto.Job
 	JobResult   proto.JobResult
+	JobStatus   proto.JobStatus
 	JobType     proto.JobType
 	Level       proto.Level
 	Metric      proto.Metric
@@ -97,6 +98,7 @@ type Filter struct {
 	Group      proto.Group
 	Job        proto.JobFilter
 	JobResult  proto.JobResult
+	JobStatus  proto.JobStatus
 	JobType    proto.JobType
 	Level      proto.Level
 	Monitoring proto.Monitoring
