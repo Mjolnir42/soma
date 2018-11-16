@@ -11,6 +11,7 @@ package soma
 import (
 	"database/sql"
 	"strconv"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/handler"
@@ -86,9 +87,9 @@ func (r *TeamRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.ListTeams: &r.stmtList,
-		stmt.ShowTeams: &r.stmtShow,
-		stmt.SyncTeams: &r.stmtSync,
+		stmt.TeamList: &r.stmtList,
+		stmt.TeamShow: &r.stmtShow,
+		stmt.TeamSync: &r.stmtSync,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`team`, err, stmt.Name(statement))
@@ -164,10 +165,12 @@ func (r *TeamRead) list(q *msg.Request, mr *msg.Result) {
 // show returns the details for a specific team
 func (r *TeamRead) show(q *msg.Request, mr *msg.Result) {
 	var (
-		teamID, teamName string
-		ldapID           int
-		systemFlag       bool
-		err              error
+		teamID, teamName            string
+		dictID, dictName, createdBy string
+		createdAt                   time.Time
+		ldapID                      int
+		systemFlag                  bool
+		err                         error
 	)
 
 	if err = r.stmtShow.QueryRow(
@@ -177,6 +180,10 @@ func (r *TeamRead) show(q *msg.Request, mr *msg.Result) {
 		&teamName,
 		&ldapID,
 		&systemFlag,
+		&dictID,
+		&dictName,
+		&createdBy,
+		&createdAt,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err, q.Section)
 		return
@@ -189,6 +196,14 @@ func (r *TeamRead) show(q *msg.Request, mr *msg.Result) {
 		Name:     teamName,
 		LdapID:   strconv.Itoa(ldapID),
 		IsSystem: systemFlag,
+		Details: &proto.TeamDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedAt: createdAt.Format(msg.RFC3339Milli),
+				CreatedBy: createdBy,
+			},
+			DictionaryID:   dictID,
+			DictionaryName: dictName,
+		},
 	})
 	mr.OK()
 }

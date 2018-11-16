@@ -10,9 +10,9 @@ import (
 const MaxInt = int(^uint(0) >> 1)
 
 var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
-	//	"inventory": map[int]func(int, string) int{
-	//		201605060001: mock_upgrade_inventory_201605060001,
-	//	},
+	`inventory`: map[int]func(int, string, bool) int{
+		201605060001: upgradeInventoryTo201811150001,
+	},
 	"auth": map[int]func(int, string, bool) int{
 		201605060001: upgradeAuthTo201605150002,
 		201605150002: upgradeAuthTo201605190001,
@@ -82,6 +82,111 @@ loop:
 		}
 	}
 	done <- true
+}
+
+func upgradeInventoryTo201811150001(curr int, tool string, printOnly bool) int {
+	if curr != 201605060001 {
+		return 0
+	}
+	stmts := []string{
+		`CREATE TABLE IF NOT EXISTS inventory.dictionary ( id uuid NOT NULL DEFAULT gen_random_uuid(), name varchar(128) NOT NULL, created_by uuid NOT NULL, created_at timestamptz(3) NOT NULL DEFAULT now(), CONSTRAINT _dictionary_primary_key PRIMARY KEY( id ), CONSTRAINT _dictionary_unique_name UNIQUE ( name ) DEFERRABLE, CONSTRAINT _dictionary_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' ));`,
+		`INSERT INTO inventory.dictionary ( id, name, created_by ) VALUES ( '00000000-0000-0000-0000-000000000000'::uuid, 'system'::varchar, '00000000-0000-0000-0000-000000000000'::uuid );`,
+		`ALTER INDEX IF EXISTS organizational_teams_pkey RENAME TO _team_primary_key;`,
+		`ALTER TABLE inventory.organizational_teams DROP CONSTRAINT organizational_teams_organizational_team_name_key;`,
+		`ALTER TABLE inventory.organizational_teams DROP CONSTRAINT organizational_teams_organizational_team_ldap_id_key;`,
+		`ALTER TABLE inventory.organizational_teams RENAME TO team;`,
+		`ALTER TABLE inventory.team RENAME organizational_team_id TO id;`,
+		`ALTER TABLE inventory.team ALTER COLUMN id SET DEFAULT gen_random_uuid();`,
+		`ALTER TABLE inventory.team RENAME organizational_team_name TO name;`,
+		`ALTER TABLE inventory.team RENAME organizational_team_ldap_id TO ldap_id;`,
+		`ALTER TABLE inventory.team RENAME organizational_team_system TO is_system;`,
+		`ALTER TABLE inventory.team ADD COLUMN dictionary_id uuid NULL;`,
+		`ALTER TABLE inventory.team ADD CONSTRAINT _team_dictionary_exists FOREIGN KEY (dictionary_id) REFERENCES inventory.dictionary (id) DEFERRABLE;`,
+		`ALTER TABLE inventory.team ADD COLUMN created_by uuid NULL;`,
+		`ALTER TABLE inventory.team ADD COLUMN created_at timestamptz(3) NOT NULL DEFAULT now();`,
+		`UPDATE inventory.team SET dictionary_id = '00000000-0000-0000-0000-000000000000'::uuid WHERE dictionary_id IS NULL;`,
+		`ALTER TABLE inventory.team ALTER COLUMN dictionary_id SET NOT NULL;`,
+		`UPDATE inventory.team SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
+		`ALTER TABLE inventory.team ALTER COLUMN created_by SET NOT NULL;`,
+		`ALTER TABLE inventory.team ADD CONSTRAINT _team_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' );`,
+		`ALTER TABLE inventory.team ADD CONSTRAINT _team_from_dictionary_for_fk UNIQUE (dictionary_id, id);`,
+		`ALTER TABLE inventory.team ADD CONSTRAINT _team_unique_name UNIQUE (name);`,
+		`ALTER TABLE inventory.team ADD CONSTRAINT _team_unique_ldap_id_per_dictionary UNIQUE (dictionary_id, ldap_id);`,
+		`ALTER INDEX IF EXISTS _users_deleted RENAME TO _user_is_deleted;`,
+		`ALTER INDEX IF EXISTS _users_system RENAME TO _user_is_system;`,
+		`ALTER INDEX IF EXISTS _users_deactivated RENAME TO _user_is_inactive;`,
+		`ALTER INDEX IF EXISTS users_pkey RENAME TO _user_primary_key;`,
+		`ALTER TABLE inventory.users DROP CONSTRAINT users_organizational_team_id_fkey;`,
+		`ALTER TABLE inventory.users DROP CONSTRAINT users_user_employee_number_key;`,
+		`ALTER INDEX IF EXISTS users_user_uid_key RENAME TO _user_unique_name;`,
+		`ALTER TABLE inventory.users RENAME TO "user";`,
+		`ALTER TABLE inventory.user ADD COLUMN dictionary_id uuid NULL;`,
+		`ALTER TABLE inventory.user ADD CONSTRAINT _user_dictionary_exists FOREIGN KEY (dictionary_id) REFERENCES inventory.dictionary (id) DEFERRABLE;`,
+		`UPDATE inventory.user SET dictionary_id = '00000000-0000-0000-0000-000000000000'::uuid WHERE dictionary_id IS NULL;`,
+		`ALTER TABLE inventory.user ALTER COLUMN dictionary_id SET NOT NULL;`,
+		`ALTER TABLE inventory.user RENAME user_id TO id;`,
+		`ALTER TABLE inventory.user ALTER COLUMN id SET DEFAULT gen_random_uuid();`,
+		`ALTER TABLE inventory.user RENAME user_uid TO uid;`,
+		`ALTER TABLE inventory.user RENAME user_first_name TO first_name;`,
+		`ALTER TABLE inventory.user RENAME user_last_name TO last_name;`,
+		`ALTER TABLE inventory.user RENAME user_employee_number TO employee_number;`,
+		`ALTER TABLE inventory.user ADD CONSTRAINT _user_unique_employee_number_per_dictionary UNIQUE (dictionary_id, employee_number);`,
+		`ALTER TABLE inventory.user RENAME user_mail_address TO mail_address;`,
+		`ALTER TABLE inventory.user RENAME user_is_active TO is_active;`,
+		`ALTER TABLE inventory.user RENAME user_is_system TO is_system;`,
+		`ALTER TABLE inventory.user RENAME user_is_deleted TO is_deleted;`,
+		`ALTER TABLE inventory.user RENAME organizational_team_id TO team_id;`,
+		`ALTER TABLE inventory.user ADD CONSTRAINT _user_team_exists FOREIGN KEY (team_id) REFERENCES inventory.team (id) DEFERRABLE;`,
+		`ALTER TABLE inventory.user ADD CONSTRAINT _user_from_same_dictionary_as_team FOREIGN KEY (dictionary_id, team_id) REFERENCES inventory.team (dictionary_id, id) DEFERRABLE;`,
+		`ALTER TABLE inventory.user ADD COLUMN created_by uuid NULL;`,
+		`ALTER TABLE inventory.user ADD COLUMN created_at timestamptz(3) NOT NULL DEFAULT now();`,
+		`UPDATE inventory.user SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
+		`ALTER TABLE inventory.user ALTER COLUMN created_by SET NOT NULL;`,
+		`ALTER TABLE inventory.user ADD CONSTRAINT _user_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' );`,
+		`ALTER TABLE inventory.oncall_duty_teams DROP CONSTRAINT oncall_duty_teams_oncall_duty_name_key;`,
+		`ALTER TABLE inventory.oncall_duty_teams DROP CONSTRAINT oncall_duty_teams_oncall_duty_phone_number_key;`,
+		`ALTER INDEX IF EXISTS oncall_duty_teams_pkey RENAME TO _oncall_team_primary_key;`,
+		`ALTER TABLE inventory.oncall_duty_teams RENAME TO oncall_team;`,
+		`ALTER TABLE inventory.oncall_team RENAME oncall_duty_id TO id;`,
+		`ALTER TABLE inventory.oncall_team RENAME oncall_duty_name TO name;`,
+		`ALTER TABLE inventory.oncall_team RENAME oncall_duty_phone_number TO phone_number;`,
+		`ALTER TABLE inventory.oncall_team ALTER COLUMN phone_number TYPE numeric(5,0);`,
+		`ALTER TABLE inventory.oncall_team ALTER COLUMN id SET DEFAULT gen_random_uuid();`,
+		`ALTER TABLE inventory.oncall_team ADD COLUMN dictionary_id uuid NULL;`,
+		`ALTER TABLE inventory.oncall_team ADD CONSTRAINT _oncall_team_dictionary_exists FOREIGN KEY (dictionary_id) REFERENCES inventory.dictionary (id) DEFERRABLE;`,
+		`UPDATE inventory.oncall_team SET dictionary_id = '00000000-0000-0000-0000-000000000000'::uuid WHERE dictionary_id IS NULL;`,
+		`ALTER TABLE inventory.oncall_team ALTER COLUMN dictionary_id SET NOT NULL;`,
+		`ALTER TABLE inventory.oncall_team ADD CONSTRAINT _oncall_team_unique_name UNIQUE ( name );`,
+		`ALTER TABLE inventory.oncall_team ADD CONSTRAINT _oncall_team_unique_phone_number UNIQUE ( phone_number );`,
+		`ALTER TABLE inventory.oncall_team ADD COLUMN created_at timestamptz(3) NOT NULL DEFAULT now();`,
+		`ALTER TABLE inventory.oncall_team ADD CONSTRAINT _oncall_team_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' );`,
+		`ALTER TABLE inventory.oncall_team ADD COLUMN created_by uuid NULL;`,
+		`UPDATE inventory.oncall_team SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
+		`ALTER TABLE inventory.oncall_team ALTER COLUMN created_by SET NOT NULL;`,
+		`ALTER TABLE inventory.oncall_team ADD CONSTRAINT _oncall_team_from_dictionary_for_fk UNIQUE (dictionary_id, id);`,
+		`ALTER TABLE inventory.oncall_duty_membership DROP CONSTRAINT oncall_duty_membership_oncall_duty_id_fkey;`,
+		`ALTER TABLE inventory.oncall_duty_membership DROP CONSTRAINT oncall_duty_membership_user_id_fkey;`,
+		`ALTER TABLE inventory.oncall_duty_membership RENAME TO oncall_membership;`,
+		`ALTER TABLE inventory.oncall_membership RENAME oncall_duty_id TO oncall_id;`,
+		`ALTER TABLE inventory.oncall_membership ADD CONSTRAINT _oncall_membership_user_exists FOREIGN KEY (user_id) REFERENCES inventory.user (id) ON DELETE CASCADE DEFERRABLE;`,
+		`ALTER TABLE inventory.oncall_membership ADD CONSTRAINT _oncall_membership_oncall_exists FOREIGN KEY (oncall_id) REFERENCES inventory.oncall_team (id) ON DELETE CASCADE DEFERRABLE;`,
+		`ALTER TABLE inventory.oncall_membership ADD CONSTRAINT _oncall_membership_only_once UNIQUE (user_id, oncall_id);`,
+		`ALTER TABLE inventory.oncall_membership ADD COLUMN created_at timestamptz(3) NOT NULL DEFAULT now();`,
+		`ALTER TABLE inventory.oncall_membership ADD CONSTRAINT _oncall_membership_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' );`,
+		`ALTER TABLE inventory.oncall_membership ADD COLUMN created_by uuid NULL;`,
+		`UPDATE inventory.oncall_membership SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
+		`ALTER TABLE inventory.oncall_membership ALTER COLUMN created_by SET NOT NULL;`,
+		`ALTER TABLE inventory.user ADD CONSTRAINT _user_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE;`,
+		`ALTER TABLE inventory.dictionary ADD CONSTRAINT _dictionary_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE;`,
+		`ALTER TABLE inventory.team ADD CONSTRAINT _team_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE;`,
+		`ALTER TABLE inventory.oncall_team ADD CONSTRAINT _oncall_team_creator_exists FOREIGN KEY(created_by) REFERENCES inventory.user(id) DEFERRABLE;`,
+		`ALTER TABLE inventory.oncall_membership ADD CONSTRAINT _oncall_membership_creator_exists FOREIGN KEY(created_by) REFERENCES inventory.user(id) DEFERRABLE;`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('inventory', 201811150001, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+	return 201811150001
 }
 
 func upgradeAuthTo201605150002(curr int, tool string, printOnly bool) int {

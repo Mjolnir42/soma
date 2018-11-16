@@ -13,12 +13,12 @@ create table if not exists soma.nodes (
     node_id                     uuid            PRIMARY KEY,
     node_asset_id               numeric(16,0)   UNIQUE NOT NULL,
     node_name                   varchar(256)    NOT NULL,
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    organizational_team_id      uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     server_id                   uuid            NOT NULL REFERENCES inventory.servers ( server_id ) DEFERRABLE,
     object_state                varchar(64)     NOT NULL DEFAULT 'unassigned' REFERENCES soma.object_states ( object_state ) DEFERRABLE,
     node_online                 boolean         NOT NULL DEFAULT 'yes',
     node_deleted                boolean         NOT NULL DEFAULT 'no',
-    created_by                  uuid            NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000' REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000' REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     UNIQUE ( node_id, organizational_team_id )
 );`
@@ -29,7 +29,7 @@ create table if not exists soma.nodes (
 create table if not exists soma.node_bucket_assignment (
     node_id                     uuid            NOT NULL,
     bucket_id                   uuid            NOT NULL,
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    organizational_team_id      uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     UNIQUE ( node_id ),
     UNIQUE ( node_id, bucket_id ),
     FOREIGN KEY ( node_id, organizational_team_id ) REFERENCES soma.nodes ( node_id, organizational_team_id ) DEFERRABLE,
@@ -69,7 +69,7 @@ create table if not exists soma.node_service_property (
     node_id                     uuid            NOT NULL REFERENCES soma.nodes ( node_id ) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
     service_id                  uuid            NOT NULL,
-    team_id                     uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    team_id                     uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',

@@ -28,9 +28,9 @@ INSERT INTO soma.permissions (
 SELECT $1::uuid,
        $2::varchar,
        $3::varchar,
-       ( SELECT user_id
-         FROM   inventory.users
-         WHERE  user_uid = $4::varchar)
+       ( SELECT id
+         FROM   inventory.user
+         WHERE  uid = $4::varchar)
 WHERE NOT EXISTS (
       SELECT permission_name
       FROM   soma.permissions
@@ -101,11 +101,11 @@ WHERE  category = $1::varchar;`
 SELECT sp.permission_id,
        sp.permission_name,
        sp.category,
-       iu.user_uid,
+       iu.uid,
        sp.created_at
 FROM   soma.permissions sp
-JOIN   inventory.users iu
-ON     sp.created_by = iu.user_id
+JOIN   inventory.user iu
+ON     sp.created_by = iu.id
 WHERE  sp.permission_id = $1::uuid
   AND  sp.category = $2::varchar;`
 

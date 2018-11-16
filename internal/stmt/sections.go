@@ -30,11 +30,11 @@ WHERE  (section_name = $1::varchar OR $1::varchar IS NULL)
 SELECT ss.section_id,
        ss.section_name,
        ss.category,
-       iu.user_uid,
+       iu.uid,
        ss.created_at
 FROM   soma.sections ss
-JOIN   inventory.users iu
-  ON   ss.created_by = iu.user_id
+JOIN   inventory.user iu
+  ON   ss.created_by = iu.id
 WHERE  ss.section_id = $1::uuid;`
 
 	SectionLoad = `
@@ -66,9 +66,9 @@ INSERT INTO soma.sections (
 SELECT      $1::uuid,
             $2::varchar,
             $3::varchar,
-            ( SELECT user_id
-              FROM   inventory.users
-              WHERE  user_uid = $4::varchar)
+            ( SELECT id
+              FROM   inventory.user
+              WHERE  uid = $4::varchar)
 WHERE       NOT EXISTS (
      SELECT section_id
      FROM   soma.sections

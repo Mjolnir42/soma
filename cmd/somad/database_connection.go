@@ -54,7 +54,7 @@ func connectToDatabase(appLog, errLog *log.Logger) {
 
 	// required schema versions
 	required := map[string]int64{
-		"inventory": 201605060001,
+		"inventory": 201811150001,
 		"root":      201605160001,
 		"auth":      201711080001,
 		`soma`:      201811120002,

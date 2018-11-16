@@ -25,12 +25,12 @@ JOIN   soma.monitoring_systems sms
 	ListScopedCapabilities = `
 WITH sysid AS (
     SELECT sms.monitoring_id
-    FROM   inventory.users iu
+    FROM   inventory.user iu
     JOIN   soma.monitoring_system_users smsu
-      ON   iu.organizational_team_id = smsu.organizational_team_id
+      ON   iu.team_id = smsu.organizational_team_id
     JOIN   soma.monitoring_systems sms
       ON   smsu.monitoring_id = sms.monitoring_id
-    WHERE  iu.user_id = $1::uuid
+    WHERE  iu.id = $1::uuid
       AND  sms.monitoring_system_mode = 'private'
     UNION
     SELECT sms.monitoring_id

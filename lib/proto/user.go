@@ -7,8 +7,9 @@
  * that can be found in the LICENSE file.
  */
 
-package proto
+package proto // import "github.com/mjolnir42/soma/lib/proto"
 
+// User describes a user
 type User struct {
 	ID             string           `json:"id,omitempty"`
 	UserName       string           `json:"userName,omitempty"`
@@ -30,7 +31,9 @@ type UserCredentials struct {
 }
 
 type UserDetails struct {
-	DetailsCreation
+	Creation       *DetailsCreation `json:"creation,omitempty"`
+	DictionaryID   string           `json:"dictionaryID,omitempty"`
+	DictionaryName string           `json:"dictionaryName,omitempty"`
 }
 
 type UserFilter struct {

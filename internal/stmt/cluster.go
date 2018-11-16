@@ -48,10 +48,10 @@ SELECT op.instance_id,
        op.source_instance_id,
        op.view,
        op.oncall_duty_id,
-       iodt.oncall_duty_name
+       iot.name
 FROM   soma.cluster_oncall_properties op
-JOIN   inventory.oncall_duty_teams iodt
-  ON   op.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   op.oncall_duty_id = iot.id
 WHERE  op.cluster_id = $1::uuid;`
 
 	ClusterSvcProps = `
@@ -106,11 +106,11 @@ WHERE  sccp.source_instance_id = $1::uuid
 	ClusterOncallPropertyForDelete = `
 SELECT scop.view,
        scop.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+       iot.name,
+       iot.phone_number
 FROM   soma.cluster_oncall_properties scop
-JOIN   inventory.oncall_duty_teams iodt
-  ON   scop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   scop.oncall_duty_id = iot.id
 WHERE  scop.source_instance_id = $1::uuid
   AND  scop.source_instance_id = scop.instance_id;`
 

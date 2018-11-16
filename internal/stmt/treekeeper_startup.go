@@ -113,11 +113,11 @@ WHERE  configuration_id = $1::uuid;`
 	// return configuration id: every constraint query has 2 columns
 	TkStartLoadCheckConstraintOncall = `
 SELECT scop.oncall_duty_id,
-       oncall_duty_name,
-       oncall_duty_phone_number
+       name,
+       phone_number
 FROM   soma.constraints_oncall_property scop
-JOIN   inventory.oncall_duty_teams iodt
-ON     scop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+ON     scop.oncall_duty_id = iot.id
 WHERE  scop.configuration_id = $1::uuid;`
 
 	TkStartLoadCheckConstraintAttribute = `
@@ -578,11 +578,11 @@ SELECT  srop.instance_id,
         srop.oncall_duty_id,
         srop.inheritance_enabled,
         srop.children_only,
-        iodt.oncall_duty_name,
-        iodt.oncall_duty_phone_number
+        iot.name,
+        iot.phone_number
 FROM    soma.repository_oncall_properties srop
-JOIN    inventory.oncall_duty_teams iodt
-  ON    srop.oncall_duty_id = iodt.oncall_duty_id
+JOIN    inventory.oncall_team iot
+  ON    srop.oncall_duty_id = iot.id
 WHERE   srop.instance_id = srop.source_instance_id
   AND   srop.repository_id = $1::uuid;`
 
@@ -594,11 +594,11 @@ SELECT  sgop.instance_id,
         sgop.oncall_duty_id,
         sgop.inheritance_enabled,
         sgop.children_only,
-        iodt.oncall_duty_name,
-        iodt.oncall_duty_phone_number
+        iot.name,
+        iot.phone_number
 FROM    soma.bucket_oncall_properties sgop
-JOIN    inventory.oncall_duty_teams iodt
-  ON    sgop.oncall_duty_id = iodt.oncall_duty_id
+JOIN    inventory.oncall_team iot
+  ON    sgop.oncall_duty_id = iot.id
 WHERE   sgop.instance_id = sgop.source_instance_id
   AND   sgop.repository_id = $1::uuid;`
 
@@ -610,11 +610,11 @@ SELECT  sgop.instance_id,
         sgop.oncall_duty_id,
         sgop.inheritance_enabled,
         sgop.children_only,
-        iodt.oncall_duty_name,
-        iodt.oncall_duty_phone_number
+        iot.name,
+        iot.phone_number
 FROM    soma.group_oncall_properties sgop
-JOIN    inventory.oncall_duty_teams iodt
-  ON    sgop.oncall_duty_id = iodt.oncall_duty_id
+JOIN    inventory.oncall_team iot
+  ON    sgop.oncall_duty_id = iot.id
 WHERE   sgop.instance_id = sgop.source_instance_id
   AND   sgop.repository_id = $1::uuid;`
 
@@ -626,11 +626,11 @@ SELECT  scop.instance_id,
         scop.oncall_duty_id,
         scop.inheritance_enabled,
         scop.children_only,
-        iodt.oncall_duty_name,
-        iodt.oncall_duty_phone_number
+        iot.name,
+        iot.phone_number
 FROM    soma.cluster_oncall_properties scop
-JOIN    inventory.oncall_duty_teams iodt
-  ON    scop.oncall_duty_id = iodt.oncall_duty_id
+JOIN    inventory.oncall_team iot
+  ON    scop.oncall_duty_id = iot.id
 WHERE   scop.instance_id = scop.source_instance_id
   AND   scop.repository_id = $1::uuid;`
 
@@ -642,11 +642,11 @@ SELECT  snop.instance_id,
         snop.oncall_duty_id,
         snop.inheritance_enabled,
         snop.children_only,
-        iodt.oncall_duty_name,
-        iodt.oncall_duty_phone_number
+        iot.name,
+        iot.phone_number
 FROM    soma.node_oncall_property snop
-JOIN    inventory.oncall_duty_teams iodt
-  ON    snop.oncall_duty_id = iodt.oncall_duty_id
+JOIN    inventory.oncall_team iot
+  ON    snop.oncall_duty_id = iot.id
 WHERE   snop.instance_id = snop.source_instance_id
   AND   snop.repository_id = $1::uuid;`
 

@@ -53,9 +53,9 @@ SELECT $1::uuid,
        $5::uuid,
        $6::uuid,
        $7::varchar,
-       iu.user_id
-FROM   inventory.users iu
-WHERE  iu.user_uid = $8::varchar;`
+       iu.id
+FROM   inventory.user iu
+WHERE  iu.uid = $8::varchar;`
 
 	GrantRepositoryAuthorization = `
 INSERT INTO soma.authorizations_repository (
@@ -84,9 +84,9 @@ SELECT $1::uuid,
        $10::uuid,
        $11::uuid,
        $12::uuid,
-       iu.user_id
-FROM   inventory.users iu
-WHERE  iu.user_uid = $13::varchar;`
+       iu.id
+FROM   inventory.user iu
+WHERE  iu.uid = $13::varchar;`
 
 	GrantTeamAuthorization = `
 INSERT INTO soma.authorizations_team (
@@ -105,9 +105,9 @@ SELECT $1::uuid,
        $5::varchar,
        $6::uuid,
        $7::uuid,
-       iu.user_id
-FROM   inventory.users iu
-WHERE  iu.user_uid = $8::varchar;`
+       iu.id
+FROM   inventory.user iu
+WHERE  iu.uid = $8::varchar;`
 
 	GrantMonitoringAuthorization = `
 INSERT INTO soma.authorizations_monitoring (
@@ -126,9 +126,9 @@ SELECT $1::uuid,
        $5::varchar,
        $6::uuid,
        $7::uuid,
-       iu.user_id
-FROM   inventory.users iu
-WHERE  iu.user_uid = $8::varchar;`
+       iu.id
+FROM   inventory.user iu
+WHERE  iu.uid = $8::varchar;`
 
 	SearchGlobalSystemGrant = `
 SELECT grant_id

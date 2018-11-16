@@ -12,6 +12,7 @@ package soma // import "github.com/mjolnir42/soma/internal/soma"
 import (
 	"database/sql"
 	"strconv"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/handler"
@@ -94,10 +95,10 @@ func (r *UserRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.ListUsers:   &r.stmtList,
-		stmt.SearchUsers: &r.stmtSearch,
-		stmt.ShowUsers:   &r.stmtShow,
-		stmt.SyncUsers:   &r.stmtSync,
+		stmt.UserList:    &r.stmtList,
+		stmt.UserSearch:  &r.stmtSearch,
+		stmt.UserShow:    &r.stmtShow,
+		stmt.UserSync:    &r.stmtSync,
 		stmt.TeamMembers: &r.stmtMembers,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
@@ -181,6 +182,8 @@ func (r *UserRead) show(q *msg.Request, mr *msg.Result) {
 		userID, userName              string
 		firstName, lastName           string
 		mailAddr, team                string
+		dictID, dictName, createdBy   string
+		createdAt                     time.Time
 		employeeNr                    int
 		isActive, isSystem, isDeleted bool
 		err                           error
@@ -199,6 +202,10 @@ func (r *UserRead) show(q *msg.Request, mr *msg.Result) {
 		&isSystem,
 		&isDeleted,
 		&team,
+		&dictID,
+		&dictName,
+		&createdBy,
+		&createdAt,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err, q.Section)
 		return
@@ -218,6 +225,14 @@ func (r *UserRead) show(q *msg.Request, mr *msg.Result) {
 		IsSystem:       isSystem,
 		IsDeleted:      isDeleted,
 		TeamID:         team,
+		Details: &proto.UserDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedAt: createdAt.Format(msg.RFC3339Milli),
+				CreatedBy: createdBy,
+			},
+			DictionaryID:   dictID,
+			DictionaryName: dictName,
+		},
 	})
 	mr.OK()
 }

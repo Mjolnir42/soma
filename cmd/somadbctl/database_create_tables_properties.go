@@ -36,7 +36,7 @@ create table if not exists soma.template_property_value (
 	queryMap["createTableServiceProperty"] = `
 create table if not exists soma.service_property (
     id                          uuid            PRIMARY KEY,
-    team_id                     uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    team_id                     uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     name                        varchar(128)    NOT NULL,
     CONSTRAINT __service_property_uniq_by_team UNIQUE( team_id, id ),
     CONSTRAINT __service_property_uniq_by_name UNIQUE( name, team_id )
@@ -48,7 +48,7 @@ create table if not exists soma.service_property (
 create table if not exists soma.service_property_value (
     service_id                  uuid            NOT NULL REFERENCES soma.service_property ( id ) DEFERRABLE,
     attribute                   varchar(128)    NOT NULL REFERENCES soma.attribute ( attribute ) DEFERRABLE,
-    team_id                     uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    team_id                     uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     value                       varchar(512)    NOT NULL,
     CONSTRAINT __service_property_value_service_exists FOREIGN KEY( team_id, service_id ) REFERENCES soma.service_property ( team_id, id ) DEFERRABLE
 );`

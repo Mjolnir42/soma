@@ -10,7 +10,7 @@ func createTablesAuthentication(printOnly bool, verbose bool) {
 
 	queryMap["createTableUserAuthentication"] = `
 create table if not exists auth.user_authentication (
-    user_id                     uuid            NOT NULL REFERENCES inventory.users ( user_id ) ON DELETE CASCADE DEFERRABLE,
+    user_id                     uuid            NOT NULL REFERENCES inventory.user ( id ) ON DELETE CASCADE DEFERRABLE,
     crypt                       text            NOT NULL,
     reset_pending               boolean         NOT NULL DEFAULT 'no',
     valid_from                  timestamptz(3)  NOT NULL,
@@ -35,7 +35,7 @@ create table if not exists auth.tokens (
 
 	queryMap[`createTableTokenRevocation`] = `
 create table if not exists auth.token_revocations (
-    user_id                     uuid            NOT NULL REFERENCES inventory.users ( user_id ) ON DELETE CASCADE DEFERRABLE,
+    user_id                     uuid            NOT NULL REFERENCES inventory.user ( id ) ON DELETE CASCADE DEFERRABLE,
     revoked_at                  timestamptz(3)  NOT NULL,
     CHECK( EXTRACT( TIMEZONE FROM revoked_at ) = '0' )
 );`
@@ -58,7 +58,7 @@ create index _token_revocations_revoked_at
 
 	queryMap["createTableUserKeys"] = `
 create table if not exists auth.user_keys (
-    user_id                     uuid            NOT NULL REFERENCES inventory.users ( user_id ) ON DELETE CASCADE DEFERRABLE,
+    user_id                     uuid            NOT NULL REFERENCES inventory.user ( id ) ON DELETE CASCADE DEFERRABLE,
     user_key_fingerprint        varchar(128)    NOT NULL,
     user_key_public             text            NOT NULL,
     user_key_active             boolean         NOT NULL DEFAULT 'yes'
@@ -76,7 +76,7 @@ create unique index _unique_active_user_key
 
 	queryMap["createTableUserClientCertificates"] = `
 create table if not exists auth.user_client_certificates (
-    user_id                     uuid            NOT NULL REFERENCES inventory.users ( user_id ) ON DELETE CASCADE DEFERRABLE,
+    user_id                     uuid            NOT NULL REFERENCES inventory.user ( id ) ON DELETE CASCADE DEFERRABLE,
     user_cert_fingerprint       varchar(128)    NOT NULL,
     user_cert_active            boolean         NOT NULL DEFAULT 'yes'
 );`
@@ -95,7 +95,7 @@ create unique index _unique_active_user_cert
 create table if not exists auth.admins (
     admin_id                    uuid            PRIMARY KEY,
     admin_uid                   varchar(256)    UNIQUE NOT NULL,
-    admin_user_uid              varchar(256)    NOT NULL REFERENCES inventory.users ( user_uid ) ON DELETE CASCADE DEFERRABLE,
+    admin_user_uid              varchar(256)    NOT NULL REFERENCES inventory.user ( uid ) ON DELETE CASCADE DEFERRABLE,
     admin_is_active             boolean         NOT NULL DEFAULT 'yes',
     -- verify the admin_uid has the prefix admin_
     CHECK( left( admin_uid, 6 ) = 'admin_' ),
@@ -157,7 +157,7 @@ create unique index _unique_active_admin_cert
 create table if not exists auth.tools (
     tool_id                     uuid            PRIMARY KEY,
     tool_name                   varchar(256)    UNIQUE NOT NULL,
-    tool_owner_id               uuid            NOT NULL REFERENCES inventory.users ( user_id ) ON DELETE RESTRICT DEFERRABLE,
+    tool_owner_id               uuid            NOT NULL REFERENCES inventory.user ( id ) ON DELETE RESTRICT DEFERRABLE,
     created                     timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
     CHECK( EXTRACT( TIMEZONE FROM created ) = '0' ),
     CHECK( left( tool_name, 5 ) = 'tool_' )
@@ -215,7 +215,7 @@ create unique index _unique_active_tool_cert
 
 	queryMap["createTablePasswordReset"] = `
 create table if not exists auth.password_reset (
-    user_id                     uuid            NULL REFERENCES inventory.users ( user_id ) ON DELETE CASCADE DEFERRABLE,
+    user_id                     uuid            NULL REFERENCES inventory.user ( id ) ON DELETE CASCADE DEFERRABLE,
     admin_id                    uuid            NULL REFERENCES auth.admins ( admin_id ) ON DELETE CASCADE DEFERRABLE,
     tool_id                     uuid            NULL REFERENCES auth.tools ( tool_id ) ON DELETE CASCADE DEFERRABLE,
     token                       varchar(256)    UNIQUE NOT NULL,

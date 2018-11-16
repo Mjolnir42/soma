@@ -75,12 +75,17 @@ revmemberloop:
 
 // OncallDetails contains metadata about an oncall duty team
 type OncallDetails struct {
-	Creation *DetailsCreation `json:"creation,omitempty"`
+	Creation       *DetailsCreation `json:"creation,omitempty"`
+	DictionaryID   string           `json:"dictionaryID,omitempty"`
+	DictionaryName string           `json:"dictionaryName,omitempty"`
 }
 
 // Clone returns a copy of o
 func (o *OncallDetails) Clone() *OncallDetails {
-	clone := &OncallDetails{}
+	clone := &OncallDetails{
+		DictionaryID:   o.DictionaryID,
+		DictionaryName: o.DictionaryName,
+	}
 	if o.Creation != nil {
 		clone.Creation = o.Creation.Clone()
 	}

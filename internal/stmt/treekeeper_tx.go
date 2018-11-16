@@ -440,9 +440,9 @@ SELECT $1::uuid,
        $3::varchar,
        $4::varchar,
        $5::uuid,
-       user_id
-FROM   inventory.users iu
-WHERE  iu.user_uid = $6::varchar;`
+       id
+FROM   inventory.user iu
+WHERE  iu.uid = $6::varchar;`
 
 	TxGroupUpdate = `
 UPDATE soma.groups
@@ -612,9 +612,9 @@ SELECT $1::uuid,
        $3::uuid,
        $4::varchar,
        $5::uuid,
-       user_id
-FROM   inventory.users iu
-WHERE  iu.user_uid = $6::varchar;`
+       id
+FROM   inventory.user iu
+WHERE  iu.uid = $6::varchar;`
 
 	TxClusterUpdate = `
 UPDATE soma.clusters
@@ -760,9 +760,9 @@ SELECT $1::uuid,
        $5::uuid,
        $6::varchar,
        $7::uuid,
-       user_id
-FROM   inventory.users iu
-WHERE  iu.user_uid = $8::varchar;`
+       id
+FROM   inventory.user iu
+WHERE  iu.uid = $8::varchar;`
 
 	TxBucketAssignNode = `
 INSERT INTO soma.node_bucket_assignment (
@@ -902,8 +902,8 @@ WHERE  check_instance_config_id = $3::uuid;`
 	TxRepositoryRename = `
 UPDATE soma.repositories
 SET    repository_name = $2::varchar,
-       created_by = ( SELECT user_id FROM inventory.users
-                      WHERE user_uid = $3::varchar)
+       created_by = ( SELECT id FROM inventory.user
+                      WHERE uid = $3::varchar)
 WHERE  repository_id = $1::uuid;`
 
 	TxRepositoryDestroy = `
@@ -914,8 +914,8 @@ WHERE  repository_id = $1::uuid;`
 	TxBucketRename = `
 UPDATE soma.buckets
 SET    bucket_name = $2::varchar,
-       created_by = ( SELECT user_id FROM inventory.users
-                      WHERE user_uid = $3::varchar)
+       created_by = ( SELECT id FROM inventory.user
+                      WHERE uid = $3::varchar)
 WHERE  bucket_id = $1::uuid;`
 
 	TxBucketDestroy = `
@@ -1060,38 +1060,38 @@ ON    sn.server_id = ins.server_id
 WHERE sn.node_id = $1::uuid;`
 
 	TxDeployDetailsTeam = `
-SELECT organizational_team_name,
-       organizational_team_ldap_id
-FROM   inventory.organizational_teams
-WHERE  organizational_team_id = $1::uuid;`
+SELECT name,
+       ldap_id
+FROM   inventory.team
+WHERE  id = $1::uuid;`
 
 	TxDeployDetailsNodeOncall = `
-SELECT iodt.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+SELECT iot.id,
+       iot.name,
+       iot.phone_number
 FROM   soma.node_oncall_property snop
-JOIN   inventory.oncall_duty_teams iodt
-ON     snop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+ON     snop.oncall_duty_id = iot.id
 WHERE  snop.node_id = $1::uuid
 AND    (snop.view = $2::varchar OR snop.view = 'any');`
 
 	TxDeployDetailsClusterOncall = `
-SELECT iodt.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+SELECT iot.id,
+       iot.name,
+       iot.phone_number
 FROM   soma.cluster_oncall_properties scop
-JOIN   inventory.oncall_duty_teams iodt
-ON     scop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+ON     scop.oncall_duty_id = iot.id
 WHERE  scop.cluster_id = $1::uuid
 AND    (scop.view = $2::varchar OR scop.view = 'any');`
 
 	TxDeployDetailsGroupOncall = `
-SELECT iodt.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+SELECT it.id,
+       it.name,
+       it.phone_number
 FROM   soma.group_oncall_properties sgop
-JOIN   inventory.oncall_duty_teams iodt
-ON     sgop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+ON     sgop.oncall_duty_id = iot.id
 WHERE  sgop.group_id = $1::uuid
 AND    (sgop.view = $2::varchar OR sgop.view = 'any');`
 

@@ -17,10 +17,10 @@ SELECT op.instance_id,
        op.source_instance_id,
        op.view,
        op.oncall_duty_id,
-       iodt.oncall_duty_name
+       iot.name
 FROM   soma.bucket_oncall_properties op
-JOIN   inventory.oncall_duty_teams iodt
-  ON   op.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   op.oncall_duty_id = iot.id
 WHERE  op.bucket_id = $1::uuid;`
 
 	BucketSvcProps = `
@@ -75,11 +75,11 @@ WHERE  sbcp.source_instance_id = $1::uuid
 	BucketOncallPropertyForDelete = `
 SELECT sbop.view,
        sbop.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+       iot.name,
+       iot.phone_number
 FROM   soma.bucket_oncall_properties sbop
-JOIN   inventory.oncall_duty_teams iodt
-  ON   sbop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   sbop.oncall_duty_id = iot.id
 WHERE  sbop.source_instance_id = $1::uuid
   AND  sbop.source_instance_id = sbop.instance_id;`
 

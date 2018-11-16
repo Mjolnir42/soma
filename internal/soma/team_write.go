@@ -80,8 +80,8 @@ func (w *TeamWrite) Run() {
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
 		stmt.TeamAdd:    &w.stmtAdd,
+		stmt.TeamRemove: &w.stmtRemove,
 		stmt.TeamUpdate: &w.stmtUpdate,
-		stmt.TeamDel:    &w.stmtRemove,
 	} {
 		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`team`, err, stmt.Name(statement))
@@ -139,6 +139,7 @@ func (w *TeamWrite) add(q *msg.Request, mr *msg.Result) {
 		q.Team.Name,
 		q.Team.LdapID,
 		q.Team.IsSystem,
+		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

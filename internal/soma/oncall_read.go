@@ -12,6 +12,7 @@ package soma // import "github.com/mjolnir42/soma/internal/soma"
 import (
 	"database/sql"
 	"strconv"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/handler"
@@ -191,9 +192,11 @@ func (r *OncallRead) search(q *msg.Request, mr *msg.Result) {
 // show returns the details of a specific oncall duty
 func (r *OncallRead) show(q *msg.Request, mr *msg.Result) {
 	var (
-		oncallID, oncallName string
-		oncallNumber         int
-		err                  error
+		oncallID, oncallName        string
+		dictID, dictName, createdBy string
+		createdAt                   time.Time
+		oncallNumber                int
+		err                         error
 	)
 
 	if err = r.stmtShow.QueryRow(
@@ -202,6 +205,10 @@ func (r *OncallRead) show(q *msg.Request, mr *msg.Result) {
 		&oncallID,
 		&oncallName,
 		&oncallNumber,
+		&dictID,
+		&dictName,
+		&createdBy,
+		&createdAt,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err, q.Section)
 		return
@@ -213,6 +220,14 @@ func (r *OncallRead) show(q *msg.Request, mr *msg.Result) {
 		ID:     oncallID,
 		Name:   oncallName,
 		Number: strconv.Itoa(oncallNumber),
+		Details: &proto.OncallDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedAt: createdAt.Format(msg.RFC3339Milli),
+				CreatedBy: createdBy,
+			},
+			DictionaryID:   dictID,
+			DictionaryName: dictName,
+		},
 	})
 	mr.OK()
 }

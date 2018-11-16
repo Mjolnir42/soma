@@ -21,14 +21,14 @@ FROM   soma.repositories;`
 -- direct user permissions
 SELECT sr.repository_id,
        sr.repository_name
-FROM   inventory.users iu
+FROM   inventory.user iu
 JOIN   soma.authorizations_repository sar
-  ON   iu.user_id = sar.user_id
+  ON   iu.id = sar.user_id
 JOIN   soma.permissions sp
   ON   sar.permission_id = sp.permission_id
 JOIN   soma.repositories sr
   ON   sar.repository_id = sr.repository_id
-WHERE  iu.user_id = $1::uuid
+WHERE  iu.id = $1::uuid
   AND  sp.permission_name = $2::varchar
   AND  sr.repository_active
   AND  NOT sr.repository_deleted
@@ -36,14 +36,14 @@ UNION
 -- team permissions
 SELECT sr.repository_id,
        sr.repository_name
-FROM   inventory.users iu
+FROM   inventory.user iu
 JOIN   soma.authorizations_repository sar
-  ON   iu.organizational_team_id = sar.organizational_team_id
+  ON   iu.team_id = sar.organizational_team_id
 JOIN   soma.permissions sp
   ON   sar.permission_id = sp.permission_id
 JOIN   soma.repositories sr
   ON   sar.repository_id = sr.repository_id
-WHERE  iu.user_id = $1::uuid
+WHERE  iu.id = $1::uuid
   AND  sp.permission_name = $2::varchar
   AND  sr.repository_active
   AND  NOT sr.repository_deleted;`
@@ -62,10 +62,10 @@ SELECT op.instance_id,
        op.source_instance_id,
        op.view,
        op.oncall_duty_id,
-       iodt.oncall_duty_name
+       iot.name
 FROM   soma.repository_oncall_properties op
-JOIN   inventory.oncall_duty_teams iodt
-  ON   op.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   op.oncall_duty_id = iot.id
 WHERE  op.repository_id = $1::uuid;`
 
 	RepoSvcProps = `
@@ -120,11 +120,11 @@ WHERE  source_instance_id = $1::uuid
 	RepoOncallPropertyForDelete = `
 SELECT srop.view,
        srop.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+       iot.name,
+       iot.phone_number
 FROM   soma.repository_oncall_properties srop
-JOIN   inventory.oncall_duty_teams iodt
-  ON   srop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   srop.oncall_duty_id = iot.id
 WHERE  source_instance_id = $1::uuid
   AND  source_instance_id = instance_id;`
 

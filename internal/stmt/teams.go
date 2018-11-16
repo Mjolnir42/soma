@@ -13,77 +13,93 @@ package stmt
 const (
 	TeamStatements = ``
 
-	ListTeams = `
-SELECT organizational_team_id,
-       organizational_team_name
-FROM   inventory.organizational_teams;`
+	TeamList = `
+SELECT id,
+       name
+FROM   inventory.team;`
 
-	ShowTeams = `
-SELECT organizational_team_id,
-       organizational_team_name,
-       organizational_team_ldap_id,
-       organizational_team_system
-FROM   inventory.organizational_teams
-WHERE  organizational_team_id = $1;`
+	TeamShow = `
+SELECT inventory.team.id,
+       inventory.team.name,
+       inventory.team.ldap_id,
+       inventory.team.is_system,
+       inventory.dictionary.id,
+       inventory.dictionary.name,
+       inventory.user.uid,
+       inventory.team.created_at
+FROM   inventory.team
+JOIN   inventory.user
+  ON   inventory.team.created_by = inventory.user.id
+JOIN   inventory.dictionary
+  ON   inventory.team.dictionary_id = inventory.dictionary.id
+WHERE  inventory.team.id = $1::uuid;`
 
-	SyncTeams = `
-SELECT organizational_team_id,
-       organizational_team_name,
-       organizational_team_ldap_id,
-       organizational_team_system
-FROM   inventory.organizational_teams
-WHERE  NOT organizational_team_system;`
+	TeamSync = `
+SELECT id,
+       name,
+       ldap_id,
+       is_system
+FROM   inventory.team
+WHERE  NOT is_system;`
 
 	TeamAdd = `
-INSERT INTO inventory.organizational_teams (
-            organizational_team_id,
-            organizational_team_name,
-            organizational_team_ldap_id,
-            organizational_team_system)
-SELECT $1::uuid, $2::varchar, $3::numeric, $4
+INSERT INTO inventory.team (
+            id,
+            name,
+            ldap_id,
+            is_system,
+            dictionary_id,
+            created_by)
+SELECT      $1::uuid,
+            $2::varchar,
+            $3::numeric,
+            $4::boolean,
+            -- hardcoded dictionary system
+            '00000000-0000-0000-0000-000000000000'::uuid,
+            ( SELECT id FROM inventory.user WHERE uid = $5::varchar )
 WHERE  NOT EXISTS (
-   SELECT organizational_team_id
-   FROM   inventory.organizational_teams
-   WHERE  organizational_team_id = $1::uuid
-      OR  organizational_team_name = $2::varchar
-      OR  organizational_team_ldap_id = $3::numeric);`
+   SELECT id
+   FROM   inventory.team
+   WHERE  id = $1::uuid
+      OR  name = $2::varchar
+      OR  ldap_id = $3::numeric);`
 
 	TeamUpdate = `
-UPDATE inventory.organizational_teams
-SET    organizational_team_name = $1::varchar,
-       organizational_team_ldap_id = $2::numeric,
-       organizational_team_system = $3::boolean
-WHERE  organizational_team_id = $4::uuid;`
+UPDATE inventory.team
+SET    name = $1::varchar,
+       ldap_id = $2::numeric,
+       is_system = $3::boolean
+WHERE  inventory.team.id = $4::uuid;`
 
-	TeamDel = `
-DELETE FROM inventory.organizational_teams
-WHERE       organizational_team_id = $1;`
+	TeamRemove = `
+DELETE FROM inventory.team
+WHERE       inventory.team.id = $1;`
 
 	TeamMembers = `
-SELECT iu.user_id,
-       iu.user_uid
-FROM   inventory.organizational_teams iot
-JOIN   inventory.users iu
-  ON   iot.organizational_team_id = iu.organizational_team_id
-WHERE  iot.organizational_team_id = $1::uuid
-  AND  NOT iu.user_is_deleted;`
+SELECT inventory.user.id,
+       inventory.user.uid
+FROM   inventory.team
+JOIN   inventory.user
+  ON   inventory.team.id = inventory.user.team_id
+WHERE  inventory.team.id = $1::uuid
+  AND  NOT inventory.user.is_deleted;`
 
 	TeamLoad = `
-SELECT organizational_team_id,
-       organizational_team_name,
-       organizational_team_ldap_id,
-       organizational_team_system
-FROM   inventory.organizational_teams;`
+SELECT id,
+       name,
+       ldap_id,
+       is_system
+FROM   inventory.team;`
 )
 
 func init() {
-	m[ListTeams] = `ListTeams`
-	m[ShowTeams] = `ShowTeams`
-	m[SyncTeams] = `SyncTeams`
 	m[TeamAdd] = `TeamAdd`
-	m[TeamDel] = `TeamDel`
+	m[TeamList] = `TeamList`
 	m[TeamLoad] = `TeamLoad`
 	m[TeamMembers] = `TeamMembers`
+	m[TeamRemove] = `TeamRemove`
+	m[TeamShow] = `TeamShow`
+	m[TeamSync] = `TeamSync`
 	m[TeamUpdate] = `TeamUpdate`
 }
 

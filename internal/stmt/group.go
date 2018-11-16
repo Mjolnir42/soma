@@ -70,10 +70,10 @@ SELECT op.instance_id,
        op.source_instance_id,
        op.view,
        op.oncall_duty_id,
-       iodt.oncall_duty_name
+       iot.name
 FROM   soma.group_oncall_properties op
-JOIN   inventory.oncall_duty_teams iodt
-  ON   op.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   op.oncall_duty_id = iot.id
 WHERE  op.group_id = $1::uuid;`
 
 	GroupSvcProps = `
@@ -128,11 +128,11 @@ WHERE  sgcp.source_instance_id = $1::uuid
 	GroupOncallPropertyForDelete = `
 SELECT sgop.view,
        sgop.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+       iot.name,
+       iot.phone_number
 FROM   soma.group_oncall_properties sgop
-JOIN   inventory.oncall_duty_teams iodt
-  ON   sgop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   sgop.oncall_duty_id = iot.id
 WHERE  sgop.source_instance_id = $1::uuid
   AND  sgop.source_instance_id = sgop.instance_id;`
 

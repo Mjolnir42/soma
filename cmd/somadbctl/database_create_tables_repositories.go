@@ -14,8 +14,8 @@ create table if not exists soma.repositories (
     repository_name             varchar(128)    UNIQUE NOT NULL,
     repository_deleted          boolean         NOT NULL DEFAULT 'no',
     repository_active           boolean         NOT NULL DEFAULT 'yes',
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE DEFAULT '00000000-0000-0000-0000-000000000000',
+    organizational_team_id      uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE DEFAULT '00000000-0000-0000-0000-000000000000',
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     UNIQUE( repository_id, organizational_team_id )
 );`
@@ -53,7 +53,7 @@ create table if not exists soma.repository_service_property (
     repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
     service_id                  uuid            NOT NULL,
-    team_id                     uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    team_id                     uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',
     CONSTRAINT __repository_service_property_service_exists FOREIGN KEY ( team_id, service_id ) REFERENCES soma.service_property ( team_id, id ) DEFERRABLE,

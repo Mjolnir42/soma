@@ -21,20 +21,20 @@ WHERE  status != 'processed';`
 	ListScopedOutstandingJobs = `
 SELECT sj.id,
        sj.type
-FROM   inventory.users iu
+FROM   inventory.user iu
 JOIN   soma.job sj
-  ON   iu.user_id = sj.user_id
-WHERE  iu.user_uid = $1::varchar
+  ON   iu.id = sj.user_id
+WHERE  iu.uid = $1::varchar
 UNION
 SELECT sj.id,
        sj.type
-FROM   inventory.users iu
+FROM   inventory.user iu
 JOIN   soma.job sj
-  ON   iu.organizational_team_id = sj.team_id
-WHERE  iu.user_uid = $1::varchar
+  ON   iu.team_id = sj.team_id
+WHERE  iu.uid = $1::varchar
   AND  sj.user_id NOT IN
-  (    SELECT user_id FROM inventory.users
-       WHERE user_uid = $1::varchar);`
+  (    SELECT id FROM inventory.user
+       WHERE uid = $1::varchar);`
 
 	JobResultForID = `
 SELECT id,
@@ -85,11 +85,11 @@ SELECT $1::uuid,
        $3::varchar,
        $4::varchar,
        $5::uuid,
-       iu.user_id,
-       iu.organizational_team_id,
+       iu.id,
+       iu.team_id,
        $7::jsonb
-FROM   inventory.users iu
-WHERE  iu.user_uid = $6::varchar;`
+FROM   inventory.user iu
+WHERE  iu.uid = $6::varchar;`
 
 	JobTypeMgmtList = `
 SELECT id
@@ -98,11 +98,11 @@ FROM   soma.job_type;`
 	JobTypeMgmtShow = `
 SELECT sjt.id,
        sjt.name,
-       iu.user_uid,
+       iu.uid,
        sjt.created_at
 FROM   soma.job_type sjt
-JOIN   inventory.users iu
-  ON   sjt.created_by = iu.user_id
+JOIN   inventory.user iu
+  ON   sjt.created_by = iu.id
 WHERE  sjt.id = $1::uuid;`
 
 	JobTypeMgmtAdd = `
@@ -112,9 +112,9 @@ INSERT INTO soma.job_type (
             created_by)
 SELECT $1::uuid,
        $2::varchar,
-       ( SELECT user_id
-         FROM   inventory.users
-         WHERE  user_uid = $3::varchar)
+       ( SELECT id
+         FROM   inventory.user
+         WHERE  uid = $3::varchar)
 WHERE  NOT EXISTS (
    SELECT  id
    FROM    soma.job_type
@@ -140,11 +140,11 @@ FROM   soma.job_result;`
 	JobResultMgmtShow = `
 SELECT sjr.id,
        sjr.name,
-       iu.user_uid,
+       iu.uid,
        sjr.created_at
 FROM   soma.job_result sjr
-JOIN   inventory.users iu
-  ON   sjr.created_by = iu.user_id
+JOIN   inventory.user iu
+  ON   sjr.created_by = iu.id
 WHERE  sjr.id = $1::uuid;`
 
 	JobResultMgmtAdd = `
@@ -154,9 +154,9 @@ INSERT INTO soma.job_result (
             created_by)
 SELECT $1::uuid,
        $2::varchar,
-       ( SELECT user_id
-         FROM   inventory.users
-         WHERE  user_uid = $3::varchar)
+       ( SELECT id
+         FROM   inventory.user
+         WHERE  uid = $3::varchar)
 WHERE  NOT EXISTS (
    SELECT  id
    FROM    soma.job_result
@@ -182,11 +182,11 @@ FROM   soma.job_status;`
 	JobStatusMgmtShow = `
 SELECT sjs.id,
        sjs.name,
-       iu.user_uid,
+       iu.uid,
        sjs.created_at
 FROM   soma.job_status sjs
-JOIN   inventory.users iu
-  ON   sjs.created_by = iu.user_id
+JOIN   inventory.user iu
+  ON   sjs.created_by = iu.id
 WHERE  sjs.id = $1::uuid;`
 
 	JobStatusMgmtAdd = `
@@ -196,9 +196,9 @@ INSERT INTO soma.job_status (
             created_by)
 SELECT $1::uuid,
        $2::varchar,
-       ( SELECT user_id
-         FROM   inventory.users
-         WHERE  user_uid = $3::varchar)
+       ( SELECT id
+         FROM   inventory.user
+         WHERE  uid = $3::varchar)
 WHERE  NOT EXISTS (
    SELECT  id
    FROM    soma.job_status

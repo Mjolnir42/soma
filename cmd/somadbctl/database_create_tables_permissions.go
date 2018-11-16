@@ -11,7 +11,7 @@ func createTablesPermissions(printOnly bool, verbose bool) {
 	queryMap["createTableCategories"] = `
 create table if not exists soma.categories (
     category                    varchar(32)     PRIMARY KEY,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()
 );`
 	queries[idx] = "createTableCategories"
@@ -22,7 +22,7 @@ create table if not exists soma.sections (
     section_id                  uuid            PRIMARY KEY,
     section_name                varchar(64)     UNIQUE NOT NULL,
     category                    varchar(32)     NOT NULL REFERENCES soma.categories ( category ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     UNIQUE ( section_id, category ),
     UNIQUE ( section_name )
@@ -36,7 +36,7 @@ create table if not exists soma.actions (
     action_name                 varchar(64)     NOT NULL,
     section_id                  uuid            NOT NULL REFERENCES soma.sections ( section_id ) DEFERRABLE,
     category                    varchar(32)     NOT NULL REFERENCES soma.categories ( category ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     --
     UNIQUE ( section_id, action_name ),
@@ -51,7 +51,7 @@ create table if not exists soma.permissions (
     permission_id               uuid            PRIMARY KEY,
     permission_name             varchar(128)    NOT NULL,
     category                    varchar(32)     NOT NULL REFERENCES soma.categories ( category ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     UNIQUE ( permission_name, category ),
     UNIQUE ( permission_id, category ),
@@ -94,12 +94,12 @@ create table if not exists soma.permission_grant_map (
 create table if not exists soma.authorizations_global (
     grant_id                    uuid            PRIMARY KEY,
     admin_id                    uuid            REFERENCES auth.admins ( admin_id ) DEFERRABLE,
-    user_id                     uuid            REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    user_id                     uuid            REFERENCES inventory.user ( id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
-    organizational_team_id      uuid            REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    organizational_team_id      uuid            REFERENCES inventory.team ( id ) DEFERRABLE,
     permission_id               uuid            NOT NULL REFERENCES soma.permissions ( permission_id ) DEFERRABLE,
     category                    varchar(32)     NOT NULL REFERENCES soma.categories ( category ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     FOREIGN KEY ( permission_id, category ) REFERENCES soma.permissions ( permission_id, category ) DEFERRABLE,
     CHECK (   ( admin_id IS NOT NULL AND user_id IS     NULL AND tool_id IS     NULL AND organizational_team_id IS     NULL )
@@ -142,10 +142,10 @@ create unique index _unique_tool_global_authoriz
 	queryMap["createTableRepoAuthorizations"] = `
 create table if not exists soma.authorizations_repository (
     grant_id                    uuid            PRIMARY KEY,
-    user_id                     uuid            REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    user_id                     uuid            REFERENCES inventory.user ( id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
     admin_id                    uuid            REFERENCES auth.admins ( admin_id ) DEFERRABLE,
-    organizational_team_id      uuid            REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    organizational_team_id      uuid            REFERENCES inventory.team ( id ) DEFERRABLE,
     object_type                 varchar(64)     NOT NULL REFERENCES soma.object_types ( object_type ) DEFERRABLE,
     repository_id               uuid            REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
     bucket_id                   uuid            REFERENCES soma.buckets ( bucket_id ) DEFERRABLE,
@@ -154,7 +154,7 @@ create table if not exists soma.authorizations_repository (
     node_id                     uuid            REFERENCES soma.nodes ( node_id ) DEFERRABLE,
     permission_id               uuid            NOT NULL REFERENCES soma.permissions ( permission_id ) DEFERRABLE,
     category                    varchar(32)     NOT NULL REFERENCES soma.categories ( category ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     FOREIGN KEY ( permission_id, category ) REFERENCES soma.permissions ( permission_id, category ) DEFERRABLE,
     FOREIGN KEY ( bucket_id, repository_id ) REFERENCES soma.buckets ( bucket_id, repository_id ) DEFERRABLE,
@@ -187,13 +187,13 @@ create table if not exists soma.authorizations_repository (
 	queryMap["createTableMonitoringAuthorizations"] = `
 create table if not exists soma.authorizations_monitoring (
     grant_id                    uuid            PRIMARY KEY,
-    user_id                     uuid            REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    user_id                     uuid            REFERENCES inventory.user ( id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
-    organizational_team_id      uuid            REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    organizational_team_id      uuid            REFERENCES inventory.team ( id ) DEFERRABLE,
     monitoring_id               uuid            NOT NULL REFERENCES soma.monitoring_systems ( monitoring_id ) DEFERRABLE,
     permission_id               uuid            NOT NULL REFERENCES soma.permissions ( permission_id ) DEFERRABLE,
     category                    varchar(32)     NOT NULL REFERENCES soma.categories ( category ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     FOREIGN KEY ( permission_id, category ) REFERENCES soma.permissions ( permission_id, category ) DEFERRABLE,
     CHECK (   ( user_id IS NOT NULL AND tool_id IS     NULL AND organizational_team_id IS     NULL )
@@ -208,13 +208,13 @@ create table if not exists soma.authorizations_monitoring (
 	queryMap["createTableTeamAuthorizations"] = `
 create table if not exists soma.authorizations_team (
     grant_id                    uuid            PRIMARY KEY,
-    user_id                     uuid            REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    user_id                     uuid            REFERENCES inventory.user ( id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
-    organizational_team_id      uuid            REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
-    authorized_team_id          uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    organizational_team_id      uuid            REFERENCES inventory.team ( id ) DEFERRABLE,
+    authorized_team_id          uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     permission_id               uuid            NOT NULL REFERENCES soma.permissions ( permission_id ) DEFERRABLE,
     category                    varchar(32)     NOT NULL REFERENCES soma.categories ( category ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
     FOREIGN KEY ( permission_id, category ) REFERENCES soma.permissions ( permission_id, category ) DEFERRABLE,
     CHECK (   ( user_id IS NOT NULL AND tool_id IS     NULL AND organizational_team_id IS     NULL )

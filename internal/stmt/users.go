@@ -12,56 +12,66 @@ package stmt
 const (
 	UserStatements = ``
 
-	ListUsers = `
-SELECT user_id,
-       user_uid
-FROM   inventory.users
-WHERE  NOT user_is_deleted;`
+	UserList = `
+SELECT id,
+       uid
+FROM   inventory.user
+WHERE  NOT is_deleted;`
 
-	SearchUsers = `
-SELECT user_id,
-       user_uid
-FROM   inventory.users
-WHERE  user_uid = $1::varchar;`
+	UserSearch = `
+SELECT id,
+       uid
+FROM   inventory.user
+WHERE  uid = $1::varchar;`
 
-	ShowUsers = `
-SELECT user_id,
-       user_uid,
-       user_first_name,
-       user_last_name,
-       user_employee_number,
-       user_mail_address,
-       user_is_active,
-       user_is_system,
-       user_is_deleted,
-       organizational_team_id
-FROM   inventory.users
-WHERE  user_id = $1::uuid;`
+	UserShow = `
+SELECT inventory.user.id,
+       inventory.user.uid,
+       inventory.user.first_name,
+       inventory.user.last_name,
+       inventory.user.employee_number,
+       inventory.user.mail_address,
+       inventory.user.is_active,
+       inventory.user.is_system,
+       inventory.user.is_deleted,
+       inventory.user.team_id,
+       inventory.user.dictionary_id,
+       inventory.dictionary.name,
+       creator.uid,
+       inventory.user.created_at
+FROM   inventory.user
+JOIN   inventory.dictionary
+  ON   inventory.user.dictionary_id = inventory.dictionary.id
+JOIN   inventory.user creator
+  ON   inventory.user.created_by = creator.id
+WHERE  inventory.user.id = $1::uuid;`
 
-	SyncUsers = `
-SELECT user_id,
-       user_uid,
-       user_first_name,
-       user_last_name,
-       user_employee_number,
-       user_mail_address,
-       user_is_deleted,
-       organizational_team_id
-FROM   inventory.users
-WHERE  NOT user_is_system;`
+	UserSync = `
+SELECT id,
+       uid,
+       first_name,
+       last_name,
+       employee_number,
+       mail_address,
+       is_deleted,
+       team_id
+FROM   inventory.user
+WHERE  NOT is_system;`
 
 	UserAdd = `
-INSERT INTO inventory.users (
-            user_id,
-            user_uid,
-            user_first_name,
-            user_last_name,
-            user_employee_number,
-            user_mail_address,
-            user_is_active,
-            user_is_system,
-            user_is_deleted,
-            organizational_team_id)
+INSERT INTO inventory.user (
+            id,
+            uid,
+            first_name,
+            last_name,
+            employee_number,
+            mail_address,
+            is_active,
+            is_system,
+            is_deleted,
+            team_id,
+            dictionary_id,
+            created_by)
 SELECT $1::uuid,
        $2::varchar,
        $3::varchar,
@@ -71,60 +81,63 @@ SELECT $1::uuid,
        $7::boolean,
        $8::boolean,
        $9::boolean,
-       $10::uuid
+       $10::uuid,
+       -- hardcoded dictionary system
+       '00000000-0000-0000-0000-000000000000'::uuid,
+       ( SELECT id FROM inventory.user WHERE uid = $11::varchar )
 WHERE  NOT EXISTS (
-  SELECT user_id
-  FROM   inventory.users
-  WHERE  user_id = $1::uuid
-     OR  user_uid = $2::varchar
-     OR  user_employee_number = $5::numeric);`
+  SELECT id
+  FROM   inventory.user
+  WHERE  id = $1::uuid
+     OR  uid = $2::varchar
+     OR  employee_number = $5::numeric);`
 
 	UserUpdate = `
-UPDATE inventory.users
-SET    user_uid = $1::varchar,
-       user_first_name = $2::varchar,
-       user_last_name = $3::varchar,
-       user_employee_number = $4::numeric,
-       user_mail_address = $5::text,
-       user_is_deleted = $6::boolean,
-       organizational_team_id = $7::uuid
-WHERE  user_id = $8::uuid
-  AND  ($6::boolean OR(user_is_deleted = $6::boolean));`
+UPDATE inventory.user
+SET    uid = $1::varchar,
+       first_name = $2::varchar,
+       last_name = $3::varchar,
+       employee_number = $4::numeric,
+       mail_address = $5::text,
+       is_deleted = $6::boolean,
+       team_id = $7::uuid
+WHERE  id = $8::uuid
+  AND  ($6::boolean OR(is_deleted = $6::boolean));`
 
-	UserDel = `
-UPDATE inventory.users
-SET    user_is_deleted = 'yes',
-       user_is_active = 'no'
-WHERE  user_id = $1::uuid;`
+	UserRemove = `
+UPDATE inventory.user
+SET    is_deleted = 'yes',
+       is_active = 'no'
+WHERE  id = $1::uuid;`
 
 	UserPurge = `
-DELETE FROM inventory.users
-WHERE  user_id = $1::uuid
-AND    user_is_deleted;`
+DELETE FROM inventory.user
+WHERE  id = $1::uuid
+AND    is_deleted;`
 
 	UserLoad = `
-SELECT user_id,
-       user_uid,
-       user_first_name,
-       user_last_name,
-       user_employee_number,
-       user_mail_address,
-       user_is_active,
-       user_is_system,
-       user_is_deleted,
-       organizational_team_id
-FROM   inventory.users;`
+SELECT id,
+       uid,
+       first_name,
+       last_name,
+       employee_number,
+       mail_address,
+       is_active,
+       is_system,
+       is_deleted,
+       team_id
+FROM   inventory.user;`
 )
 
 func init() {
-	m[ListUsers] = `ListUsers`
-	m[SearchUsers] = `SearchUsers`
-	m[ShowUsers] = `ShowUsers`
-	m[SyncUsers] = `SyncUsers`
 	m[UserAdd] = `UserAdd`
-	m[UserDel] = `UserDel`
+	m[UserList] = `UserList`
 	m[UserLoad] = `UserLoad`
 	m[UserPurge] = `UserPurge`
+	m[UserRemove] = `UserRemove`
+	m[UserSearch] = `UserSearch`
+	m[UserShow] = `UserShow`
+	m[UserSync] = `UserSync`
 	m[UserUpdate] = `UserUpdate`
 }
 

@@ -18,9 +18,9 @@ INSERT INTO soma.categories (
             created_by
 )
 SELECT $1::varchar,
-       ( SELECT user_id
-         FROM   inventory.users
-         WHERE  user_uid = $2::varchar)
+       ( SELECT id
+         FROM   inventory.user
+         WHERE  uid = $2::varchar)
 WHERE NOT EXISTS (
       SELECT category
       FROM   soma.categories
@@ -36,11 +36,11 @@ FROM   soma.categories;`
 
 	CategoryShow = `
 SELECT sc.category,
-       iu.user_uid,
+       iu.uid,
        sc.created_at
 FROM   soma.categories sc
-JOIN   inventory.users iu
-ON     sc.created_by = iu.user_id
+JOIN   inventory.user iu
+ON     sc.created_by = iu.id
 WHERE  sc.category = $1::varchar;`
 
 	CategoryListSections = `

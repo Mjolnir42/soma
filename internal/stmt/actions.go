@@ -33,11 +33,11 @@ SELECT sa.action_id,
        sa.section_id,
        ss.section_name,
        sa.category,
-       iu.user_uid,
+       iu.uid,
        sa.created_at
 FROM   soma.actions sa
-JOIN   inventory.users iu
-  ON   sa.created_by = iu.user_id
+JOIN   inventory.user iu
+  ON   sa.created_by = iu.id
 JOIN   soma.sections ss
   ON   sa.section_id = ss.section_id
 WHERE  sa.action_id = $1::uuid;`
@@ -73,9 +73,9 @@ SELECT      $1::uuid,
             ( SELECT category
               FROM   soma.sections
               WHERE  section_id = $3::uuid),
-            ( SELECT user_id
-              FROM   inventory.users
-              WHERE  user_uid = $4::varchar)
+            ( SELECT id
+              FROM   inventory.user
+              WHERE  uid = $4::varchar)
 WHERE       NOT EXISTS (
      SELECT action_id
      FROM   soma.actions

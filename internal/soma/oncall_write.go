@@ -84,9 +84,9 @@ func (w *OncallWrite) Run() {
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
 		stmt.OncallAdd:            &w.stmtAdd,
-		stmt.OncallDel:            &w.stmtRemove,
 		stmt.OncallMemberAssign:   &w.stmtAssign,
 		stmt.OncallMemberUnassign: &w.stmtUnassign,
+		stmt.OncallRemove:         &w.stmtRemove,
 		stmt.OncallUpdate:         &w.stmtUpdate,
 	} {
 		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
@@ -140,6 +140,7 @@ func (w *OncallWrite) add(q *msg.Request, mr *msg.Result) {
 		q.Oncall.ID,
 		q.Oncall.Name,
 		q.Oncall.Number,
+		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
@@ -157,6 +158,7 @@ func (w *OncallWrite) assign(q *msg.Request, mr *msg.Result) {
 	if res, err = w.stmtAssign.Exec(
 		q.Oncall.ID,
 		(*q.Oncall.Members)[0].UserID,
+		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

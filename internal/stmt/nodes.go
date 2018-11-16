@@ -69,10 +69,10 @@ SELECT op.instance_id,
        op.source_instance_id,
        op.view,
        op.oncall_duty_id,
-       iodt.oncall_duty_name
+       iot.name
 FROM   soma.node_oncall_property op
-JOIN   inventory.oncall_duty_teams iodt
-  ON   op.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   op.oncall_duty_id = iot.id
 WHERE  op.node_id = $1::uuid;`
 
 	NodeSvcProps = `
@@ -127,11 +127,11 @@ WHERE  sncp.source_instance_id = $1::uuid
 	NodeOncallPropertyForDelete = `
 SELECT snop.view,
        snop.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+       iot.name,
+       iot.phone_number
 FROM   soma.node_oncall_property snop
-JOIN   inventory.oncall_duty_teams iodt
-  ON   snop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+  ON   snop.oncall_duty_id = iot.id
 WHERE  snop.source_instance_id = $1::uuid
   AND  snop.source_instance_id = snop.instance_id;`
 
@@ -179,9 +179,9 @@ SELECT $1::uuid,
        $6,
        $7,
        $8,
-       user_id
-FROM   inventory.users iu
-WHERE  iu.user_uid = $9::varchar
+       id
+FROM   inventory.user iu
+WHERE  iu.uid = $9::varchar
 AND    NOT EXISTS (
          SELECT node_id
          FROM   soma.nodes

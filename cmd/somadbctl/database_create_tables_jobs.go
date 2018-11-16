@@ -16,7 +16,7 @@ create table if not exists soma.job_status (
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
     CONSTRAINT _job_status_primary_key          PRIMARY KEY ( id ),
     CONSTRAINT _job_status_unique_name          UNIQUE ( name ),
-    CONSTRAINT _job_status_user_exists          FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    CONSTRAINT _job_status_user_exists          FOREIGN KEY ( created_by ) REFERENCES inventory.user ( id ) DEFERRABLE,
     CONSTRAINT _job_status_timezone_utc         CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' )
 );`
 	queries[idx] = `createTableJobStatus`
@@ -30,7 +30,7 @@ create table if not exists soma.job_result (
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
     CONSTRAINT _job_result_primary_key          PRIMARY KEY (id),
     CONSTRAINT _job_result_unique_name          UNIQUE (name),
-    CONSTRAINT _job_result_user_exists          FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    CONSTRAINT _job_result_user_exists          FOREIGN KEY ( created_by ) REFERENCES inventory.user ( id ) DEFERRABLE,
     CONSTRAINT _job_result_timezone_utc         CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' )
 );`
 	queries[idx] = `createTableJobResult`
@@ -44,7 +44,7 @@ create table if not exists soma.job_type (
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
     CONSTRAINT _job_type_primary_key            PRIMARY KEY (id),
     CONSTRAINT _job_type_unique_name            UNIQUE (name),
-    CONSTRAINT _job_type_user_exists            FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE,
+    CONSTRAINT _job_type_user_exists            FOREIGN KEY ( created_by ) REFERENCES inventory.user ( id ) DEFERRABLE,
     CONSTRAINT _job_type_timezone_utc           CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' )
 );`
 	queries[idx] = `createTableJobType`
@@ -70,8 +70,8 @@ create table if not exists soma.job (
     CONSTRAINT _job_result_exists               FOREIGN KEY ( result ) REFERENCES soma.job_result ( name ) DEFERRABLE,
     CONSTRAINT _job_type_exists                 FOREIGN KEY ( type ) REFERENCES soma.job_type ( name ) DEFERRABLE,
     CONSTRAINT _job_repository_exists           FOREIGN KEY ( repository_id ) REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
-    CONSTRAINT _job_user_exists                 FOREIGN KEY ( user_id ) REFERENCES inventory.users ( user_id ) DEFERRABLE,
-    CONSTRAINT _job_team_exists                 FOREIGN KEY ( team_id ) REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE
+    CONSTRAINT _job_user_exists                 FOREIGN KEY ( user_id ) REFERENCES inventory.user ( id ) DEFERRABLE,
+    CONSTRAINT _job_team_exists                 FOREIGN KEY ( team_id ) REFERENCES inventory.team ( id ) DEFERRABLE
 );`
 	queries[idx] = `createTableJobs`
 	idx++

@@ -31,11 +31,16 @@ func (t *Team) Clone() Team {
 }
 
 type TeamDetails struct {
-	Creation *DetailsCreation `json:"creation,omitempty"`
+	Creation       *DetailsCreation `json:"creation,omitempty"`
+	DictionaryID   string           `json:"dictionaryID,omitempty"`
+	DictionaryName string           `json:"dictionaryName,omitempty"`
 }
 
 func (t *TeamDetails) Clone() *TeamDetails {
-	clone := &TeamDetails{}
+	clone := &TeamDetails{
+		DictionaryID:   t.DictionaryID,
+		DictionaryName: t.DictionaryName,
+	}
 	if t.Creation != nil {
 		clone.Creation = t.Creation.Clone()
 	}

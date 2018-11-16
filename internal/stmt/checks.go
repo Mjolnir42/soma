@@ -121,13 +121,13 @@ WHERE  scc.configuration_id = $1::uuid;`
 	CheckConfigShowConstrOncall = `
 SELECT scc.configuration_id,
        scop.oncall_duty_id,
-       iodt.oncall_duty_name,
-       iodt.oncall_duty_phone_number
+       iot.name,
+       iot.phone_number
 FROM   soma.check_configurations scc
 JOIN   soma.constraints_oncall_property scop
 ON     scc.configuration_id = scop.configuration_id
-JOIN   inventory.oncall_duty_teams iodt
-ON     scop.oncall_duty_id = iodt.oncall_duty_id
+JOIN   inventory.oncall_team iot
+ON     scop.oncall_duty_id = iot.id
 WHERE  scc.configuration_id = $1::uuid;`
 
 	CheckConfigInstanceInfo = `

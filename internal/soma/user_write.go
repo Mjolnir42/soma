@@ -82,9 +82,9 @@ func (w *UserWrite) Run() {
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
 		stmt.UserAdd:    &w.stmtAdd,
-		stmt.UserUpdate: &w.stmtUpdate,
-		stmt.UserDel:    &w.stmtRemove,
 		stmt.UserPurge:  &w.stmtPurge,
+		stmt.UserRemove: &w.stmtRemove,
+		stmt.UserUpdate: &w.stmtUpdate,
 	} {
 		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`user`, err, stmt.Name(statement))
@@ -150,6 +150,7 @@ func (w *UserWrite) add(q *msg.Request, mr *msg.Result) {
 		q.User.IsSystem,
 		false,
 		q.User.TeamID,
+		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

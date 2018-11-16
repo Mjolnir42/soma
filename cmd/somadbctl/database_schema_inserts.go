@@ -10,33 +10,53 @@ func schemaInserts(printOnly bool, verbose bool) {
 	// resolve successfully
 	queries := make([]string, 100)
 
+	queryMap[`insert__inventory.dictionary=system`] = `
+INSERT INTO inventory.dictionary (
+            id,
+            name,
+            created_by
+) VALUES (
+            '00000000-0000-0000-0000-000000000000'::uuid,
+            'system'::varchar,
+            '00000000-0000-0000-0000-000000000000'::uuid
+);
+`
+	queries[idx] = `insert__inventory.dictionary=system`
+	idx++
+
 	queryMap["insertSystemGroupWheel"] = `
-INSERT INTO inventory.organizational_teams (
-            organizational_team_id,
-            organizational_team_name,
-            organizational_team_ldap_id,
-            organizational_team_system
+INSERT INTO inventory.team (
+            id,
+            name,
+            ldap_id,
+            is_system,
+            dictionary_id,
+            created_by
 ) VALUES (
             '00000000-0000-0000-0000-000000000000',
             'wheel',
             0,
-            'yes'
+            'yes',
+            '00000000-0000-0000-0000-000000000000',
+            '00000000-0000-0000-0000-000000000000'
 );`
 	queries[idx] = "insertSystemGroupWheel"
 	idx++
 
 	queryMap["insertSystemUserRootAndFriends"] = `
-INSERT INTO inventory.users (
-            user_id,
-            user_uid,
-            user_first_name,
-            user_last_name,
-            user_employee_number,
-            user_mail_address,
-            user_is_active,
-            user_is_system,
-            user_is_deleted,
-            organizational_team_id
+INSERT INTO inventory.user (
+            id,
+            uid,
+            first_name,
+            last_name,
+            employee_number,
+            mail_address,
+            is_active,
+            is_system,
+            is_deleted,
+            team_id,
+            dictionary_id,
+            created_by,
 ) VALUES (
             '00000000-0000-0000-0000-000000000000',
             'root',
@@ -47,6 +67,8 @@ INSERT INTO inventory.users (
             'yes',
             'yes',
             'no',
+            '00000000-0000-0000-0000-000000000000',
+            '00000000-0000-0000-0000-000000000000',
             '00000000-0000-0000-0000-000000000000'
 ),
 (
@@ -59,9 +81,29 @@ INSERT INTO inventory.users (
             'yes',
             'yes',
             'no',
+            '00000000-0000-0000-0000-000000000000',
+            '00000000-0000-0000-0000-000000000000',
             '00000000-0000-0000-0000-000000000000'
 );`
 	queries[idx] = "insertSystemUserRootAndFriends"
+	idx++
+
+	queryMap[`activate_circular_dependency__1of3`] = `
+ALTER TABLE inventory.dictionary ADD CONSTRAINT _dictionary_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE;
+`
+	queries[idx] = `activate_circular_dependency__1of3`
+	idx++
+
+	queryMap[`activate_circular_dependency__2of3`] = `
+ALTER TABLE inventory.team ADD CONSTRAINT _team_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE;
+`
+	queries[idx] = `activate_circular_dependency__2of3`
+	idx++
+
+	queryMap[`activate_circular_dependency__3of3`] = `
+ALTER TABLE inventory.user ADD CONSTRAINT _user_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE;
+`
+	queries[idx] = `activate_circular_dependency__3of3`
 	idx++
 
 	queryMap["insertCategoryOmnipotence"] = `
@@ -140,7 +182,7 @@ INSERT INTO public.schema_versions (
             description )
 VALUES (
             'inventory',
-            201605060001,
+            201811150001,
             'Initial create - somadbctl %s'
 );`, version)
 	queryMap["insertInventorySchemaVersion"] = invString

@@ -54,8 +54,8 @@ create table if not exists soma.monitoring_systems (
     monitoring_id               uuid            PRIMARY KEY,
     monitoring_name             varchar(96)     UNIQUE NOT NULL,
     monitoring_system_mode      varchar(32)     NOT NULL REFERENCES soma.monitoring_system_modes ( monitoring_system_mode ) DEFERRABLE,
-    monitoring_contact          uuid            NOT NULL REFERENCES inventory.users ( user_id ) DEFERRABLE,
-    monitoring_owner_team       uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    monitoring_contact          uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
+    monitoring_owner_team       uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     monitoring_callback_uri     text,
     UNIQUE ( monitoring_id, monitoring_system_mode )
 );`
@@ -66,7 +66,7 @@ create table if not exists soma.monitoring_systems (
 create table if not exists soma.monitoring_system_users (
     monitoring_id               uuid            NOT NULL REFERENCES soma.monitoring_systems ( monitoring_id ) DEFERRABLE,
     monitoring_system_mode      varchar(32)     NOT NULL REFERENCES soma.monitoring_system_modes ( monitoring_system_mode ) DEFERRABLE,
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.organizational_teams ( organizational_team_id ) DEFERRABLE,
+    organizational_team_id      uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
     FOREIGN KEY ( monitoring_id, monitoring_system_mode ) REFERENCES soma.monitoring_systems ( monitoring_id, monitoring_system_mode ) DEFERRABLE,
     CHECK ( monitoring_system_mode = 'private' )
 );`

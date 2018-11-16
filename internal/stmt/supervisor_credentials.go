@@ -18,32 +18,32 @@ SELECT aua.user_id,
        aua.reset_pending,
        aua.valid_from,
        aua.valid_until,
-       iu.user_uid
-FROM   inventory.users iu
+       iu.uid
+FROM   inventory.user iu
 JOIN   auth.user_authentication aua
-ON     iu.user_id = aua.user_id
-WHERE  iu.user_id != '00000000-0000-0000-0000-000000000000'::uuid
+ON     iu.id = aua.user_id
+WHERE  iu.id != '00000000-0000-0000-0000-000000000000'::uuid
 AND    NOW() < aua.valid_until
-AND    NOT iu.user_is_deleted
-AND    iu.user_is_active;`
+AND    NOT iu.is_deleted
+AND    iu.is_active;`
 
 	FindUserID = `
-SELECT user_id
-FROM   inventory.users
-WHERE  user_uid = $1::varchar
-AND    NOT user_is_deleted;`
+SELECT id
+FROM   inventory.user
+WHERE  uid = $1::varchar
+AND    NOT is_deleted;`
 
 	FindUserName = `
-SELECT user_uid
-FROM   inventory.users
-WHERE  user_id = $1::uuid
-AND    NOT user_is_deleted;`
+SELECT uid
+FROM   inventory.user
+WHERE  id = $1::uuid
+AND    NOT is_deleted;`
 
 	CheckUserActive = `
-SELECT user_is_active
-FROM   inventory.users
-WHERE  user_id = $1::uuid
-AND    NOT user_is_deleted;`
+SELECT is_active
+FROM   inventory.user
+WHERE  id = $1::uuid
+AND    NOT is_deleted;`
 
 	SetUserCredential = `
 INSERT INTO auth.user_authentication (
@@ -61,20 +61,20 @@ INSERT INTO auth.user_authentication (
 );`
 
 	ActivateUser = `
-UPDATE inventory.users
-SET    user_is_active = 'yes'::boolean
-WHERE  user_id = $1::uuid;`
+UPDATE inventory.user
+SET    is_active = 'yes'::boolean
+WHERE  id = $1::uuid;`
 
 	InvalidateUserCredential = `
 UPDATE auth.user_authentication aua
 SET    valid_until = $1::timestamptz
-FROM   inventory.users iu
-WHERE  aua.user_id = iu.user_id
+FROM   inventory.user iu
+WHERE  aua.user_id = iu.id
   AND  aua.user_id = $2::uuid
   AND  NOW() < aua.valid_until
-  AND  iu.user_is_active = 'yes'::boolean
-  AND  NOT iu.user_is_deleted
-  AND  iu.user_id != '00000000-0000-0000-0000-000000000000';`
+  AND  iu.is_active = 'yes'::boolean
+  AND  NOT iu.is_deleted
+  AND  iu.id != '00000000-0000-0000-0000-000000000000'::uuid;`
 )
 
 func init() {

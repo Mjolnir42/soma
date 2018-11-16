@@ -28,13 +28,13 @@ FROM   root.flags;`
 SELECT aua.crypt,
        aua.valid_from,
        aua.valid_until
-FROM   inventory.users ui
+FROM   inventory.user ui
 JOIN   auth.user_authentication aua
-ON     ui.user_id = aua.user_id
-WHERE  ui.user_id = '00000000-0000-0000-0000-000000000000'::uuid
-AND    ui.user_uid = 'root'
-AND    ui.user_is_system
-AND    ui.user_is_active
+ON     ui.id = aua.user_id
+WHERE  ui.id = '00000000-0000-0000-0000-000000000000'::uuid
+AND    ui.uid = 'root'
+AND    ui.is_system
+AND    ui.is_active
 AND    aua.valid_from < NOW()
 AND    aua.valid_until > NOW();`
 

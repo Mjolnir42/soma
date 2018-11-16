@@ -51,9 +51,9 @@ SELECT      $1::uuid,
             $3::boolean,
             $4::boolean,
             $5::uuid,
-            user_id
-FROM        inventory.users iu
-WHERE       iu.user_uid = $6::varchar
+            id
+FROM        inventory.user iu
+WHERE       iu.uid = $6::varchar
 AND NOT EXISTS (
 	SELECT  repository_id
 	FROM    soma.repositories

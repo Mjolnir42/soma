@@ -13,13 +13,13 @@ const (
 	SupervisorInventoryStatements = ``
 
 	LoadUserTeamMapping = `
-SELECT iu.user_id,
-       iu.user_uid,
-       iu.organizational_team_id,
-       iot.organizational_team_name
-FROM   inventory.users iu
-JOIN   inventory.organizational_teams iot
-ON     iu.organizational_team_id = iot.organizational_team_id;`
+SELECT iu.id,
+       iu.uid,
+       it.id,
+       it.name
+FROM   inventory.user iu
+JOIN   inventory.team it
+ON     iu.team_id = it.id;`
 )
 
 func init() {
