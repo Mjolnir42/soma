@@ -13,12 +13,12 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 	`inventory`: map[int]func(int, string, bool) int{
 		201605060001: upgradeInventoryTo201811150001,
 	},
-	"auth": map[int]func(int, string, bool) int{
+	`auth`: map[int]func(int, string, bool) int{
 		201605060001: upgradeAuthTo201605150002,
 		201605150002: upgradeAuthTo201605190001,
 		201605190001: upgradeAuthTo201711080001,
 	},
-	"soma": map[int]func(int, string, bool) int{
+	`soma`: map[int]func(int, string, bool) int{
 		201605060001: upgradeSomaTo201605210001,
 		201605210001: upgradeSomaTo201605240001,
 		201605240001: upgradeSomaTo201605240002,
@@ -42,7 +42,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 		201811060001: upgradeSomaTo201811120001,
 		201811120001: upgradeSomaTo201811120002,
 	},
-	"root": map[int]func(int, string, bool) int{
+	`root`: map[int]func(int, string, bool) int{
 		000000000001: installRoot201605150001,
 		201605150001: upgradeRootTo201605160001,
 	},
@@ -259,7 +259,7 @@ func upgradeSomaTo201605210001(curr int, tool string, printOnly bool) int {
 		return 0
 	}
 	stmts := []string{
-		`ALTER TABLE soma.permissions ADD CHECK  ( permission_type != 'omnipotence' OR permission_name = 'omnipotence' );`,
+		`ALTER TABLE soma.permissions ADD CHECK ( permission_type != 'omnipotence' OR permission_name = 'omnipotence' );`,
 		`ALTER TABLE soma.global_authorizations DROP CONSTRAINT "global_authorizations_permission_type_check";`,
 		`ALTER TABLE soma.repo_authorizations DROP CONSTRAINT "repo_authorizations_permission_type_check";`,
 		`ALTER TABLE soma.bucket_authorizations DROP CONSTRAINT "bucket_authorizations_permission_type_check";`,
@@ -926,23 +926,23 @@ func upgradeSomaTo201811120002(curr int, tool string, printOnly bool) int {
 		`ALTER INDEX IF EXISTS _jobs_by_repo RENAME TO _job_by_repository;`,
 		`ALTER INDEX IF EXISTS _not_processed_jobs RENAME TO _job_not_processed;`,
 		`ALTER TABLE soma.job_status ADD COLUMN created_by uuid NULL;`,
-		`ALTER TABLE soma.job_status ADD COLUMN created_at timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3);`,
+		`ALTER TABLE soma.job_status ADD COLUMN created_at timestamptz(3) NOT NULL DEFAULT NOW()::timestamptz(3);`,
 		`UPDATE soma.job_status SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
 		`ALTER TABLE soma.job_status ALTER COLUMN created_by SET NOT NULL;`,
 		`ALTER TABLE soma.job_status ADD CONSTRAINT _job_status_user_exists FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE;`,
-		`ALTER TABLE soma.job_status ADD CONSTRAINT _job_status_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' );`,
+		`ALTER TABLE soma.job_status ADD CONSTRAINT _job_status_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' );`,
 		`ALTER TABLE soma.job_result ADD COLUMN created_by uuid NULL;`,
-		`ALTER TABLE soma.job_result ADD COLUMN created_at timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3);`,
+		`ALTER TABLE soma.job_result ADD COLUMN created_at timestamptz(3) NOT NULL DEFAULT NOW()::timestamptz(3);`,
 		`UPDATE soma.job_result SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
 		`ALTER TABLE soma.job_result ALTER COLUMN created_by SET NOT NULL;`,
 		`ALTER TABLE soma.job_result ADD CONSTRAINT _job_result_user_exists FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE;`,
-		`ALTER TABLE soma.job_result ADD CONSTRAINT _job_result_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' );`,
+		`ALTER TABLE soma.job_result ADD CONSTRAINT _job_result_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' );`,
 		`ALTER TABLE soma.job_type ADD COLUMN created_by uuid NULL;`,
-		`ALTER TABLE soma.job_type ADD COLUMN created_at timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3);`,
+		`ALTER TABLE soma.job_type ADD COLUMN created_at timestamptz(3) NOT NULL DEFAULT NOW()::timestamptz(3);`,
 		`UPDATE soma.job_type SET created_by = '00000000-0000-0000-0000-000000000000'::uuid WHERE created_by IS NULL;`,
 		`ALTER TABLE soma.job_type ALTER COLUMN created_by SET NOT NULL;`,
 		`ALTER TABLE soma.job_type ADD CONSTRAINT _job_type_user_exists FOREIGN KEY ( created_by ) REFERENCES inventory.users ( user_id ) DEFERRABLE;`,
-		`ALTER TABLE soma.job_type ADD CONSTRAINT _job_type_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at )  = '0' );`,
+		`ALTER TABLE soma.job_type ADD CONSTRAINT _job_type_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' );`,
 	}
 	stmts = append(stmts,
 		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201811120002, 'Upgrade - somadbctl %s');", tool),
