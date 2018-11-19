@@ -49,13 +49,15 @@ WHERE  iu.id = $1::uuid
   AND  NOT sr.repository_deleted;`
 
 	ShowRepository = `
-SELECT repository_id,
-       repository_name,
-       repository_active,
-       organizational_team_id
-FROM   soma.repositories
-WHERE  repository_id = $1
-AND    NOT repository_deleted;`
+SELECT id,
+       name,
+       is_deleted,
+       is_active,
+       team_id,
+       created_by,
+       created_at
+FROM   soma.repository
+WHERE  id = $1::uuid;`
 
 	RepoOncProps = `
 SELECT op.instance_id,
@@ -139,16 +141,16 @@ WHERE  srsp.source_instance_id = $1::uuid
   AND  srsp.source_instance_id = srsp.instance_id;`
 
 	RepoNameByID = `
-SELECT repository_name
-FROM   soma.repositories
-WHERE  repository_id = $1::uuid;`
+SELECT name
+FROM   soma.repository
+WHERE  id = $1::uuid;`
 
 	RepoByBucketID = `
 SELECT sb.repository_id,
-       sr.repository_name
+       soma.repository.name
 FROM   soma.buckets sb
-JOIN   soma.repositories sr
-  ON   sb.repository_id = sr.repository_id
+JOIN   soma.repository
+  ON   sb.repository_id = soma.repository.id
 WHERE  sb.bucket_id = $1::uuid;`
 )
 

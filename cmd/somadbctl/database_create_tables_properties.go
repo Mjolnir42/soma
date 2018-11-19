@@ -92,7 +92,7 @@ func createTableCustomProperties(printOnly bool, verbose bool) {
 	queryMap["createTableCustomProperties"] = `
 create table if not exists soma.custom_properties (
     custom_property_id          uuid            PRIMARY KEY,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     custom_property             varchar(128)    NOT NULL,
     UNIQUE( repository_id, custom_property ),
     UNIQUE( repository_id, custom_property_id )

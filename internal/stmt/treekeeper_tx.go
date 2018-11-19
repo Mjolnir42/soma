@@ -900,16 +900,16 @@ SET    status = '` + proto.DeploymentComputed + `'::varchar,
 WHERE  check_instance_config_id = $3::uuid;`
 
 	TxRepositoryRename = `
-UPDATE soma.repositories
-SET    repository_name = $2::varchar,
+UPDATE soma.repository
+SET    name = $2::varchar,
        created_by = ( SELECT id FROM inventory.user
                       WHERE uid = $3::varchar)
-WHERE  repository_id = $1::uuid;`
+WHERE  id = $1::uuid;`
 
 	TxRepositoryDestroy = `
-UPDATE soma.repositories
-SET    repository_deleted = 'true'::boolean
-WHERE  repository_id = $1::uuid;`
+UPDATE soma.repository
+SET    is_deleted = 'true'::boolean
+WHERE  id = $1::uuid;`
 
 	TxBucketRename = `
 UPDATE soma.buckets
@@ -1008,12 +1008,12 @@ SELECT sg.bucket_id,
        sg.organizational_team_id,
        sb.bucket_name,
        sb.environment,
-       sr.repository_name
+       soma.repository.name
 FROM   soma.groups sg
 JOIN   soma.buckets sb
 ON     sg.bucket_id = sb.bucket_id
-JOIN   soma.repositories sr
-ON     sb.repository_id = sr.repository_id
+JOIN   soma.repository
+ON     sb.repository_id = soma.repository.id
 WHERE  sg.group_id = $1::uuid;`
 
 	TxDeployDetailsCluster = `
@@ -1023,12 +1023,12 @@ SELECT sc.cluster_name,
        sc.organizational_team_id,
        sb.bucket_name,
        sb.environment,
-       sr.repository_name
+       soma.repository.name
 FROM   soma.clusters sc
 JOIN   soma.buckets sb
 ON     sc.bucket_id = sb.bucket_id
-JOIN   soma.repositories sr
-ON     sb.repository_id = sr.repository_id
+JOIN   soma.repository
+ON     sb.repository_id = soma.repository.id
 WHERE  sc.cluster_id = $1::uuid;`
 
 	TxDeployDetailsNode = `
@@ -1041,7 +1041,7 @@ SELECT sn.node_asset_id,
        sn.node_deleted,
        sb.bucket_name,
        sb.environment,
-       sr.repository_name,
+       soma.repository.name,
        ins.server_asset_id,
        ins.server_datacenter_name,
        ins.server_datacenter_location,
@@ -1053,8 +1053,8 @@ JOIN  soma.node_bucket_assignment snba
 ON    sn.node_id = snba.node_id
 JOIN  soma.buckets sb
 ON    snba.bucket_id = sb.bucket_id
-JOIN  soma.repositories sr
-ON    sb.repository_id = sr.repository_id
+JOIN  soma.repository
+ON    sb.repository_id = soma.repository.id
 JOIN  inventory.servers ins
 ON    sn.server_id = ins.server_id
 WHERE sn.node_id = $1::uuid;`

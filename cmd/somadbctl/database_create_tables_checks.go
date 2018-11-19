@@ -54,7 +54,7 @@ create table if not exists soma.notification_levels (
 	queryMap["createTableCheckConfigurations"] = `
 create table if not exists soma.check_configurations (
     configuration_id            uuid            PRIMARY KEY,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     bucket_id                   uuid            REFERENCES soma.buckets ( bucket_id ) DEFERRABLE,
     configuration_name          varchar(256)    NOT NULL,
     configuration_object        uuid            NOT NULL,
@@ -89,7 +89,7 @@ create unique index _singleton_undeleted_checkconfig_name
 	queryMap["createTableChecks"] = `
 create table if not exists soma.checks (
     check_id                    uuid            PRIMARY KEY,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     bucket_id                   uuid            REFERENCES soma.buckets ( bucket_id ) DEFERRABLE,
     source_check_id             uuid            NOT NULL,
     source_object_type          varchar(64)     NOT NULL REFERENCES soma.object_types ( object_type ) DEFERRABLE,
@@ -138,7 +138,7 @@ create index _configuration_id_levels
 create table if not exists soma.constraints_custom_property (
     configuration_id            uuid            NOT NULL REFERENCES soma.check_configurations ( configuration_id ) DEFERRABLE,
     custom_property_id          uuid            NOT NULL REFERENCES soma.custom_properties ( custom_property_id ) DEFERRABLE,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     property_value              text            NOT NULL,
     -- ensure this custom property is defined for this repository
     FOREIGN KEY ( repository_id, custom_property_id ) REFERENCES soma.custom_properties ( repository_id, custom_property_id ) DEFERRABLE,

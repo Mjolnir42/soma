@@ -8,18 +8,22 @@ func createTableRepositories(printOnly bool, verbose bool) {
 	// resolve successfully
 	queries := make([]string, 5)
 
-	queryMap["createTableRepositories"] = `
-create table if not exists soma.repositories (
-    repository_id               uuid            PRIMARY KEY,
-    repository_name             varchar(128)    UNIQUE NOT NULL,
-    repository_deleted          boolean         NOT NULL DEFAULT 'no',
-    repository_active           boolean         NOT NULL DEFAULT 'yes',
-    organizational_team_id      uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
-    created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE DEFAULT '00000000-0000-0000-0000-000000000000',
+	queryMap[`create__soma.repository`] = `
+create table if not exists soma.repository (
+    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    name                        varchar(128)    NOT NULL,
+    is_deleted                  boolean         NOT NULL DEFAULT 'no',
+    is_active                   boolean         NOT NULL DEFAULT 'yes',
+    team_id                     uuid            NOT NULL,
+    created_by                  uuid            NOT NULL,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
-    UNIQUE( repository_id, organizational_team_id )
+    CONSTRAINT _repository_primary_key PRIMARY KEY (id),
+    CONSTRAINT _repository_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE,
+    CONSTRAINT _repository_team_exists FOREIGN KEY (team_id) REFERENCES inventory.team (id) DEFERRABLE,
+    CONSTRAINT _repository_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' ),
+    CONSTRAINT _repository_unique_name UNIQUE (name)
 );`
-	queries[idx] = "createTableRepositories"
+	queries[idx] = `create__soma.repository`
 
 	performDatabaseTask(printOnly, verbose, queries, queryMap)
 }
@@ -36,7 +40,7 @@ func createTablesRepositoryProperties(printOnly bool, verbose bool) {
 create table if not exists soma.repository_oncall_properties (
     instance_id                 uuid            NOT NULL REFERENCES soma.property_instances ( instance_id ) DEFERRABLE,
     source_instance_id          uuid            NOT NULL,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
     oncall_duty_id              uuid            NOT NULL REFERENCES inventory.oncall_duty_teams ( oncall_duty_id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
@@ -50,7 +54,7 @@ create table if not exists soma.repository_oncall_properties (
 create table if not exists soma.repository_service_property (
     instance_id                 uuid            NOT NULL REFERENCES soma.property_instances ( instance_id ) DEFERRABLE,
     source_instance_id          uuid            NOT NULL,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
     service_id                  uuid            NOT NULL,
     team_id                     uuid            NOT NULL REFERENCES inventory.team ( id ) DEFERRABLE,
@@ -66,7 +70,7 @@ create table if not exists soma.repository_service_property (
 create table if not exists soma.repository_system_properties (
     instance_id                 uuid            NOT NULL REFERENCES soma.property_instances ( instance_id ) DEFERRABLE,
     source_instance_id          uuid            NOT NULL,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
     system_property             varchar(64)     NOT NULL REFERENCES soma.system_properties ( system_property ) DEFERRABLE,
     source_type                 varchar(64)     NOT NULL REFERENCES soma.object_types ( object_type ) DEFERRABLE,
@@ -86,7 +90,7 @@ create table if not exists soma.repository_system_properties (
 create table if not exists soma.repository_custom_properties (
     instance_id                 uuid            NOT NULL REFERENCES soma.property_instances ( instance_id ) DEFERRABLE,
     source_instance_id          uuid            NOT NULL,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
     custom_property_id          uuid            NOT NULL REFERENCES soma.custom_properties ( custom_property_id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',

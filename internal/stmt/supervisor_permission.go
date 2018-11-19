@@ -13,15 +13,15 @@ const (
 	SupervisorPermissionStatements = ``
 
 	PermissionLoad = `
-SELECT permission_id,
-       permission_name,
+SELECT id,
+       name,
        category
-FROM   soma.permissions;`
+FROM   soma.permission;`
 
 	PermissionAdd = `
-INSERT INTO soma.permissions (
-            permission_id,
-            permission_name,
+INSERT INTO soma.permission (
+            id,
+            name,
             category,
             created_by
 )
@@ -32,9 +32,9 @@ SELECT $1::uuid,
          FROM   inventory.user
          WHERE  uid = $4::varchar)
 WHERE NOT EXISTS (
-      SELECT permission_name
-      FROM   soma.permissions
-      WHERE  permission_name = $2::varchar
+      SELECT id
+      FROM   soma.permission
+      WHERE  name = $2::varchar
         AND  category = $3::varchar);`
 
 	PermissionLinkGrant = `
@@ -79,103 +79,107 @@ DELETE FROM soma.permission_map
 WHERE       permission_id = $1::uuid;`
 
 	PermissionRemove = `
-DELETE FROM soma.permissions
-WHERE       permission_id = $1::uuid;`
+DELETE FROM soma.permission
+WHERE       id = $1::uuid;`
 
 	PermissionRemoveLink = `
 DELETE FROM soma.permission_grant_map
 WHERE       granted_permission_id = $1::uuid;`
 
 	PermissionRemoveByName = `
-DELETE FROM soma.permissions
-WHERE       permission_name = $1::varchar
+DELETE FROM soma.permission
+WHERE       name = $1::varchar
 AND         category = $2::varchar;`
 
 	PermissionList = `
-SELECT permission_id,
-       permission_name
-FROM   soma.permissions
+SELECT id,
+       name
+FROM   soma.permission
 WHERE  category = $1::varchar;`
 
 	PermissionShow = `
-SELECT sp.permission_id,
-       sp.permission_name,
-       sp.category,
-       iu.uid,
-       sp.created_at
-FROM   soma.permissions sp
-JOIN   inventory.user iu
-ON     sp.created_by = iu.id
-WHERE  sp.permission_id = $1::uuid
-  AND  sp.category = $2::varchar;`
+SELECT soma.permission.id,
+       soma.permission.name,
+       soma.permission.category,
+       inventory.user.uid,
+       soma.permission.created_at
+FROM   soma.permission
+JOIN   inventory.user
+ON     soma.permission.created_by = inventory.user.id
+WHERE  soma.permission.id = $1::uuid
+  AND  soma.permission.category = $2::varchar;`
 
 	PermissionSearchByName = `
-SELECT permission_id,
-       permission_name
-FROM   soma.permissions
-WHERE  permission_name = $1::varchar
+SELECT id,
+       name
+FROM   soma.permission
+WHERE  name = $1::varchar
   AND  category= $2::varchar;`
 
 	PermissionMapLoad = `
-SELECT    spm.mapping_id,
-          spm.category,
-          spm.permission_id,
-          sp.permission_name,
-          spm.section_id,
-          ss.section_name,
-          spm.action_id,
-          sa.action_name
-FROM      soma.permission_map spm
-JOIN      soma.permissions sp
-  ON      spm.permission_id = sp.permission_id
-JOIN      soma.sections ss
-  ON      spm.section_id = ss.section_id
-LEFT JOIN soma.actions sa
-  ON      spm.action_id = sa.action_id;`
+SELECT    soma.permission_map.id,
+          soma.permission_map.category,
+          soma.permission_map.permission_id,
+          soma.permission.name,
+          soma.permission_map.section_id,
+          soma.section.name,
+          soma.permission_map.action_id,
+          soma.action.name
+FROM      soma.permission_map
+JOIN      soma.permission
+  ON      soma.permission_map.permission_id = soma.permission.id
+JOIN      soma.section
+  ON      soma.permission_map.section_id = soma.section.id
+LEFT JOIN soma.action
+  ON      soma.permission_map.action_id = soma.action.id;`
 
 	PermissionMappedActions = `
-SELECT sa.action_id,
-       sa.action_name,
-       sa.section_id,
-       ss.section_name,
-       sa.category
-FROM   soma.permissions sp
-JOIN   soma.permission_map spm
-  ON   sp.permission_id = spm.permission_id
-JOIN   soma.sections ss
-  ON   spm.section_id = ss.section_id
-JOIN   soma.actions sa
-  ON   spm.action_id = sa.action_id
-WHERE  sp.permission_id = $1::uuid
-  AND  sp.category = $2::varchar
-  AND  spm.action_id IS NOT NULL
-  AND  sa.section_id = spm.section_id;`
+SELECT soma.action.id,
+       soma.action.name,
+       soma.section.id,
+       soma.section.name,
+       soma.action.category
+FROM   soma.permission
+JOIN   soma.permission_map
+  ON   soma.permission.id = soma.permission_map.permission_id
+JOIN   soma.section
+  ON   soma.permission_map.section_id = soma.section.id
+JOIN   soma.action
+  ON   soma.permission_map.action_id = soma.action.id
+WHERE  soma.permission.id = $1::uuid
+  AND  soma.permission.category = $2::varchar
+  AND  soma.permission_map.action_id IS NOT NULL
+  AND  soma.action.section_id = soma.permission_map.section_id;`
 
 	PermissionMappedSections = `
-SELECT ss.section_id,
-       ss.section_name,
-       ss.category
-FROM   soma.permissions sp
+SELECT soma.section.id,
+       soma.section.name,
+       soma.section.category
+FROM   soma.permission
 JOIN   soma.permission_map spm
-  ON   sp.permission_id = spm.permission_id
-JOIN   soma.sections ss
-  ON   spm.section_id = ss.section_id
-WHERE  sp.permission_id = $1::uuid
-  AND  sp.category = $2::varchar
-  AND  spm.action_id IS NULL;`
+  ON   soma.permission.id = soma.permission_map.permission_id
+JOIN   soma.section
+  ON   soma.permission_map.section_id = soma.section.id
+WHERE  soma.permission.id = $1::uuid
+  AND  soma.permission.category = $2::varchar
+  AND  soma.permission_map.action_id IS NULL;`
 
 	PermissionMapEntry = `
 INSERT INTO soma.permission_map (
-            mapping_id,
+            id,
             category,
             permission_id,
             section_id,
-            action_id)
+            action_id,
+            created_by)
 SELECT $1::uuid,
        $2::varchar,
        $3::uuid,
        $4::uuid,
-       $5::uuid;`
+       $5::uuid,
+       ( SELECT inventory.user.id
+         FROM   inventory.user
+         WHERE  inventory.user.uid = $6::varchar);`
 
 	PermissionUnmapEntry = `
 DELETE FROM soma.permission_map

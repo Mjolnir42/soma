@@ -37,7 +37,7 @@ func createTablesTemplates(printOnly bool, verbose bool) {
 	queryMap["createTableTemplates"] = `
 create table if not exists soma.templates (
     template_id                 uuid            PRIMARY KEY,
-    repository_id               uuid            NOT NULL REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     template_name               varchar(128)    NOT NULL,
     UNIQUE( repository_id, template_name )
 );`

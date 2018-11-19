@@ -13,14 +13,14 @@ const (
 	TreeStatements = ``
 
 	TreeShowRepository = `
-SELECT repository_name,
-       repository_active,
-       organizational_team_id,
-	   repository_deleted,
-	   created_by,
-	   created_at
-FROM   soma.repositories
-WHERE  repository_id = $1::uuid;`
+SELECT soma.repository.name,
+       soma.repository.is_active,
+       soma.repository.team_id,
+       soma.repository.is_deleted,
+       soma.repository.created_by,
+       soma.repository.created_at
+FROM   soma.repository
+WHERE  soma.repository.id = $1::uuid;`
 
 	TreeShowBucket = `
 SELECT bucket_name,

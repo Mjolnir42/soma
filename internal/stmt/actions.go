@@ -13,74 +13,74 @@ const (
 	ActionStatements = ``
 
 	ActionList = `
-SELECT action_id,
-       action_name,
-       section_id
-FROM   soma.actions
+SELECT soma.action.id,
+       soma.action.name,
+       soma.action.section_id
+FROM   soma.action
 WHERE  section_id = $1::uuid;`
 
 	ActionSearch = `
-SELECT action_id,
-       action_name,
-       section_id
-FROM   soma.actions
-WHERE  action_name = $1::varchar
-  AND  section_id = $2::uuid;`
+SELECT soma.action.id,
+       soma.action.name,
+       soma.action.section_id
+FROM   soma.action
+WHERE  soma.action.name = $1::varchar
+  AND  soma.action.section_id = $2::uuid;`
 
 	ActionShow = `
-SELECT sa.action_id,
-       sa.action_name,
-       sa.section_id,
-       ss.section_name,
-       sa.category,
-       iu.uid,
-       sa.created_at
-FROM   soma.actions sa
-JOIN   inventory.user iu
-  ON   sa.created_by = iu.id
-JOIN   soma.sections ss
-  ON   sa.section_id = ss.section_id
-WHERE  sa.action_id = $1::uuid;`
+SELECT soma.action.id,
+       soma.action.name,
+       soma.action.section_id,
+       soma.section.name,
+       soma.action.category,
+       inventory.user.uid,
+       soma.action.created_at
+FROM   soma.action
+JOIN   inventory.user
+  ON   soma.action.created_by = inventory.user.id
+JOIN   soma.section
+  ON   soma.action.section_id = soma.section.id
+WHERE  soma.action.id = $1::uuid;`
 
 	ActionLoad = `
-SELECT sa.action_id,
-       sa.action_name,
-       sa.section_id,
-       ss.section_name,
-       sa.category
-FROM   soma.actions sa
-JOIN   soma.sections ss
-  ON   sa.section_id = ss.section_id;`
+SELECT soma.action.id,
+       soma.action.name,
+       soma.action.section_id,
+       soma.section.name,
+       soma.action.category
+FROM   soma.action
+JOIN   soma.section
+  ON   soma.action.section_id = soma.section.id;`
 
 	ActionRemoveFromMap = `
 DELETE FROM soma.permission_map
 WHERE       action_id = $1::uuid;`
 
 	ActionRemove = `
-DELETE FROM soma.actions
-WHERE       action_id = $1::uuid;`
+DELETE FROM soma.action
+WHERE       id = $1::uuid;`
 
 	ActionAdd = `
-INSERT INTO soma.actions (
-            action_id,
-            action_name,
+INSERT INTO soma.action (
+            id,
+            name,
             section_id,
             category,
             created_by)
 SELECT      $1::uuid,
             $2::varchar,
             $3::uuid,
-            ( SELECT category
-              FROM   soma.sections
-              WHERE  section_id = $3::uuid),
-            ( SELECT id
+            ( SELECT soma.section.category
+              FROM   soma.section
+              WHERE  soma.section.id = $3::uuid),
+            ( SELECT inventory.user.id
               FROM   inventory.user
-              WHERE  uid = $4::varchar)
+              WHERE  inventory.user.uid = $4::varchar)
 WHERE       NOT EXISTS (
-     SELECT action_id
-     FROM   soma.actions
-     WHERE  action_name = $2::varchar
-     AND    section_id = $3::uuid);`
+     SELECT soma.action.id
+     FROM   soma.action
+     WHERE  soma.action.name = $2::varchar
+     AND    soma.action.section_id = $3::uuid);`
 )
 
 func init() {

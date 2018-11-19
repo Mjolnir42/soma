@@ -69,7 +69,7 @@ create table if not exists soma.job (
     CONSTRAINT _job_status_exists               FOREIGN KEY ( status ) REFERENCES soma.job_status ( name ) DEFERRABLE,
     CONSTRAINT _job_result_exists               FOREIGN KEY ( result ) REFERENCES soma.job_result ( name ) DEFERRABLE,
     CONSTRAINT _job_type_exists                 FOREIGN KEY ( type ) REFERENCES soma.job_type ( name ) DEFERRABLE,
-    CONSTRAINT _job_repository_exists           FOREIGN KEY ( repository_id ) REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
+    CONSTRAINT _job_repository_exists           FOREIGN KEY ( repository_id ) REFERENCES soma.repository (id) DEFERRABLE,
     CONSTRAINT _job_user_exists                 FOREIGN KEY ( user_id ) REFERENCES inventory.user ( id ) DEFERRABLE,
     CONSTRAINT _job_team_exists                 FOREIGN KEY ( team_id ) REFERENCES inventory.team ( id ) DEFERRABLE
 );`

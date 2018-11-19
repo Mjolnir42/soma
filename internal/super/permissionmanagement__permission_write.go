@@ -222,6 +222,7 @@ func (s *Supervisor) permissionMap(q *msg.Request, mr *msg.Result) {
 		q.Permission.ID,
 		sectionID,
 		actionID,
+		q.AuthUser,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)

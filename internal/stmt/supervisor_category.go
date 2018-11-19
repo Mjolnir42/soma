@@ -13,45 +13,45 @@ const (
 	SupervisorCategoryStatements = ``
 
 	CategoryAdd = `
-INSERT INTO soma.categories (
-            category,
+INSERT INTO soma.category (
+            name,
             created_by
 )
 SELECT $1::varchar,
-       ( SELECT id
+       ( SELECT inventory.user.id
          FROM   inventory.user
-         WHERE  uid = $2::varchar)
+         WHERE  inventory.user.uid = $2::varchar)
 WHERE NOT EXISTS (
-      SELECT category
-      FROM   soma.categories
-      WHERE  category = $1::varchar);`
+      SELECT soma.category.name
+      FROM   soma.category
+      WHERE  soma.category.name = $1::varchar);`
 
 	CategoryRemove = `
-DELETE FROM soma.categories
-WHERE category = $1::varchar;`
+DELETE FROM soma.category
+WHERE soma.category.name = $1::varchar;`
 
 	CategoryList = `
-SELECT category
-FROM   soma.categories;`
+SELECT soma.category.name
+FROM   soma.category;`
 
 	CategoryShow = `
-SELECT sc.category,
-       iu.uid,
-       sc.created_at
-FROM   soma.categories sc
-JOIN   inventory.user iu
-ON     sc.created_by = iu.id
-WHERE  sc.category = $1::varchar;`
+SELECT soma.category.name,
+       inventory.user.uid,
+       soma.category.created_at
+FROM   soma.category
+JOIN   inventory.user
+ON     soma.category.created_by = inventory.user.id
+WHERE  soma.category.name = $1::varchar;`
 
 	CategoryListSections = `
-SELECT section_id
-FROM   soma.sections
-WHERE  category = $1::varchar;`
+SELECT soma.section.id
+FROM   soma.section
+WHERE  soma.section.category = $1::varchar;`
 
 	CategoryListPermissions = `
-SELECT permission_id
-FROM   soma.permissions
-WHERE  category = $1::varchar;`
+SELECT soma.permission.id
+FROM   soma.permission
+WHERE  soma.permission.category = $1::varchar;`
 )
 
 func init() {

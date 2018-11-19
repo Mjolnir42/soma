@@ -13,27 +13,27 @@ const (
 	PropertyStatements = ``
 
 	ServiceLookup = `
-SELECT ssp.id,
-       ssp.name
-FROM   soma.repositories sr
-JOIN   soma.service_property ssp
-ON     sr.organizational_team_id = ssp.team_id
-WHERE  sr.repository_id = $1::uuid
-AND    ssp.id = $2::uuid
-AND    sr.organizational_team_id = $3::uuid;`
+SELECT soma.service_property.id,
+       soma.service_property.name
+FROM   soma.repository
+JOIN   soma.service_property
+ON     soma.repository.team_id = soma.service_property.team_id
+WHERE  soma.repository.id = $1::uuid
+AND    soma.service_property.id = $2::uuid
+AND    soma.repository.team_id = $3::uuid;`
 
 	ServiceAttributes = `
-SELECT sspv.attribute,
-       sspv.value
-FROM   soma.repositories sr
-JOIN   soma.service_property ssp
-ON     sr.organizational_team_id = ssp.team_id
-JOIN   soma.service_property_value sspv
-ON     ssp.team_id = sspv.team_id
-AND    ssp.id = sspv.service_id
-WHERE  sr.repository_id = $1::uuid
-AND    ssp.id = $2::uuid
-AND    sr.organizational_team_id = $3::uuid;`
+SELECT soma.service_property_value.attribute,
+       soma.service_property_value.value
+FROM   soma.repository
+JOIN   soma.service_property
+ON     soma.repository.team_id = soma.service_property.team_id
+JOIN   soma.service_property_value
+ON     soma.service_property.team_id = soma.service_property_value.team_id
+AND    soma.service_property.id = soma.service_property_value.service_id
+WHERE  soma.repository.id = $1::uuid
+AND    soma.service_property.id = $2::uuid
+AND    soma.repository.team_id = $3::uuid;`
 
 	PropertySystemList = `
 SELECT system_property

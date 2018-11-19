@@ -25,26 +25,26 @@ WHERE  sci.check_id = sc.check_id
 AND    sc.repository_id = $1::uuid;`
 
 	ForestRepoNameByID = `
-SELECT repository_name,
-       organizational_team_id
-FROM   soma.repositories
-WHERE  repository_id = $1::uuid;`
+SELECT name,
+       team_id
+FROM   soma.repository
+WHERE  id = $1::uuid;`
 
 	ForestLoadRepository = `
-SELECT repository_id,
-       repository_name,
-       repository_deleted,
-       repository_active,
-       organizational_team_id
-FROM   soma.repositories;`
+SELECT id,
+       name,
+       is_deleted,
+       is_active,
+       team_id
+FROM   soma.repository;`
 
 	ForestAddRepository = `
-INSERT INTO soma.repositories (
-            repository_id,
-            repository_name,
-            repository_active,
-            repository_deleted,
-            organizational_team_id,
+INSERT INTO soma.repository (
+            id,
+            name,
+            is_active,
+            is_deleted,
+            team_id,
             created_by)
 SELECT      $1::uuid,
             $2::varchar,
@@ -52,13 +52,13 @@ SELECT      $1::uuid,
             $4::boolean,
             $5::uuid,
             id
-FROM        inventory.user iu
-WHERE       iu.uid = $6::varchar
+FROM        inventory.user
+WHERE       uid = $6::varchar
 AND NOT EXISTS (
-	SELECT  repository_id
-	FROM    soma.repositories
-	WHERE   repository_id   = $1::uuid
-	OR      repository_name = $2::varchar);`
+	SELECT  id
+	FROM    soma.repository
+	WHERE   id   = $1::uuid
+	  OR    name = $2::varchar);`
 )
 
 func init() {

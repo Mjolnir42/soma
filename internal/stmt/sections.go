@@ -13,35 +13,35 @@ const (
 	SectionStatements = ``
 
 	SectionList = `
-SELECT section_id,
-       section_name
-FROM   soma.sections
+SELECT soma.section.id,
+       soma.section.name
+FROM   soma.section
 WHERE  category = $1::varchar;`
 
 	SectionSearch = `
-SELECT section_id,
-       section_name,
-       category
-FROM   soma.sections
-WHERE  (section_name = $1::varchar OR $1::varchar IS NULL)
-  AND  (section_id = $2::uuid OR $2::uuid IS NULL);`
+SELECT soma.section.id,
+       soma.section.name,
+       soma.section.category
+FROM   soma.section
+WHERE  (soma.section.name = $1::varchar OR $1::varchar IS NULL)
+  AND  (soma.section.id = $2::uuid OR $2::uuid IS NULL);`
 
 	SectionShow = `
-SELECT ss.section_id,
-       ss.section_name,
-       ss.category,
-       iu.uid,
-       ss.created_at
-FROM   soma.sections ss
-JOIN   inventory.user iu
-  ON   ss.created_by = iu.id
-WHERE  ss.section_id = $1::uuid;`
+SELECT soma.section.id,
+       soma.section.name,
+       soma.section.category,
+       inventory.user.uid,
+       soma.section.created_at
+FROM   soma.section
+JOIN   inventory.user
+  ON   soma.section.created_by = inventory.user.id
+WHERE  soma.section.id = $1::uuid;`
 
 	SectionLoad = `
-SELECT section_id,
-       section_name,
-       category
-FROM   soma.sections;`
+SELECT soma.section.id,
+       soma.section.name,
+       soma.section.category
+FROM   soma.section;`
 
 	SectionRemoveFromMap = `
 DELETE FROM soma.permission_map
@@ -49,30 +49,30 @@ WHERE       section_id = $1::uuid
   AND       action_id IS NULL;`
 
 	SectionRemove = `
-DELETE FROM soma.sections
-WHERE       section_id = $1::uuid;`
+DELETE FROM soma.section
+WHERE       soma.section.id = $1::uuid;`
 
 	SectionListActions = `
-SELECT action_id
-FROM   soma.actions
-WHERE  section_id = $1::uuid;`
+SELECT soma.action.id
+FROM   soma.action
+WHERE  soma.action.section_id = $1::uuid;`
 
 	SectionAdd = `
-INSERT INTO soma.sections (
-            section_id,
-            section_name,
+INSERT INTO soma.section (
+            id,
+            name,
             category,
             created_by)
 SELECT      $1::uuid,
             $2::varchar,
             $3::varchar,
-            ( SELECT id
+            ( SELECT inventory.user.id
               FROM   inventory.user
-              WHERE  uid = $4::varchar)
+              WHERE  inventory.user.uid = $4::varchar)
 WHERE       NOT EXISTS (
-     SELECT section_id
-     FROM   soma.sections
-     WHERE  section_name = $2::varchar);`
+     SELECT soma.section.id
+     FROM   soma.section
+     WHERE  soma.section.name = $2::varchar);`
 )
 
 func init() {

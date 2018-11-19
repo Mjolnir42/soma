@@ -42,7 +42,7 @@ INSERT INTO soma.authorizations_global (
             admin_id,
             user_id,
             tool_id,
-            organizational_team_id,
+            team_id,
             permission_id,
             category,
             created_by)
@@ -62,7 +62,7 @@ INSERT INTO soma.authorizations_repository (
             grant_id,
             user_id,
             tool_id,
-            organizational_team_id,
+            team_id,
             category,
             permission_id,
             object_type,
@@ -93,7 +93,7 @@ INSERT INTO soma.authorizations_team (
             grant_id,
             user_id,
             tool_id,
-            organizational_team_id,
+            team_id,
             category,
             permission_id,
             authorized_team_id,
@@ -114,7 +114,7 @@ INSERT INTO soma.authorizations_monitoring (
             grant_id,
             user_id,
             tool_id,
-            organizational_team_id,
+            team_id,
             category,
             permission_id,
             monitoring_id,
@@ -144,7 +144,7 @@ SELECT grant_id,
        admin_id,
        user_id,
        tool_id,
-       organizational_team_id
+       team_id
 FROM   soma.authorizations_global
 WHERE  permission_id = $1::uuid
   AND  category = $2::varchar;`
@@ -154,7 +154,7 @@ SELECT grant_id,
        admin_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        permission_id,
        category
 FROM   soma.authorizations_global;`
@@ -164,7 +164,7 @@ SELECT grant_id,
        admin_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        object_type,
        repository_id,
        bucket_id,
@@ -179,7 +179,7 @@ WHERE  permission_id = $1::uuid
 SELECT grant_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        category,
        permission_id,
        object_type,
@@ -194,7 +194,7 @@ FROM   soma.authorizations_repository;`
 SELECT grant_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        monitoring_id
 FROM   soma.authorizations_monitoring
 WHERE  permission_id = $1::uuid
@@ -204,7 +204,7 @@ WHERE  permission_id = $1::uuid
 SELECT grant_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        monitoring_id,
        permission_id,
        category
@@ -214,7 +214,7 @@ FROM   soma.authorizations_monitoring;`
 SELECT grant_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        authorized_team_id
 FROM   soma.authorizations_team
 WHERE  permission_id = $1::uuid
@@ -224,7 +224,7 @@ WHERE  permission_id = $1::uuid
 SELECT grant_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        authorized_team_id,
        permission_id,
        category
@@ -235,7 +235,7 @@ SELECT grant_id,
        admin_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        created_by,
        created_at
 FROM   soma.authorizations_global
@@ -248,7 +248,7 @@ SELECT grant_id,
        admin_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        object_type,
        repository_id,
        bucket_id,
@@ -266,7 +266,7 @@ WHERE  grant_id = $1::uuid
 SELECT grant_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        monitoring_id,
        created_by,
        created_at
@@ -279,7 +279,7 @@ WHERE  grant_id = $1::uuid
 SELECT grant_id,
        user_id,
        tool_id,
-       organizational_team_id,
+       team_id,
        authorized_team_id,
        created_by,
        created_at
@@ -296,7 +296,7 @@ WHERE  permission_id = $1::uuid
   AND ((admin_id = $3::uuid AND 'admin' = $4::varchar)
     OR (user_id = $3::uuid AND 'user' = $4::varchar)
     OR (tool_id = $3::uuid AND 'tool' = $4::varchar)
-    OR (organizational_team_id = $3::uuid AND 'team' = $4::varchar));`
+    OR (team_id = $3::uuid AND 'team' = $4::varchar));`
 
 	SearchRepositoryAuthorization = `
 SELECT grant_id
@@ -305,7 +305,7 @@ WHERE  permission_id = $1::uuid
   AND  category = $2::varchar
   AND ((user_id = $3::uuid AND 'user' = $4::varchar )
     OR (tool_id = $3::uuid AND 'tool' = $4::varchar )
-    OR (organizational_team_id = $3::uuid AND 'team' = $4::varchar))
+    OR (team_id = $3::uuid AND 'team' = $4::varchar))
   AND  object_type = $5::varchar
   AND ((repository_id = $6::uuid AND 'repository' = $5::varchar)
     OR (bucket_id = $6::uuid AND 'bucket' = $5::varchar)
@@ -320,7 +320,7 @@ WHERE  permission_id = $1::uuid
   AND  category = $2::varchar
   AND ((user_id = $3::uuid AND 'user' = $4::varchar )
     OR (tool_id = $3::uuid AND 'tool' = $4::varchar )
-    OR (organizational_team_id = $3::uuid AND 'team' = $4::varchar))
+    OR (team_id = $3::uuid AND 'team' = $4::varchar))
   AND  'team' = $5::varchar
   AND  authorized_team_id = $6::uuid;`
 
@@ -331,17 +331,17 @@ WHERE  permission_id = $1::uuid
   AND  category = $2::varchar
   AND ((user_id = $3::uuid AND 'user' = $4::varchar )
     OR (tool_id = $3::uuid AND 'tool' = $4::varchar )
-    OR (organizational_team_id = $3::uuid AND 'team' = $4::varchar))
+    OR (team_id = $3::uuid AND 'team' = $4::varchar))
   AND  'monitoring' = $5::varchar
   AND  monitoring_id = $6::uuid;`
 
 	GrantRemoveSystem = `
 DELETE FROM soma.authorizations_global sag
-USING       soma.permissions sp
-WHERE       sag.permission_id = sp.permission_id
+USING       soma.permission sp
+WHERE       sag.permission_id = sp.id
   AND       sag.category = sp.category
   AND       sag.category = 'system'
-  AND       sp.permission_name = $1::varchar;`
+  AND       sp.name = $1::varchar;`
 
 	/////////////////////////////////
 
