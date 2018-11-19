@@ -10,17 +10,17 @@
 package proto // import "github.com/mjolnir42/soma/lib/proto"
 
 type Repository struct {
-	ID         string      `json:"id,omitempty"`
-	Name       string      `json:"name,omitempty"`
-	TeamID     string      `json:"teamId,omitempty"`
-	IsDeleted  bool        `json:"isDeleted,omitempty"`
-	IsActive   bool        `json:"isActive,omitempty"`
-	Members    *[]Bucket   `json:"members,omitempty"`
-	Details    *Details    `json:"details,omitempty"`
-	Properties *[]Property `json:"properties,omitempty"`
+	ID         string             `json:"id,omitempty"`
+	Name       string             `json:"name,omitempty"`
+	TeamID     string             `json:"teamId,omitempty"`
+	IsDeleted  bool               `json:"isDeleted,omitempty"`
+	IsActive   bool               `json:"isActive,omitempty"`
+	Members    *[]Bucket          `json:"members,omitempty"`
+	Details    *RepositoryDetails `json:"details,omitempty"`
+	Properties *[]Property        `json:"properties,omitempty"`
 }
 
-// Clone function
+// Clone returns a copy of r
 func (r *Repository) Clone() Repository {
 	clone := Repository{
 		ID:        r.ID,
@@ -28,6 +28,23 @@ func (r *Repository) Clone() Repository {
 		TeamID:    r.TeamID,
 		IsDeleted: r.IsDeleted,
 		IsActive:  r.IsActive,
+	}
+	if r.Details != nil {
+		clone.Details = r.Details.Clone()
+	}
+	return clone
+}
+
+// RepositoryDetails contains metadata about a Repository
+type RepositoryDetails struct {
+	Creation *DetailsCreation `json:"creation,omitempty"`
+}
+
+// Clone returns a copy of r
+func (r *RepositoryDetails) Clone() *RepositoryDetails {
+	clone := &RepositoryDetails{}
+	if r.Creation != nil {
+		clone.Creation = r.Creation.Clone()
 	}
 	return clone
 }

@@ -229,9 +229,11 @@ func (r *TreeRead) repository(id string, depth int) (*proto.Repository, error) {
 		TeamID:    teamID,
 		IsDeleted: isDeleted,
 		IsActive:  isActive,
-		Details: &proto.Details{
-			CreatedBy: createdBy,
-			CreatedAt: createdAt.UTC().Format(time.RFC3339),
+		Details: &proto.RepositoryDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedAt: createdAt.UTC().Format(time.RFC3339),
+				CreatedBy: createdBy,
+			},
 		},
 	}
 
