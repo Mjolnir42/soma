@@ -12,42 +12,6 @@ package stmt
 const (
 	RepositoryStatements = ``
 
-	ListAllRepositories = `
-SELECT repository_id,
-       repository_name
-FROM   soma.repositories;`
-
-	ListScopedRepositories = `
--- direct user permissions
-SELECT sr.repository_id,
-       sr.repository_name
-FROM   inventory.user iu
-JOIN   soma.authorizations_repository sar
-  ON   iu.id = sar.user_id
-JOIN   soma.permissions sp
-  ON   sar.permission_id = sp.permission_id
-JOIN   soma.repositories sr
-  ON   sar.repository_id = sr.repository_id
-WHERE  iu.id = $1::uuid
-  AND  sp.permission_name = $2::varchar
-  AND  sr.repository_active
-  AND  NOT sr.repository_deleted
-UNION
--- team permissions
-SELECT sr.repository_id,
-       sr.repository_name
-FROM   inventory.user iu
-JOIN   soma.authorizations_repository sar
-  ON   iu.team_id = sar.organizational_team_id
-JOIN   soma.permissions sp
-  ON   sar.permission_id = sp.permission_id
-JOIN   soma.repositories sr
-  ON   sar.repository_id = sr.repository_id
-WHERE  iu.id = $1::uuid
-  AND  sp.permission_name = $2::varchar
-  AND  sr.repository_active
-  AND  NOT sr.repository_deleted;`
-
 	ShowRepository = `
 SELECT id,
        name,
@@ -155,8 +119,6 @@ WHERE  sb.bucket_id = $1::uuid;`
 )
 
 func init() {
-	m[ListAllRepositories] = `ListAllRepositories`
-	m[ListScopedRepositories] = `ListScopedRepositories`
 	m[RepoByBucketID] = `RepoByBucketID`
 	m[RepoCstProps] = `RepoCstProps`
 	m[RepoCustomPropertyForDelete] = `RepoCustomPropertyForDelete`

@@ -85,12 +85,12 @@ func (r *RepositoryRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.ListAllRepositories: &r.stmtList,
 		stmt.ShowRepository:      &r.stmtShow,
 		stmt.RepoOncProps:        &r.stmtPropOncall,
 		stmt.RepoSvcProps:        &r.stmtPropService,
 		stmt.RepoSysProps:        &r.stmtPropSystem,
 		stmt.RepoCstProps:        &r.stmtPropCustom,
+		stmt.AuthorizedRepositoryList:   &r.stmtList,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`repository`, err, stmt.Name(statement))
@@ -135,7 +135,11 @@ func (r *RepositoryRead) list(q *msg.Request, mr *msg.Result) {
 		err              error
 	)
 
-	if rows, err = r.stmtList.Query(); err != nil {
+	if rows, err = r.stmtList.Query(
+		q.Section,
+		q.Action,
+		q.AuthUser,
+	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
