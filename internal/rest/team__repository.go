@@ -93,4 +93,41 @@ func (x *Rest) RepositoryRename(w http.ResponseWriter, r *http.Request,
 	x.send(&w, &result)
 }
 
+// RepositorySearch function
+func (x *Rest) RepositorySearch(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	cReq := proto.NewRepositoryFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
+		return
+	}
+
+	switch {
+	case cReq.Filter.Repository.ID != ``:
+	case cReq.Filter.Repository.Name != ``:
+	case cReq.Filter.Repository.TeamID != ``:
+	default:
+		dispatchBadRequest(&w, fmt.Errorf(`RepositorySearch request without condition`))
+		return
+	}
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepository
+	request.Action = msg.ActionSearch
+	request.Search.Repository.ID = cReq.Filter.Repository.ID
+	request.Search.Repository.Name = cReq.Filter.Repository.Name
+	request.Search.Repository.TeamID = cReq.Filter.Repository.TeamID
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -46,7 +46,11 @@ func (x *Rest) RepositoryConfigSearch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if cReq.Filter.Repository.Name == `` {
+	switch {
+	case cReq.Filter.Repository.ID != ``:
+	case cReq.Filter.Repository.Name != ``:
+	case cReq.Filter.Repository.TeamID != ``:
+	default:
 		dispatchBadRequest(&w, fmt.Errorf(`RepositorySearch request without condition`))
 		return
 	}
@@ -56,18 +60,15 @@ func (x *Rest) RepositoryConfigSearch(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionSearch
 	request.Search.Repository.ID = cReq.Filter.Repository.ID
 	request.Search.Repository.Name = cReq.Filter.Repository.Name
+	request.Search.Repository.TeamID = cReq.Filter.Repository.TeamID
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-
-	// XXX BUG filter in SQL statement
-	filtered := []proto.Repository{}
-	for _, i := range result.Repository {
-		if i.Name == cReq.Filter.Repository.Name {
-			filtered = append(filtered, i)
-		}
-	}
-	result.Repository = filtered
 	x.send(&w, &result)
 }
 

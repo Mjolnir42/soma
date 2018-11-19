@@ -10,6 +10,7 @@ package soma
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/handler"
@@ -30,6 +31,7 @@ type RepositoryRead struct {
 	stmtPropService *sql.Stmt
 	stmtPropSystem  *sql.Stmt
 	stmtPropCustom  *sql.Stmt
+	stmtSearch      *sql.Stmt
 	appLog          *logrus.Logger
 	reqLog          *logrus.Logger
 	errLog          *logrus.Logger
@@ -91,6 +93,7 @@ func (r *RepositoryRead) Run() {
 		stmt.RepoSysProps:        &r.stmtPropSystem,
 		stmt.RepoCstProps:        &r.stmtPropCustom,
 		stmt.AuthorizedRepositoryList:   &r.stmtList,
+		stmt.AuthorizedRepositorySearch: &r.stmtSearch,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`repository`, err, stmt.Name(statement))
@@ -117,8 +120,10 @@ func (r *RepositoryRead) process(q *msg.Request) {
 	logRequest(r.reqLog, q)
 
 	switch q.Action {
-	case msg.ActionList, msg.ActionSearch:
+	case msg.ActionList:
 		r.list(q, &result)
+	case msg.ActionSearch:
+		r.search(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
 	default:
@@ -220,6 +225,77 @@ func (r *RepositoryRead) show(q *msg.Request, mr *msg.Result) {
 	}
 
 	mr.Repository = append(mr.Repository, repo)
+	mr.OK()
+}
+
+// search looks up a repository
+func (r *RepositoryRead) search(q *msg.Request, mr *msg.Result) {
+	var (
+		repoID, repoName, teamID, createdBy            string
+		rows                                           *sql.Rows
+		err                                            error
+		searchRepoID, searchRepoName, searchRepoTeamID sql.NullString
+		isDeleted, isActive                            bool
+		createdAt                                      time.Time
+	)
+
+	if q.Search.Repository.ID != `` {
+		searchRepoID.String = q.Search.Repository.ID
+		searchRepoID.Valid = true
+	}
+	if q.Search.Repository.Name != `` {
+		searchRepoName.String = q.Search.Repository.Name
+		searchRepoName.Valid = true
+	}
+	if q.Search.Repository.TeamID != `` {
+		searchRepoTeamID.String = q.Search.Repository.TeamID
+		searchRepoTeamID.Valid = true
+	}
+
+	if rows, err = r.stmtSearch.Query(
+		q.Section,
+		q.Action,
+		q.AuthUser,
+		searchRepoID,
+		searchRepoName,
+		searchRepoTeamID,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&repoID,
+			&repoName,
+			&isDeleted,
+			&isActive,
+			&teamID,
+			&createdBy,
+			&createdAt,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		mr.Repository = append(mr.Repository, proto.Repository{
+			ID:        repoID,
+			Name:      repoName,
+			TeamID:    teamID,
+			IsDeleted: isDeleted,
+			IsActive:  isActive,
+			Details: &proto.RepositoryDetails{
+				Creation: &proto.DetailsCreation{
+					CreatedAt: createdAt.UTC().Format(time.RFC3339),
+					CreatedBy: createdBy,
+				},
+			},
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
 	mr.OK()
 }
 

@@ -156,7 +156,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.POST(rtSearchJobStatus, x.Authenticated(x.JobStatusMgmtSearch))
 	router.POST(rtSearchNode, x.Authenticated(x.NodeSearch))
 	router.POST(rtSearchPermission, x.Authenticated(x.PermissionSearch))
-	router.POST(rtSearchRepository, x.Authenticated(x.RepositoryConfigSearch))
+	router.POST(rtSearchRepository, x.Authenticated(x.ScopeSelectRepositorySearch))
 	router.POST(rtSearchRight, x.Authenticated(x.RightSearch))
 	router.POST(rtSearchServiceProperty, x.Authenticated(x.PropertyMgmtSearch))
 

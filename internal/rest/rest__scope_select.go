@@ -204,4 +204,27 @@ func (x *Rest) ScopeSelectTeamSearch(w http.ResponseWriter,
 	x.TeamSearch(w, r, params)
 }
 
+// ScopeSelectRepositorySearch function
+func (x *Rest) ScopeSelectRepositorySearch(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+	defer panicCatcher(w)
+
+	cReq := proto.NewRepositoryFilter()
+	if err := peekJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
+		return
+	}
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepository
+	request.Action = msg.ActionSearch
+
+	if x.isAuthorized(&request) {
+		x.RepositorySearch(w, r, params)
+		return
+	}
+
+	x.RepositoryConfigSearch(w, r, params)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
