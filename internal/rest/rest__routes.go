@@ -231,6 +231,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PATCH(rtOncallMember, x.Authenticated(x.OncallMemberAssign))
 			router.PATCH(rtPermissionID, x.Authenticated(x.PermissionEdit))
 			router.PATCH(rtTeamRepositoryID, x.Authenticated(x.RepositoryRename))
+			router.PATCH(rtTeamRepositoryIDOwner, x.Authenticated(x.RepositoryRepossess))
 			router.POST(`/attribute/`, x.Authenticated(x.AttributeAdd))
 			router.POST(`/capability/`, x.Authenticated(x.CapabilityDeclare))
 			router.POST(`/category/:category/section/:sectionID/action/`, x.Authenticated(x.ActionAdd))

@@ -160,6 +160,7 @@ const (
 	ActionRepoRebuild     = `rebuild-repository`
 	ActionRepoRestart     = `restart-repository`
 	ActionRepoStop        = `stop-repository`
+	ActionRepossess       = `repossess`
 	ActionRetry           = `retry`
 	ActionRevoke          = `revoke`
 	ActionSearch          = `search`

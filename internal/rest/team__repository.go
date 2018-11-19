@@ -93,6 +93,34 @@ func (x *Rest) RepositoryRename(w http.ResponseWriter, r *http.Request,
 	x.send(&w, &result)
 }
 
+// RepositoryRepossess function
+func (x *Rest) RepositoryRepossess(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	cReq := proto.NewRepositoryRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		dispatchBadRequest(&w, err)
+		return
+	}
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepository
+	request.Action = msg.ActionRepossess
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Repository.TeamID = params.ByName(`teamID`)
+	request.Update.Repository.TeamID = cReq.Repository.TeamID
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
+}
+
 // RepositorySearch function
 func (x *Rest) RepositorySearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

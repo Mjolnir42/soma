@@ -70,6 +70,7 @@ const (
 	rtTeamMember                 = `/team/:teamID/member/`
 	rtTeamRepositoryID           = `/team/:teamID/repository/:repositoryID`
 	rtTeamRepositoryIDAudit      = `/team/:teamID/repository/:repositoryID/audit`
+	rtTeamRepositoryIDOwner      = `/team/:teamID/repository/:repositoryID/owner`
 	rtTeamPropertyMgmt           = `/team/:teamID/property-mgmt/:propertyType/`
 	rtTeamPropertyMgmtID         = `/team/:teamID/property-mgmt/:propertyType/:propertyID`
 	rtSearchRepository           = `/search/repository/`
