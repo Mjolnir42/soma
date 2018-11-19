@@ -26,12 +26,12 @@ type RepositoryRead struct {
 	handlerName     string
 	conn            *sql.DB
 	stmtList        *sql.Stmt
-	stmtShow        *sql.Stmt
+	stmtPropCustom  *sql.Stmt
 	stmtPropOncall  *sql.Stmt
 	stmtPropService *sql.Stmt
 	stmtPropSystem  *sql.Stmt
-	stmtPropCustom  *sql.Stmt
 	stmtSearch      *sql.Stmt
+	stmtShow        *sql.Stmt
 	appLog          *logrus.Logger
 	reqLog          *logrus.Logger
 	errLog          *logrus.Logger
@@ -87,13 +87,13 @@ func (r *RepositoryRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.ShowRepository:      &r.stmtShow,
-		stmt.RepoOncProps:        &r.stmtPropOncall,
-		stmt.RepoSvcProps:        &r.stmtPropService,
-		stmt.RepoSysProps:        &r.stmtPropSystem,
-		stmt.RepoCstProps:        &r.stmtPropCustom,
 		stmt.AuthorizedRepositoryList:   &r.stmtList,
 		stmt.AuthorizedRepositorySearch: &r.stmtSearch,
+		stmt.RepoCstProps:               &r.stmtPropCustom,
+		stmt.RepoOncProps:               &r.stmtPropOncall,
+		stmt.RepoSvcProps:               &r.stmtPropService,
+		stmt.RepoSysProps:               &r.stmtPropSystem,
+		stmt.ShowRepository:             &r.stmtShow,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`repository`, err, stmt.Name(statement))
