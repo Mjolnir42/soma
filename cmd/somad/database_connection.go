@@ -56,7 +56,7 @@ func connectToDatabase(appLog, errLog *log.Logger) {
 	required := map[string]int64{
 		"inventory": 201811150001,
 		"root":      201605160001,
-		"auth":      201711080001,
+		`auth`:      201811150001,
 		`soma`:      201811120002,
 	}
 

@@ -91,23 +91,24 @@ create unique index _unique_active_user_cert
 	queries[idx] = "createIndexUniqueActiveUserCert"
 	idx++
 
-	queryMap["createTableAdmins"] = `
-create table if not exists auth.admins (
-    admin_id                    uuid            PRIMARY KEY,
-    admin_uid                   varchar(256)    UNIQUE NOT NULL,
-    admin_user_uid              varchar(256)    NOT NULL REFERENCES inventory.user ( uid ) ON DELETE CASCADE DEFERRABLE,
-    admin_is_active             boolean         NOT NULL DEFAULT 'yes',
-    -- verify the admin_uid has the prefix admin_
-    CHECK( left( admin_uid, 6 ) = 'admin_' ),
-    -- verify admin_uid contains the user_uid of the owner
-    CHECK( position( admin_user_uid in admin_uid ) != 0 )
+	queryMap[`create__auth.admin`] = `
+create table if not exists auth.admin (
+    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    uid                         varchar(256)    NOT NULL,
+    user_uid                    varchar(256)    NOT NULL,
+    is_active                   boolean         NOT NULL DEFAULT 'yes',
+    CONSTRAINT _admin_primary_key PRIMARY KEY (id),
+    CONSTRAINT _admin_unique_name UNIQUE (uid),
+    CONSTRAINT _admin_check_uid_prefix CHECK( left( uid, 6 ) = 'admin_' ),
+    CONSTRAINT _admin_uid_contains_user_uid CHECK( position( user_uid in uid ) != 0 ),
+    CONSTRAINT _admin_user_exists FOREIGN KEY (user_uid) REFERENCES inventory.user (uid) ON DELETE CASCADE DEFERRABLE,
 );`
-	queries[idx] = "createTableAdmins"
+	queries[idx] = `create__auth.admin`
 	idx++
 
 	queryMap["createTableAdminAuthentication"] = `
 create table if not exists auth.admin_authentication (
-    admin_id                    uuid            NOT NULL REFERENCES auth.admins ( admin_id ) ON DELETE CASCADE DEFERRABLE,
+    admin_id                    uuid            NOT NULL REFERENCES auth.admin (id) ON DELETE CASCADE DEFERRABLE,
     crypt                       text            NOT NULL,
     reset_pending               boolean         NOT NULL DEFAULT 'no',
     valid_from                  timestamptz(3)  NOT NULL,
@@ -120,7 +121,7 @@ create table if not exists auth.admin_authentication (
 
 	queryMap["createTableAdminKeys"] = `
 create table if not exists auth.admin_keys (
-    admin_id                    uuid            NOT NULL REFERENCES auth.admins ( admin_id ) ON DELETE CASCADE DEFERRABLE,
+    admin_id                    uuid            NOT NULL REFERENCES auth.admin (id) ON DELETE CASCADE DEFERRABLE,
     admin_key_fingerprint       varchar(128)    NOT NULL,
     admin_key_public            text            NOT NULL,
     admin_key_active            boolean         NOT NULL DEFAULT 'yes'
@@ -138,7 +139,7 @@ create index _unique_active_admin_key
 
 	queryMap["createTableAdminClientCertificates"] = `
 create table if not exists auth.admin_client_certificates (
-    admin_id                    uuid            NOT NULL REFERENCES auth.admins ( admin_id ) ON DELETE CASCADE DEFERRABLE,
+    admin_id                    uuid            NOT NULL REFERENCES auth.admin (id) ON DELETE CASCADE DEFERRABLE,
     admin_cert_fingerprint      varchar(128)    NOT NULL,
     admin_cert_active           boolean         NOT NULL DEFAULT 'yes'
 );`
@@ -216,7 +217,7 @@ create unique index _unique_active_tool_cert
 	queryMap["createTablePasswordReset"] = `
 create table if not exists auth.password_reset (
     user_id                     uuid            NULL REFERENCES inventory.user ( id ) ON DELETE CASCADE DEFERRABLE,
-    admin_id                    uuid            NULL REFERENCES auth.admins ( admin_id ) ON DELETE CASCADE DEFERRABLE,
+    admin_id                    uuid            NULL REFERENCES auth.admin (id) ON DELETE CASCADE DEFERRABLE,
     tool_id                     uuid            NULL REFERENCES auth.tools ( tool_id ) ON DELETE CASCADE DEFERRABLE,
     token                       varchar(256)    UNIQUE NOT NULL,
     valid_from                  timestamptz(3)  NOT NULL,

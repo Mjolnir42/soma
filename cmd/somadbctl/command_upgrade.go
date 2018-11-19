@@ -17,6 +17,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 		201605060001: upgradeAuthTo201605150002,
 		201605150002: upgradeAuthTo201605190001,
 		201605190001: upgradeAuthTo201711080001,
+		201711080001: upgradeAuthTo201811150001,
 	},
 	`soma`: map[int]func(int, string, bool) int{
 		201605060001: upgradeSomaTo201605210001,
@@ -252,6 +253,36 @@ func upgradeAuthTo201711080001(curr int, tool string, printOnly bool) int {
 	executeUpgrades(stmts, printOnly)
 
 	return 201711080001
+}
+
+func upgradeAuthTo201811150001(curr int, tool string, printOnly bool) int {
+	if curr != 201711080001 {
+		return 0
+	}
+
+	stmts := []string{
+		`ALTER TABLE auth.admins RENAME TO admin;`,
+		`ALTER INDEX IF EXISTS admins_pkey RENAME TO _admin_primary_key;`,
+		`ALTER TABLE auth.admin RENAME admin_id TO id;`,
+		`ALTER TABLE auth.admin ALTER COLUMN id SET DEFAULT gen_random_uuid();`,
+		`ALTER TABLE auth.admin RENAME admin_uid TO uid;`,
+		`ALTER TABLE auth.admin DROP CONSTRAINT admins_admin_uid_key;`,
+		`ALTER TABLE auth.admin DROP CONSTRAINT admins_admin_uid_check;`,
+		`ALTER TABLE auth.admin ADD CONSTRAINT _admin_unique_name UNIQUE (uid);`,
+		`ALTER TABLE auth.admin ADD CONSTRAINT _admin_check_uid_prefix CHECK( left( uid, 6 ) = 'admin_' );`,
+		`ALTER TABLE auth.admin DROP CONSTRAINT admins_check;`,
+		`ALTER TABLE auth.admin DROP CONSTRAINT admins_admin_user_uid_fkey;`,
+		`ALTER TABLE auth.admin RENAME admin_user_uid TO user_uid;`,
+		`ALTER TABLE auth.admin ADD CONSTRAINT _admin_uid_contains_user_uid CHECK( position( user_uid in uid ) != 0 );`,
+		`ALTER TABLE auth.admin ADD CONSTRAINT _admin_user_exists FOREIGN KEY (user_uid) REFERENCES inventory.user (uid) ON DELETE CASCADE DEFERRABLE;`,
+		`ALTER TABLE auth.admin RENAME admin_is_active TO is_active;`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('auth', 201811150001, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+
+	return 201811150001
 }
 
 func upgradeSomaTo201605210001(curr int, tool string, printOnly bool) int {

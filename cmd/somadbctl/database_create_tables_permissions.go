@@ -93,7 +93,7 @@ create table if not exists soma.permission_grant_map (
 	queryMap["createTableGlobalAuthorizations"] = `
 create table if not exists soma.authorizations_global (
     grant_id                    uuid            PRIMARY KEY,
-    admin_id                    uuid            REFERENCES auth.admins ( admin_id ) DEFERRABLE,
+    admin_id                    uuid            REFERENCES auth.admin ( id ) DEFERRABLE,
     user_id                     uuid            REFERENCES inventory.user ( id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
     organizational_team_id      uuid            REFERENCES inventory.team ( id ) DEFERRABLE,
@@ -144,7 +144,7 @@ create table if not exists soma.authorizations_repository (
     grant_id                    uuid            PRIMARY KEY,
     user_id                     uuid            REFERENCES inventory.user ( id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
-    admin_id                    uuid            REFERENCES auth.admins ( admin_id ) DEFERRABLE,
+    admin_id                    uuid            REFERENCES auth.admin ( id ) DEFERRABLE,
     organizational_team_id      uuid            REFERENCES inventory.team ( id ) DEFERRABLE,
     object_type                 varchar(64)     NOT NULL REFERENCES soma.object_types ( object_type ) DEFERRABLE,
     repository_id               uuid            REFERENCES soma.repositories ( repository_id ) DEFERRABLE,
