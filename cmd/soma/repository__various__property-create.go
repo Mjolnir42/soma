@@ -164,7 +164,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		var teamID string
 		switch oType {
 		case `repository`:
-			if teamID, err = adm.LookupTeamByRepo(repoID); err != nil {
+			if err = adm.LookupTeamByRepo(repoID, &teamID); err != nil {
 				return err
 			}
 		default:

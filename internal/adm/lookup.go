@@ -70,7 +70,7 @@ func LookupTeamID(s string, r *string) error {
 // LookupTeamByRepo looks up the UUID for the team that is the
 // owner of a given repository s, which can be the name or UUID
 // of the repository.
-func LookupTeamByRepo(s string) (string, error) {
+func LookupTeamByRepo(s string, r *string) error {
 	var (
 		bID string
 		err error
@@ -78,13 +78,13 @@ func LookupTeamByRepo(s string) (string, error) {
 
 	if !IsUUID(s) {
 		if bID, err = LookupRepoID(s); err != nil {
-			return ``, err
+			return err
 		}
 	} else {
 		bID = s
 	}
 
-	return teamIDByRepoID(bID)
+	return teamIDByRepoID(bID, r)
 }
 
 // LookupTeamByBucket looks up the UUID for the team that is
@@ -555,7 +555,7 @@ abort:
 
 // teamIDByRepoID implements the actual serverside lookup of
 // a repository's TeamID
-func teamIDByRepoID(repo string) (string, error) {
+func teamIDByRepoID(repo string, team *string) error {
 	res, err := fetchObjList(fmt.Sprintf("/repository/%s", repo))
 	if err != nil {
 		goto abort
@@ -572,10 +572,11 @@ func teamIDByRepoID(repo string) (string, error) {
 			repo, (*res.Repositories)[0].ID)
 		goto abort
 	}
-	return (*res.Repositories)[0].TeamID, nil
+	*team = (*res.Repositories)[0].TeamID
+	return nil
 
 abort:
-	return ``, fmt.Errorf("TeamID lookup failed: %s",
+	return fmt.Errorf("TeamID lookup failed: %s",
 		err.Error())
 }
 

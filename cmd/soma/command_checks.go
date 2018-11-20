@@ -135,8 +135,8 @@ func cmdCheckAdd(c *cli.Context) error {
 		req.CheckConfig.ExternalID = ex[0]
 	}
 
-	if teamID, err = adm.LookupTeamByRepo(
-		req.CheckConfig.RepositoryID); err != nil {
+	if err = adm.LookupTeamByRepo(
+		req.CheckConfig.RepositoryID, &teamID); err != nil {
 		return err
 	}
 

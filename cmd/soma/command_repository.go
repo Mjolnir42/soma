@@ -137,8 +137,8 @@ func cmdRepositoryDestroy(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	teamID, err := adm.LookupTeamByRepo(id)
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamByRepo(id, &teamID); err != nil {
 		return err
 	}
 	path := fmt.Sprintf("/team/%s/repository/%s", teamID, id)
@@ -160,8 +160,8 @@ func cmdRepositoryRename(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	teamID, err := adm.LookupTeamByRepo(id)
-	if err != nil {
+	var teamID string
+	if err := adm.LookupTeamByRepo(id, &teamID); err != nil {
 		return err
 	}
 	path := fmt.Sprintf("/team/%s/repository/%s", teamID, id)
