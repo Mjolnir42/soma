@@ -70,4 +70,8 @@ func DirectIdName(c *cli.Context) {
 	GenericDirect(c, []string{`id`, `name`})
 }
 
+func RepositoryConfigSearch(c *cli.Context) {
+	GenericDirect(c, []string{`id`, `name`, `team`, `deleted`, `active`})
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -50,11 +50,13 @@ func (r *RepositoryDetails) Clone() *RepositoryDetails {
 }
 
 type RepositoryFilter struct {
-	ID        string `json:"ID,omitempty"`
-	Name      string `json:"name,omitempty"`
-	TeamID    string `json:"teamId,omitempty"`
-	IsDeleted bool   `json:"isDeleted,omitempty"`
-	IsActive  bool   `json:"isActive,omitempty"`
+	ID                string `json:"ID,omitempty"`
+	Name              string `json:"name,omitempty"`
+	TeamID            string `json:"teamId,omitempty"`
+	IsDeleted         bool   `json:"isDeleted"`
+	IsActive          bool   `json:"isActive"`
+	FilterOnIsDeleted bool   `json:"filterOnIsDeleted"`
+	FilterOnIsActive  bool   `json:"filterOnIsActive"`
 }
 
 func NewRepositoryRequest() Request {

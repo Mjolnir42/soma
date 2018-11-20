@@ -60,13 +60,16 @@ func (r *RepositoryRead) Register(c *sql.DB, l ...*logrus.Logger) {
 func (r *RepositoryRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
-		msg.ActionShow,
 		msg.ActionSearch,
+		msg.ActionShow,
 	} {
 		hmap.Request(msg.SectionRepositoryConfig, action, r.handlerName)
 	}
 	for _, action := range []string{
 		msg.ActionAudit,
+		msg.ActionList,
+		msg.ActionSearch,
+		msg.ActionShow,
 	} {
 		hmap.Request(msg.SectionRepository, action, r.handlerName)
 	}
@@ -89,11 +92,11 @@ func (r *RepositoryRead) Run() {
 	for statement, prepStmt := range map[string]**sql.Stmt{
 		stmt.AuthorizedRepositoryList:   &r.stmtList,
 		stmt.AuthorizedRepositorySearch: &r.stmtSearch,
+		stmt.AuthorizedRepositoryShow:   &r.stmtShow,
 		stmt.RepoCstProps:               &r.stmtPropCustom,
 		stmt.RepoOncProps:               &r.stmtPropOncall,
 		stmt.RepoSvcProps:               &r.stmtPropService,
 		stmt.RepoSysProps:               &r.stmtPropSystem,
-		stmt.ShowRepository:             &r.stmtShow,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`repository`, err, stmt.Name(statement))
@@ -173,18 +176,26 @@ func (r *RepositoryRead) list(q *msg.Request, mr *msg.Result) {
 // show returns the details of a specific repository
 func (r *RepositoryRead) show(q *msg.Request, mr *msg.Result) {
 	var (
-		repoID, repoName, teamID string
-		isActive                 bool
-		err                      error
+		repoID, repoName, teamID, createdBy string
+		isDeleted, isActive                 bool
+		createdAt                           time.Time
+		err                                 error
 	)
 
 	if err = r.stmtShow.QueryRow(
+		q.Section,
+		q.Action,
+		q.AuthUser,
 		q.Repository.ID,
+		q.Repository.TeamID,
 	).Scan(
 		&repoID,
 		&repoName,
+		&isDeleted,
 		&isActive,
 		&teamID,
+		&createdBy,
+		&createdAt,
 	); err == sql.ErrNoRows {
 		mr.NotFound(err, q.Section)
 		return
@@ -196,8 +207,14 @@ func (r *RepositoryRead) show(q *msg.Request, mr *msg.Result) {
 		ID:        repoID,
 		Name:      repoName,
 		TeamID:    teamID,
-		IsDeleted: false,
+		IsDeleted: isDeleted,
 		IsActive:  isActive,
+		Details: &proto.RepositoryDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedAt: createdAt.UTC().Format(time.RFC3339),
+				CreatedBy: createdBy,
+			},
+		},
 	}
 
 	// add properties
@@ -237,6 +254,7 @@ func (r *RepositoryRead) search(q *msg.Request, mr *msg.Result) {
 		searchRepoID, searchRepoName, searchRepoTeamID sql.NullString
 		isDeleted, isActive                            bool
 		createdAt                                      time.Time
+		searchActive, searchDeleted                    sql.NullBool
 	)
 
 	if q.Search.Repository.ID != `` {
@@ -252,6 +270,12 @@ func (r *RepositoryRead) search(q *msg.Request, mr *msg.Result) {
 		searchRepoTeamID.Valid = true
 	}
 
+	searchDeleted.Bool = q.Search.Repository.IsDeleted
+	searchDeleted.Valid = q.Search.Repository.FilterOnIsDeleted
+
+	searchActive.Bool = q.Search.Repository.IsActive
+	searchActive.Valid = q.Search.Repository.FilterOnIsActive
+
 	if rows, err = r.stmtSearch.Query(
 		q.Section,
 		q.Action,
@@ -259,6 +283,8 @@ func (r *RepositoryRead) search(q *msg.Request, mr *msg.Result) {
 		searchRepoID,
 		searchRepoName,
 		searchRepoTeamID,
+		searchDeleted,
+		searchActive,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		return

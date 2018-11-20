@@ -555,8 +555,11 @@ abort:
 
 // teamIDByRepoID implements the actual serverside lookup of
 // a repository's TeamID
-func teamIDByRepoID(repo string, team *string) error {
-	res, err := fetchObjList(fmt.Sprintf("/repository/%s", repo))
+func teamIDByRepoID(repoID string, team *string) error {
+	req := proto.NewRepositoryFilter()
+	req.Filter.Repository.ID = repoID
+
+	res, err := fetchFilter(req, `/search/repository/`)
 	if err != nil {
 		goto abort
 	}
@@ -567,9 +570,9 @@ func teamIDByRepoID(repo string, team *string) error {
 	}
 
 	// check the received record against the input
-	if repo != (*res.Repositories)[0].ID {
-		err = fmt.Errorf("RepositoryId mismatch: %s vs %s",
-			repo, (*res.Repositories)[0].ID)
+	if repoID != (*res.Repositories)[0].ID {
+		err = fmt.Errorf("RepositoryID mismatch: %s vs %s",
+			repoID, (*res.Repositories)[0].ID)
 		goto abort
 	}
 	*team = (*res.Repositories)[0].TeamID

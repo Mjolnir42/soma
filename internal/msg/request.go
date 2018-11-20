@@ -106,7 +106,7 @@ type Filter struct {
 	Oncall     proto.Oncall
 	Permission proto.Permission
 	Property   proto.Property
-	Repository proto.Repository
+	Repository proto.RepositoryFilter
 	SectionObj proto.Section
 	Server     proto.Server
 	Team       proto.Team

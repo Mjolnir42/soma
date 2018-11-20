@@ -12,17 +12,6 @@ package stmt
 const (
 	RepositoryStatements = ``
 
-	ShowRepository = `
-SELECT id,
-       name,
-       is_deleted,
-       is_active,
-       team_id,
-       created_by,
-       created_at
-FROM   soma.repository
-WHERE  id = $1::uuid;`
-
 	RepoOncProps = `
 SELECT op.instance_id,
        op.source_instance_id,
@@ -129,7 +118,6 @@ func init() {
 	m[RepoSvcProps] = `RepoSvcProps`
 	m[RepoSysProps] = `RepoSysProps`
 	m[RepoSystemPropertyForDelete] = `RepoSystemPropertyForDelete`
-	m[ShowRepository] = `ShowRepository`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -13,121 +13,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
-	"github.com/mjolnir42/soma/internal/cmpl"
-	"github.com/mjolnir42/soma/lib/proto"
 )
-
-func registerRepository(app cli.App) *cli.App {
-	app.Commands = append(app.Commands,
-		[]cli.Command{
-			// repository
-			{
-				Name:  "repository",
-				Usage: "SUBCOMMANDS for repository",
-				Subcommands: []cli.Command{
-					{
-						Name:   "destroy",
-						Usage:  "Destroy an existing repository",
-						Action: runtime(cmdRepositoryDestroy),
-					},
-					{
-						Name:         "rename",
-						Usage:        "Rename an existing repository",
-						Action:       runtime(cmdRepositoryRename),
-						BashComplete: cmpl.To,
-					},
-					{
-						Name:   "list",
-						Usage:  "List all existing repositories",
-						Action: runtime(cmdRepositoryList),
-					},
-					{
-						Name:   "show",
-						Usage:  "Show information about a specific repository",
-						Action: runtime(cmdRepositoryShow),
-					},
-					{
-						Name:   `tree`,
-						Usage:  `Display the repository as tree`,
-						Action: runtime(cmdRepositoryTree),
-					},
-					{
-						Name:   `instances`,
-						Usage:  `List check instances for a repository`,
-						Action: runtime(cmdRepositoryInstance),
-					},
-					{
-						Name:  "property",
-						Usage: "SUBCOMMANDS for properties",
-						Subcommands: []cli.Command{
-							{
-								Name:  "add",
-								Usage: "SUBCOMMANDS for property add",
-								Subcommands: []cli.Command{
-									{
-										Name:         "system",
-										Usage:        "Add a system property to a repository",
-										Action:       runtime(cmdRepositorySystemPropertyAdd),
-										BashComplete: cmpl.PropertyAddValue,
-									},
-									{
-										Name:         "service",
-										Usage:        "Add a service property to a repository",
-										Action:       runtime(cmdRepositoryServicePropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
-									},
-									{
-										Name:         "oncall",
-										Usage:        "Add an oncall property to a repository",
-										Action:       runtime(cmdRepositoryOncallPropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
-									},
-									{
-										Name:         "custom",
-										Usage:        "Add a custom property to a repository",
-										Action:       runtime(cmdRepositoryCustomPropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
-									},
-								},
-							},
-							{
-								Name:  `delete`,
-								Usage: `SUBCOMMANDS for property delete`,
-								Subcommands: []cli.Command{
-									{
-										Name:         `system`,
-										Usage:        `Delete a system property from a repository`,
-										Action:       runtime(cmdRepositorySystemPropertyDelete),
-										BashComplete: cmpl.FromView,
-									},
-									{
-										Name:         `service`,
-										Usage:        `Delete a service property from a repository`,
-										Action:       runtime(cmdRepositoryServicePropertyDelete),
-										BashComplete: cmpl.FromView,
-									},
-									{
-										Name:         `oncall`,
-										Usage:        `Delete an oncall property from a repository`,
-										Action:       runtime(cmdRepositoryOncallPropertyDelete),
-										BashComplete: cmpl.FromView,
-									},
-									{
-										Name:         `custom`,
-										Usage:        `Delete a custom property from a repository`,
-										Action:       runtime(cmdRepositoryCustomPropertyDelete),
-										BashComplete: cmpl.FromView,
-									},
-								},
-							},
-						},
-					},
-				},
-			}, // end repository
-		}...,
-	)
-	return &app
-}
 
 func cmdRepositoryDestroy(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
@@ -171,27 +57,6 @@ func cmdRepositoryRename(c *cli.Context) error {
 	req.Repository.Name = opts[`to`][0]
 
 	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
-func cmdRepositoryList(c *cli.Context) error {
-	if err := adm.VerifyNoArgument(c); err != nil {
-		return err
-	}
-
-	return adm.Perform(`get`, `/repository/`, `list`, nil, c)
-}
-
-func cmdRepositoryShow(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/repository/%s", id)
-	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
 func cmdRepositoryInstance(c *cli.Context) error {

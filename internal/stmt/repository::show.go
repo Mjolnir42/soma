@@ -9,15 +9,12 @@
 
 package stmt // import "github.com/mjolnir42/soma/internal/stmt"
 
-const AuthorizedRepositorySearch = `
--- $1 section.name          ::varchar
--- $2 action.name           ::varchar
--- $3 user.uid              ::varchar
--- $4 repository.id         ::uuid
--- $5 repository.name       ::varchar
--- $6 repository.team_id    ::uuid
--- $7 repository.is_deleted ::boolean
--- $8 repository.is_active  ::boolean
+const AuthorizedRepositoryShow = `
+-- $1 section.name       ::varchar
+-- $2 action.name        ::varchar
+-- $3 user.uid           ::varchar
+-- $4 repository.id      ::uuid
+-- $5 repository.team_id ::uuid
 -------------------------------
 -- CASE1: root user has omnipotence permission
 SELECT      soma.repository.id,
@@ -41,12 +38,9 @@ WHERE       inventory.user.uid = $3::varchar
   AND       soma.permission.name = 'omnipotence'
   AND       (   $1::varchar = 'repository'
              OR $1::varchar = 'repository-config')
-  AND       $2::varchar = 'search'
-  AND       (soma.repository.id         = $4::uuid    OR $4::uuid    IS NULL)
-  AND       (soma.repository.name       = $5::varchar OR $5::varchar IS NULL)
-  AND       (soma.repository.team_id    = $6::uuid    OR $6::uuid    IS NULL)
-  AND       (soma.repository.is_deleted = $7::boolean OR $7::boolean IS NULL)
-  AND       (soma.repository.is_active  = $8::boolean OR $8::boolean IS NULL)
+  AND       $2::varchar = 'show'
+  AND       soma.repository.id = $4::uuid
+  AND       soma.repository.team_id = $5::uuid
 UNION
 -- CASE2: admin user has suitable system permission for requested section::action
 SELECT      soma.repository.id,
@@ -77,12 +71,9 @@ WHERE       auth.admin.uid = $3::varchar
   AND       soma.action.name  = $2::varchar
   AND       (   $1::varchar = 'repository'
              OR $1::varchar = 'repository-config')
-  AND       $2::varchar = 'search'
-  AND       (soma.repository.id         = $4::uuid    OR $4::uuid    IS NULL)
-  AND       (soma.repository.name       = $5::varchar OR $5::varchar IS NULL)
-  AND       (soma.repository.team_id    = $6::uuid    OR $6::uuid    IS NULL)
-  AND       (soma.repository.is_deleted = $7::boolean OR $7::boolean IS NULL)
-  AND       (soma.repository.is_active  = $8::boolean OR $8::boolean IS NULL)
+  AND       $2::varchar = 'show'
+  AND       soma.repository.id = $4::uuid
+  AND       soma.repository.team_id = $5::uuid
 UNION
 -- CASE 3:  regular user has repository scoped repository-config::search, which allows to find
 --          that one repository
@@ -115,15 +106,12 @@ WHERE       inventory.user.uid = $3::varchar
   AND       soma.section.name = $1::varchar
   AND       soma.action.name  = $2::varchar
   AND       $1::varchar = 'repository-config'
-  AND       $2::varchar = 'search'
+  AND       $2::varchar = 'show'
             -- section grant for all actions has soma.permission_map.action_id as NULL
   AND       (   soma.permission_map.action_id = soma.action.id
              OR soma.permission_map.action_id IS NULL                 )
-  AND       (soma.repository.id         = $4::uuid    OR $4::uuid    IS NULL)
-  AND       (soma.repository.name       = $5::varchar OR $5::varchar IS NULL)
-  AND       (soma.repository.team_id    = $6::uuid    OR $6::uuid    IS NULL)
-  AND       (soma.repository.is_deleted = $7::boolean OR $7::boolean IS NULL)
-  AND       (soma.repository.is_active  = $8::boolean OR $8::boolean IS NULL)
+  AND       soma.repository.id = $4::uuid
+  AND       soma.repository.team_id = $5::uuid
 UNION
 -- CASE 4:  regular user has team scoped repository::search, which allows to find all
 --          repositories owned by a team
@@ -156,18 +144,15 @@ WHERE       inventory.user.uid = $3::varchar
   AND       soma.section.name = $1::varchar
   AND       soma.action.name  = $2::varchar
   AND       $1::varchar = 'repository'
-  AND       $2::varchar = 'search'
+  AND       $2::varchar = 'show'
             -- section grant for all actions has soma.permission_map.action_id as NULL
   AND       (   soma.permission_map.action_id = soma.action.id
              OR soma.permission_map.action_id IS NULL                 )
-  AND       (soma.repository.id         = $4::uuid    OR $4::uuid    IS NULL)
-  AND       (soma.repository.name       = $5::varchar OR $5::varchar IS NULL)
-  AND       (soma.repository.team_id    = $6::uuid    OR $6::uuid    IS NULL)
-  AND       (soma.repository.is_deleted = $7::boolean OR $7::boolean IS NULL)
-  AND       (soma.repository.is_active  = $8::boolean OR $8::boolean IS NULL);`
+  AND       soma.repository.id = $4::uuid
+  AND       soma.repository.team_id = $5::uuid;`
 
 func init() {
-	m[AuthorizedRepositorySearch] = `AuthorizedRepositorySearch`
+	m[AuthorizedRepositoryShow] = `AuthorizedRepositoryShow`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

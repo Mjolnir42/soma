@@ -16,14 +16,14 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-func registerRepositoryMgmt(app cli.App) *cli.App {
+func registerRepository(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			// repository
 			{
-				Name:        `repository-mgmt`,
+				Name:        `repository`,
 				Usage:       `SUBCOMMANDS for repository management`,
-				Description: help.Text(`repository-mgmt::`),
+				Description: help.Text(`repository::`),
 				Subcommands: []cli.Command{
 					{
 						Name:         `create`,
@@ -31,6 +31,26 @@ func registerRepositoryMgmt(app cli.App) *cli.App {
 						Description:  help.Text(`repository-mgmt::create`),
 						Action:       runtime(repositoryMgmtCreate),
 						BashComplete: cmpl.Team,
+					},
+					{
+						Name:        `list`,
+						Usage:       `List existing repositories`,
+						Description: help.Text(`repository-config::list`),
+						Action:      runtime(repositoryConfigList),
+					},
+					{
+						Name:         `show`,
+						Usage:        `Show information about a specific repository`,
+						Description:  help.Text(`repository::show`),
+						Action:       runtime(repositoryShow),
+						BashComplete: cmpl.Team,
+					},
+					{
+						Name:         `search`,
+						Usage:        `Search for repositories matching specific conditions`,
+						Description:  help.Text(`repository-config::search`),
+						Action:       runtime(repositoryConfigSearch),
+						BashComplete: cmpl.RepositoryConfigSearch,
 					},
 				},
 			},
@@ -40,7 +60,7 @@ func registerRepositoryMgmt(app cli.App) *cli.App {
 }
 
 // repositoryMgmtCreate function
-// soma repository-mgmt create ${repository} team ${team}
+// soma repository create ${repository} team ${team}
 func repositoryMgmtCreate(c *cli.Context) error {
 	opts := map[string][]string{}
 	multipleAllowed := []string{}

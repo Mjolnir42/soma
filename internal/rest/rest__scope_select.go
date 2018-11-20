@@ -227,4 +227,23 @@ func (x *Rest) ScopeSelectRepositorySearch(w http.ResponseWriter,
 	x.RepositoryConfigSearch(w, r, params)
 }
 
+// ScopeSelectRepositoryShow function
+func (x *Rest) ScopeSelectRepositoryShow(w http.ResponseWriter,
+	r *http.Request, params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepository
+	request.Action = msg.ActionShow
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Repository.TeamID = params.ByName(`teamID`)
+
+	if x.isAuthorized(&request) {
+		x.RepositoryShow(w, r, params)
+		return
+	}
+
+	x.RepositoryConfigShow(w, r, params)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

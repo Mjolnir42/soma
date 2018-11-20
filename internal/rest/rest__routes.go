@@ -119,7 +119,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 	router.GET(rtPropertyMgmt, x.Authenticated(x.PropertyMgmtList))
 	router.GET(rtPropertyMgmtID, x.Authenticated(x.PropertyMgmtShow))
 	router.GET(rtRepository, x.Authenticated(x.RepositoryConfigList))
-	router.GET(rtTeamRepositoryID, x.Authenticated(x.RepositoryConfigShow))
+	router.GET(rtTeamRepositoryID, x.Authenticated(x.ScopeSelectRepositoryShow))
 	router.GET(rtRepositoryInstance, x.Authenticated(x.InstanceList))
 	router.GET(rtRepositoryInstanceID, x.Authenticated(x.InstanceShow))
 	router.GET(rtRepositoryInstanceVersions, x.Authenticated(x.InstanceVersions))

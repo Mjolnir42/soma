@@ -136,6 +136,8 @@ func (x *Rest) RepositorySearch(w http.ResponseWriter, r *http.Request,
 	case cReq.Filter.Repository.ID != ``:
 	case cReq.Filter.Repository.Name != ``:
 	case cReq.Filter.Repository.TeamID != ``:
+	case cReq.Filter.Repository.FilterOnIsDeleted:
+	case cReq.Filter.Repository.FilterOnIsActive:
 	default:
 		dispatchBadRequest(&w, fmt.Errorf(`RepositorySearch request without condition`))
 		return
@@ -147,6 +149,31 @@ func (x *Rest) RepositorySearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Repository.ID = cReq.Filter.Repository.ID
 	request.Search.Repository.Name = cReq.Filter.Repository.Name
 	request.Search.Repository.TeamID = cReq.Filter.Repository.TeamID
+	request.Search.Repository.IsDeleted = cReq.Filter.Repository.IsDeleted
+	request.Search.Repository.IsActive = cReq.Filter.Repository.IsActive
+	request.Search.Repository.FilterOnIsDeleted = cReq.Filter.Repository.FilterOnIsDeleted
+	request.Search.Repository.FilterOnIsActive = cReq.Filter.Repository.FilterOnIsActive
+
+	if !x.isAuthorized(&request) {
+		dispatchForbidden(&w, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
+}
+
+// RepositoryShow function
+func (x *Rest) RepositoryShow(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepository
+	request.Action = msg.ActionShow
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Repository.TeamID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
 		dispatchForbidden(&w, nil)
