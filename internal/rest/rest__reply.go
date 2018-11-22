@@ -21,21 +21,24 @@ func (x *Rest) replyNoContent(w *http.ResponseWriter) {
 	(*w).Write(nil)
 }
 
-// replyBadRequest returns a 400 error
+// replyBadRequest returns a 400 application error inside the returned
+// JSON body
 func (x *Rest) replyBadRequest(w *http.ResponseWriter, q *msg.Request, err error) {
 	result := msg.FromRequest(q)
 	result.BadRequest(err, q.Section)
 	x.send(w, &result)
 }
 
-// replyForbidden returns a 403 error
+// replyForbidden returns a 403 application error inside the returned
+// JSON body
 func (x *Rest) replyForbidden(w *http.ResponseWriter, q *msg.Request, err error) {
 	result := msg.FromRequest(q)
 	result.Forbidden(err, q.Section)
 	x.send(w, &result)
 }
 
-// replyNotImplemented returns a 501 error
+// replyNotImplemented returns a 501 application error inside the
+// returned JSON body
 func (x *Rest) replyNotImplemented(w *http.ResponseWriter, q *msg.Request, err error) {
 	result := msg.FromRequest(q)
 	result.NotImplemented(err, q.Section)
