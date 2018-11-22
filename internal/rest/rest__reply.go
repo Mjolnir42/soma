@@ -37,6 +37,14 @@ func (x *Rest) replyForbidden(w *http.ResponseWriter, q *msg.Request, err error)
 	x.send(w, &result)
 }
 
+// replyServerError returns a 500 application error inside the
+// returned JSON body
+func (x *Rest) replyServerError(w *http.ResponseWriter, q *msg.Request, err error) {
+	result := msg.FromRequest(q)
+	result.ServerError(err, q.Section)
+	x.send(w, &result)
+}
+
 // replyNotImplemented returns a 501 application error inside the
 // returned JSON body
 func (x *Rest) replyNotImplemented(w *http.ResponseWriter, q *msg.Request, err error) {

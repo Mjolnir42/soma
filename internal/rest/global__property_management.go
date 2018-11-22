@@ -304,8 +304,10 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 	case msg.PropertyCustom:
 		fallthrough
 	case msg.PropertyService:
-		dispatchInternalError(&w, fmt.Errorf("Request routing error. Type %s request appeared in global handler"+
-			" for types: native, template, system", request.Property.Type))
+		x.replyServerError(&w, &request, fmt.Errorf(
+			"Request routing error. Type %s request appeared in global"+
+				" handler for types: native, template, system",
+			request.Property.Type))
 		return
 	default:
 		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", request.Property.Type))
@@ -353,8 +355,10 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 	case msg.PropertyCustom:
 		fallthrough
 	case msg.PropertyService:
-		dispatchInternalError(&w, fmt.Errorf("Request routing error. Type %s request appeared in global handler"+
-			" for types: native, template, system", request.Property.Type))
+		x.replyServerError(&w, &request, fmt.Errorf(
+			"Request routing error. Type %s request appeared in global"+
+				" handler for types: native, template, system",
+			request.Property.Type))
 		return
 	default:
 		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", request.Property.Type))

@@ -454,8 +454,10 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		logEntry.WithField(`Code`, r.Code).
 			WithField(`Masked`, 500).
 			Warnf(`Result for unhandled section`)
-		dispatchInternalError(w, nil)
-		return
+		result.Error(nil)
+		// prevent any data leak
+		result.DataClean()
+		goto buildJSON
 	}
 	result.RequestID = r.ID.String()
 
@@ -495,8 +497,9 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		logEntry.WithField(`Code`, r.Code).
 			WithField(`Masked`, 500).
 			Warn(`Unhandled internal result code`)
-		dispatchInternalError(w, nil)
-		return
+		result.Error(nil)
+		// prevent any data leak
+		result.DataClean()
 	}
 	goto buildJSON
 

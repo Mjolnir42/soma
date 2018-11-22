@@ -78,14 +78,6 @@ func dispatchJSONReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Write(*b)
 }
 
-func dispatchInternalError(w *http.ResponseWriter, err error) {
-	if err != nil {
-		http.Error(*w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	http.Error(*w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-}
-
 func dispatchNotFound(w *http.ResponseWriter, err error) {
 	if err != nil {
 		http.Error(*w, err.Error(), http.StatusNotFound)
