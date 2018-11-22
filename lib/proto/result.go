@@ -189,4 +189,55 @@ func NewResult() Result {
 	}
 }
 
+// DataClean ensures that r contains no leaky application data except
+// for tracking and correlation metadata IDs required to match the
+// result with server logs
+func (r *Result) DataClean() {
+	r.Errors = &[]string{`Internal server error forced empty result`}
+	r.DeploymentsList = nil
+	r.Actions = nil
+	r.Attributes = nil
+	r.Buckets = nil
+	r.Capabilities = nil
+	r.Categories = nil
+	r.CheckConfigs = nil
+	r.Clusters = nil
+	r.DatacenterGroups = nil
+	r.Datacenters = nil
+	r.Deployments = nil
+	r.Entities = nil
+	r.Environments = nil
+	r.Grants = nil
+	r.Groups = nil
+	r.HostDeployments = nil
+	r.Instances = nil
+	r.JobResults = nil
+	r.JobStatus = nil
+	r.JobTypes = nil
+	r.Jobs = nil
+	r.Levels = nil
+	r.Metrics = nil
+	r.Modes = nil
+	r.Monitorings = nil
+	r.Nodes = nil
+	r.Oncalls = nil
+	r.Permissions = nil
+	r.Predicates = nil
+	r.Properties = nil
+	r.Providers = nil
+	r.Repositories = nil
+	r.Sections = nil
+	r.Servers = nil
+	r.States = nil
+	r.Status = nil
+	r.Systems = nil
+	r.Teams = nil
+	r.Tree = nil
+	r.Units = nil
+	r.Users = nil
+	r.Validities = nil
+	r.Views = nil
+	r.Workflows = nil
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
