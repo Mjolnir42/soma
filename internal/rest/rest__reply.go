@@ -15,6 +15,12 @@ import (
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
+// replyNoContent returns a 204 HTTP statuscode reply with no content
+func (x *Rest) replyNoContent(w *http.ResponseWriter) {
+	(*w).WriteHeader(http.StatusNoContent)
+	(*w).Write(nil)
+}
+
 // replyBadRequest returns a 400 error
 func (x *Rest) replyBadRequest(w *http.ResponseWriter, q *msg.Request, err error) {
 	result := msg.FromRequest(q)

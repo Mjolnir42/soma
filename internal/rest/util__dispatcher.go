@@ -78,11 +78,6 @@ func dispatchJSONReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Write(*b)
 }
 
-func dispatchNoContent(w *http.ResponseWriter) {
-	(*w).WriteHeader(http.StatusNoContent)
-	(*w).Write(nil)
-}
-
 func dispatchInternalError(w *http.ResponseWriter, err error) {
 	if err != nil {
 		http.Error(*w, err.Error(), http.StatusInternalServerError)

@@ -33,7 +33,7 @@ func (x *Rest) JobMgmtWait(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	<-request.Reply
-	dispatchNoContent(&w)
+	x.replyNoContent(&w)
 }
 
 // JobMgmtList function
