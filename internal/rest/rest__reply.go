@@ -53,6 +53,17 @@ func (x *Rest) replyNotImplemented(w *http.ResponseWriter, q *msg.Request, err e
 	x.send(w, &result)
 }
 
+// hardConflict returns a 409 HTTP error with a provided error text.
+// This function is intended to be used only for special policy
+// violations
+func (x *Rest) hardConflict(w *http.ResponseWriter, err error) {
+	if err != nil {
+		http.Error(*w, err.Error(), http.StatusConflict)
+		return
+	}
+	http.Error(*w, http.StatusText(http.StatusConflict), http.StatusConflict)
+}
+
 // hardServerError returns a 500 HTTP error with no application data
 // body. This function is intended to be used only if normal response
 // generation itself fails

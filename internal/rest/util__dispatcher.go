@@ -37,14 +37,6 @@ func dispatchJSONReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Write(*b)
 }
 
-func dispatchConflict(w *http.ResponseWriter, err error) {
-	if err != nil {
-		http.Error(*w, err.Error(), http.StatusConflict)
-		return
-	}
-	http.Error(*w, http.StatusText(http.StatusConflict), http.StatusConflict)
-}
-
 func dispatchOctetReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Header().Set("Content-Type", `application/octet-stream`)
 	(*w).WriteHeader(http.StatusOK)

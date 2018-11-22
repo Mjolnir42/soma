@@ -431,7 +431,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 				// request failed due to a policy constraint, do not
 				// mask the error and return the full detail error message
 				logEntry.WithField(`Code`, r.Code).Warn(r.Error)
-				dispatchConflict(w, r.Error)
+				x.hardConflict(w, r.Error)
 				return
 			}
 
