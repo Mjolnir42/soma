@@ -78,14 +78,6 @@ func dispatchJSONReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Write(*b)
 }
 
-func dispatchNotFound(w *http.ResponseWriter, err error) {
-	if err != nil {
-		http.Error(*w, err.Error(), http.StatusNotFound)
-		return
-	}
-	http.Error(*w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-}
-
 func dispatchConflict(w *http.ResponseWriter, err error) {
 	if err != nil {
 		http.Error(*w, err.Error(), http.StatusConflict)
