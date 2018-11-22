@@ -21,14 +21,14 @@ func (x *Rest) DeploymentShow(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	if err := checkStringIsUUID(params.ByName(`deploymentID`)); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionDeployment
 	request.Action = msg.ActionShow
+
+	if err := checkStringIsUUID(params.ByName(`deploymentID`)); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Deployment.ID = params.ByName(`deploymentID`)
 
 	// BUG	if !x.isAuthorized(&request) {
@@ -46,28 +46,27 @@ func (x *Rest) DeploymentUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	if err := checkStringIsUUID(params.ByName(`deploymentID`)); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionDeployment
-	request.Deployment.ID = params.ByName(`deploymentID`)
-
 	switch params.ByName(`action`) {
 	case msg.ActionSuccess:
 		request.Action = msg.ActionSuccess
 	case msg.ActionFailed:
 		request.Action = msg.ActionFailed
 	default:
-		dispatchBadRequest(&w, fmt.Errorf("Unknown action: %s", params.ByName(`action`)))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Unknown action: %s", params.ByName(`action`)))
 		return
 	}
 
+	if err := checkStringIsUUID(params.ByName(`deploymentID`)); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	request.Deployment.ID = params.ByName(`deploymentID`)
+
 	if params.ByName(`monitoringID`) != `` {
 		if err := checkStringIsUUID(params.ByName(`monitoringID`)); err != nil {
-			dispatchBadRequest(&w, err)
+			x.replyBadRequest(&w, &request, err)
 			return
 		}
 		request.Monitoring.ID = params.ByName(`monitoringID`)
@@ -88,14 +87,14 @@ func (x *Rest) DeploymentList(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	if err := checkStringIsUUID(params.ByName(`monitoringID`)); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionDeployment
 	request.Action = msg.ActionList
+
+	if err := checkStringIsUUID(params.ByName(`monitoringID`)); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Monitoring.ID = params.ByName(`monitoringID`)
 
 	// BUG	if !x.isAuthorized(&request) {
@@ -113,14 +112,14 @@ func (x *Rest) DeploymentPending(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	if err := checkStringIsUUID(params.ByName(`monitoringID`)); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionDeployment
 	request.Action = msg.ActionPending
+
+	if err := checkStringIsUUID(params.ByName(`monitoringID`)); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Monitoring.ID = params.ByName(`monitoringID`)
 
 	// BUG	if !x.isAuthorized(&request) {

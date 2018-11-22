@@ -52,7 +52,7 @@ func (x *Rest) PropertyMgmtList(w http.ResponseWriter, r *http.Request,
 		request.Property.Service = &proto.PropertyService{}
 		request.Property.Service.TeamID = request.Team.ID
 	default:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", request.Property.Type))
 		return
 	}
 
@@ -109,7 +109,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 		request.Property.Service.TeamID = request.Team.ID
 		request.Property.Service.ID = params.ByName(`propertyID`)
 	default:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", request.Property.Type))
 		return
 	}
 
@@ -128,15 +128,15 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewPropertyFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewPropertyFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
@@ -144,7 +144,7 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	if cReq.Filter.Property.Type != params.ByName(`propertyType`) {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatched propertyType %s vs %s",
 			cReq.Filter.Property.Type, params.ByName(`propertyType`),
 		))
@@ -174,14 +174,14 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		request.Search.Property.Custom.Name = cReq.Filter.Property.Name
 		request.Search.Property.Custom.RepositoryID = cReq.Filter.Property.RepositoryID
 		if cReq.Filter.Property.RepositoryID != request.Repository.ID {
-			dispatchBadRequest(&w, fmt.Errorf(
+			x.replyBadRequest(&w, &request, fmt.Errorf(
 				"PropertyMgmtSearch with mismatched repositoryID %s vs %s",
 				cReq.Filter.Property.RepositoryID, request.Repository.ID,
 			))
 			return
 		}
 		if request.Repository.ID == `` {
-			dispatchBadRequest(&w, fmt.Errorf(
+			x.replyBadRequest(&w, &request, fmt.Errorf(
 				"PropertyMgmtSearch with empty repositoryID",
 			))
 			return
@@ -194,7 +194,7 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 		request.Search.Property.Service.Name = cReq.Filter.Property.Name
 
 	default:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"PropertyMgmtSearch request has unknown property type: %s",
 			cReq.Filter.Property.Type,
 		))
@@ -255,15 +255,15 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewPropertyRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewPropertyRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
@@ -272,7 +272,7 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.Property.Type = params.ByName(`propertyType`)
 
 	if request.Property.Type != cReq.Property.Type {
-		dispatchBadRequest(&w, fmt.Errorf("Mismatching property types in URI and body: %s vs %s",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatching property types in URI and body: %s vs %s",
 			request.Property.Type,
 			cReq.Property.Type,
 		))
@@ -284,21 +284,21 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 		request.Section = msg.SectionPropertyNative
 		request.Property = cReq.Property.Clone()
 		if request.Property.Native.Name == `` {
-			dispatchBadRequest(&w, fmt.Errorf(`Invalid empty property name`))
+			x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid empty property name`))
 			return
 		}
 	case msg.PropertyTemplate:
 		request.Section = msg.SectionPropertyTemplate
 		request.Property = cReq.Property.Clone()
 		if request.Property.Service.Name == `` {
-			dispatchBadRequest(&w, fmt.Errorf(`Invalid empty property name`))
+			x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid empty property name`))
 			return
 		}
 	case msg.PropertySystem:
 		request.Section = msg.SectionPropertySystem
 		request.Property = cReq.Property.Clone()
 		if request.Property.System.Name == `` {
-			dispatchBadRequest(&w, fmt.Errorf(`Invalid empty property name`))
+			x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid empty property name`))
 			return
 		}
 	case msg.PropertyCustom:
@@ -308,7 +308,7 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 			" for types: native, template, system", request.Property.Type))
 		return
 	default:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", request.Property.Type))
 		return
 	}
 
@@ -357,7 +357,7 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 			" for types: native, template, system", request.Property.Type))
 		return
 	default:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", request.Property.Type))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", request.Property.Type))
 		return
 	}
 

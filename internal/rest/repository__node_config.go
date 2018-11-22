@@ -21,15 +21,17 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionNode
+	request.Action = msg.ActionAssign
+
 	cReq := proto.NewNodeRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	// XXX check params.ByName(`nodeID`) == cReq.Node.ID
-
-	request := msg.New(r, params)
 	request.Node.ID = cReq.Node.ID
 	request.Node.Config.RepositoryID = cReq.Node.Config.RepositoryID
 	request.Node.Config.BucketID = cReq.Node.Config.BucketID
@@ -37,8 +39,6 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 	request.Bucket.ID = cReq.Node.Config.BucketID
 
 	// check if the user is allowed to assign nodes from this team
-	request.Section = msg.SectionNode
-	request.Action = msg.ActionAssign
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
 		return
@@ -93,35 +93,35 @@ func (x *Rest) NodeConfigPropertyCreate(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionNodeConfig
+	request.Action = msg.ActionPropertyCreate
+
 	cReq := proto.NewNodeRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`nodeID`) != cReq.Node.ID:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatched node ids: %s, %s",
 			params.ByName(`nodeID`),
 			cReq.Node.ID))
 		return
 	case len(*cReq.Node.Properties) != 1:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Expected property count 1, actual count: %d",
 			len(*cReq.Node.Properties)))
 		return
 	case (*cReq.Node.Properties)[0].Type == "service":
 		if (*cReq.Node.Properties)[0].Service.Name == `` {
-			dispatchBadRequest(&w, fmt.Errorf(
+			x.replyBadRequest(&w, &request, fmt.Errorf(
 				"Empty service name is invalid"))
 			return
 		}
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionNodeConfig
-	request.Action = msg.ActionPropertyCreate
 	request.TargetEntity = msg.EntityNode
 	request.Node = cReq.Node.Clone()
 	request.Repository.ID = params.ByName(`repositoryID`)
@@ -144,35 +144,35 @@ func (x *Rest) NodeConfigPropertyDestroy(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionNodeConfig
+	request.Action = msg.ActionPropertyDestroy
+
 	cReq := proto.NewNodeRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`nodeID`) != cReq.Node.ID:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatched node ids: %s, %s",
 			params.ByName(`nodeID`),
 			cReq.Node.ID))
 		return
 	case cReq.Node.Config == nil:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Node configuration data missing`))
 		return
 	}
 	// outside switch: _after_ nil test
 	if cReq.Node.Config.RepositoryID == `` ||
 		cReq.Node.Config.BucketID == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Node configuration data incomplete`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionNodeConfig
-	request.Action = msg.ActionPropertyDestroy
 	request.TargetEntity = msg.EntityNode
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)

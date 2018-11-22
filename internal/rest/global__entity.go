@@ -61,15 +61,15 @@ func (x *Rest) EntityAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewEntityRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionEntity
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewEntityRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Entity = proto.Entity{
 		Name: cReq.Entity.Name,
 	}
@@ -111,15 +111,15 @@ func (x *Rest) EntityRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewEntityRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionEntity
 	request.Action = msg.ActionRename
+
+	cReq := proto.NewEntityRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Entity = proto.Entity{
 		Name: params.ByName(`entity`),
 	}

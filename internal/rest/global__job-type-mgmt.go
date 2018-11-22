@@ -60,15 +60,15 @@ func (x *Rest) JobTypeMgmtAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewJobTypeRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionJobTypeMgmt
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewJobTypeRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.JobType = cReq.JobType.Clone()
 
 	if !x.isAuthorized(&request) {
@@ -106,15 +106,15 @@ func (x *Rest) JobTypeMgmtSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewJobTypeFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionJobTypeMgmt
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewJobTypeFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Search.JobType.ID = cReq.Filter.JobType.ID
 	request.Search.JobType.Name = cReq.Filter.JobType.Name
 

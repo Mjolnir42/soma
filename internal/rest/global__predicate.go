@@ -60,15 +60,15 @@ func (x *Rest) PredicateAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewPredicateRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionPredicate
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewPredicateRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Predicate.Symbol = cReq.Predicate.Symbol
 
 	if !x.isAuthorized(&request) {

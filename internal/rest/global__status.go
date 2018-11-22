@@ -60,15 +60,15 @@ func (x *Rest) StatusAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewStatusRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionStatus
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewStatusRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Status = cReq.Status.Clone()
 
 	if !x.isAuthorized(&request) {

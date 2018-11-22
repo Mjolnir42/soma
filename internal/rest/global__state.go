@@ -60,15 +60,15 @@ func (x *Rest) StateAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewViewRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionState
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewViewRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.State.Name = cReq.State.Name
 
 	if !x.isAuthorized(&request) {
@@ -106,15 +106,16 @@ func (x *Rest) StateRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewViewRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionState
 	request.Action = msg.ActionRename
+
+	cReq := proto.NewViewRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
 	request.Update.State.Name = cReq.State.Name
 	request.State.Name = params.ByName(`state`)
 

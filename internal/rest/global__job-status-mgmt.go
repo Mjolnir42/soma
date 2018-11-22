@@ -60,15 +60,15 @@ func (x *Rest) JobStatusMgmtAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewJobStatusRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionJobStatusMgmt
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewJobStatusRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.JobStatus = cReq.JobStatus.Clone()
 
 	if !x.isAuthorized(&request) {
@@ -106,15 +106,15 @@ func (x *Rest) JobStatusMgmtSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewJobStatusFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionJobStatusMgmt
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewJobStatusFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Search.JobStatus.ID = cReq.Filter.JobStatus.ID
 	request.Search.JobStatus.Name = cReq.Filter.JobStatus.Name
 

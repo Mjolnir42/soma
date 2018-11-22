@@ -22,21 +22,22 @@ func (x *Rest) RepositoryMgmtCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepositoryMgmt
+	request.Action = msg.ActionCreate
+
 	cReq := proto.NewRepositoryRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	nameLen := utf8.RuneCountInString(cReq.Repository.Name)
 	if nameLen < 4 || nameLen > 128 {
-		dispatchBadRequest(&w, fmt.Errorf(`Illegal repository name length (valid: 4 <= len <= 128)`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Illegal repository name length (valid: 4 <= len <= 128)`))
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionRepositoryMgmt
-	request.Action = msg.ActionCreate
 	request.Repository = cReq.Repository.Clone()
 
 	if !x.isAuthorized(&request) {

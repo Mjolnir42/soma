@@ -43,21 +43,22 @@ func (x *Rest) MonitoringMgmtSearchAll(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewMonitoringFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if cReq.Filter.Monitoring.Name == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
-			`Empty search request: name missing`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoringMgmt
 	request.Action = msg.ActionSearchAll
 	request.Flag.Unscoped = true
+
+	cReq := proto.NewMonitoringFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if cReq.Filter.Monitoring.Name == `` {
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`Empty search request: name missing`))
+		return
+	}
+
 	request.Search.Monitoring.Name = cReq.Filter.Monitoring.Name
 
 	if !x.isAuthorized(&request) {
@@ -75,21 +76,21 @@ func (x *Rest) MonitoringMgmtAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionMonitoringMgmt
+	request.Action = msg.ActionAdd
+
 	cReq := proto.NewMonitoringRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 	if strings.Contains(cReq.Monitoring.Name, `.`) {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Invalid monitoring system`+
 				` name containing . character`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionMonitoringMgmt
-	request.Action = msg.ActionAdd
 	request.Monitoring.Name = cReq.Monitoring.Name
 	request.Monitoring.Mode = cReq.Monitoring.Mode
 	request.Monitoring.Contact = cReq.Monitoring.Contact

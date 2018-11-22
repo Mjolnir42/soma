@@ -41,21 +41,21 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionBucket
+	request.Action = msg.ActionList
+
 	cReq := proto.NewBucketFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Bucket.Name == `` && cReq.Filter.Bucket.ID == `` {
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf(`BucketSearch request without condition`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionBucket
-	request.Action = msg.ActionList
 	request.Search.Bucket.ID = cReq.Filter.Bucket.ID
 	request.Search.Bucket.Name = cReq.Filter.Bucket.Name
 
@@ -128,29 +128,29 @@ func (x *Rest) BucketCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionBucket
+	request.Action = msg.ActionCreate
+
 	cReq := proto.NewBucketRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Bucket.Name == `` || cReq.Bucket.Environment == `` ||
 		cReq.Bucket.TeamID == `` || cReq.Bucket.RepositoryID == `` {
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf(`Incomplete Bucket.Create request`))
 		return
 	}
 
 	nameLen := utf8.RuneCountInString(cReq.Bucket.Name)
 	if nameLen < 4 || nameLen > 512 {
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf(`Illegal bucket name length (4 < x <= 512)`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionBucket
-	request.Action = msg.ActionCreate
 	request.Bucket = cReq.Bucket.Clone()
 
 	if !x.isAuthorized(&request) {
@@ -174,15 +174,15 @@ func (x *Rest) BucketRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewBucketRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionRename
+
+	cReq := proto.NewBucketRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Update.Bucket.Name = cReq.Bucket.Name
@@ -220,33 +220,33 @@ func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionBucket
+	request.Action = msg.ActionPropertyCreate
+
 	cReq := proto.NewBucketRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`bucketID`) != cReq.Bucket.ID:
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf("Mismatched bucket ids: %s, %s",
 				params.ByName(`bucket`),
 				cReq.Bucket.ID))
 		return
 	case len(*cReq.Bucket.Properties) != 1:
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf("Expected property count 1, actual count: %d",
 				len(*cReq.Bucket.Properties)))
 		return
 	case (*cReq.Bucket.Properties)[0].Type == `service` && (*cReq.Bucket.Properties)[0].Service.Name == ``:
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf(`Empty service name is invalid`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionBucket
-	request.Action = msg.ActionPropertyCreate
 	request.TargetEntity = msg.EntityBucket
 	request.Bucket = cReq.Bucket.Clone()
 	request.Property.Type = params.ByName(`propertyType`)

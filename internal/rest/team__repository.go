@@ -64,21 +64,21 @@ func (x *Rest) RepositoryRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepository
+	request.Action = msg.ActionRename
+
 	cReq := proto.NewRepositoryRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	nameLen := utf8.RuneCountInString(cReq.Repository.Name)
 	if nameLen < 4 || nameLen > 128 {
-		dispatchBadRequest(&w, fmt.Errorf(`Illegal new repository name length (4 < x <= 128)`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Illegal new repository name length (4 < x <= 128)`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionRepository
-	request.Action = msg.ActionRename
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Repository.TeamID = params.ByName(`teamID`)
 	request.Update.Repository.Name = cReq.Repository.Name
@@ -98,15 +98,15 @@ func (x *Rest) RepositoryRepossess(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewRepositoryRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionRepository
 	request.Action = msg.ActionRepossess
+
+	cReq := proto.NewRepositoryRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Repository.TeamID = params.ByName(`teamID`)
 	request.Update.Repository.TeamID = cReq.Repository.TeamID
@@ -126,9 +126,13 @@ func (x *Rest) RepositorySearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepository
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewRepositoryFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
@@ -139,13 +143,9 @@ func (x *Rest) RepositorySearch(w http.ResponseWriter, r *http.Request,
 	case cReq.Filter.Repository.FilterOnIsDeleted:
 	case cReq.Filter.Repository.FilterOnIsActive:
 	default:
-		dispatchBadRequest(&w, fmt.Errorf(`RepositorySearch request without condition`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`RepositorySearch request without condition`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionRepository
-	request.Action = msg.ActionSearch
 	request.Search.Repository.ID = cReq.Filter.Repository.ID
 	request.Search.Repository.Name = cReq.Filter.Repository.Name
 	request.Search.Repository.TeamID = cReq.Filter.Repository.TeamID

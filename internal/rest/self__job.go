@@ -61,15 +61,15 @@ func (x *Rest) JobSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewJobFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionJob
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewJobFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Flag.JobDetail = false
 	request.Search.IsDetailed = cReq.Flags.Detailed
 	request.Search.Job.IDList = cReq.Filter.Job.IDList

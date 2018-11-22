@@ -43,21 +43,21 @@ func (x *Rest) TeamMgmtSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionTeamMgmt
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewTeamFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Team.Name == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`TeamMgmtSearch request missing Team.Name`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeamMgmt
-	request.Action = msg.ActionSearch
 	request.Search.Team.Name = cReq.Filter.Team.Name
 	request.Flag.Unscoped = true
 
@@ -127,15 +127,15 @@ func (x *Rest) TeamMgmtAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewTeamRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewTeamRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Team = cReq.Team.Clone()
 
 	if !x.isAuthorized(&request) {
@@ -153,23 +153,23 @@ func (x *Rest) TeamMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionTeamMgmt
+	request.Action = msg.ActionUpdate
+
 	cReq := proto.NewTeamRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 	if params.ByName(`teamID`) != cReq.Team.ID {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatched teamID: %s vs %s",
 			params.ByName(`teamID`),
 			cReq.Team.ID,
 		))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeamMgmt
-	request.Action = msg.ActionUpdate
 	request.Team = cReq.Team.Clone()
 
 	if !x.isAuthorized(&request) {

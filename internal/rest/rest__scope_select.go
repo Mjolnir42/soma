@@ -141,15 +141,15 @@ func (x *Rest) ScopeSelectUserSearch(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewUserFilter()
-	if err := peekJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewUserFilter()
+	if err := peekJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Search.User.UserName = cReq.Filter.User.UserName
 	request.Flag.Unscoped = true
 
@@ -184,15 +184,15 @@ func (x *Rest) ScopeSelectTeamSearch(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewTeamFilter()
-	if err := peekJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionTeamMgmt
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewTeamFilter()
+	if err := peekJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Search.Team.Name = cReq.Filter.Team.Name
 	request.Flag.Unscoped = true
 
@@ -209,15 +209,15 @@ func (x *Rest) ScopeSelectRepositorySearch(w http.ResponseWriter,
 	r *http.Request, params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewRepositoryFilter()
-	if err := peekJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionRepository
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewRepositoryFilter()
+	if err := peekJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 
 	if x.isAuthorized(&request) {
 		x.RepositorySearch(w, r, params)

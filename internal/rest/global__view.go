@@ -64,19 +64,19 @@ func (x *Rest) ViewAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewViewRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if strings.Contains(cReq.View.Name, `.`) {
-		dispatchBadRequest(&w, fmt.Errorf(`Invalid view name containing . character`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionView
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewViewRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if strings.Contains(cReq.View.Name, `.`) {
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid view name containing . character`))
+		return
+	}
 	request.View.Name = cReq.View.Name
 
 	if !x.isAuthorized(&request) {
@@ -114,20 +114,20 @@ func (x *Rest) ViewRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewViewRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if strings.Contains(cReq.View.Name, `.`) {
-		dispatchBadRequest(&w, fmt.Errorf(
-			`Invalid view name containing . character`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionView
 	request.Action = msg.ActionRename
+
+	cReq := proto.NewViewRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if strings.Contains(cReq.View.Name, `.`) {
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`Invalid view name containing . character`))
+		return
+	}
 	request.View.Name = params.ByName(`view`)
 	request.Update.View.Name = cReq.View.Name
 

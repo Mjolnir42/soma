@@ -64,20 +64,21 @@ func (x *Rest) PermissionSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionPermission
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewPermissionFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Permission.Name == `` || cReq.Filter.Permission.Category == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`PermissionSearch request missing permission name or category`))
 		return
 	}
-	request := msg.New(r, params)
-	request.Section = msg.SectionPermission
-	request.Action = msg.ActionSearch
 	request.Search.Permission.Name = cReq.Filter.Permission.Name
 	request.Search.Permission.Category = cReq.Filter.Permission.Category
 
@@ -96,25 +97,25 @@ func (x *Rest) PermissionAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewPermissionRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
-	if cReq.Permission.Category != params.ByName(`category`) {
-		dispatchBadRequest(&w, fmt.Errorf(`Category mismatch`))
-		return
-	}
-	if strings.Contains(params.ByName(`category`), `:grant`) {
-		dispatchBadRequest(&w, fmt.Errorf(
-			`Permissions in :grant categories are auto-managed.`))
-		return
-	}
 	request := msg.New(r, params)
 	request.Section = msg.SectionPermission
 	request.Action = msg.ActionAdd
 
+	cReq := proto.NewPermissionRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
+	if cReq.Permission.Category != params.ByName(`category`) {
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Category mismatch`))
+		return
+	}
+	if strings.Contains(params.ByName(`category`), `:grant`) {
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`Permissions in :grant categories are auto-managed.`))
+		return
+	}
 	if params.ByName(`category`) == msg.CategorySystem ||
 		params.ByName(`category`) == msg.CategoryOmnipotence {
 		x.replyForbidden(&w, &request, nil)
@@ -138,15 +139,15 @@ func (x *Rest) PermissionRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	if strings.Contains(params.ByName(`category`), `:grant`) {
-		dispatchBadRequest(&w, fmt.Errorf(
-			`Permissions in :grant categories are auto-managed.`))
-		return
-	}
 	request := msg.New(r, params)
 	request.Section = msg.SectionPermission
 	request.Action = msg.ActionRemove
 
+	if strings.Contains(params.ByName(`category`), `:grant`) {
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`Permissions in :grant categories are auto-managed.`))
+		return
+	}
 	if params.ByName(`category`) == msg.CategorySystem ||
 		params.ByName(`category`) == msg.CategoryOmnipotence {
 		x.replyForbidden(&w, &request, nil)
@@ -170,22 +171,26 @@ func (x *Rest) PermissionEdit(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionPermission
+	request.Action = msg.ActionUpdate
+
 	cReq := proto.NewPermissionRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Permission.Category != params.ByName(`category`) {
-		dispatchBadRequest(&w, fmt.Errorf(`Category mismatch`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Category mismatch`))
 		return
 	}
 	if cReq.Permission.ID != params.ByName(`permissionID`) {
-		dispatchBadRequest(&w, fmt.Errorf(`PermissionID mismatch`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`PermissionID mismatch`))
 		return
 	}
 	if strings.Contains(params.ByName(`category`), `:grant`) {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Permissions in :grant categories can not be mapped`))
 		return
 	}
@@ -196,31 +201,28 @@ func (x *Rest) PermissionEdit(w http.ResponseWriter, r *http.Request,
 	}
 	// invalid: map+unmap at the same time
 	if cReq.Flags.Add && cReq.Flags.Remove {
-		dispatchBadRequest(&w, fmt.Errorf(`Ambiguous instruction`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Ambiguous instruction`))
 		return
 	}
 	// invalid: batched mapping
 	if cReq.Permission.Actions != nil && cReq.Permission.Sections != nil {
-		dispatchBadRequest(&w, fmt.Errorf(`Invalid batch mapping`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid batch mapping`))
 		return
 	}
 	if cReq.Permission.Actions != nil {
 		if len(*cReq.Permission.Actions) != 1 ||
 			params.ByName(`category`) != (*cReq.Permission.Actions)[0].Category {
-			dispatchBadRequest(&w, fmt.Errorf(`Invalid action specification`))
+			x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid action specification`))
 			return
 		}
 	}
 	if cReq.Permission.Sections != nil {
 		if len(*cReq.Permission.Sections) != 1 ||
 			params.ByName(`category`) != (*cReq.Permission.Sections)[0].Category {
-			dispatchBadRequest(&w, fmt.Errorf(`Invalid section specification`))
+			x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid section specification`))
 			return
 		}
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionPermission
 	request.Permission.ID = cReq.Permission.ID
 	request.Permission.Name = cReq.Permission.Name
 	request.Permission.Category = cReq.Permission.Category

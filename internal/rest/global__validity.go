@@ -62,15 +62,15 @@ func (x *Rest) ValidityAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewValidityRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionValidity
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewValidityRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Validity = *cReq.Validity
 
 	if !x.isAuthorized(&request) {

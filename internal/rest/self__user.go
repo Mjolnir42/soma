@@ -41,15 +41,15 @@ func (x *Rest) UserSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewUserFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionUser
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewUserFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Search.User.UserName = cReq.Filter.User.UserName
 
 	if !x.isAuthorized(&request) {

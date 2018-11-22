@@ -62,15 +62,15 @@ func (x *Rest) CategoryAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewCategoryRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionCategory
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewCategoryRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Category = cReq.Category.Clone()
 
 	if !x.isAuthorized(&request) {

@@ -43,30 +43,30 @@ func (x *Rest) GroupSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionGroup
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewGroupFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Group.Name == `` {
-		dispatchBadRequest(&w, nil) // XXX
+		x.replyBadRequest(&w, &request, nil) // XXX
 		return
 	}
 
 	if cReq.Filter.Group.BucketID != `` && cReq.Filter.Group.BucketID != params.ByName(`bucketID`) {
-		dispatchBadRequest(&w, nil) // XXX
+		x.replyBadRequest(&w, &request, nil) // XXX
 		return
 	}
 
 	if cReq.Filter.Group.RepositoryID != `` && cReq.Filter.Group.RepositoryID != params.ByName(`repositoryID`) {
-		dispatchBadRequest(&w, nil) // XXX
+		x.replyBadRequest(&w, &request, nil) // XXX
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionGroup
-	request.Action = msg.ActionSearch
 	request.Search.Group.Name = cReq.Filter.Group.Name
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
@@ -136,21 +136,21 @@ func (x *Rest) GroupCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionGroup
+	request.Action = msg.ActionCreate
+
 	cReq := proto.NewGroupRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	nameLen := utf8.RuneCountInString(cReq.Group.Name)
 	if nameLen < 4 || nameLen > 256 {
-		dispatchBadRequest(&w, fmt.Errorf(`Illegal group name length (4 <= x <= 256)`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Illegal group name length (4 <= x <= 256)`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionGroup
-	request.Action = msg.ActionCreate
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Group = cReq.Group.Clone()
@@ -214,15 +214,15 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewGroupRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionMemberAssign
+
+	cReq := proto.NewGroupRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Group = cReq.Group.Clone()
@@ -234,7 +234,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 		cReq.Group.MemberClusters = nil
 		cReq.Group.MemberNodes = nil
 		if cReq.Group.MemberGroups == nil || len(*cReq.Group.MemberGroups) != 1 {
-			dispatchBadRequest(&w, nil)
+			x.replyBadRequest(&w, &request, nil)
 			return
 		}
 	case msg.EntityCluster:
@@ -242,7 +242,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 		cReq.Group.MemberGroups = nil
 		cReq.Group.MemberNodes = nil
 		if cReq.Group.MemberClusters == nil || len(*cReq.Group.MemberClusters) != 1 {
-			dispatchBadRequest(&w, nil)
+			x.replyBadRequest(&w, &request, nil)
 			return
 		}
 	case msg.EntityNode:
@@ -250,7 +250,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 		cReq.Group.MemberGroups = nil
 		cReq.Group.MemberClusters = nil
 		if cReq.Group.MemberNodes == nil || len(*cReq.Group.MemberNodes) != 1 {
-			dispatchBadRequest(&w, nil)
+			x.replyBadRequest(&w, &request, nil)
 			return
 		}
 	}
@@ -294,7 +294,7 @@ func (x *Rest) GroupMemberUnassign(w http.ResponseWriter, r *http.Request,
 			proto.Node{ID: params.ByName(`memberID`)},
 		}
 	default:
-		dispatchBadRequest(&w, nil)
+		x.replyBadRequest(&w, &request, nil)
 		return
 	}
 
@@ -313,33 +313,33 @@ func (x *Rest) GroupPropertyCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionGroup
+	request.Action = msg.ActionPropertyCreate
+
 	cReq := proto.NewGroupRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`groupID`) != cReq.Group.ID:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatched group ids: %s, %s",
 			params.ByName(`groupID`),
 			cReq.Group.ID))
 		return
 	case len(*cReq.Group.Properties) != 1:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Expected property count 1, actual count: %d",
 			len(*cReq.Group.Properties)))
 		return
 	case (*cReq.Group.Properties)[0].Type == `service` && (*cReq.Group.Properties)[0].Service.Name == ``:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Empty service name is invalid`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionGroup
-	request.Action = msg.ActionPropertyCreate
 	request.TargetEntity = msg.EntityGroup
 	request.Group = cReq.Group.Clone()
 	request.Property.Type = params.ByName(`propertyType`)
@@ -359,28 +359,28 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionGroup
+	request.Action = msg.ActionPropertyDestroy
+
 	cReq := proto.NewGroupRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`groupID`) != cReq.Group.ID:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatched group ids: %s, %s",
 			params.ByName(`groupID`),
 			cReq.Group.ID))
 		return
 	case cReq.Group.BucketID == ``:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Missing bucketId in group delete request`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionGroup
-	request.Action = msg.ActionPropertyDestroy
 	request.TargetEntity = msg.EntityGroup
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)

@@ -61,20 +61,20 @@ func (x *Rest) ServerSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewServerFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if cReq.Filter.Server.Name == `` && cReq.Filter.Server.AssetID == 0 {
-		dispatchBadRequest(&w, fmt.Errorf(`Bad search request with empty `+
-			`Server.Name and Server.AssetID`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewServerFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if cReq.Filter.Server.Name == `` && cReq.Filter.Server.AssetID == 0 {
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Bad search request with empty `+
+			`Server.Name and Server.AssetID`))
+		return
+	}
 	request.Search.Server.Name = cReq.Filter.Server.Name
 	request.Search.Server.AssetID = cReq.Filter.Server.AssetID
 
@@ -112,15 +112,15 @@ func (x *Rest) ServerAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewServerRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewServerRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Server.AssetID = cReq.Server.AssetID
 	request.Server.Datacenter = cReq.Server.Datacenter
 	request.Server.Location = cReq.Server.Location
@@ -143,14 +143,16 @@ func (x *Rest) ServerRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionServer
+	request.Action = msg.ActionRemove
+
 	cReq := proto.NewServerRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
 	switch cReq.Flags.Purge {
 	case true:
 		request.Action = msg.ActionPurge
@@ -174,19 +176,20 @@ func (x *Rest) ServerUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewServerRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if cReq.Server.ID != params.ByName(`serverID`) {
-		dispatchBadRequest(&w, fmt.Errorf(`Mismatching server UUIDs`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionServer
 	request.Action = msg.ActionUpdate
+
+	cReq := proto.NewServerRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if cReq.Server.ID != params.ByName(`serverID`) {
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Mismatching server UUIDs`))
+		return
+	}
+
 	request.Server.ID = cReq.Server.ID
 	request.Update.Server.AssetID = cReq.Server.AssetID
 	request.Update.Server.Datacenter = cReq.Server.Datacenter
@@ -210,20 +213,21 @@ func (x *Rest) ServerAddNull(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionServer
+	request.Action = msg.ActionInsertNullID
+
 	cReq := proto.NewServerRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 	if cReq.Server.ID != `00000000-0000-0000-0000-000000000000` ||
 		params.ByName(`serverID`) != `null` {
-		dispatchBadRequest(&w, fmt.Errorf(`not null server`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`not null server`))
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionServer
-	request.Action = msg.ActionInsertNullID
 	request.Server.Datacenter = cReq.Server.Datacenter
 
 	if !x.isAuthorized(&request) {

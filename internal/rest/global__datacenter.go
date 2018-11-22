@@ -80,15 +80,15 @@ func (x *Rest) DatacenterAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewDatacenterRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionDatacenter
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewDatacenterRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Datacenter = cReq.Datacenter.Clone()
 
 	if !x.isAuthorized(&request) {
@@ -128,15 +128,16 @@ func (x *Rest) DatacenterRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewDatacenterRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionDatacenter
 	request.Action = msg.ActionRename
+
+	cReq := proto.NewDatacenterRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
 	request.Datacenter = proto.Datacenter{
 		LoCode: params.ByName(`datacenter`),
 	}

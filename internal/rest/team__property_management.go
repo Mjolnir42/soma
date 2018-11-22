@@ -22,31 +22,31 @@ func (x *Rest) PropertyMgmtServiceAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionPropertyMgmt
+	request.Action = msg.ActionAdd
+
 	cReq := proto.NewPropertyRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`propertyType`) != msg.PropertyService:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
 		return
 	case cReq.Property.Type != msg.PropertyService:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
 		return
 	case cReq.Property.Service.TeamID != params.ByName(`teamID`):
-		dispatchBadRequest(&w, fmt.Errorf("Mismatching team IDs: %s vs %s",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatching team IDs: %s vs %s",
 			cReq.Property.Service.TeamID, params.ByName(`teamID`)))
 		return
 	case cReq.Property.Service.Name == ``:
-		dispatchBadRequest(&w, fmt.Errorf(`Invalid empty service property name`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid empty service property name`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionPropertyMgmt
-	request.Action = msg.ActionAdd
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
@@ -71,15 +71,15 @@ func (x *Rest) PropertyMgmtServiceRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	switch {
-	case params.ByName(`propertyType`) != msg.PropertyService:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyMgmt
 	request.Action = msg.ActionRemove
+
+	switch {
+	case params.ByName(`propertyType`) != msg.PropertyService:
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
+		return
+	}
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)

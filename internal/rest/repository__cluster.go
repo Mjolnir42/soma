@@ -43,20 +43,20 @@ func (x *Rest) ClusterSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewClusterFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Cluster.Name == `` {
-		dispatchBadRequest(&w, fmt.Errorf(`ClusterSearch on empty name`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`ClusterSearch on empty name`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionCluster
-	request.Action = msg.ActionSearch
 	request.Search.Cluster.Name = cReq.Filter.Cluster.Name
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
@@ -132,22 +132,22 @@ func (x *Rest) ClusterCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionCreate
+
 	cReq := proto.NewClusterRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	nameLen := utf8.RuneCountInString(cReq.Cluster.Name)
 	if nameLen < 4 || nameLen > 256 {
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf(`Illegal cluster name length (4 <= x <= 256)`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionCluster
-	request.Action = msg.ActionCreate
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
@@ -211,15 +211,15 @@ func (x *Rest) ClusterMemberAssign(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewClusterRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionMemberAssign
+
+	cReq := proto.NewClusterRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
@@ -255,7 +255,7 @@ func (x *Rest) ClusterMemberUnassign(w http.ResponseWriter, r *http.Request,
 			proto.Node{ID: params.ByName(`memberID`)},
 		}
 	default:
-		dispatchBadRequest(&w, nil)
+		x.replyBadRequest(&w, &request, nil)
 		return
 	}
 
@@ -274,36 +274,36 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionPropertyCreate
+
 	cReq := proto.NewClusterRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`clusterID`) != cReq.Cluster.ID:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatched cluster ids: %s, %s",
 			params.ByName(`clusterID`),
 			cReq.Cluster.ID,
 		))
 		return
 	case len(*cReq.Cluster.Properties) != 1:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Expected property count 1, actual count: %d",
 			len(*cReq.Cluster.Properties),
 		))
 		return
 	case (*cReq.Cluster.Properties)[0].Type == `service` && (*cReq.Cluster.Properties)[0].Service.Name == ``:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Invalid empty service name`,
 		))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionCluster
-	request.Action = msg.ActionPropertyCreate
 	request.TargetEntity = msg.EntityCluster
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
@@ -326,30 +326,30 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionPropertyDestroy
+
 	cReq := proto.NewClusterRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`clusterID`) != cReq.Cluster.ID:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatched cluster ids: %s, %s",
 			params.ByName(`clusterID`),
 			cReq.Cluster.ID,
 		))
 		return
 	case cReq.Cluster.BucketID == ``:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Missing bucketID in bucket property delete request`,
 		))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionCluster
-	request.Action = msg.ActionPropertyDestroy
 	request.TargetEntity = msg.EntityCluster
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
@@ -390,22 +390,22 @@ func (x *Rest) ClusterRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionRename
+
 	cReq := proto.NewClusterRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	nameLen := utf8.RuneCountInString(cReq.Cluster.Name)
 	if nameLen < 4 || nameLen > 256 {
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf(`Illegal cluster name length (4 <= x <= 256)`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionCluster
-	request.Action = msg.ActionRename
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster.ID = params.ByName(`clusterID`)

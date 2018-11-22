@@ -69,21 +69,21 @@ func (x *Rest) ActionSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionAction
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewActionRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Action.SectionID == `` || cReq.Filter.Action.Name == `` {
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf(`Invalid action search specification`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionAction
-	request.Action = msg.ActionSearch
 	request.Search.ActionObj.Name = cReq.Filter.Action.Name
 	request.Search.ActionObj.SectionID = cReq.Filter.Action.SectionID
 
@@ -102,21 +102,21 @@ func (x *Rest) ActionAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionAction
+	request.Action = msg.ActionAdd
+
 	cReq := proto.NewActionRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Action.SectionID != params.ByName(`sectionID`) {
-		dispatchBadRequest(&w, fmt.Errorf("SectionId mismatch: %s, %s",
+		x.replyBadRequest(&w, &request, fmt.Errorf("SectionId mismatch: %s, %s",
 			cReq.Action.SectionID, params.ByName(`sectionID`)))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionAction
-	request.Action = msg.ActionAdd
 	request.ActionObj = proto.Action{
 		Name:      cReq.Action.Name,
 		SectionID: cReq.Action.SectionID,

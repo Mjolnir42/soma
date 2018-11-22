@@ -10,14 +10,17 @@
 package rest
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/mjolnir42/soma/internal/msg"
-	"github.com/mjolnir42/soma/lib/auth"
-	"github.com/mjolnir42/soma/lib/proto"
 )
+
+// replyBadRequest returns a 400 error
+func (x *Rest) replyBadRequest(w *http.ResponseWriter, q *msg.Request, err error) {
+	result := msg.FromRequest(q)
+	result.BadRequest(err, q.Section)
+	x.send(w, &result)
+}
 
 // replyForbidden returns a 403 error
 func (x *Rest) replyForbidden(w *http.ResponseWriter, q *msg.Request, err error) {

@@ -44,20 +44,20 @@ func (x *Rest) CheckConfigSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionCheckConfig
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewCheckConfigRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.CheckConfig.Name == `` {
-		dispatchBadRequest(&w, fmt.Errorf(`CheckConfigSearch on empty name`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`CheckConfigSearch on empty name`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionCheckConfig
-	request.Action = msg.ActionSearch
 	request.CheckConfig = proto.CheckConfig{
 		RepositoryID: params.ByName(`repositoryID`),
 	}
@@ -108,15 +108,15 @@ func (x *Rest) CheckConfigCreate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewCheckConfigRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoring
 	request.Action = msg.ActionUse
+
+	cReq := proto.NewCheckConfigRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.CheckConfig = cReq.CheckConfig.Clone()
 
 	if !x.isAuthorized(&request) {

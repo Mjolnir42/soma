@@ -62,15 +62,15 @@ func (x *Rest) AttributeAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewAttributeRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionAttribute
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewAttributeRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Attribute = proto.Attribute{
 		Name:        cReq.Attribute.Name,
 		Cardinality: cReq.Attribute.Cardinality,

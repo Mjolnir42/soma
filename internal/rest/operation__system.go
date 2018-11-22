@@ -14,9 +14,13 @@ func (x *Rest) SystemOperation(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionSystem
+	request.Action = msg.ActionWait //XXX TODO invalid action at this point
+
 	cReq := proto.NewSystemRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
@@ -26,16 +30,13 @@ func (x *Rest) SystemOperation(w http.ResponseWriter, r *http.Request,
 	case msg.ActionRepoStop:
 	case msg.ActionShutdown:
 	default:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			"Mismatching requests: %s vs %s",
 			cReq.System.Request,
 			msg.ActionRepoStop,
 		))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionSystem
 	request.Action = cReq.System.Request
 	request.System = proto.System{
 		Request:      cReq.System.Request,
@@ -86,7 +87,7 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 	request.Section = msg.SectionSystem
 	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
-		Task:            msg.TaskInvalidateAccount,
+		Task:          msg.TaskInvalidateAccount,
 		RevokeForName: params.ByName(`account`),
 	}
 

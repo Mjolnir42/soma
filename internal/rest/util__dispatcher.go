@@ -72,14 +72,6 @@ func decodeJSONBody(r *http.Request, s interface{}) error {
 	return err
 }
 
-func dispatchBadRequest(w *http.ResponseWriter, err error) {
-	if err != nil {
-		http.Error(*w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	http.Error(*w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-}
-
 func dispatchJSONReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Header().Set("Content-Type", "application/json")
 	(*w).WriteHeader(http.StatusOK)

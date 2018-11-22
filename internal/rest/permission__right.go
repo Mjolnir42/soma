@@ -64,15 +64,16 @@ func (x *Rest) RightSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	crq := proto.NewGrantFilter()
-	if err := decodeJSONBody(r, &crq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionRight
 	request.Action = msg.ActionSearch
+
+	crq := proto.NewGrantFilter()
+	if err := decodeJSONBody(r, &crq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
 	request.Search.Grant.RecipientType = crq.Filter.Grant.RecipientType
 	request.Search.Grant.RecipientID = crq.Filter.Grant.RecipientID
 	request.Search.Grant.PermissionID = crq.Filter.Grant.PermissionID
@@ -95,22 +96,22 @@ func (x *Rest) RightGrant(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionRight
+	request.Action = msg.ActionGrant
+
 	cReq := proto.NewGrantRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Grant.Category != params.ByName(`category`) ||
 		cReq.Grant.PermissionID != params.ByName(`permissionID`) {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Category/PermissionId mismatch`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionRight
-	request.Action = msg.ActionGrant
 	request.Grant = cReq.Grant.Clone()
 
 	if !x.isAuthorized(&request) {

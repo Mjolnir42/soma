@@ -62,14 +62,16 @@ func (x *Rest) EnvironmentAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewEnvironmentRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
 	request := msg.New(r, params)
 	request.Section = msg.SectionEnvironment
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewEnvironmentRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
 	request.Environment = proto.Environment{
 		Name: cReq.Environment.Name,
 	}
@@ -111,14 +113,15 @@ func (x *Rest) EnvironmentRename(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewEnvironmentRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
 	request := msg.New(r, params)
 	request.Section = msg.SectionEnvironment
 	request.Action = msg.ActionRename
+
+	cReq := proto.NewEnvironmentRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Environment.Name = params.ByName(`environment`)
 	request.Update.Environment.Name = cReq.Environment.Name
 

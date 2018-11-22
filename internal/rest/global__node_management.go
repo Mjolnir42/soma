@@ -21,9 +21,13 @@ func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionNodeMgmt
+	request.Action = msg.ActionAdd
+
 	cReq := proto.NewNodeRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
@@ -33,10 +37,6 @@ func (x *Rest) NodeMgmtAdd(w http.ResponseWriter, r *http.Request,
 	} else {
 		serverID = `00000000-0000-0000-0000-000000000000`
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionNodeMgmt
-	request.Action = msg.ActionAdd
 	request.Node = proto.Node{
 		AssetID:   cReq.Node.AssetID,
 		Name:      cReq.Node.Name,
@@ -81,15 +81,16 @@ func (x *Rest) NodeMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewNodeRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionNodeMgmt
 	request.Action = msg.ActionUpdate
+
+	cReq := proto.NewNodeRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
 	request.Node = proto.Node{
 		ID:        cReq.Node.ID,
 		AssetID:   cReq.Node.AssetID,
@@ -115,15 +116,16 @@ func (x *Rest) NodeMgmtRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewNodeRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionNodeMgmt
 	action := msg.ActionRemove
+
+	cReq := proto.NewNodeRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
 	if cReq.Flags.Purge {
 		action = msg.ActionPurge
 		switch params.ByName(`nodeID`) {

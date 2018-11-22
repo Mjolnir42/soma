@@ -60,15 +60,15 @@ func (x *Rest) UnitAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewUnitRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionUnit
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewUnitRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Unit.Unit = cReq.Unit.Unit
 	request.Unit.Name = cReq.Unit.Name
 

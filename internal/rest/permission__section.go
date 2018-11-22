@@ -68,21 +68,21 @@ func (x *Rest) SectionSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionSection
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewSectionRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Section.Name == `` && cReq.Filter.Section.ID == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Invalid section search specification`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionSection
-	request.Action = msg.ActionSearch
 	request.Search.SectionObj.Name = cReq.Filter.Section.Name
 	request.Search.SectionObj.ID = cReq.Filter.Section.ID
 
@@ -101,15 +101,15 @@ func (x *Rest) SectionAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewSectionRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionSection
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewSectionRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.SectionObj = proto.Section{
 		Name:     cReq.Section.Name,
 		Category: cReq.Section.Category,

@@ -30,9 +30,13 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionSupervisor
+	request.Action = msg.ActionKex
+
 	kex := auth.Kex{}
 	if err := decodeJSONBody(r, &kex); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
@@ -41,10 +45,6 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 		Key:   `RequestID`,
 		Value: uuid.Must(uuid.NewV4()).String(),
 	})
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionSupervisor
-	request.Action = msg.ActionKex
 	request.Super = &msg.Supervisor{
 		Kex: auth.Kex{
 			Public:               kex.Public,
@@ -89,7 +89,7 @@ func (x *Rest) SupervisorTokenInvalidateSelf(w http.ResponseWriter,
 	request.Section = msg.SectionSupervisor
 	request.Action = msg.ActionToken
 	request.Super = &msg.Supervisor{
-		Task:            msg.TaskInvalidateAccount,
+		Task:          msg.TaskInvalidateAccount,
 		RevokeForName: params.ByName(`AuthenticatedUser`),
 	}
 

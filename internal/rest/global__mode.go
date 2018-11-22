@@ -60,15 +60,15 @@ func (x *Rest) ModeAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewModeRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionMode
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewModeRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Mode.Mode = cReq.Mode.Mode
 
 	if !x.isAuthorized(&request) {

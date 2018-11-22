@@ -41,20 +41,20 @@ func (x *Rest) MonitoringSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewMonitoringFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if cReq.Filter.Monitoring.Name == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
-			`Empty search request: name missing`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionMonitoring
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewMonitoringFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if cReq.Filter.Monitoring.Name == `` {
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`Empty search request: name missing`))
+		return
+	}
 	request.Search.Monitoring.Name = cReq.Filter.Monitoring.Name
 
 	if !x.isAuthorized(&request) {

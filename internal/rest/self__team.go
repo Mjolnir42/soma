@@ -42,21 +42,21 @@ func (x *Rest) TeamSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionTeam
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewTeamFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Team.Name == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`TeamSearch request missing Team.Name`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionTeam
-	request.Action = msg.ActionSearch
 	request.Search.Team.Name = cReq.Filter.Team.Name
 
 	if !x.isAuthorized(&request) {

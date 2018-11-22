@@ -22,31 +22,31 @@ func (x *Rest) PropertyMgmtCustomAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionPropertyCustom
+	request.Action = msg.ActionAdd
+
 	cReq := proto.NewPropertyRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`propertyType`) != msg.PropertyCustom:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
 		return
 	case cReq.Property.Type != msg.PropertyCustom:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
 		return
 	case cReq.Property.Custom.RepositoryID != params.ByName(`repositoryID`):
-		dispatchBadRequest(&w, fmt.Errorf("Mismatching repository IDs: %s vs %s",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatching repository IDs: %s vs %s",
 			cReq.Property.Custom.RepositoryID, params.ByName(`repositoryID`)))
 		return
 	case cReq.Property.Custom.Name == ``:
-		dispatchBadRequest(&w, fmt.Errorf(`Invalid empty custom property name`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid empty custom property name`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionPropertyCustom
-	request.Action = msg.ActionAdd
 	request.Property = cReq.Property.Clone()
 
 	if !x.isAuthorized(&request) {
@@ -64,15 +64,16 @@ func (x *Rest) PropertyMgmtCustomRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	switch {
-	case params.ByName(`propertyType`) != msg.PropertyCustom:
-		dispatchBadRequest(&w, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionPropertyCustom
 	request.Action = msg.ActionRemove
+
+	switch {
+	case params.ByName(`propertyType`) != msg.PropertyCustom:
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
+		return
+	}
+
 	request.Property.Type = msg.PropertyCustom
 	request.Property.RepositoryID = params.ByName(`repositoryID`)
 	request.Property.Custom = &proto.PropertyCustom{

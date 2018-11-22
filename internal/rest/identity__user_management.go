@@ -84,15 +84,15 @@ func (x *Rest) UserMgmtSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewUserFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewUserFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Search.User.UserName = cReq.Filter.User.UserName
 	request.Flag.Unscoped = true
 
@@ -111,20 +111,20 @@ func (x *Rest) UserMgmtAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewUserRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if strings.Contains(cReq.User.UserName, `:`) {
-		dispatchBadRequest(&w, fmt.Errorf(
-			`Invalid username containing : character`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewUserRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if strings.Contains(cReq.User.UserName, `:`) {
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`Invalid username containing : character`))
+		return
+	}
 	request.User.UserName = cReq.User.UserName
 	request.User.FirstName = cReq.User.FirstName
 	request.User.LastName = cReq.User.LastName
@@ -150,25 +150,25 @@ func (x *Rest) UserMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionUserMgmt
+	request.Action = msg.ActionUpdate
+
 	cReq := proto.NewUserRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 	if strings.Contains(cReq.User.UserName, `:`) {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Invalid username containing : character`))
 		return
 	}
 	if params.ByName(`userID`) != cReq.User.ID {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Mismatching user UUIDs in body and URL`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionUserMgmt
-	request.Action = msg.ActionUpdate
 	request.User.ID = cReq.User.ID
 	request.Update.User.UserName = cReq.User.UserName
 	request.Update.User.FirstName = cReq.User.FirstName
@@ -193,13 +193,16 @@ func (x *Rest) UserMgmtRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewUserRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
 	request := msg.New(r, params)
 	request.Section = msg.SectionUserMgmt
+	request.Action = msg.ActionRemove
+
+	cReq := proto.NewUserRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
 	switch cReq.Flags.Purge {
 	case true:
 		request.Action = msg.ActionPurge

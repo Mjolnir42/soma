@@ -40,21 +40,21 @@ func (x *Rest) CapabilitySearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionCapability
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewCapabilityFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Filter.Capability.MonitoringID == `` {
-		dispatchBadRequest(&w,
+		x.replyBadRequest(&w, &request,
 			fmt.Errorf(`CapabilitySearch request missing MonitoringID`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionCapability
-	request.Action = msg.ActionSearch
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
@@ -112,15 +112,15 @@ func (x *Rest) CapabilityDeclare(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewCapabilityRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionCapability
 	request.Action = msg.ActionDeclare
+
+	cReq := proto.NewCapabilityRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Capability = cReq.Capability.Clone()
 
 	if !x.isAuthorized(&request) {

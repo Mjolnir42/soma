@@ -61,15 +61,15 @@ func (x *Rest) OncallSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewOncallFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionOncall
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewOncallFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Search.Oncall.Name = cReq.Filter.Oncall.Name
 
 	if !x.isAuthorized(&request) {
@@ -87,15 +87,15 @@ func (x *Rest) OncallAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewOncallRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionOncall
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewOncallRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Oncall = cReq.Oncall.Clone()
 	request.Oncall.Sanitize()
 
@@ -114,15 +114,15 @@ func (x *Rest) OncallUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewOncallRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionOncall
 	request.Action = msg.ActionUpdate
+
+	cReq := proto.NewOncallRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Update.Oncall = cReq.Oncall.Clone()
 	request.Update.Oncall.Sanitize()
 	request.Oncall.ID = params.ByName(`oncallID`)
@@ -162,20 +162,20 @@ func (x *Rest) OncallMemberAssign(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionOncall
+	request.Action = msg.ActionMemberAssign
+
 	cReq := proto.NewOncallRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if cReq.Oncall.Members == nil || *cReq.Oncall.Members == nil || len(*cReq.Oncall.Members) != 1 {
-		dispatchBadRequest(&w, nil)
+		x.replyBadRequest(&w, &request, nil)
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionOncall
-	request.Action = msg.ActionMemberAssign
 	request.Oncall = cReq.Oncall.Clone()
 	request.Oncall.ID = params.ByName(`oncallID`)
 

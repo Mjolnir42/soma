@@ -40,9 +40,13 @@ func (x *Rest) RepositoryConfigSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepositoryConfig
+	request.Action = msg.ActionSearch
+
 	cReq := proto.NewRepositoryFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
@@ -53,13 +57,9 @@ func (x *Rest) RepositoryConfigSearch(w http.ResponseWriter, r *http.Request,
 	case cReq.Filter.Repository.FilterOnIsDeleted:
 	case cReq.Filter.Repository.FilterOnIsActive:
 	default:
-		dispatchBadRequest(&w, fmt.Errorf(`RepositorySearch request without condition`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`RepositorySearch request without condition`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionRepositoryConfig
-	request.Action = msg.ActionSearch
 	request.Search.Repository.ID = cReq.Filter.Repository.ID
 	request.Search.Repository.Name = cReq.Filter.Repository.Name
 	request.Search.Repository.TeamID = cReq.Filter.Repository.TeamID
@@ -127,33 +127,33 @@ func (x *Rest) RepositoryConfigPropertyCreate(w http.ResponseWriter, r *http.Req
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepositoryConfig
+	request.Action = msg.ActionPropertyCreate
+
 	cReq := proto.NewRepositoryRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`repositoryID`) != cReq.Repository.ID:
-		dispatchBadRequest(&w, fmt.Errorf("Mismatched repository ids: %s, %s",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatched repository ids: %s, %s",
 			params.ByName(`repositoryID`), cReq.Repository.ID))
 		return
 	case len(*cReq.Repository.Properties) != 1:
-		dispatchBadRequest(&w, fmt.Errorf("Expected property count 1, actual count: %d",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Expected property count 1, actual count: %d",
 			len(*cReq.Repository.Properties)))
 		return
 	case params.ByName(`propertyType`) != (*cReq.Repository.Properties)[0].Type:
-		dispatchBadRequest(&w, fmt.Errorf("Mismatched property types: %s, %s",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatched property types: %s, %s",
 			params.ByName(`propertyType`), (*cReq.Repository.Properties)[0].Type))
 		return
 	case (params.ByName(`propertyType`) == `service`) && (*cReq.Repository.Properties)[0].Service.Name == ``:
-		dispatchBadRequest(&w, fmt.Errorf(`Invalid service name: empty string`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid service name: empty string`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionRepositoryConfig
-	request.Action = msg.ActionPropertyCreate
 	request.Repository = cReq.Repository.Clone()
 	request.TargetEntity = msg.EntityRepository
 	request.Property.Type = params.ByName(`propertyType`)
@@ -202,33 +202,33 @@ func (x *Rest) RepositoryConfigPropertyUpdate(w http.ResponseWriter, r *http.Req
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionRepositoryConfig
+	request.Action = msg.ActionPropertyUpdate
+
 	cReq := proto.NewRepositoryRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	switch {
 	case params.ByName(`repositoryID`) != cReq.Repository.ID:
-		dispatchBadRequest(&w, fmt.Errorf("Mismatched repository ids: %s, %s",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatched repository ids: %s, %s",
 			params.ByName(`repositoryID`), cReq.Repository.ID))
 		return
 	case len(*cReq.Repository.Properties) != 1:
-		dispatchBadRequest(&w, fmt.Errorf("Expected property count 1, actual count: %d",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Expected property count 1, actual count: %d",
 			len(*cReq.Repository.Properties)))
 		return
 	case params.ByName(`propertyType`) != (*cReq.Repository.Properties)[0].Type:
-		dispatchBadRequest(&w, fmt.Errorf("Mismatched property types: %s, %s",
+		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatched property types: %s, %s",
 			params.ByName(`propertyType`), (*cReq.Repository.Properties)[0].Type))
 		return
 	case (params.ByName(`propertyType`) == `service`) && (*cReq.Repository.Properties)[0].Service.Name == ``:
-		dispatchBadRequest(&w, fmt.Errorf(`Invalid service name: empty string`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid service name: empty string`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionRepositoryConfig
-	request.Action = msg.ActionPropertyUpdate
 	request.Repository = cReq.Repository.Clone()
 	request.TargetEntity = msg.EntityRepository
 	request.Property.Type = params.ByName(`propertyType`)

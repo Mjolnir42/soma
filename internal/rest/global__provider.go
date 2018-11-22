@@ -60,15 +60,15 @@ func (x *Rest) ProviderAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewProviderRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionProvider
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewProviderRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Provider.Name = cReq.Provider.Name
 
 	if !x.isAuthorized(&request) {

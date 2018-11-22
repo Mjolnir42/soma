@@ -27,19 +27,20 @@ func (x *Rest) HostDeploymentFetch(w http.ResponseWriter, r *http.Request,
 		assetID uint64
 	)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionHostDeployment
+	request.Action = msg.ActionGet
+
 	if err = checkStringIsUUID(params.ByName(`monitoringID`)); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	if assetID, err = strconv.ParseUint(params.ByName(`assetID`), 10, 64); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionHostDeployment
-	request.Action = msg.ActionGet
 	request.Monitoring.ID = params.ByName(`monitoringID`)
 	request.Node.AssetID = assetID
 
@@ -62,28 +63,29 @@ func (x *Rest) HostDeploymentAssemble(w http.ResponseWriter, r *http.Request,
 		assetID uint64
 	)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionHostDeployment
+	request.Action = msg.ActionAssemble
+
 	if err = checkStringIsUUID(params.ByName(`monitoringID`)); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 	if assetID, err = strconv.ParseUint(params.ByName(`assetID`), 10, 64); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
 	cReq := proto.NewHostDeploymentRequest()
 	if err = decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 	if cReq.HostDeployment == nil {
-		dispatchBadRequest(&w, fmt.Errorf(`HostDeployment section missing`))
+		x.replyBadRequest(&w, &request, fmt.Errorf(`HostDeployment section missing`))
 		return
 	}
 
-	request := msg.New(r, params)
-	request.Section = msg.SectionHostDeployment
-	request.Action = msg.ActionAssemble
 	request.Monitoring.ID = params.ByName(`monitoringID`)
 	request.Node.AssetID = assetID
 	request.DeploymentIDs = cReq.HostDeployment.CurrentCheckInstanceIDList

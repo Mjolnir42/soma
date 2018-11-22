@@ -62,15 +62,15 @@ func (x *Rest) LevelSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewLevelFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionLevel
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewLevelFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Search.Level = proto.Level{
 		Name:      cReq.Filter.Level.Name,
 		ShortName: cReq.Filter.Level.ShortName,
@@ -91,15 +91,15 @@ func (x *Rest) LevelAdd(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewLevelRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionLevel
 	request.Action = msg.ActionAdd
+
+	cReq := proto.NewLevelRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
 	request.Level = proto.Level{
 		Name:      cReq.Level.Name,
 		ShortName: cReq.Level.ShortName,

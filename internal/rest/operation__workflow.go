@@ -61,20 +61,20 @@ func (x *Rest) WorkflowSearch(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewWorkflowFilter()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if cReq.Filter.Workflow.Status == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
-			`No workflow status specified`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionWorkflow
 	request.Action = msg.ActionSearch
+
+	cReq := proto.NewWorkflowFilter()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if cReq.Filter.Workflow.Status == `` {
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`No workflow status specified`))
+		return
+	}
 	request.Workflow = proto.Workflow{
 		Status: cReq.Filter.Workflow.Status,
 	}
@@ -94,20 +94,20 @@ func (x *Rest) WorkflowRetry(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	cReq := proto.NewWorkflowRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
-		return
-	}
-	if cReq.Workflow.InstanceID == `` {
-		dispatchBadRequest(&w, fmt.Errorf(
-			`No instanceID for retry specified`))
-		return
-	}
-
 	request := msg.New(r, params)
 	request.Section = msg.SectionWorkflow
 	request.Action = msg.ActionRetry
+
+	cReq := proto.NewWorkflowRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+	if cReq.Workflow.InstanceID == `` {
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`No instanceID for retry specified`))
+		return
+	}
 	request.Workflow = proto.Workflow{
 		InstanceID: cReq.Workflow.InstanceID,
 	}
@@ -127,9 +127,13 @@ func (x *Rest) WorkflowSet(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
+	request := msg.New(r, params)
+	request.Section = msg.SectionWorkflow
+	request.Action = msg.ActionSet
+
 	cReq := proto.NewWorkflowRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
-		dispatchBadRequest(&w, err)
+		x.replyBadRequest(&w, &request, err)
 		return
 	}
 
@@ -140,7 +144,7 @@ func (x *Rest) WorkflowSet(w http.ResponseWriter, r *http.Request,
 	case cReq.Workflow.NextStatus == ``:
 		fallthrough
 	case params.ByName(`instanceconfigID`) == ``:
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`Incomplete status information specified`))
 		return
 	default:
@@ -148,14 +152,10 @@ func (x *Rest) WorkflowSet(w http.ResponseWriter, r *http.Request,
 
 	// It's dangerous out there, take this -f
 	if !cReq.Flags.Forced {
-		dispatchBadRequest(&w, fmt.Errorf(
+		x.replyBadRequest(&w, &request, fmt.Errorf(
 			`WorkflowSet request declined, force required.`))
 		return
 	}
-
-	request := msg.New(r, params)
-	request.Section = msg.SectionWorkflow
-	request.Action = msg.ActionSet
 	request.Workflow = proto.Workflow{
 		InstanceConfigID: params.ByName(`instanceconfigID`),
 		Status:           cReq.Workflow.Status,
