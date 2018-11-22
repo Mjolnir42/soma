@@ -1086,9 +1086,9 @@ WHERE  scop.cluster_id = $1::uuid
 AND    (scop.view = $2::varchar OR scop.view = 'any');`
 
 	TxDeployDetailsGroupOncall = `
-SELECT it.id,
-       it.name,
-       it.phone_number
+SELECT iot.id,
+       iot.name,
+       iot.phone_number
 FROM   soma.group_oncall_properties sgop
 JOIN   inventory.oncall_team iot
 ON     sgop.oncall_duty_id = iot.id
