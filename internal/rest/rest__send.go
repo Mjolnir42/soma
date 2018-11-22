@@ -366,7 +366,8 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 				x.errLog.WithField(`RequestID`, r.ID.String()).
 					WithField(`Phase`, `json`).
 					Error(err)
-				dispatchInternalError(w, nil)
+				// KEX has no regular application payload
+				x.hardServerError(w)
 				return
 			}
 			logEntry.WithField(`Code`, r.Code).Info(`OK`)
@@ -508,7 +509,7 @@ buildJSON:
 		x.errLog.WithField(`RequestID`, r.ID.String()).
 			WithField(`Phase`, `json`).
 			Error(err)
-		dispatchInternalError(w, nil)
+		x.hardServerError(w)
 		return
 	}
 

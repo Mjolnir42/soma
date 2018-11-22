@@ -45,4 +45,14 @@ func (x *Rest) replyNotImplemented(w *http.ResponseWriter, q *msg.Request, err e
 	x.send(w, &result)
 }
 
+// hardServerError returns a 500 HTTP error with no application data
+// body. This function is intended to be used only if normal response
+// generation itself fails
+func (x *Rest) hardServerError(w *http.ResponseWriter) {
+	http.Error(*w,
+		http.StatusText(http.StatusInternalServerError),
+		http.StatusInternalServerError,
+	)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
