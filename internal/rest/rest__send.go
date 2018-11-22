@@ -255,6 +255,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 
 	case msg.SectionSystem:
 		result = proto.NewResult()
+		result.RequestID = r.ID.String()
 		switch r.Action {
 		case msg.ActionRepoRebuild:
 		case msg.ActionRepoRestart:
@@ -305,6 +306,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		switch r.Action {
 		case msg.ActionToken:
 			result = proto.NewResult()
+			result.RequestID = r.ID.String()
 
 			switch r.Super.Task {
 			// invalidate Token requests
@@ -454,6 +456,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 		dispatchInternalError(w, nil)
 		return
 	}
+	result.RequestID = r.ID.String()
 
 	logEntry = logEntry.WithField(`Code`, r.Code)
 

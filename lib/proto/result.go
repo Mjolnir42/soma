@@ -43,6 +43,7 @@ var DisplayStatus = map[int]string{
 type Result struct {
 	StatusCode uint16 `json:"statusCode"`
 	StatusText string `json:"statusText"`
+	RequestID  string `json:"requestID"`
 
 	// Errors is set for StatusCode >399
 	Errors *[]string `json:"errors,omitempty"`
