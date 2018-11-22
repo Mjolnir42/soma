@@ -504,7 +504,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	goto buildJSON
 
 dispatchOCTET:
-	dispatchOctetReply(w, &r.Super.Encrypted.Data)
+	x.writeReplyOctetStream(w, &r.Super.Encrypted.Data)
 	return
 
 buildJSON:
@@ -517,8 +517,24 @@ buildJSON:
 	}
 
 dispatchJSON:
-	dispatchJSONReply(w, &bjson)
+	x.writeReplyJSON(w, &bjson)
 	return
+}
+
+// writeReplyOctetStream writes out b as the reply with content-type set
+// to application/octet-stream
+func (x *Rest) writeReplyOctetStream(w *http.ResponseWriter, b *[]byte) {
+	(*w).Header().Set(`Content-Type`, `application/octet-stream`)
+	(*w).WriteHeader(http.StatusOK)
+	(*w).Write(*b)
+}
+
+// writeReplyJSON writes out b as the reply with content-type
+// set to application/json
+func (x *Rest) writeReplyJSON(w *http.ResponseWriter, b *[]byte) {
+	(*w).Header().Set(`Content-Type`, `application/json`)
+	(*w).WriteHeader(http.StatusOK)
+	(*w).Write(*b)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
