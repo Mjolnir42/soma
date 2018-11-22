@@ -178,6 +178,7 @@ func (g *GuidePost) process(q *msg.Request) {
 		rowCnt                   int64
 	)
 	result := msg.FromRequest(q)
+	logRequest(g.reqLog, q)
 
 	// to which tree this request must be forwarded
 	if repoID, repoName, nf, err = g.extractRouting(q); err != nil {
@@ -276,6 +277,7 @@ func (g *GuidePost) sysprocess(q *msg.Request) {
 		handler                  *TreeKeeper
 	)
 	result := msg.FromRequest(q)
+	logRequest(g.reqLog, q)
 	result.System = []proto.System{q.System}
 
 	switch q.System.Request {
