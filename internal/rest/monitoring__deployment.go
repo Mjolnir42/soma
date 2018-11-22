@@ -136,7 +136,11 @@ func (x *Rest) DeploymentPending(w http.ResponseWriter, r *http.Request,
 func (x *Rest) DeploymentFilter(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 
-	dispatchNotImplemented(&w, nil)
+	request := msg.New(r, params)
+	request.Section = msg.SectionDeployment
+	request.Action = msg.ActionFilter
+
+	x.replyNotImplemented(&w, &request, nil)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

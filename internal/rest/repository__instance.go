@@ -87,7 +87,7 @@ func (x *Rest) InstanceList(w http.ResponseWriter, r *http.Request,
 	case params.ByName(`node`) != ``:
 		fallthrough
 	default:
-		dispatchNotImplemented(&w, nil)
+		x.replyNotImplemented(&w, &request, nil)
 		return
 	}
 

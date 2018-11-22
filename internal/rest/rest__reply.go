@@ -29,4 +29,11 @@ func (x *Rest) replyForbidden(w *http.ResponseWriter, q *msg.Request, err error)
 	x.send(w, &result)
 }
 
+// replyNotImplemented returns a 501 error
+func (x *Rest) replyNotImplemented(w *http.ResponseWriter, q *msg.Request, err error) {
+	result := msg.FromRequest(q)
+	result.NotImplemented(err, q.Section)
+	x.send(w, &result)
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

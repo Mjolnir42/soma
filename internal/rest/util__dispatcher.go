@@ -91,14 +91,6 @@ func dispatchInternalError(w *http.ResponseWriter, err error) {
 	http.Error(*w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
-func dispatchNotImplemented(w *http.ResponseWriter, err error) {
-	if err != nil {
-		http.Error(*w, err.Error(), http.StatusNotImplemented)
-		return
-	}
-	http.Error(*w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
-}
-
 func dispatchUnauthorized(w *http.ResponseWriter, err error) {
 	if err != nil {
 		http.Error(*w, err.Error(), http.StatusUnauthorized)
