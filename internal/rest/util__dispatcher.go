@@ -31,47 +31,6 @@ func panicCatcher(w http.ResponseWriter) {
 	}
 }
 
-func peekJSONBody(r *http.Request, s interface{}) error {
-	var err error
-	body, _ := ioutil.ReadAll(r.Body)
-
-	decoder := json.NewDecoder(
-		ioutil.NopCloser(bytes.NewReader(body)),
-	)
-	r.Body = ioutil.NopCloser(bytes.NewReader(body))
-
-	switch s.(type) {
-	case *proto.Request:
-		c := s.(*proto.Request)
-		err = decoder.Decode(c)
-	case *auth.Kex:
-		c := s.(*auth.Kex)
-		err = decoder.Decode(c)
-	default:
-		rt := reflect.TypeOf(s)
-		err = fmt.Errorf("DecodeJsonBody: Unhandled request type: %s", rt)
-	}
-	return err
-}
-
-func decodeJSONBody(r *http.Request, s interface{}) error {
-	decoder := json.NewDecoder(r.Body)
-	var err error
-
-	switch s.(type) {
-	case *proto.Request:
-		c := s.(*proto.Request)
-		err = decoder.Decode(c)
-	case *auth.Kex:
-		c := s.(*auth.Kex)
-		err = decoder.Decode(c)
-	default:
-		rt := reflect.TypeOf(s)
-		err = fmt.Errorf("DecodeJsonBody: Unhandled request type: %s", rt)
-	}
-	return err
-}
-
 func dispatchJSONReply(w *http.ResponseWriter, b *[]byte) {
 	(*w).Header().Set("Content-Type", "application/json")
 	(*w).WriteHeader(http.StatusOK)
