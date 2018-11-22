@@ -40,14 +40,14 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 	request.Section = msg.SectionNode
 	request.Action = msg.ActionAssign
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
 	// check if the user is allowed to assign nodes to the target repo
 	request.Section = msg.SectionNodeConfig
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 	request.Section = msg.SectionNode
 	request.Action = msg.ActionUnassign
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -79,7 +79,7 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 	request.Section = msg.SectionNodeConfig
 	request.Action = msg.ActionUnassign
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -130,7 +130,7 @@ func (x *Rest) NodeConfigPropertyCreate(w http.ResponseWriter,
 	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -190,7 +190,7 @@ func (x *Rest) NodeConfigPropertyDestroy(w http.ResponseWriter,
 	}}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -221,7 +221,7 @@ func (x *Rest) NodeConfigTree(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

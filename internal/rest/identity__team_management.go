@@ -29,7 +29,7 @@ func (x *Rest) TeamMgmtList(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (x *Rest) TeamMgmtSearch(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (x *Rest) TeamMgmtShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -113,7 +113,7 @@ func (x *Rest) TeamMgmtSync(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -139,7 +139,7 @@ func (x *Rest) TeamMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.Team = cReq.Team.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -173,7 +173,7 @@ func (x *Rest) TeamMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	request.Team = cReq.Team.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -195,7 +195,7 @@ func (x *Rest) TeamMgmtRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -215,7 +215,7 @@ func (x *Rest) TeamMgmtMemberList(w http.ResponseWriter, r *http.Request,
 	request.Team.ID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

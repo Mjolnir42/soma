@@ -44,7 +44,7 @@ func (x *Rest) HostDeploymentFetch(w http.ResponseWriter, r *http.Request,
 	request.Node.AssetID = assetID
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (x *Rest) HostDeploymentAssemble(w http.ResponseWriter, r *http.Request,
 	request.DeploymentIDs = cReq.HostDeployment.CurrentCheckInstanceIDList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

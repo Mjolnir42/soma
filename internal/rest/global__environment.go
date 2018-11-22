@@ -26,7 +26,7 @@ func (x *Rest) EnvironmentList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (x *Rest) EnvironmentShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (x *Rest) EnvironmentAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -97,7 +97,7 @@ func (x *Rest) EnvironmentRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -123,7 +123,7 @@ func (x *Rest) EnvironmentRename(w http.ResponseWriter, r *http.Request,
 	request.Update.Environment.Name = cReq.Environment.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

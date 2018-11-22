@@ -29,7 +29,7 @@ func (x *Rest) RepositoryDestroy(w http.ResponseWriter, r *http.Request,
 	request.Repository.TeamID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (x *Rest) RepositoryAudit(w http.ResponseWriter, r *http.Request,
 	request.Repository.TeamID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -84,7 +84,7 @@ func (x *Rest) RepositoryRename(w http.ResponseWriter, r *http.Request,
 	request.Update.Repository.Name = cReq.Repository.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -112,7 +112,7 @@ func (x *Rest) RepositoryRepossess(w http.ResponseWriter, r *http.Request,
 	request.Update.Repository.TeamID = cReq.Repository.TeamID
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -155,7 +155,7 @@ func (x *Rest) RepositorySearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Repository.FilterOnIsActive = cReq.Filter.Repository.FilterOnIsActive
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -176,7 +176,7 @@ func (x *Rest) RepositoryShow(w http.ResponseWriter, r *http.Request,
 	request.Repository.TeamID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

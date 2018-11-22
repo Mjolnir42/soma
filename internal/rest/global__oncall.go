@@ -27,7 +27,7 @@ func (x *Rest) OncallList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (x *Rest) OncallShow(w http.ResponseWriter, r *http.Request,
 	request.Oncall.ID = params.ByName(`oncallID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (x *Rest) OncallSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Oncall.Name = cReq.Filter.Oncall.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -100,7 +100,7 @@ func (x *Rest) OncallAdd(w http.ResponseWriter, r *http.Request,
 	request.Oncall.Sanitize()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -128,7 +128,7 @@ func (x *Rest) OncallUpdate(w http.ResponseWriter, r *http.Request,
 	request.Oncall.ID = params.ByName(`oncallID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -148,7 +148,7 @@ func (x *Rest) OncallRemove(w http.ResponseWriter, r *http.Request,
 	request.Oncall.ID = params.ByName(`oncallID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -180,7 +180,7 @@ func (x *Rest) OncallMemberAssign(w http.ResponseWriter, r *http.Request,
 	request.Oncall.ID = params.ByName(`oncallID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -203,7 +203,7 @@ func (x *Rest) OncallMemberUnassign(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -223,7 +223,7 @@ func (x *Rest) OncallMemberList(w http.ResponseWriter, r *http.Request,
 	request.Oncall.ID = params.ByName(`oncallID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

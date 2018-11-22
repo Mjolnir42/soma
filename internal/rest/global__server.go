@@ -27,7 +27,7 @@ func (x *Rest) ServerList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (x *Rest) ServerShow(w http.ResponseWriter, r *http.Request,
 	request.Server.ID = params.ByName(`serverID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -79,7 +79,7 @@ func (x *Rest) ServerSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Server.AssetID = cReq.Filter.Server.AssetID
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (x *Rest) ServerSync(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionSync
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -129,7 +129,7 @@ func (x *Rest) ServerAdd(w http.ResponseWriter, r *http.Request,
 	request.Server.IsDeleted = false
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -160,7 +160,7 @@ func (x *Rest) ServerRemove(w http.ResponseWriter, r *http.Request,
 	request.Server.ID = params.ByName(`serverID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -196,7 +196,7 @@ func (x *Rest) ServerUpdate(w http.ResponseWriter, r *http.Request,
 	request.Update.Server.IsDeleted = cReq.Server.IsDeleted
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -227,7 +227,7 @@ func (x *Rest) ServerAddNull(w http.ResponseWriter, r *http.Request,
 	request.Server.Datacenter = cReq.Server.Datacenter
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

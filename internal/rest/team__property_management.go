@@ -49,7 +49,7 @@ func (x *Rest) PropertyMgmtServiceAdd(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionAdd
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (x *Rest) PropertyMgmtServiceAdd(w http.ResponseWriter, r *http.Request,
 	request.Property = cReq.Property.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -82,7 +82,7 @@ func (x *Rest) PropertyMgmtServiceRemove(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionRemove
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (x *Rest) PropertyMgmtServiceRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

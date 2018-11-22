@@ -22,14 +22,6 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-func dispatchForbidden(w *http.ResponseWriter, err error) {
-	if err != nil {
-		http.Error(*w, err.Error(), http.StatusForbidden)
-		return
-	}
-	http.Error(*w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
-}
-
 func panicCatcher(w http.ResponseWriter) {
 	if r := recover(); r != nil {
 		log.Printf("%s\n", debug.Stack())

@@ -50,7 +50,7 @@ func (x *Rest) PropertyMgmtCustomAdd(w http.ResponseWriter, r *http.Request,
 	request.Property = cReq.Property.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (x *Rest) PropertyMgmtCustomRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

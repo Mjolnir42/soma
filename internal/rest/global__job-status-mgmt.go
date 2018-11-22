@@ -26,7 +26,7 @@ func (x *Rest) JobStatusMgmtList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) JobStatusMgmtShow(w http.ResponseWriter, r *http.Request,
 	request.JobStatus.ID = params.ByName(`statusID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (x *Rest) JobStatusMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.JobStatus = cReq.JobStatus.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) JobStatusMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.JobStatus.ID = params.ByName(`statusID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -119,7 +119,7 @@ func (x *Rest) JobStatusMgmtSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.JobStatus.Name = cReq.Filter.JobStatus.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

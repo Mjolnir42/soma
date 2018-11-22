@@ -26,7 +26,7 @@ func (x *Rest) ProviderList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) ProviderShow(w http.ResponseWriter, r *http.Request,
 	request.Provider.Name = params.ByName(`provider`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (x *Rest) ProviderAdd(w http.ResponseWriter, r *http.Request,
 	request.Provider.Name = cReq.Provider.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) ProviderRemove(w http.ResponseWriter, r *http.Request,
 	request.Provider.Name = params.ByName(`provider`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

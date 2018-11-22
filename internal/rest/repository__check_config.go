@@ -30,7 +30,7 @@ func (x *Rest) CheckConfigList(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (x *Rest) CheckConfigSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (x *Rest) CheckConfigShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -120,7 +120,7 @@ func (x *Rest) CheckConfigCreate(w http.ResponseWriter, r *http.Request,
 	request.CheckConfig = cReq.CheckConfig.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -128,7 +128,7 @@ func (x *Rest) CheckConfigCreate(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionCreate
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -151,7 +151,7 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -159,7 +159,7 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionDestroy
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

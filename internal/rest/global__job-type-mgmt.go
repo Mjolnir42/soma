@@ -26,7 +26,7 @@ func (x *Rest) JobTypeMgmtList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) JobTypeMgmtShow(w http.ResponseWriter, r *http.Request,
 	request.JobType.ID = params.ByName(`typeID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (x *Rest) JobTypeMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.JobType = cReq.JobType.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) JobTypeMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.JobType.ID = params.ByName(`typeID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -119,7 +119,7 @@ func (x *Rest) JobTypeMgmtSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.JobType.Name = cReq.Filter.JobType.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

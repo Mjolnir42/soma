@@ -28,7 +28,7 @@ func (x *Rest) TeamShow(w http.ResponseWriter, r *http.Request,
 	request.User.ID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (x *Rest) TeamSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Team.Name = cReq.Filter.Team.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

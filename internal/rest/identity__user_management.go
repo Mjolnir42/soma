@@ -29,7 +29,7 @@ func (x *Rest) UserMgmtList(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (x *Rest) UserMgmtShow(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (x *Rest) UserMgmtSync(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -97,7 +97,7 @@ func (x *Rest) UserMgmtSearch(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -136,7 +136,7 @@ func (x *Rest) UserMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.User.TeamID = cReq.User.TeamID
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -179,7 +179,7 @@ func (x *Rest) UserMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	request.Update.User.TeamID = cReq.User.TeamID
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -209,7 +209,7 @@ func (x *Rest) UserMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.User.ID = params.ByName(`userID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

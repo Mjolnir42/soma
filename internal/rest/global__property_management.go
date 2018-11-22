@@ -27,7 +27,7 @@ func (x *Rest) PropertyMgmtList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (x *Rest) PropertyMgmtList(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -76,7 +76,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionShow
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -114,7 +114,7 @@ func (x *Rest) PropertyMgmtShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -139,7 +139,7 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionSearch
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -202,7 +202,7 @@ func (x *Rest) PropertyMgmtSearch(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -266,7 +266,7 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionAdd
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 	request.Property.Type = params.ByName(`propertyType`)
@@ -313,7 +313,7 @@ func (x *Rest) PropertyMgmtAdd(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -332,7 +332,7 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionRemove
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 	request.Property.Type = params.ByName(`propertyType`)
@@ -362,7 +362,7 @@ func (x *Rest) PropertyMgmtRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

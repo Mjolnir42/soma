@@ -40,7 +40,7 @@ func (x *Rest) RepositoryMgmtCreate(w http.ResponseWriter, r *http.Request,
 	request.Repository = cReq.Repository.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

@@ -29,7 +29,7 @@ func (x *Rest) ClusterList(w http.ResponseWriter, r *http.Request,
 	request.Bucket.ID = params.ByName(`bucketID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (x *Rest) ClusterSearch(w http.ResponseWriter, r *http.Request,
 	request.Bucket.ID = params.ByName(`bucketID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (x *Rest) ClusterShow(w http.ResponseWriter, r *http.Request,
 	request.Cluster.ID = params.ByName(`clusterID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -118,7 +118,7 @@ func (x *Rest) ClusterTree(w http.ResponseWriter, r *http.Request,
 	request.Tree.Type = msg.EntityCluster
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -153,7 +153,7 @@ func (x *Rest) ClusterCreate(w http.ResponseWriter, r *http.Request,
 	request.Cluster = cReq.Cluster.Clone()
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -175,7 +175,7 @@ func (x *Rest) ClusterDestroy(w http.ResponseWriter, r *http.Request,
 	request.Cluster.ID = params.ByName(`clusterID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -197,7 +197,7 @@ func (x *Rest) ClusterMemberList(w http.ResponseWriter, r *http.Request,
 	request.Cluster.ID = params.ByName(`clusterID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -227,7 +227,7 @@ func (x *Rest) ClusterMemberAssign(w http.ResponseWriter, r *http.Request,
 	request.TargetEntity = msg.EntityNode
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -260,7 +260,7 @@ func (x *Rest) ClusterMemberUnassign(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -312,7 +312,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -368,7 +368,7 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -414,7 +414,7 @@ func (x *Rest) ClusterRename(w http.ResponseWriter, r *http.Request,
 	request.Update.Cluster.Name = cReq.Cluster.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

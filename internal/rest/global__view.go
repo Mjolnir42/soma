@@ -28,7 +28,7 @@ func (x *Rest) ViewList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (x *Rest) ViewShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (x *Rest) ViewAdd(w http.ResponseWriter, r *http.Request,
 	request.View.Name = cReq.View.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -100,7 +100,7 @@ func (x *Rest) ViewRemove(w http.ResponseWriter, r *http.Request,
 	request.View.Name = params.ByName(`view`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -132,7 +132,7 @@ func (x *Rest) ViewRename(w http.ResponseWriter, r *http.Request,
 	request.Update.View.Name = cReq.View.Name
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

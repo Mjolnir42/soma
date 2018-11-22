@@ -272,8 +272,8 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 					WithField(`Masked`, 403).
 					WithField(`Task`, r.Super.Task).
 					Warnf(`Unhandled supervisor task`)
-				dispatchForbidden(w, nil)
-				return
+				result.Forbidden(nil)
+				goto buildJSON
 			}
 
 			// check supervisor verdict
@@ -287,15 +287,15 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			logEntry.WithField(`Code`, r.Code).
 				WithField(`Masked`, 403).
 				Warnf(`Forbidden`)
-			dispatchForbidden(w, nil)
-			return
+			result.Forbidden(nil)
+			goto buildJSON
 
 		default:
 			logEntry.WithField(`Code`, r.Code).
 				WithField(`Masked`, 500).
 				Warnf(`Unhandled system action`)
-			dispatchInternalError(w, nil)
-			return
+			result.Forbidden(nil)
+			goto buildJSON
 		}
 
 	// supervisor results handle AAA data and mask internal error codes
@@ -323,8 +323,8 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 					WithField(`Masked`, 403).
 					WithField(`Task`, r.Super.Task).
 					Warnf(`Forbidden`)
-				dispatchForbidden(w, nil)
-				return
+				result.Forbidden(nil)
+				goto buildJSON
 
 			// token generation request - encrypted payload
 			case msg.TaskRequest:
@@ -339,16 +339,16 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 					WithField(`Masked`, 403).
 					WithField(`Task`, r.Super.Task).
 					Warnf(`Forbidden`)
-				dispatchForbidden(w, nil)
-				return
+				result.Forbidden(nil)
+				goto buildJSON
 
 			default: // switch r.Super.Task
 				logEntry.WithField(`Code`, r.Code).
 					WithField(`Masked`, 403).
 					WithField(`Task`, r.Super.Task).
 					Warnf(`Unhandled supervisor task`)
-				dispatchForbidden(w, nil)
-				return
+				result.Forbidden(nil)
+				goto buildJSON
 
 			}
 			// unreachable
@@ -382,8 +382,8 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 					WithField(`Masked`, 403).
 					WithField(`Task`, r.Super.Task).
 					Warnf(`Unhandled supervisor task`)
-				dispatchForbidden(w, nil)
-				return
+				result.Forbidden(nil)
+				goto buildJSON
 			}
 
 			// check supervisor verdict
@@ -397,8 +397,8 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			logEntry.WithField(`Code`, r.Code).
 				WithField(`Masked`, 403).
 				Warnf(`Forbidden`)
-			dispatchForbidden(w, nil)
-			return
+			result.Forbidden(nil)
+			goto buildJSON
 
 		case msg.ActionActivate:
 			// Account activation request -- encrypted payload
@@ -412,8 +412,8 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 					WithField(`Masked`, 403).
 					WithField(`Task`, r.Super.Task).
 					Warnf(`Unhandled supervisor task`)
-				dispatchForbidden(w, nil)
-				return
+				result.Forbidden(nil)
+				goto buildJSON
 			}
 
 			// check supervisor verdict
@@ -436,15 +436,15 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			logEntry.WithField(`Code`, r.Code).
 				WithField(`Masked`, 403).
 				Warnf(`Forbidden`)
-			dispatchForbidden(w, nil)
-			return
+			result.Forbidden(nil)
+			goto buildJSON
 
 		default:
 			logEntry.WithField(`Code`, r.Code).
 				WithField(`Masked`, 403).
 				Warnf(`Unhandled supervisor action`)
-			dispatchForbidden(w, nil)
-			return
+			result.Forbidden(nil)
+			goto buildJSON
 		}
 
 	default:

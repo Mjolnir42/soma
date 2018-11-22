@@ -27,7 +27,7 @@ func (x *Rest) UserShow(w http.ResponseWriter, r *http.Request,
 	request.User.ID = params.ByName(`userID`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (x *Rest) UserSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.User.UserName = cReq.Filter.User.UserName
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

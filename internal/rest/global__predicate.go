@@ -26,7 +26,7 @@ func (x *Rest) PredicateList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) PredicateShow(w http.ResponseWriter, r *http.Request,
 	request.Predicate.Symbol = params.ByName(`predicate`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (x *Rest) PredicateAdd(w http.ResponseWriter, r *http.Request,
 	request.Predicate.Symbol = cReq.Predicate.Symbol
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) PredicateRemove(w http.ResponseWriter, r *http.Request,
 	request.Predicate.Symbol = params.ByName(`predicate`)
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 

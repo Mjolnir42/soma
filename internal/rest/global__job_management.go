@@ -27,7 +27,7 @@ func (x *Rest) JobMgmtWait(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (x *Rest) JobMgmtList(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		dispatchForbidden(&w, nil)
+		x.replyForbidden(&w, &request, nil)
 		return
 	}
 
