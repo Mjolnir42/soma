@@ -8,7 +8,7 @@
  * that can be found in the LICENSE file.
  */
 
-package rest
+package rest // import "github.com/mjolnir42/soma/internal/rest"
 
 import (
 	"encoding/json"
