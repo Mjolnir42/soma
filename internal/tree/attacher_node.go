@@ -8,6 +8,10 @@
 
 package tree
 
+import (
+	uuid "github.com/satori/go.uuid"
+)
+
 //
 // Interface: Attacher
 func (ten *Node) Attach(a AttachRequest) {
@@ -123,6 +127,11 @@ func (ten *Node) Detach() {
 func (ten *Node) SetName(s string) {
 	ten.Name = s
 	ten.actionRename()
+}
+
+func (ten *Node) inheritTeamID(newTeamID string) {
+	ten.Team, _ = uuid.FromString(newTeamID)
+	ten.actionRepossess()
 }
 
 //

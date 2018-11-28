@@ -51,6 +51,13 @@ func (tef *Fault) ReAttach(a AttachRequest) {
 func (tef *Fault) SetName(s string) {
 }
 
+func (tef *Fault) inheritTeamID(newTeamID string) {
+	tef.Error <- &Error{
+		Action: ActionRepossess,
+		Text:   `Fault handler received inheritTeamID() invocation`,
+	}
+}
+
 //
 // Interface: RepositoryAttacher
 func (tef *Fault) attachToRepository(a AttachRequest) {

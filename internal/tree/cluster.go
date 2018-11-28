@@ -364,6 +364,14 @@ func (tec *Cluster) actionRename() {
 	}
 }
 
+func (tec *Cluster) actionRepossess() {
+	tec.Action <- &Action{
+		Action:  ActionRepossess,
+		Type:    tec.Type,
+		Cluster: tec.export(),
+	}
+}
+
 func (tec *Cluster) actionMemberNew(a Action) {
 	a.Action = ActionMemberNew
 	a.Type = tec.Type

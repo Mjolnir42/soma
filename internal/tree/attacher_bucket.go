@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 //
@@ -124,6 +126,42 @@ func (teb *Bucket) setParent(p Receiver) {
 
 func (teb *Bucket) setBucketParent(p BucketReceiver) {
 	teb.Parent = p
+}
+
+func (teb *Bucket) inheritTeamID(newTeamID string) {
+	wg := sync.WaitGroup{}
+	switch deterministicInheritanceOrder {
+	case true:
+		// groups
+		for i := 0; i < teb.ordNumChildGrp; i++ {
+			if child, ok := teb.ordChildrenGrp[i]; ok {
+				teb.Children[child].inheritTeamID(newTeamID)
+			}
+		}
+		// clusters
+		for i := 0; i < teb.ordNumChildClr; i++ {
+			if child, ok := teb.ordChildrenClr[i]; ok {
+				teb.Children[child].inheritTeamID(newTeamID)
+			}
+		}
+		// nodes
+		for i := 0; i < teb.ordNumChildNod; i++ {
+			if child, ok := teb.ordChildrenNod[i]; ok {
+				teb.Children[child].inheritTeamID(newTeamID)
+			}
+		}
+	default:
+		for child := range teb.Children {
+			wg.Add(1)
+			go func(name, teamID string) {
+				defer wg.Done()
+				teb.Children[name].inheritTeamID(teamID)
+			}(child, newTeamID)
+		}
+	}
+	teb.Team, _ = uuid.FromString(newTeamID)
+	teb.actionRepossess()
+	wg.Wait()
 }
 
 //

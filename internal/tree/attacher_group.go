@@ -8,7 +8,11 @@
 
 package tree
 
-import "sync"
+import (
+	"sync"
+
+	uuid "github.com/satori/go.uuid"
+)
 
 //
 // Interface: Attacher
@@ -134,6 +138,42 @@ func (teg *Group) Detach() {
 func (teg *Group) SetName(s string) {
 	teg.Name = s
 	teg.actionRename()
+}
+
+func (teg *Group) inheritTeamID(newTeamID string) {
+	wg := sync.WaitGroup{}
+	switch deterministicInheritanceOrder {
+	case true:
+		// groups
+		for i := 0; i < teg.ordNumChildGrp; i++ {
+			if child, ok := teg.ordChildrenGrp[i]; ok {
+				teg.Children[child].inheritTeamID(newTeamID)
+			}
+		}
+		// clusters
+		for i := 0; i < teg.ordNumChildClr; i++ {
+			if child, ok := teg.ordChildrenClr[i]; ok {
+				teg.Children[child].inheritTeamID(newTeamID)
+			}
+		}
+		// nodes
+		for i := 0; i < teg.ordNumChildNod; i++ {
+			if child, ok := teg.ordChildrenNod[i]; ok {
+				teg.Children[child].inheritTeamID(newTeamID)
+			}
+		}
+	default:
+		for child := range teg.Children {
+			wg.Add(1)
+			go func(name, teamID string) {
+				defer wg.Done()
+				teg.Children[name].inheritTeamID(teamID)
+			}(child, newTeamID)
+		}
+	}
+	teg.Team, _ = uuid.FromString(newTeamID)
+	teg.actionRepossess()
+	wg.Wait()
 }
 
 //

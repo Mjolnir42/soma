@@ -399,6 +399,14 @@ func (teg *Group) actionRename() {
 	}
 }
 
+func (teg *Group) actionRepossess() {
+	teg.Action <- &Action{
+		Action: ActionRepossess,
+		Type:   teg.Type,
+		Group:  teg.export(),
+	}
+}
+
 func (teg *Group) actionMemberNew(a Action) {
 	a.Action = ActionMemberNew
 	a.Type = teg.Type

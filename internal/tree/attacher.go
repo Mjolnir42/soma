@@ -30,11 +30,14 @@ type Attacher interface {
 	setParent(p Receiver)
 	updateFaultRecursive(f *Fault)
 	updateParentRecursive(p Receiver)
+	inheritTeamID(s string)
 }
 
 // implemented by: repository
 type RootAttacher interface {
 	Attacher
+
+	SetTeamID(s string)
 
 	attachToRoot(a AttachRequest)
 	setLog(l *log.Logger)

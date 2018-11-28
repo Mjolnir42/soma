@@ -23,6 +23,7 @@ const (
 	ActionPropertyNew         = `property_new`
 	ActionPropertyUpdate      = `property_update`
 	ActionRename              = `rename`
+	ActionRepossess           = `repossess`
 	ActionUpdate              = `update`
 )
 

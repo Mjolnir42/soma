@@ -13,6 +13,11 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+// deterministicInheritanceOrder switches off concurrency in some tree
+// actions. This is activated in unit testing to create repeatable test
+// runs
+var deterministicInheritanceOrder = false
+
 type Tree struct {
 	ID      uuid.UUID
 	Name    string
@@ -94,6 +99,11 @@ func (st *Tree) GetName() string {
 
 func (st *Tree) GetType() string {
 	return st.Type
+}
+
+//
+func (st *Tree) SetTeamID(newTeamID string) {
+	st.Child.SetTeamID(newTeamID)
 }
 
 //

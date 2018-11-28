@@ -324,6 +324,14 @@ func (ter *Repository) actionRename() {
 	}
 }
 
+func (ter *Repository) actionRepossess() {
+	ter.Action <- &Action{
+		Action:     ActionRepossess,
+		Type:       ter.Type,
+		Repository: ter.export(),
+	}
+}
+
 func (ter *Repository) actionPropertyNew(a Action) {
 	a.Action = ActionPropertyNew
 	ter.actionProperty(a)

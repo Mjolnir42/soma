@@ -326,6 +326,14 @@ func (teb *Bucket) actionAssignNode(a Action) {
 	teb.Action <- &a
 }
 
+func (teb *Bucket) actionRepossess() {
+	teb.Action <- &Action{
+		Action: ActionRepossess,
+		Type:   teb.Type,
+		Bucket: teb.export(),
+	}
+}
+
 //
 func (teb *Bucket) actionPropertyNew(a Action) {
 	a.Action = ActionPropertyNew

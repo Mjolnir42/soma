@@ -294,6 +294,14 @@ func (ten *Node) actionRename() {
 	}
 }
 
+func (ten *Node) actionRepossess() {
+	ten.Action <- &Action{
+		Action: ActionRepossess,
+		Type:   ten.Type,
+		Node:   ten.export(),
+	}
+}
+
 //
 func (ten *Node) actionPropertyNew(a Action) {
 	a.Action = ActionPropertyNew

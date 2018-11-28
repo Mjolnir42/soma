@@ -11,6 +11,8 @@ package tree
 import (
 	"strings"
 	"sync"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 //
@@ -88,6 +90,37 @@ func (ter *Repository) SetName(newRepoName string) {
 
 	ter.Name = newRepoName
 	ter.actionRename()
+}
+
+func (ter *Repository) SetTeamID(newTeamID string) {
+	wg := sync.WaitGroup{}
+	switch deterministicInheritanceOrder {
+	case true:
+		// buckets
+		for i := 0; i < ter.ordNumChildBck; i++ {
+			if child, ok := ter.ordChildrenBck[i]; ok {
+				ter.Children[child].inheritTeamID(newTeamID)
+			}
+		}
+	default:
+		for child := range ter.Children {
+			wg.Add(1)
+			go func(name, teamID string) {
+				defer wg.Done()
+				ter.Children[name].inheritTeamID(teamID)
+			}(child, newTeamID)
+		}
+	}
+	ter.Team, _ = uuid.FromString(newTeamID)
+	ter.actionRepossess()
+	wg.Wait()
+}
+
+func (ter *Repository) inheritTeamID(newTeamUUID string) {
+	ter.Fault.Error <- &Error{
+		Action: ActionRepossess,
+		Text:   `Repository received inheritTeamID() invocation`,
+	}
 }
 
 // Interface: RootAttacher
