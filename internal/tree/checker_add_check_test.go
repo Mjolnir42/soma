@@ -17,6 +17,8 @@ import (
 )
 
 func TestCheckerAddCheck(t *testing.T) {
+	deterministicInheritanceOrder = true
+
 	sTree, actionC, errC := testSpawnCheckTree()
 
 	chkConfigID := uuid.Must(uuid.NewV4())
@@ -127,9 +129,12 @@ func TestCheckerAddCheck(t *testing.T) {
 		}
 		elem++
 	}
+	deterministicInheritanceOrder = false
 }
 
 func TestCheckerDeleteCheck(t *testing.T) {
+	deterministicInheritanceOrder = true
+
 	sTree, actionC, errC := testSpawnCheckTree()
 
 	chkConfigID := uuid.Must(uuid.NewV4())
@@ -273,6 +278,7 @@ func TestCheckerDeleteCheck(t *testing.T) {
 		}
 		elem++
 	}
+	deterministicInheritanceOrder = false
 }
 
 func testSpawnCheckTree() (*Tree, chan *Action, chan *Error) {

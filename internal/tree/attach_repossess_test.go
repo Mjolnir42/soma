@@ -96,6 +96,8 @@ func TestRepossessRepository(t *testing.T) {
 		t.Error(`missing action:`, actions[elem][0], actions[elem][1])
 		elem++
 	}
+
+	deterministicInheritanceOrder = false
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
