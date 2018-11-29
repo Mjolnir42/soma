@@ -923,6 +923,41 @@ UPDATE soma.buckets
 SET    bucket_deleted = 'true'::boolean
 WHERE  bucket_id = $1::uuid;`
 
+	TxRepositoryRepossess = `
+UPDATE soma.repository
+SET    team_id = $2::uuid,
+       created_by = ( SELECT id FROM inventory.user
+                      WHERE uid = $3::varchar)
+WHERE  id = $1::uuid;`
+
+	TxBucketRepossess = `
+UPDATE soma.buckets
+SET    organizational_team_id = $2::uuid,
+       created_by = ( SELECT id FROM inventory.user
+                      WHERE uid = $3::varchar)
+WHERE  bucket_id = $1::uuid;`
+
+	TxGroupRepossess = `
+UPDATE soma.groups
+SET    organizational_team_id = $2::uuid,
+       created_by = ( SELECT id FROM inventory.user
+                      WHERE uid = $3::varchar)
+WHERE  group_id = $1::uuid;`
+
+	TxClusterRepossess = `
+UPDATE soma.clusters
+SET    organizational_team_id = $2::uuid,
+       created_by = ( SELECT id FROM inventory.user
+                      WHERE uid = $3::varchar)
+WHERE  cluster_id = $1::uuid;`
+
+	TxNodeRepossess = `
+UPDATE soma.nodes
+SET    organizational_team_id = $2::uuid,
+       created_by = ( SELECT id FROM inventory.user
+                      WHERE uid = $3::varchar)
+WHERE  node_id = $1::uuid;`
+
 	TxDeployDetailsCheckInstance = `
 SELECT scic.version,
        scic.check_instance_id,
@@ -1290,10 +1325,15 @@ func init() {
 	m[TxRepositoryPropertySystemCreate] = `TxRepositoryPropertySystemCreate`
 	m[TxRepositoryPropertySystemDelete] = `TxRepositoryPropertySystemDelete`
 	m[TxUpdateNodeState] = `TxUpdateNodeState`
-	m[TxRepositoryRename] = `TxRepositoryRename`
 	m[TxRepositoryDestroy] = `TxRepositoryDestroy`
-	m[TxBucketRename] = `TxBucketRename`
+	m[TxRepositoryRename] = `TxRepositoryRename`
 	m[TxBucketDestroy] = `TxBucketDestroy`
+	m[TxBucketRename] = `TxBucketRename`
+	m[TxRepositoryRepossess] = `TxRepositoryRepossess`
+	m[TxBucketRepossess] = `TxBucketRepossess`
+	m[TxGroupRepossess] = `TxGroupRepossess`
+	m[TxClusterRepossess] = `TxClusterRepossess`
+	m[TxNodeRepossess] = `TxNodeRepossess`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

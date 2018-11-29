@@ -97,6 +97,11 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 		case msg.SectionRepository:
 			return false, nil
 		}
+	case msg.ActionRepossess:
+		switch q.Section {
+		case msg.SectionRepository:
+			return false, nil
+		}
 	}
 	return false, fmt.Errorf("Unimplemented guidepost/%s::%s", q.Section, q.Action)
 }

@@ -15,13 +15,16 @@ import (
 )
 
 func (tk *TreeKeeper) treeRepository(q *msg.Request) {
-	if q.Section == msg.SectionRepository && q.Action == msg.ActionRename {
+	switch {
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionRename:
 		tk.tree.Find(tree.FindRequest{
 			ElementID:   q.Repository.ID,
 			ElementType: `repository`,
 		}, true).SetName(
 			q.Update.Repository.Name,
 		)
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionRepossess:
+		tk.tree.SetTeamID(q.Update.Repository.TeamID)
 	}
 }
 

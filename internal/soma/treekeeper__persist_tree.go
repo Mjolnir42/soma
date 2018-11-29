@@ -23,6 +23,8 @@ func (tk *TreeKeeper) txTree(a *tree.Action,
 		return tk.txTreeCreate(a, stm, user)
 	case tree.ActionRename:
 		return tk.txTreeRename(a, stm, user)
+	case tree.ActionRepossess:
+		return tk.txTreeRepossess(a, stm, user)
 	case tree.ActionUpdate:
 		return tk.txTreeUpdate(a, stm)
 	case tree.ActionDelete:
@@ -87,6 +89,44 @@ func (tk *TreeKeeper) txTreeRename(a *tree.Action,
 		_, err = stm[`bucket::rename`].Exec(
 			a.Bucket.ID,
 			a.Bucket.Name,
+			user,
+		)
+	}
+	return err
+}
+
+func (tk *TreeKeeper) txTreeRepossess(a *tree.Action,
+	stm map[string]*sql.Stmt, user string) error {
+	var err error
+	switch a.Type {
+	case msg.EntityRepository:
+		_, err = stm[`repository::repossess`].Exec(
+			a.Repository.ID,
+			a.Repository.TeamID,
+			user,
+		)
+	case msg.EntityBucket:
+		_, err = stm[`bucket::repossess`].Exec(
+			a.Bucket.ID,
+			a.Bucket.TeamID,
+			user,
+		)
+	case msg.EntityGroup:
+		_, err = stm[`group::repossess`].Exec(
+			a.Group.ID,
+			a.Group.TeamID,
+			user,
+		)
+	case msg.EntityCluster:
+		_, err = stm[`cluster::repossess`].Exec(
+			a.Cluster.ID,
+			a.Cluster.TeamID,
+			user,
+		)
+	case msg.EntityNode:
+		_, err = stm[`node::repossess`].Exec(
+			a.Node.ID,
+			a.Node.TeamID,
 			user,
 		)
 	}

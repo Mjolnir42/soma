@@ -472,6 +472,9 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		tk.treeBucket(q)
 	case q.Section == msg.SectionRepository && q.Action == msg.ActionRename:
 		tk.treeRepository(q)
+	// tree object: repossession requests
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionRepossess:
+		tk.treeRepository(q)
 	}
 
 	// check if we accumulated an error in one of the switch cases
@@ -600,6 +603,7 @@ actionloop:
 			tree.ActionMemberRemoved,
 			tree.ActionNodeAssignment,
 			tree.ActionRename,
+			tree.ActionRepossess,
 			tree.ActionUpdate:
 			if err = tk.txTree(a, stm, q.AuthUser); err != nil {
 				break actionloop
@@ -868,8 +872,13 @@ func (tk *TreeKeeper) startTx() (
 		`UpdateNodeState`:          stmt.TxUpdateNodeState,
 		`repository::rename`:       stmt.TxRepositoryRename,
 		`repository::destroy`:      stmt.TxRepositoryDestroy,
+		`repository::repossess`:    stmt.TxRepositoryRepossess,
 		`bucket::rename`:           stmt.TxBucketRename,
 		`bucket::destroy`:          stmt.TxBucketDestroy,
+		`bucket::repossess`:        stmt.TxBucketRepossess,
+		`group::repossess`:         stmt.TxGroupRepossess,
+		`cluster::repossess`:       stmt.TxClusterRepossess,
+		`node::repossess`:          stmt.TxNodeRepossess,
 	} {
 		if stMap[name], err = tx.Prepare(statement); err != nil {
 			err = fmt.Errorf("tk.Prepare(%s) error: %s",
