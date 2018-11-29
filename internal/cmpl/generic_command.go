@@ -38,6 +38,10 @@ func From(c *cli.Context) {
 	Generic(c, []string{`from`})
 }
 
+func FromTo(c *cli.Context) {
+	Generic(c, []string{`from`, `to`})
+}
+
 func FromView(c *cli.Context) {
 	Generic(c, []string{`from`, `view`})
 }

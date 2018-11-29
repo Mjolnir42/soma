@@ -1,5 +1,6 @@
 /*-
  * Copyright (c) 2015-2018, Jörg Pernfuß
+ * Copyright (c) 2018, 1&1 IONOS SE
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -15,50 +16,6 @@ import (
 	"github.com/mjolnir42/soma/internal/adm"
 )
 
-func cmdRepositoryDestroy(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-	var teamID string
-	if err := adm.LookupTeamByRepo(id, &teamID); err != nil {
-		return err
-	}
-	path := fmt.Sprintf("/team/%s/repository/%s", teamID, id)
-
-	return adm.Perform(`delete`, path, `command`, nil, c)
-}
-
-func cmdRepositoryRename(c *cli.Context) error {
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		[]string{`to`},
-		[]string{`to`},
-		c.Args().Tail()); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-	var teamID string
-	if err := adm.LookupTeamByRepo(id, &teamID); err != nil {
-		return err
-	}
-	path := fmt.Sprintf("/team/%s/repository/%s", teamID, id)
-
-	var req proto.Request
-	req.Repository = &proto.Repository{}
-	req.Repository.Name = opts[`to`][0]
-
-	return adm.Perform(`patchbody`, path, `command`, req, c)
-}
-
 func cmdRepositoryInstance(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
@@ -70,19 +27,6 @@ func cmdRepositoryInstance(c *cli.Context) error {
 
 	path := fmt.Sprintf("/repository/%s/instance/", id)
 	return adm.Perform(`get`, path, `list`, nil, c)
-}
-
-func cmdRepositoryTree(c *cli.Context) error {
-	if err := adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	id, err := adm.LookupRepoID(c.Args().First())
-	if err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/repository/%s/tree", id)
-	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 
 func cmdRepositorySystemPropertyAdd(c *cli.Context) error {

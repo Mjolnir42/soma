@@ -468,6 +468,9 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		tk.treeGroup(q)
 	case q.Section == msg.SectionBucket && q.Action == msg.ActionCreate:
 		tk.treeBucket(q)
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy:
+		tk.treeRepository(q)
+	// tree object: rename requests
 	case q.Section == msg.SectionBucket && q.Action == msg.ActionRename:
 		tk.treeBucket(q)
 	case q.Section == msg.SectionRepository && q.Action == msg.ActionRename:
@@ -482,8 +485,13 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		goto bailout
 	}
 
-	// recalculate check instances
-	tk.tree.ComputeCheckInstances()
+	// recalculate check instances, unless the job destroyed the
+	// repository
+	switch {
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy:
+	default:
+		tk.tree.ComputeCheckInstances()
+	}
 
 	// open multi-statement transaction
 	if tx, stm, err = tk.startTx(); err != nil {
@@ -497,20 +505,30 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		goto bailout
 	}
 
-	// save the check configuration as part of the transaction before
-	// processing the action channel
-	if q.Section == msg.SectionCheckConfig && q.Action == msg.ActionCreate {
-		if err = tk.txCheckConfig(q.CheckConfig,
-			stm); err != nil {
+	switch {
+	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionCreate:
+		// save the check configuration as part of the transaction before
+		// processing the action channel
+		if err = tk.txCheckConfig(
+			q.CheckConfig,
+			stm,
+		); err != nil {
 			goto bailout
 		}
-	}
-
-	// mark the check configuration as deleted
-	if q.Section == msg.SectionCheckConfig && q.Action == msg.ActionDestroy {
+	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionDestroy:
+		// mark the check configuration as deleted
 		if _, err = tx.Exec(
 			stmt.TxMarkCheckConfigDeleted,
 			q.CheckConfig.ID,
+		); err != nil {
+			goto bailout
+		}
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy:
+		// mark all check configurations deleted if the repository is
+		// being destroyed
+		if _, err = tx.Exec(
+			stmt.TxMarkAllCheckConfigDeletedForRepo,
+			q.Repository.ID,
 		); err != nil {
 			goto bailout
 		}
@@ -608,6 +626,11 @@ actionloop:
 			if err = tk.txTree(a, stm, q.AuthUser); err != nil {
 				break actionloop
 			}
+		case `remove_actionchannel`:
+			if a.Type == `fault` && q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy {
+				// expected no-op for this request
+				continue actionloop
+			}
 		default:
 			err = fmt.Errorf(
 				"Unhandled message in action stream: %s/%s",
@@ -666,6 +689,13 @@ actionloop:
 				super.Update <- msg.CacheUpdateFromRequest(q)
 			}()
 		}
+	}
+	// shutdown if the successful job was a repository::destroy
+	switch {
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy:
+		tk.ShutdownNow()
+		keeper := fmt.Sprintf("repository_%s", tk.meta.repoName)
+		tk.soma.handlerMap.Del(keeper)
 	}
 	return
 

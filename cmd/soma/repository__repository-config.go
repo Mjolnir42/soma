@@ -11,6 +11,7 @@ package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
@@ -99,6 +100,23 @@ func repositoryConfigSearch(c *cli.Context) error {
 	}
 
 	return adm.Perform(`postbody`, `/search/repository/`, `list`, req, c)
+}
+
+// repositoryConfigTree function
+// soma repository dumptree ${repository}
+func repositoryConfigTree(c *cli.Context) error {
+	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+	repositoryID, err := adm.LookupRepoID(c.Args().First())
+	if err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/repository/%s/tree", url.QueryEscape(
+		repositoryID,
+	))
+	return adm.Perform(`get`, path, `tree`, nil, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

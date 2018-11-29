@@ -89,7 +89,7 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 		}
 	case msg.ActionDestroy:
 		switch q.Section {
-		case msg.SectionCheckConfig:
+		case msg.SectionCheckConfig, msg.SectionRepository:
 			return false, nil
 		}
 	case msg.ActionRename:

@@ -18,6 +18,91 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
+// repositoryDestroy function
+// soma repository destroy ${repository} [from ${team}]
+func repositoryDestroy(c *cli.Context) error {
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`team`}
+	mandatoryOptions := []string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail(),
+	); err != nil {
+		return err
+	}
+
+	repositoryID, err := adm.LookupRepoID(c.Args().First())
+	if err != nil {
+		return err
+	}
+
+	var teamID string
+	if _, ok := opts[`team`]; ok {
+		if err := adm.LookupTeamID(opts[`team`][0], &teamID); err != nil {
+			return err
+		}
+	} else {
+		if err := adm.LookupTeamByRepo(repositoryID, &teamID); err != nil {
+			return err
+		}
+	}
+
+	path := fmt.Sprintf("/team/%s/repository/%s",
+		url.QueryEscape(teamID),
+		url.QueryEscape(repositoryID),
+	)
+	return adm.Perform(`delete`, path, `command`, nil, c)
+}
+
+// repositoryRename function
+// soma repository rename ${repository} to ${newName} [from ${team}]
+func repositoryRename(c *cli.Context) error {
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`to`, `from`}
+	mandatoryOptions := []string{`to`}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail(),
+	); err != nil {
+		return err
+	}
+
+	req := proto.NewRepositoryRequest()
+	req.Repository.Name = opts[`to`][0]
+
+	repositoryID, err := adm.LookupRepoID(c.Args().First())
+	if err != nil {
+		return err
+	}
+
+	var teamID string
+	if _, ok := opts[`team`]; ok {
+		if err := adm.LookupTeamID(opts[`team`][0], &teamID); err != nil {
+			return err
+		}
+	} else {
+		if err := adm.LookupTeamByRepo(repositoryID, &teamID); err != nil {
+			return err
+		}
+	}
+
+	path := fmt.Sprintf(
+		"/team/%s/repository/%s/name",
+		url.QueryEscape(teamID),
+		url.QueryEscape(repositoryID),
+	)
+	return adm.Perform(`patchbody`, path, `command`, req, c)
+}
 
 // repositoryShow function
 // soma repository show ${repository} [from ${team}]
@@ -62,6 +147,54 @@ func repositoryShow(c *cli.Context) error {
 
 // TODO repositoryAudit
 
-// TODO repositoryRepossess
+// repositoryRepossess function
+// soma repository repossess ${repository} to ${newTeam} [from ${team}]
+func repositoryRepossess(c *cli.Context) error {
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`to`, `from`}
+	mandatoryOptions := []string{`to`}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail(),
+	); err != nil {
+		return err
+	}
+
+	var newOwnerTeamID string
+	if err := adm.LookupTeamID(opts[`to`][0], &newOwnerTeamID); err != nil {
+		return err
+	}
+
+	req := proto.NewRepositoryRequest()
+	req.Repository.TeamID = newOwnerTeamID
+
+	repositoryID, err := adm.LookupRepoID(c.Args().First())
+	if err != nil {
+		return err
+	}
+
+	var currentOwnerTeamID string
+	if _, ok := opts[`team`]; ok {
+		if err := adm.LookupTeamID(opts[`team`][0], &currentOwnerTeamID); err != nil {
+			return err
+		}
+	} else {
+		if err := adm.LookupTeamByRepo(repositoryID, &currentOwnerTeamID); err != nil {
+			return err
+		}
+	}
+
+	path := fmt.Sprintf(
+		"/team/%s/repository/%s/owner",
+		url.QueryEscape(currentOwnerTeamID),
+		url.QueryEscape(repositoryID),
+	)
+	return adm.Perform(`patchbody`, path, `command`, req, c)
+}
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

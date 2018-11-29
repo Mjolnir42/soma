@@ -19,7 +19,6 @@ import (
 func registerRepository(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
-			// repository
 			{
 				Name:        `repository`,
 				Usage:       `SUBCOMMANDS for repository management`,
@@ -31,6 +30,27 @@ func registerRepository(app cli.App) *cli.App {
 						Description:  help.Text(`repository-mgmt::create`),
 						Action:       runtime(repositoryMgmtCreate),
 						BashComplete: cmpl.Team,
+					},
+					{
+						Name:         `destroy`,
+						Usage:        `Destroy an existing repository`,
+						Description:  help.Text(`repository::destroy`),
+						Action:       runtime(repositoryDestroy),
+						BashComplete: cmpl.From,
+					},
+					{
+						Name:         `rename`,
+						Usage:        `Rename an existing repository`,
+						Description:  help.Text(`repository::rename`),
+						Action:       runtime(repositoryRename),
+						BashComplete: cmpl.FromTo,
+					},
+					{
+						Name:         `repossess`,
+						Usage:        `Change the owner team of a repository`,
+						Description:  help.Text(`repository::repossess`),
+						Action:       runtime(repositoryRepossess),
+						BashComplete: cmpl.FromTo,
 					},
 					{
 						Name:        `list`,
@@ -51,6 +71,12 @@ func registerRepository(app cli.App) *cli.App {
 						Description:  help.Text(`repository-config::search`),
 						Action:       runtime(repositoryConfigSearch),
 						BashComplete: cmpl.RepositoryConfigSearch,
+					},
+					{
+						Name:        `dumptree`,
+						Usage:       `Display the repository as tree`,
+						Description: help.Text(`repository-config::tree`),
+						Action:      runtime(repositoryConfigTree),
 					},
 				},
 			},

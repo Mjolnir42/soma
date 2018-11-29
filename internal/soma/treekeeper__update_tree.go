@@ -25,6 +25,11 @@ func (tk *TreeKeeper) treeRepository(q *msg.Request) {
 		)
 	case q.Section == msg.SectionRepository && q.Action == msg.ActionRepossess:
 		tk.tree.SetTeamID(q.Update.Repository.TeamID)
+	case q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy:
+		tk.tree.Find(tree.FindRequest{
+			ElementID:   q.Repository.ID,
+			ElementType: `repository`,
+		}, true).Destroy()
 	}
 }
 

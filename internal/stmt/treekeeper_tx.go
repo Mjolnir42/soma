@@ -21,6 +21,12 @@ UPDATE soma.check_configurations
 SET    deleted = 'yes'::boolean
 WHERE  configuration_id = $1::uuid;`
 
+	TxMarkAllCheckConfigDeletedForRepo = `
+UPDATE soma.check_configurations
+SET    deleted = 'yes'::boolean
+WHERE  repository_id = $1::uuid
+  AND  NOT deleted;`
+
 	TxCreateCheck = `
 INSERT INTO soma.checks (
             check_id,
@@ -1334,6 +1340,7 @@ func init() {
 	m[TxGroupRepossess] = `TxGroupRepossess`
 	m[TxClusterRepossess] = `TxClusterRepossess`
 	m[TxNodeRepossess] = `TxNodeRepossess`
+	m[TxMarkAllCheckConfigDeletedForRepo] = `TxMarkAllCheckConfigDeletedForRepo`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
