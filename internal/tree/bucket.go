@@ -227,33 +227,36 @@ func (teb *Bucket) ComputeCheckInstances() {
 		`bucket`,
 		teb.ID.String(),
 	)
-	/* var wg sync.WaitGroup
-	for child, _ := range teb.Children {
-		wg.Add(1)
-		c := child
-		go func() {
-			defer wg.Done()
-			teb.Children[c].ComputeCheckInstances()
-		}()
-	}
-	wg.Wait() */
-	// groups
-	for i := 0; i < teb.ordNumChildGrp; i++ {
-		if child, ok := teb.ordChildrenGrp[i]; ok {
-			teb.Children[child].ComputeCheckInstances()
+	switch deterministicInheritanceOrder {
+	case true:
+		// groups
+		for i := 0; i < teb.ordNumChildGrp; i++ {
+			if child, ok := teb.ordChildrenGrp[i]; ok {
+				teb.Children[child].ComputeCheckInstances()
+			}
 		}
-	}
-	// clusters
-	for i := 0; i < teb.ordNumChildClr; i++ {
-		if child, ok := teb.ordChildrenClr[i]; ok {
-			teb.Children[child].ComputeCheckInstances()
+		// clusters
+		for i := 0; i < teb.ordNumChildClr; i++ {
+			if child, ok := teb.ordChildrenClr[i]; ok {
+				teb.Children[child].ComputeCheckInstances()
+			}
 		}
-	}
-	// nodes
-	for i := 0; i < teb.ordNumChildNod; i++ {
-		if child, ok := teb.ordChildrenNod[i]; ok {
-			teb.Children[child].ComputeCheckInstances()
+		// nodes
+		for i := 0; i < teb.ordNumChildNod; i++ {
+			if child, ok := teb.ordChildrenNod[i]; ok {
+				teb.Children[child].ComputeCheckInstances()
+			}
 		}
+	default:
+		var wg sync.WaitGroup
+		for child, _ := range teb.Children {
+			wg.Add(1)
+			go func(c string) {
+				defer wg.Done()
+				teb.Children[c].ComputeCheckInstances()
+			}(child)
+		}
+		wg.Wait()
 	}
 }
 

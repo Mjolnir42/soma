@@ -307,35 +307,38 @@ func (teg *Group) ComputeCheckInstances() {
 		`group`,
 		teg.ID.String(),
 	)
-	/* var wg sync.WaitGroup
-	for child := range teg.Children {
-		wg.Add(1)
-		c := child
-		go func() {
-			defer wg.Done()
-			teg.Children[c].ComputeCheckInstances()
-		}()
-	}
-	wg.Wait() */
-	// groups
-	for i := 0; i < teg.ordNumChildGrp; i++ {
-		if child, ok := teg.ordChildrenGrp[i]; ok {
-			teg.Children[child].ComputeCheckInstances()
+	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		// groups
+		for i := 0; i < teg.ordNumChildGrp; i++ {
+			if child, ok := teg.ordChildrenGrp[i]; ok {
+				teg.Children[child].ComputeCheckInstances()
+			}
 		}
-	}
-	// clusters
-	for i := 0; i < teg.ordNumChildClr; i++ {
-		if child, ok := teg.ordChildrenClr[i]; ok {
-			teg.Children[child].ComputeCheckInstances()
+		// clusters
+		for i := 0; i < teg.ordNumChildClr; i++ {
+			if child, ok := teg.ordChildrenClr[i]; ok {
+				teg.Children[child].ComputeCheckInstances()
+			}
 		}
-	}
-	// nodes
-	for i := 0; i < teg.ordNumChildNod; i++ {
-		if child, ok := teg.ordChildrenNod[i]; ok {
-			teg.Children[child].ComputeCheckInstances()
+		// nodes
+		for i := 0; i < teg.ordNumChildNod; i++ {
+			if child, ok := teg.ordChildrenNod[i]; ok {
+				teg.Children[child].ComputeCheckInstances()
+			}
+		}
+	default:
+		for child := range teg.Children {
+			wg.Add(1)
+			go func(ch string) {
+				defer wg.Done()
+				teg.Children[ch].ComputeCheckInstances()
+			}(child)
 		}
 	}
 	teg.updateCheckInstances()
+	wg.Wait()
 }
 
 //

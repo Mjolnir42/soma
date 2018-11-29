@@ -9,7 +9,7 @@
 package tree
 
 import (
-	//	"sync"
+	"sync"
 
 	"github.com/satori/go.uuid"
 )
@@ -54,34 +54,36 @@ func (teg *Group) setCheckInherited(c Check) {
 }
 
 func (teg *Group) setCheckOnChildren(c Check) {
-	/*	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		// groups
+		for i := 0; i < teg.ordNumChildGrp; i++ {
+			if child, ok := teg.ordChildrenGrp[i]; ok {
+				teg.Children[child].(Checker).setCheckInherited(c)
+			}
+		}
+		// clusters
+		for i := 0; i < teg.ordNumChildClr; i++ {
+			if child, ok := teg.ordChildrenClr[i]; ok {
+				teg.Children[child].(Checker).setCheckInherited(c)
+			}
+		}
+		// nodes
+		for i := 0; i < teg.ordNumChildNod; i++ {
+			if child, ok := teg.ordChildrenNod[i]; ok {
+				teg.Children[child].(Checker).setCheckInherited(c)
+			}
+		}
+	default:
+		var wg sync.WaitGroup
 		for child, _ := range teg.Children {
 			wg.Add(1)
-			ch := child
-			go func(stc Check) {
+			go func(stc Check, ch string) {
 				defer wg.Done()
 				teg.Children[ch].(Checker).setCheckInherited(stc)
-			}(c)
+			}(c, child)
 		}
-		wg.Wait() */
-
-	// groups
-	for i := 0; i < teg.ordNumChildGrp; i++ {
-		if child, ok := teg.ordChildrenGrp[i]; ok {
-			teg.Children[child].(Checker).setCheckInherited(c)
-		}
-	}
-	// clusters
-	for i := 0; i < teg.ordNumChildClr; i++ {
-		if child, ok := teg.ordChildrenClr[i]; ok {
-			teg.Children[child].(Checker).setCheckInherited(c)
-		}
-	}
-	// nodes
-	for i := 0; i < teg.ordNumChildNod; i++ {
-		if child, ok := teg.ordChildrenNod[i]; ok {
-			teg.Children[child].(Checker).setCheckInherited(c)
-		}
+		wg.Wait()
 	}
 }
 
@@ -105,7 +107,28 @@ func (teg *Group) deleteCheckInherited(c Check) {
 }
 
 func (teg *Group) deleteCheckOnChildren(c Check) {
-	/*	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		// groups
+		for i := 0; i < teg.ordNumChildGrp; i++ {
+			if child, ok := teg.ordChildrenGrp[i]; ok {
+				teg.Children[child].(Checker).deleteCheckInherited(c)
+			}
+		}
+		// clusters
+		for i := 0; i < teg.ordNumChildClr; i++ {
+			if child, ok := teg.ordChildrenClr[i]; ok {
+				teg.Children[child].(Checker).deleteCheckInherited(c)
+			}
+		}
+		// nodes
+		for i := 0; i < teg.ordNumChildNod; i++ {
+			if child, ok := teg.ordChildrenNod[i]; ok {
+				teg.Children[child].(Checker).deleteCheckInherited(c)
+			}
+		}
+	default:
+		var wg sync.WaitGroup
 		for child, _ := range teg.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
@@ -113,25 +136,7 @@ func (teg *Group) deleteCheckOnChildren(c Check) {
 				teg.Children[ch].(Checker).deleteCheckInherited(stc)
 			}(c, child)
 		}
-		wg.Wait() */
-
-	// groups
-	for i := 0; i < teg.ordNumChildGrp; i++ {
-		if child, ok := teg.ordChildrenGrp[i]; ok {
-			teg.Children[child].(Checker).deleteCheckInherited(c)
-		}
-	}
-	// clusters
-	for i := 0; i < teg.ordNumChildClr; i++ {
-		if child, ok := teg.ordChildrenClr[i]; ok {
-			teg.Children[child].(Checker).deleteCheckInherited(c)
-		}
-	}
-	// nodes
-	for i := 0; i < teg.ordNumChildNod; i++ {
-		if child, ok := teg.ordChildrenNod[i]; ok {
-			teg.Children[child].(Checker).deleteCheckInherited(c)
-		}
+		wg.Wait()
 	}
 }
 

@@ -252,20 +252,24 @@ func (ter *Repository) ComputeCheckInstances() {
 		`repository`,
 		ter.ID.String(),
 	)
-	/*	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		// buckets
+		for i := 0; i < ter.ordNumChildBck; i++ {
+			if child, ok := ter.ordChildrenBck[i]; ok {
+				ter.Children[child].ComputeCheckInstances()
+			}
+		}
+	default:
+		var wg sync.WaitGroup
 		for child := range ter.Children {
 			wg.Add(1)
-			c := child
-			go func() {
+			go func(c string) {
 				defer wg.Done()
 				ter.Children[c].ComputeCheckInstances()
-			}()
+			}(child)
 		}
-		wg.Wait() */
-	for i := 0; i < ter.ordNumChildBck; i++ {
-		if child, ok := ter.ordChildrenBck[i]; ok {
-			ter.Children[child].ComputeCheckInstances()
-		}
+		wg.Wait()
 	}
 }
 

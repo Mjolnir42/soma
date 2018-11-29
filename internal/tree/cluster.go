@@ -285,22 +285,25 @@ func (tec *Cluster) ComputeCheckInstances() {
 		`cluster`,
 		tec.ID.String(),
 	)
-	/* var wg sync.WaitGroup
-	for child := range tec.Children {
-		wg.Add(1)
-		c := child
-		go func() {
-			defer wg.Done()
-			tec.Children[c].ComputeCheckInstances()
-		}()
-	}
-	wg.Wait() */
-	for i := 0; i < tec.ordNumChildNod; i++ {
-		if child, ok := tec.ordChildrenNod[i]; ok {
-			tec.Children[child].ComputeCheckInstances()
+	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		for i := 0; i < tec.ordNumChildNod; i++ {
+			if child, ok := tec.ordChildrenNod[i]; ok {
+				tec.Children[child].ComputeCheckInstances()
+			}
+		}
+	default:
+		for child := range tec.Children {
+			wg.Add(1)
+			go func(ch string) {
+				defer wg.Done()
+				tec.Children[ch].ComputeCheckInstances()
+			}(child)
 		}
 	}
 	tec.updateCheckInstances()
+	wg.Wait()
 }
 
 //

@@ -9,8 +9,8 @@
 package tree
 
 import (
-	//"sync"
 	"github.com/satori/go.uuid"
+	"sync"
 )
 
 // Implementation of the `Checker` interface
@@ -53,34 +53,36 @@ func (teb *Bucket) setCheckInherited(c Check) {
 }
 
 func (teb *Bucket) setCheckOnChildren(c Check) {
-	/*	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		// groups
+		for i := 0; i < teb.ordNumChildGrp; i++ {
+			if child, ok := teb.ordChildrenGrp[i]; ok {
+				teb.Children[child].(Checker).setCheckInherited(c)
+			}
+		}
+		// clusters
+		for i := 0; i < teb.ordNumChildClr; i++ {
+			if child, ok := teb.ordChildrenClr[i]; ok {
+				teb.Children[child].(Checker).setCheckInherited(c)
+			}
+		}
+		// nodes
+		for i := 0; i < teb.ordNumChildNod; i++ {
+			if child, ok := teb.ordChildrenNod[i]; ok {
+				teb.Children[child].(Checker).setCheckInherited(c)
+			}
+		}
+	default:
+		var wg sync.WaitGroup
 		for child, _ := range teb.Children {
 			wg.Add(1)
-			ch := child
-			go func(stc Check) {
+			go func(stc Check, ch string) {
 				defer wg.Done()
 				teb.Children[ch].(Checker).setCheckInherited(stc)
-			}(c)
+			}(c, child)
 		}
-		wg.Wait() */
-
-	// groups
-	for i := 0; i < teb.ordNumChildGrp; i++ {
-		if child, ok := teb.ordChildrenGrp[i]; ok {
-			teb.Children[child].(Checker).setCheckInherited(c)
-		}
-	}
-	// clusters
-	for i := 0; i < teb.ordNumChildClr; i++ {
-		if child, ok := teb.ordChildrenClr[i]; ok {
-			teb.Children[child].(Checker).setCheckInherited(c)
-		}
-	}
-	// nodes
-	for i := 0; i < teb.ordNumChildNod; i++ {
-		if child, ok := teb.ordChildrenNod[i]; ok {
-			teb.Children[child].(Checker).setCheckInherited(c)
-		}
+		wg.Wait()
 	}
 }
 
@@ -103,7 +105,28 @@ func (teb *Bucket) deleteCheckInherited(c Check) {
 }
 
 func (teb *Bucket) deleteCheckOnChildren(c Check) {
-	/*	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		// groups
+		for i := 0; i < teb.ordNumChildGrp; i++ {
+			if child, ok := teb.ordChildrenGrp[i]; ok {
+				teb.Children[child].(Checker).deleteCheckInherited(c)
+			}
+		}
+		// clusters
+		for i := 0; i < teb.ordNumChildClr; i++ {
+			if child, ok := teb.ordChildrenClr[i]; ok {
+				teb.Children[child].(Checker).deleteCheckInherited(c)
+			}
+		}
+		// nodes
+		for i := 0; i < teb.ordNumChildNod; i++ {
+			if child, ok := teb.ordChildrenNod[i]; ok {
+				teb.Children[child].(Checker).deleteCheckInherited(c)
+			}
+		}
+	default:
+		var wg sync.WaitGroup
 		for child, _ := range teb.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
@@ -111,25 +134,8 @@ func (teb *Bucket) deleteCheckOnChildren(c Check) {
 				teb.Children[ch].(Checker).deleteCheckInherited(stc)
 			}(c, child)
 		}
-		wg.Wait() */
+		wg.Wait()
 
-	// groups
-	for i := 0; i < teb.ordNumChildGrp; i++ {
-		if child, ok := teb.ordChildrenGrp[i]; ok {
-			teb.Children[child].(Checker).deleteCheckInherited(c)
-		}
-	}
-	// clusters
-	for i := 0; i < teb.ordNumChildClr; i++ {
-		if child, ok := teb.ordChildrenClr[i]; ok {
-			teb.Children[child].(Checker).deleteCheckInherited(c)
-		}
-	}
-	// nodes
-	for i := 0; i < teb.ordNumChildNod; i++ {
-		if child, ok := teb.ordChildrenNod[i]; ok {
-			teb.Children[child].(Checker).deleteCheckInherited(c)
-		}
 	}
 }
 

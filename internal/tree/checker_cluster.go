@@ -9,7 +9,7 @@
 package tree
 
 import (
-	//"sync"
+	"sync"
 
 	"github.com/satori/go.uuid"
 )
@@ -54,22 +54,24 @@ func (tec *Cluster) setCheckInherited(c Check) {
 }
 
 func (tec *Cluster) setCheckOnChildren(c Check) {
-	/*	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		// nodes
+		for i := 0; i < tec.ordNumChildNod; i++ {
+			if child, ok := tec.ordChildrenNod[i]; ok {
+				tec.Children[child].(Checker).setCheckInherited(c)
+			}
+		}
+	default:
+		var wg sync.WaitGroup
 		for child, _ := range tec.Children {
 			wg.Add(1)
-			ch := child
-			go func(stc Check) {
+			go func(stc Check, ch string) {
 				defer wg.Done()
 				tec.Children[ch].(Checker).setCheckInherited(stc)
-			}(c)
+			}(c, child)
 		}
-		wg.Wait() */
-
-	// nodes
-	for i := 0; i < tec.ordNumChildNod; i++ {
-		if child, ok := tec.ordChildrenNod[i]; ok {
-			tec.Children[child].(Checker).setCheckInherited(c)
-		}
+		wg.Wait()
 	}
 }
 
@@ -93,7 +95,15 @@ func (tec *Cluster) deleteCheckInherited(c Check) {
 }
 
 func (tec *Cluster) deleteCheckOnChildren(c Check) {
-	/*	var wg sync.WaitGroup
+	switch deterministicInheritanceOrder {
+	case true:
+		for i := 0; i < tec.ordNumChildNod; i++ {
+			if child, ok := tec.ordChildrenNod[i]; ok {
+				tec.Children[child].(Checker).deleteCheckInherited(c)
+			}
+		}
+	default:
+		var wg sync.WaitGroup
 		for child, _ := range tec.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
@@ -101,12 +111,7 @@ func (tec *Cluster) deleteCheckOnChildren(c Check) {
 				tec.Children[ch].(Checker).deleteCheckInherited(stc)
 			}(c, child)
 		}
-		wg.Wait() */
-
-	for i := 0; i < tec.ordNumChildNod; i++ {
-		if child, ok := tec.ordChildrenNod[i]; ok {
-			tec.Children[child].(Checker).deleteCheckInherited(c)
-		}
+		wg.Wait()
 	}
 }
 
