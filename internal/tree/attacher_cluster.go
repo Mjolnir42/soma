@@ -76,8 +76,8 @@ func (tec *Cluster) Destroy() {
 	tec.actionDelete()
 	tec.deletePropertyAllLocal()
 	tec.deletePropertyAllInherited()
-	// TODO delete all checks + check instances
-	// TODO delete all inherited checks + check instances
+	tec.deleteCheckLocalAll()
+	tec.updateCheckInstances()
 
 	wg := new(sync.WaitGroup)
 	for child := range tec.Children {

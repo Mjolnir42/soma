@@ -31,6 +31,7 @@ type Checker interface {
 
 	deleteCheckInherited(c Check)
 	deleteCheckOnChildren(c Check)
+	deleteCheckLocalAll()
 	rmCheck(c Check)
 
 	syncCheck(childID string)

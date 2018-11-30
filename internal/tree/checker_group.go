@@ -140,6 +140,23 @@ func (teg *Group) deleteCheckOnChildren(c Check) {
 	}
 }
 
+func (teg *Group) deleteCheckLocalAll() {
+	localChecks := make(chan *Check, len(teg.Checks)+1)
+
+	for _, check := range teg.Checks {
+		if check.GetIsInherited() {
+			// not a locally configured check
+			continue
+		}
+		localChecks <- &check
+	}
+	close(localChecks)
+
+	for check := range localChecks {
+		teg.DeleteCheck(check.Clone())
+	}
+}
+
 func (teg *Group) rmCheck(c Check) {
 	for id := range teg.Checks {
 		if uuid.Equal(teg.Checks[id].SourceID, c.SourceID) {

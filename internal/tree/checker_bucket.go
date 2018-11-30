@@ -139,6 +139,23 @@ func (teb *Bucket) deleteCheckOnChildren(c Check) {
 	}
 }
 
+func (teb *Bucket) deleteCheckLocalAll() {
+	localChecks := make(chan *Check, len(teb.Checks)+1)
+
+	for _, check := range teb.Checks {
+		if check.GetIsInherited() {
+			// not a locally configured check
+			continue
+		}
+		localChecks <- &check
+	}
+	close(localChecks)
+
+	for check := range localChecks {
+		teb.DeleteCheck(check.Clone())
+	}
+}
+
 func (teb *Bucket) rmCheck(c Check) {
 	for id := range teb.Checks {
 		if uuid.Equal(teb.Checks[id].SourceID, c.SourceID) {

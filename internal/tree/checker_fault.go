@@ -31,6 +31,9 @@ func (tef *Fault) deleteCheckInherited(c Check) {
 func (tef *Fault) deleteCheckOnChildren(c Check) {
 }
 
+func (tef *Fault) deleteCheckLocalAll() {
+}
+
 func (tef *Fault) rmCheck(c Check) {
 }
 

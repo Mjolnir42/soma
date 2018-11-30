@@ -115,6 +115,23 @@ func (tec *Cluster) deleteCheckOnChildren(c Check) {
 	}
 }
 
+func (tec *Cluster) deleteCheckLocalAll() {
+	localChecks := make(chan *Check, len(tec.Checks)+1)
+
+	for _, check := range tec.Checks {
+		if check.GetIsInherited() {
+			// not a locally configured check
+			continue
+		}
+		localChecks <- &check
+	}
+	close(localChecks)
+
+	for check := range localChecks {
+		tec.DeleteCheck(check.Clone())
+	}
+}
+
 func (tec *Cluster) rmCheck(c Check) {
 	for id := range tec.Checks {
 		if uuid.Equal(tec.Checks[id].SourceID, c.SourceID) {

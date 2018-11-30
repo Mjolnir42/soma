@@ -76,8 +76,8 @@ func (teg *Group) Destroy() {
 	teg.actionDelete()
 	teg.deletePropertyAllLocal()
 	teg.deletePropertyAllInherited()
-	// TODO delete all checks + check instances
-	// TODO delete all inherited checks + check instances
+	teg.deleteCheckLocalAll()
+	teg.updateCheckInstances()
 
 	wg := new(sync.WaitGroup)
 	for child := range teg.Children {

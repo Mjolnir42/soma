@@ -114,6 +114,23 @@ func (ter *Repository) deleteCheckOnChildren(c Check) {
 	}
 }
 
+func (ter *Repository) deleteCheckLocalAll() {
+	localChecks := make(chan *Check, len(ter.Checks)+1)
+
+	for _, check := range ter.Checks {
+		if check.GetIsInherited() {
+			// not a locally configured check
+			continue
+		}
+		localChecks <- &check
+	}
+	close(localChecks)
+
+	for check := range localChecks {
+		ter.DeleteCheck(check.Clone())
+	}
+}
+
 func (ter *Repository) rmCheck(c Check) {
 	for id := range ter.Checks {
 		if uuid.Equal(ter.Checks[id].SourceID, c.SourceID) {

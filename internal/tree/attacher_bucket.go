@@ -39,8 +39,7 @@ func (teb *Bucket) Destroy() {
 	}
 	teb.deletePropertyAllLocal()
 	teb.deletePropertyAllInherited()
-	// TODO delete all checks + check instances
-	// TODO delete all inherited checks + check instances
+	teb.deleteCheckLocalAll()
 
 	wg := new(sync.WaitGroup)
 	for child := range teb.Children {

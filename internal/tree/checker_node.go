@@ -64,6 +64,23 @@ func (ten *Node) deleteCheckInherited(c Check) {
 func (ten *Node) deleteCheckOnChildren(c Check) {
 }
 
+func (ten *Node) deleteCheckLocalAll() {
+	localChecks := make(chan *Check, len(ten.Checks)+1)
+
+	for _, check := range ten.Checks {
+		if check.GetIsInherited() {
+			// not a locally configured check
+			continue
+		}
+		localChecks <- &check
+	}
+	close(localChecks)
+
+	for check := range localChecks {
+		ten.DeleteCheck(check.Clone())
+	}
+}
+
 func (ten *Node) rmCheck(c Check) {
 	for id := range ten.Checks {
 		if uuid.Equal(ten.Checks[id].SourceID, c.SourceID) {

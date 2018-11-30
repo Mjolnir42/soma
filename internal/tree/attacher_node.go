@@ -75,8 +75,8 @@ func (ten *Node) Destroy() {
 	ten.actionDelete()
 	ten.deletePropertyAllLocal()
 	ten.deletePropertyAllInherited()
-	// TODO delete all checks + check instances
-	// TODO delete all inherited checks + check instances
+	ten.deleteCheckLocalAll()
+	ten.updateCheckInstances()
 
 	ten.Parent.Unlink(UnlinkRequest{
 		ParentType: ten.Parent.(Builder).GetType(),

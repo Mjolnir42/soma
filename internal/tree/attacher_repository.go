@@ -43,8 +43,7 @@ func (ter *Repository) Destroy() {
 	ter.actionDelete()
 	ter.deletePropertyAllLocal()
 	ter.deletePropertyAllInherited()
-	// TODO delete all checks + check instances
-	// TODO delete all inherited checks + check instances
+	ter.deleteCheckLocalAll()
 
 	wg := new(sync.WaitGroup)
 	for child := range ter.Children {
