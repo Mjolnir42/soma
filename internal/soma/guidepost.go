@@ -258,7 +258,7 @@ func (g *GuidePost) process(q *msg.Request) {
 		result.CheckConfig = append(result.CheckConfig,
 			q.CheckConfig)
 	}
-	result.OK()
+	result.Accepted()
 
 bailout:
 	if err != nil {
