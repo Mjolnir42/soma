@@ -9,8 +9,10 @@
 package tree
 
 import (
+	"io/ioutil"
 	"testing"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/satori/go.uuid"
 )
 
@@ -1219,6 +1221,7 @@ func TestDetachNodeToBucket(t *testing.T) {
 }
 
 func TestDestroyRepository(t *testing.T) {
+	deterministicInheritanceOrder = true
 	actionC := make(chan *Action, 128)
 	errC := make(chan *Error, 128)
 
@@ -1252,6 +1255,7 @@ func TestDestroyRepository(t *testing.T) {
 		ParentID:   rootID,
 	})
 	sTree.SetError()
+	sTree.SwitchLogger(newDiscardLogger())
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -1348,6 +1352,7 @@ func TestDestroyRepository(t *testing.T) {
 	if sTree.Child != nil {
 		t.Error(`Destroy failed`)
 	}
+	deterministicInheritanceOrder = false
 }
 
 func TestDestroyBucket(t *testing.T) {
@@ -1384,6 +1389,7 @@ func TestDestroyBucket(t *testing.T) {
 		ParentID:   rootID,
 	})
 	sTree.SetError()
+	sTree.SwitchLogger(newDiscardLogger())
 
 	// create bucket
 	NewBucket(BucketSpec{
@@ -1628,6 +1634,12 @@ func TestRollbackDetachNodeToBucket(t *testing.T) {
 	}, true) {
 		t.Error(`Bad things`)
 	}
+}
+
+func newDiscardLogger() *logrus.Logger {
+	discardLog := logrus.New()
+	discardLog.Out = ioutil.Discard
+	return discardLog
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
