@@ -19,11 +19,20 @@ import (
 func FindRepoPropSrcID(pType, pName, view, repoID string,
 	id *string) error {
 	var (
-		err  error
-		res  *proto.Result
-		repo proto.Repository
+		err    error
+		res    *proto.Result
+		repo   proto.Repository
+		teamID string
 	)
-	res, err = fetchObjList(fmt.Sprintf("/repository/%s", repoID))
+	if err := LookupTeamByRepo(repoID, &teamID); err != nil {
+		return err
+	}
+
+	res, err = fetchObjList(fmt.Sprintf(
+		"/team/%s/repository/%s",
+		teamID,
+		repoID,
+	))
 	if err != nil {
 		goto abort
 	}
@@ -212,7 +221,7 @@ func findPropSrcID(pType, pName, view string, props []proto.Property,
 				return nil
 			}
 		case `service`:
-			if p.Service.Name == pName {
+			if p.Service.ID == pName {
 				*id = p.SourceInstanceID
 				return nil
 			}

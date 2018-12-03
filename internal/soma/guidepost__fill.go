@@ -77,27 +77,33 @@ func (g *GuidePost) fillNode(q *msg.Request) (bool, error) {
 // database. Replaces whatever the client sent in.
 func (g *GuidePost) fillServiceAttributes(q *msg.Request) (bool, error) {
 	var (
-		service, attr, val, svName, svTeam, repoID string
-		rows                                       *sql.Rows
-		err                                        error
-		nf                                         bool
+		serviceID, attr, val, svName, svTeam, repoID string
+		rows                                         *sql.Rows
+		err                                          error
+		nf                                           bool
 	)
 	attrs := []proto.ServiceAttribute{}
 
 	switch q.Section {
 	case msg.SectionRepositoryConfig:
+		// svName may be the ID or the name
+		serviceID = (*q.Repository.Properties)[0].Service.ID
 		svName = (*q.Repository.Properties)[0].Service.Name
 		svTeam = (*q.Repository.Properties)[0].Service.TeamID
 	case msg.SectionBucket:
+		serviceID = (*q.Bucket.Properties)[0].Service.ID
 		svName = (*q.Bucket.Properties)[0].Service.Name
 		svTeam = (*q.Bucket.Properties)[0].Service.TeamID
 	case msg.SectionGroup:
+		serviceID = (*q.Group.Properties)[0].Service.ID
 		svName = (*q.Group.Properties)[0].Service.Name
 		svTeam = (*q.Group.Properties)[0].Service.TeamID
 	case msg.SectionCluster:
+		serviceID = (*q.Cluster.Properties)[0].Service.ID
 		svName = (*q.Cluster.Properties)[0].Service.Name
 		svTeam = (*q.Cluster.Properties)[0].Service.TeamID
 	case msg.SectionNodeConfig:
+		serviceID = (*q.Node.Properties)[0].Service.ID
 		svName = (*q.Node.Properties)[0].Service.Name
 		svTeam = (*q.Node.Properties)[0].Service.TeamID
 	}
@@ -105,11 +111,13 @@ func (g *GuidePost) fillServiceAttributes(q *msg.Request) (bool, error) {
 	// ignore error since it would have been caught by GuidePost
 	repoID, _, _, _ = g.extractRouting(q)
 
-	// validate the tuple (repo, team, service) is valid
+	// validate the tuple (repo, team, service) is valid.
+	// also resolve and disambiguate serviceID and serviceName
 	if err = g.stmtServiceLookup.QueryRow(
-		repoID, svName, svTeam,
+		repoID, serviceID, svName, svTeam,
 	).Scan(
-		&service,
+		&serviceID,
+		&svName,
 	); err != nil {
 		if err == sql.ErrNoRows {
 			nf = true
@@ -121,7 +129,7 @@ func (g *GuidePost) fillServiceAttributes(q *msg.Request) (bool, error) {
 
 	// load attributes
 	if rows, err = g.stmtServiceAttributes.Query(
-		repoID, svName, svTeam,
+		repoID, serviceID, svTeam,
 	); err != nil {
 		goto abort
 	}
@@ -254,7 +262,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 
 	// execute and scan
 	switch q.Section {
-	case msg.SectionRepository:
+	case msg.SectionRepository, msg.SectionRepositoryConfig:
 		row = g.conn.QueryRow(queryStmt,
 			(*q.Repository.Properties)[0].SourceInstanceID)
 	case msg.SectionBucket:

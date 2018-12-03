@@ -29,8 +29,22 @@ func (r *Repository) Clone() Repository {
 		IsDeleted: r.IsDeleted,
 		IsActive:  r.IsActive,
 	}
+	if r.Members != nil {
+		b := make([]Bucket, 0)
+		for i := range *r.Members {
+			b = append(b, (*r.Members)[i].Clone())
+		}
+		clone.Members = &b
+	}
 	if r.Details != nil {
 		clone.Details = r.Details.Clone()
+	}
+	if r.Properties != nil && *r.Properties != nil {
+		p := make([]Property, 0)
+		for i := range *r.Properties {
+			p = append(p, (*r.Properties)[i].Clone())
+		}
+		clone.Properties = &p
 	}
 	return clone
 }

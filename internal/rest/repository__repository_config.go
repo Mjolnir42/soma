@@ -146,17 +146,17 @@ func (x *Rest) RepositoryConfigPropertyCreate(w http.ResponseWriter, r *http.Req
 		x.replyBadRequest(&w, &request, fmt.Errorf("Expected property count 1, actual count: %d",
 			len(*cReq.Repository.Properties)))
 		return
-	case params.ByName(`propertyType`) != (*cReq.Repository.Properties)[0].Type:
-		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatched property types: %s, %s",
-			params.ByName(`propertyType`), (*cReq.Repository.Properties)[0].Type))
-		return
-	case (params.ByName(`propertyType`) == `service`) && (*cReq.Repository.Properties)[0].Service.Name == ``:
-		x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid service name: empty string`))
-		return
+	}
+	switch (*cReq.Repository.Properties)[0].Type {
+	case `service`:
+		if (*cReq.Repository.Properties)[0].Service.Name == `` {
+			x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid service name: empty string`))
+			return
+		}
 	}
 	request.Repository = cReq.Repository.Clone()
 	request.TargetEntity = msg.EntityRepository
-	request.Property.Type = params.ByName(`propertyType`)
+	request.Property.Type = (*cReq.Repository.Properties)[0].Type
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
@@ -183,7 +183,7 @@ func (x *Rest) RepositoryConfigPropertyDestroy(w http.ResponseWriter, r *http.Re
 		proto.Property{
 			Type:             params.ByName(`propertyType`),
 			RepositoryID:     params.ByName(`repositoryID`),
-			SourceInstanceID: params.ByName(`sourceInstanceID`),
+			SourceInstanceID: params.ByName(`sourceID`),
 		},
 	}
 

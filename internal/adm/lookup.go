@@ -32,6 +32,7 @@ func LookupOncallID(s string) (string, error) {
 // LookupOncallDetails looks up the details for oncall duty s.
 func LookupOncallDetails(s string) (string, string, error) {
 	var oID, o string
+	oID = s
 	if !IsUUID(s) {
 		var err error
 		if o, err = LookupOncallID(s); err != nil {
@@ -372,8 +373,12 @@ func LookupServicePropertyID(s, team string) (string, error) {
 		return s, nil
 	}
 	var tID string
-	if err := teamIDByName(team, &tID); err != nil {
-		return ``, err
+	if IsUUID(team) {
+		tID = team
+	} else {
+		if err := teamIDByName(team, &tID); err != nil {
+			return ``, err
+		}
 	}
 	return propertyIDByName(`service`, s, tID)
 }

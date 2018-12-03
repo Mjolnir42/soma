@@ -8,7 +8,7 @@ The repository name must be between 4 and 128 characters long.
 # SYNOPSIS
 
 ```
-soma repository-mgmt create ${repository} team ${team}
+soma repository create ${repository} team ${team}
 ```
 
 # ARGUMENT TYPES
@@ -32,5 +32,5 @@ global | repository-mgmt | add | yes | no
 # EXAMPLES
 
 ```
-soma repository-mgmt create example team ExampleTeam
+soma repository create example team ExampleTeam
 ```

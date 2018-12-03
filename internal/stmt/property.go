@@ -19,8 +19,8 @@ FROM   soma.repository
 JOIN   soma.service_property
 ON     soma.repository.team_id = soma.service_property.team_id
 WHERE  soma.repository.id = $1::uuid
-AND    soma.service_property.id = $2::uuid
-AND    soma.repository.team_id = $3::uuid;`
+AND    (soma.service_property.name = $3::varchar OR soma.service_property.id = $2::uuid)
+AND    soma.repository.team_id = $4::uuid;`
 
 	ServiceAttributes = `
 SELECT soma.service_property_value.attribute,

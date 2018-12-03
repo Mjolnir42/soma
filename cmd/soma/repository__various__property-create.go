@@ -10,67 +10,64 @@ package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-// cmdPropertyAdd function
-func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
-	switch oType {
-	case `node`, `bucket`, `repository`, `group`, `cluster`:
-		switch pType {
-		case `system`, `custom`, `service`, `oncall`:
-		default:
-			return fmt.Errorf("Unknown property type: %s", pType)
-		}
+// variousPropertyCreate is the generic function for creating properties
+// on tree objects
+func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
+	switch entity {
+	case proto.EntityRepository, proto.EntityBucket, proto.EntityGroup, proto.EntityCluster, proto.EntityNode:
 	default:
-		return fmt.Errorf("Unknown object type: %s", oType)
+		return fmt.Errorf("Unknown entity: %s", entity)
+	}
+	switch propertyType {
+	case proto.PropertyTypeSystem, proto.PropertyTypeCustom, proto.PropertyTypeService, proto.PropertyTypeOncall:
+	case proto.PropertyTypeNative:
+		return fmt.Errorf(`Native properties are for introspection and can not be created on tree objects`)
+	case proto.PropertyTypeTemplate:
+		return fmt.Errorf(`Template properties can not be created on tree objects`)
+	default:
+		return fmt.Errorf("Unknown property type: %s", propertyType)
 	}
 
-	// argument parsing
-	multiple := []string{}
-	required := []string{`to`, `view`}
-	unique := []string{`to`, `in`, `view`, `inheritance`, `childrenonly`}
-
-	switch pType {
-	case `system`:
-		if err := adm.ValidateSystemProperty(
-			c.Args().First()); err != nil {
-			return err
-		}
-		fallthrough
-	case `custom`:
-		required = append(required, `value`)
-		unique = append(unique, `value`)
-	}
-	switch oType {
-	case `group`, `cluster`:
-		required = append(required, `in`)
-	}
 	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`on`, `view`, `inheritance`, `childrenonly`}
+	mandatoryOptions := []string{`on`, `view`}
+
+	switch propertyType {
+	case proto.PropertyTypeSystem:
+		uniqueOptions = append(uniqueOptions, `value`)
+		mandatoryOptions = append(mandatoryOptions, `value`)
+	case proto.PropertyTypeCustom:
+		uniqueOptions = append(uniqueOptions, `value`)
+		mandatoryOptions = append(mandatoryOptions, `value`)
+	}
+
+	switch entity {
+	case proto.EntityGroup, proto.EntityCluster:
+		uniqueOptions = append(uniqueOptions, `in`)
+		mandatoryOptions = append(mandatoryOptions, `in`)
+	}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
-		multiple,
-		unique,
-		required,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
 		c.Args().Tail(),
 	); err != nil {
 		return err
 	}
 
-	// deprecation warning
-	switch oType {
-	case `repository`, `bucket`, `node`:
-		if _, ok := opts[`in`]; ok {
-			fmt.Fprintf(
-				os.Stderr,
-				"Hint: Keyword `in` is DEPRECATED for %s objects,"+
-					" since they are global objects. Ignoring.",
-				oType,
-			)
+	switch propertyType {
+	case proto.PropertyTypeSystem:
+		if err := adm.ValidateSystemProperty(c.Args().First()); err != nil {
+			return err
 		}
 	}
 
@@ -81,9 +78,9 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		err                        error
 	)
 	// id lookup
-	switch oType {
+	switch entity {
 	case `node`:
-		if objectID, err = adm.LookupNodeID(opts[`to`][0]); err != nil {
+		if objectID, err = adm.LookupNodeID(opts[`on`][0]); err != nil {
 			return err
 		}
 		if config, err = adm.LookupNodeConfig(objectID); err != nil {
@@ -92,11 +89,11 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		repoID = config.RepositoryID
 		bucketID = config.BucketID
 	case `cluster`:
-		bucketID, err = adm.LookupBucketID(opts["in"][0])
+		bucketID, err = adm.LookupBucketID(opts[`in`][0])
 		if err != nil {
 			return err
 		}
-		if objectID, err = adm.LookupClusterID(opts[`to`][0],
+		if objectID, err = adm.LookupClusterID(opts[`on`][0],
 			bucketID); err != nil {
 			return err
 		}
@@ -104,11 +101,11 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 			return err
 		}
 	case `group`:
-		bucketID, err = adm.LookupBucketID(opts["in"][0])
+		bucketID, err = adm.LookupBucketID(opts[`in`][0])
 		if err != nil {
 			return err
 		}
-		if objectID, err = adm.LookupGroupID(opts[`to`][0],
+		if objectID, err = adm.LookupGroupID(opts[`on`][0],
 			bucketID); err != nil {
 			return err
 		}
@@ -116,7 +113,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 			return err
 		}
 	case `bucket`:
-		bucketID, err = adm.LookupBucketID(opts["to"][0])
+		bucketID, err = adm.LookupBucketID(opts[`on`][0])
 		if err != nil {
 			return err
 		}
@@ -125,7 +122,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 			return err
 		}
 	case `repository`:
-		repoID, err = adm.LookupRepoID(opts[`to`][0])
+		repoID, err = adm.LookupRepoID(opts[`on`][0])
 		if err != nil {
 			return err
 		}
@@ -134,7 +131,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 
 	// property assembly
 	prop := proto.Property{
-		Type: pType,
+		Type: propertyType,
 		View: opts[`view`][0],
 	}
 	// property assembly, optional arguments
@@ -154,33 +151,40 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	} else {
 		prop.Inheritance = true
 	}
-	switch pType {
-	case `system`:
+	switch propertyType {
+	case proto.PropertyTypeSystem:
 		prop.System = &proto.PropertySystem{
 			Name:  c.Args().First(),
 			Value: opts[`value`][0],
 		}
-	case `service`:
-		var teamID string
-		switch oType {
-		case `repository`:
+	case proto.PropertyTypeService:
+		var serviceID, teamID string
+		switch entity {
+		case proto.EntityRepository:
 			if err = adm.LookupTeamByRepo(repoID, &teamID); err != nil {
 				return err
 			}
 		default:
-			if teamID, err = adm.LookupTeamByBucket(
-				bucketID); err != nil {
+			if teamID, err = adm.LookupTeamByBucket(bucketID); err != nil {
 				return err
 			}
 		}
+		serviceID, err = adm.LookupServicePropertyID(
+			c.Args().First(),
+			teamID)
+		if err != nil {
+			return err
+		}
+
 		// no reason to fill out the attributes, client-provided
 		// attributes are discarded by the server
 		prop.Service = &proto.PropertyService{
+			ID:         serviceID,
 			Name:       c.Args().First(),
 			TeamID:     teamID,
 			Attributes: []proto.ServiceAttribute{},
 		}
-	case `oncall`:
+	case proto.PropertyTypeOncall:
 		oncallID, err := adm.LookupOncallID(c.Args().First())
 		if err != nil {
 			return err
@@ -194,7 +198,7 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 		if err != nil {
 			return err
 		}
-	case `custom`:
+	case proto.PropertyTypeCustom:
 		customID, err := adm.LookupCustomPropertyID(
 			c.Args().First(), repoID)
 		if err != nil {
@@ -210,45 +214,47 @@ func cmdPropertyAdd(c *cli.Context, pType, oType string) error {
 	}
 
 	// request assembly
-	switch oType {
-	case `node`:
+	switch entity {
+	case proto.EntityNode:
 		req = proto.NewNodeRequest()
 		req.Node.ID = objectID
 		req.Node.Config = config
 		req.Node.Properties = &[]proto.Property{prop}
-	case `cluster`:
+	case proto.EntityCluster:
 		req = proto.NewClusterRequest()
 		req.Cluster.ID = objectID
 		req.Cluster.RepositoryID = repoID
 		req.Cluster.BucketID = bucketID
 		req.Cluster.Properties = &[]proto.Property{prop}
-	case `group`:
+	case proto.EntityGroup:
 		req = proto.NewGroupRequest()
 		req.Group.ID = objectID
 		req.Group.RepositoryID = repoID
 		req.Group.BucketID = bucketID
 		req.Group.Properties = &[]proto.Property{prop}
-	case `bucket`:
+	case proto.EntityBucket:
 		req = proto.NewBucketRequest()
 		req.Bucket.ID = objectID
 		req.Bucket.Properties = &[]proto.Property{prop}
-	case `repository`:
+	case proto.EntityRepository:
 		req = proto.NewRepositoryRequest()
 		req.Repository.ID = repoID
 		req.Repository.Properties = &[]proto.Property{prop}
 	}
 
 	var path string
-	switch oType {
+	switch entity {
 	case `cluster`, `group`, `node`:
 		path = fmt.Sprintf("/repository/%s/bucket/%s/%s/%s/property/",
-			repoID, bucketID, oType, objectID)
+			repoID, bucketID, entity, objectID)
 	case `bucket`:
 		path = fmt.Sprintf("/repository/%s/%s/%s/property/",
-			repoID, oType, objectID)
-	case `repository`:
+			repoID, entity, objectID)
+	case proto.EntityRepository:
 		path = fmt.Sprintf("/%s/%s/property/",
-			oType, objectID)
+			proto.EntityRepository,
+			objectID,
+		)
 	}
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }

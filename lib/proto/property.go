@@ -157,6 +157,7 @@ type PropertyService struct {
 
 func (t *PropertyService) Clone() *PropertyService {
 	clone := &PropertyService{
+		ID:     t.ID,
 		Name:   t.Name,
 		TeamID: t.TeamID,
 	}

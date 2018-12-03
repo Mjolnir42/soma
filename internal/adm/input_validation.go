@@ -158,7 +158,7 @@ func ValidateProvider(s string) error {
 // ValidateSystemProperty tests against the server if string s is a
 // valid system property.
 func ValidateSystemProperty(s string) error {
-	res, err := fetchObjList(`/property/system/`)
+	res, err := fetchObjList(`/property-mgmt/system/`)
 	if err != nil {
 		return err
 	}
