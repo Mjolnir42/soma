@@ -83,7 +83,7 @@ func (c *Cache) Perform(q *msg.Request) {
 		c.performNode(q.Cache)
 	case msg.SectionPermission:
 		c.performPermission(q.Cache)
-	case msg.SectionRepository:
+	case msg.SectionRepository, msg.SectionRepositoryMgmt:
 		c.performRepository(q.Cache)
 	case msg.SectionRight:
 		c.performRight(q.Cache)
