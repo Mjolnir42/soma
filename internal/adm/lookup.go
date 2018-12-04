@@ -139,6 +139,19 @@ func LookupRepoID(s string) (string, error) {
 	return repoIDByName(s)
 }
 
+//  LookupRepoName looks up the name for a repository on the server
+// with repoID id. Error is set if no such repository was found or
+// an error occured.
+// If id is not an UUID, then id is assumed to be the name. The result
+// is set in name.
+func LookupRepoName(id string, name *string) error {
+	if !IsUUID(id) {
+		*name = id
+		return nil
+	}
+	return repoNameByID(id, name)
+}
+
 // LookupRepoByBucket looks up the UUI for a repository by either
 // the UUID or name of a bucket in that repository.
 func LookupRepoByBucket(s string) (string, error) {
@@ -667,6 +680,29 @@ func repoIDByName(repo string) (string, error) {
 abort:
 	return ``, fmt.Errorf("RepositoryId lookup failed: %s",
 		err.Error())
+}
+
+// repoNameById mplements the actual serverside lookup
+func repoNameByID(id string, name *string) error {
+	var teamID string
+	if err := LookupTeamByRepo(id, &teamID); err != nil {
+		return err
+	}
+	res, err := fetchObjList(fmt.Sprintf("/team/%s/repository/%s", teamID, id))
+	if err != nil {
+		goto abort
+	}
+
+	if res.Repositories == nil || len(*res.Repositories) == 0 {
+		err = fmt.Errorf(`no object returned`)
+		goto abort
+	}
+	*name = (*res.Repositories)[0].Name
+	return nil
+
+abort:
+	*name = ``
+	return fmt.Errorf("RepositoryName lookup failed: %s", err.Error())
 }
 
 // repoIDByBucketID implements the actual serverside lookup of the
