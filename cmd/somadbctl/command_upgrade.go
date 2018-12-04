@@ -183,6 +183,8 @@ func upgradeInventoryTo201811150001(curr int, tool string, printOnly bool) int {
 		`ALTER TABLE inventory.team ADD CONSTRAINT _team_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE;`,
 		`ALTER TABLE inventory.oncall_team ADD CONSTRAINT _oncall_team_creator_exists FOREIGN KEY(created_by) REFERENCES inventory.user(id) DEFERRABLE;`,
 		`ALTER TABLE inventory.oncall_membership ADD CONSTRAINT _oncall_membership_creator_exists FOREIGN KEY(created_by) REFERENCES inventory.user(id) DEFERRABLE;`,
+		`GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA inventory TO soma_svc;`,
+		`GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA inventory TO soma_svc;`,
 	}
 	stmts = append(stmts,
 		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('inventory', 201811150001, 'Upgrade - somadbctl %s');", tool),
