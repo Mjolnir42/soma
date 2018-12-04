@@ -3,7 +3,9 @@ package soma
 import (
 	"database/sql"
 
+	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
+	"github.com/mjolnir42/soma/lib/proto"
 )
 
 func (tk *TreeKeeper) startupBuckets(stMap map[string]*sql.Stmt) {
@@ -26,6 +28,8 @@ func (tk *TreeKeeper) startupBuckets(stMap map[string]*sql.Stmt) {
 		return
 	}
 	defer rows.Close()
+
+	super := tk.soma.getSupervisor()
 
 bucketloop:
 	for rows.Next() {
@@ -61,6 +65,24 @@ bucketloop:
 		})
 		tk.drain(`action`)
 		tk.drain(`error`)
+
+		// very explicitly ensure that the go routine is receiving
+		// actual copies of the value of the strings updated in rows.Next()
+		bucket := proto.Bucket{
+			ID:           bucketID,
+			Name:         bucketName,
+			TeamID:       teamID,
+			RepositoryID: tk.meta.repoID,
+			Environment:  environment,
+		}
+		req := msg.Request{
+			Section: msg.SectionBucket,
+			Action:  msg.ActionCreate,
+			Bucket:  bucket.Clone(),
+		}
+		go func(q *msg.Request) {
+			super.Update <- msg.CacheUpdateFromRequest(q)
+		}(&req)
 	}
 }
 
@@ -83,6 +105,8 @@ func (tk *TreeKeeper) startupGroups(stMap map[string]*sql.Stmt) {
 		return
 	}
 	defer rows.Close()
+
+	super := tk.soma.getSupervisor()
 
 grouploop:
 	for rows.Next() {
@@ -111,6 +135,24 @@ grouploop:
 		})
 		tk.drain(`action`)
 		tk.drain(`error`)
+
+		// very explicitly ensure that the go routine is receiving
+		// actual copies of the value of the strings updated in rows.Next()
+		group := proto.Group{
+			ID:           groupID,
+			Name:         groupName,
+			TeamID:       teamID,
+			RepositoryID: tk.meta.repoID,
+			BucketID:     bucketID,
+		}
+		req := msg.Request{
+			Section: msg.SectionGroup,
+			Action:  msg.ActionCreate,
+			Group:   group.Clone(),
+		}
+		go func(q *msg.Request) {
+			super.Update <- msg.CacheUpdateFromRequest(q)
+		}(&req)
 	}
 }
 
@@ -157,9 +199,9 @@ memberloop:
 			ParentType: "group",
 			ParentID:   groupID,
 		})
+		tk.drain(`action`)
+		tk.drain(`error`)
 	}
-	tk.drain(`action`)
-	tk.drain(`error`)
 }
 
 func (tk *TreeKeeper) startupGroupedClusters(stMap map[string]*sql.Stmt) {
@@ -171,6 +213,7 @@ func (tk *TreeKeeper) startupGroupedClusters(stMap map[string]*sql.Stmt) {
 		err                                     error
 		rows                                    *sql.Rows
 		clusterID, clusterName, teamID, groupID string
+		bucketID                                string
 	)
 
 	tk.startLog.Printf("TK[%s]: loading grouped-clusters", tk.meta.repoName)
@@ -182,6 +225,8 @@ func (tk *TreeKeeper) startupGroupedClusters(stMap map[string]*sql.Stmt) {
 	}
 	defer rows.Close()
 
+	super := tk.soma.getSupervisor()
+
 clusterloop:
 	for rows.Next() {
 		err = rows.Scan(
@@ -189,6 +234,7 @@ clusterloop:
 			&clusterName,
 			&teamID,
 			&groupID,
+			&bucketID,
 		)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -208,9 +254,27 @@ clusterloop:
 			ParentType: "group",
 			ParentID:   groupID,
 		})
+		tk.drain(`action`)
+		tk.drain(`error`)
+
+		// very explicitly ensure that the go routine is receiving
+		// actual copies of the value of the strings updated in rows.Next()
+		cluster := proto.Cluster{
+			ID:           clusterID,
+			Name:         clusterName,
+			TeamID:       teamID,
+			RepositoryID: tk.meta.repoID,
+			BucketID:     bucketID,
+		}
+		req := msg.Request{
+			Section: msg.SectionCluster,
+			Action:  msg.ActionCreate,
+			Cluster: cluster.Clone(),
+		}
+		go func(q *msg.Request) {
+			super.Update <- msg.CacheUpdateFromRequest(q)
+		}(&req)
 	}
-	tk.drain(`action`)
-	tk.drain(`error`)
 }
 
 func (tk *TreeKeeper) startupClusters(stMap map[string]*sql.Stmt) {
@@ -232,6 +296,8 @@ func (tk *TreeKeeper) startupClusters(stMap map[string]*sql.Stmt) {
 		return
 	}
 	defer rows.Close()
+
+	super := tk.soma.getSupervisor()
 
 clusterloop:
 	for rows.Next() {
@@ -259,9 +325,25 @@ clusterloop:
 			ParentType: "bucket",
 			ParentID:   bucketID,
 		})
+		tk.drain(`action`)
+		tk.drain(`error`)
+
+		cluster := proto.Cluster{
+			ID:           clusterID,
+			Name:         clusterName,
+			TeamID:       teamID,
+			RepositoryID: tk.meta.repoID,
+			BucketID:     bucketID,
+		}
+		req := msg.Request{
+			Section: msg.SectionCluster,
+			Action:  msg.ActionCreate,
+			Cluster: cluster.Clone(),
+		}
+		go func(q *msg.Request) {
+			super.Update <- msg.CacheUpdateFromRequest(q)
+		}(&req)
 	}
-	tk.drain(`action`)
-	tk.drain(`error`)
 }
 
 func (tk *TreeKeeper) startupNodes(stMap map[string]*sql.Stmt) {
@@ -286,6 +368,8 @@ func (tk *TreeKeeper) startupNodes(stMap map[string]*sql.Stmt) {
 		return
 	}
 	defer rows.Close()
+
+	super := tk.soma.getSupervisor()
 
 nodeloop:
 	for rows.Next() {
@@ -338,9 +422,29 @@ nodeloop:
 				ParentID:   bucketID,
 			})
 		}
+		tk.drain(`action`)
+		tk.drain(`error`)
+
+		go func() {
+			super.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionNodeConfig,
+				Action:  msg.ActionAssign,
+				Node: proto.Node{
+					ID:        nodeID,
+					AssetID:   uint64(assetID),
+					Name:      nodeName,
+					TeamID:    teamID,
+					ServerID:  serverID,
+					IsOnline:  nodeOnline,
+					IsDeleted: nodeDeleted,
+					Config: &proto.NodeConfig{
+						RepositoryID: tk.meta.repoID,
+						BucketID:     bucketID,
+					},
+				},
+			})
+		}()
 	}
-	tk.drain(`action`)
-	tk.drain(`error`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
