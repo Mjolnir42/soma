@@ -673,7 +673,7 @@ actionloop:
 
 	// update permission cache
 	switch q.Section {
-	case msg.SectionRepository, msg.SectionBucket, msg.SectionGroup, msg.SectionCluster:
+	case msg.SectionRepository, msg.SectionRepositoryMgmt, msg.SectionBucket, msg.SectionGroup, msg.SectionCluster:
 		switch q.Action {
 		case msg.ActionCreate, msg.ActionDestroy:
 			go func() {
