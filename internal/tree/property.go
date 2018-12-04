@@ -324,6 +324,7 @@ func (p PropertyService) Clone() Property {
 	cl.ID = uuid.Must(uuid.FromString(p.ID.String()))
 	cl.SourceID = uuid.Must(uuid.FromString(p.SourceID.String()))
 	cl.InheritedFrom = uuid.Must(uuid.FromString(p.InheritedFrom.String()))
+	cl.ServiceID = uuid.Must(uuid.FromString(p.ServiceID.String()))
 	cl.Attributes = make([]proto.ServiceAttribute, 0)
 	for _, attr := range p.Attributes {
 		a := proto.ServiceAttribute{
