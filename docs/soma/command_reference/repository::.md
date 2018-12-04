@@ -24,4 +24,4 @@ soma repository property destroy service ${service} on ${repository} view ${view
 soma repository property destroy oncall ${oncall} on ${repository} view ${view}
 ```
 
-See `soma repository help ${command}` for detailed help.
+See `soma repository help ${command}` or `soma repository property help ${command}` for detailed help.
