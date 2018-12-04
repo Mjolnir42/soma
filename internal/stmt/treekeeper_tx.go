@@ -238,8 +238,9 @@ SELECT $1::uuid,
        $3::uuid,
        $4::varchar,
        $5::uuid,
-       $6::boolean,
-       $7::boolean;`
+       $7::boolean,
+       $8::boolean
+WHERE $6::uuid IS NOT NULL;`
 
 	TxRepositoryPropertyOncallDelete = `
 DELETE FROM soma.repository_oncall_properties
@@ -261,8 +262,9 @@ SELECT $1::uuid,
        $4::varchar,
        $5::uuid,
        $6::uuid,
-       $7::boolean,
-       $8::boolean;`
+       $8::boolean,
+       $9::boolean
+WHERE $7::uuid IS NOT NULL;`
 
 	TxRepositoryPropertyServiceDelete = `
 DELETE FROM soma.repository_service_property
@@ -286,10 +288,11 @@ SELECT $1::uuid,
        $4::varchar,
        $5::varchar,
        $6::varchar,
-       $7::boolean,
        $8::boolean,
-       $9::text,
-       $10::boolean;`
+       $9::boolean,
+       $10::text,
+       $11::boolean
+WHERE $7::uuid IS NOT NULL;`
 
 	TxRepositoryPropertySystemDelete = `
 DELETE FROM soma.repository_system_properties
@@ -310,9 +313,10 @@ SELECT $1::uuid,
        $3::uuid,
        $4::varchar,
        $5::uuid,
-       $6::boolean,
        $7::boolean,
-       $8::text;`
+       $8::boolean,
+       $9::text
+WHERE $6::uuid IS NOT NULL;`
 
 	TxRepositoryPropertyCustomDelete = `
 DELETE FROM soma.repository_custom_properties
