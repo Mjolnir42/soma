@@ -31,6 +31,9 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 			return nf, err
 		}
 	case msg.SectionBucket:
+		if q.Action == msg.ActionCreate {
+			break
+		}
 		if nf, err := g.validateBucketInRepository(
 			q.Bucket.RepositoryID,
 			q.Bucket.ID,
