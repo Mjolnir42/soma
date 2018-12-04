@@ -53,7 +53,9 @@ treeloop:
 
 		f.appLog.Printf("ForestCustodian loading treekeeper: %s",
 			repoName)
-		if err = f.loadSomaTree(&msg.Request{
+		loadRequest := &msg.Request{
+			Section: msg.SectionRepositoryMgmt,
+			Action:  msg.ActionCreate,
 			Repository: proto.Repository{
 				ID:        repoID,
 				Name:      repoName,
@@ -61,7 +63,10 @@ treeloop:
 				IsDeleted: isDeleted,
 				IsActive:  isActive,
 			},
-		}); err != nil {
+		}
+		if err = f.loadSomaTree(
+			loadRequest,
+		); err != nil {
 			f.errLog.Printf("fc.loadSomaTree(), error: %s",
 				err.Error(),
 			)
@@ -121,6 +126,9 @@ func (f *ForestCustodian) loadSomaTree(q *msg.Request) error {
 	if err != nil {
 		return err
 	}
+
+	super := f.soma.getSupervisor()
+	super.Update <- msg.CacheUpdateFromRequest(q)
 
 	return f.spawnTreeKeeper(
 		q,

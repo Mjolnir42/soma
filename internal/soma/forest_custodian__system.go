@@ -93,6 +93,13 @@ func (f *ForestCustodian) stop(q *msg.Request, mr *msg.Result) {
 
 	// fully shut down the handler
 	close(handler.Shutdown)
+
+	super := f.soma.getSupervisor()
+	super.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+		Section:    msg.SectionRepository,
+		Action:     msg.ActionDestroy,
+		Repository: q.Repository.Clone(),
+	})
 }
 
 // restart launches a fresh TreeKeeper for a repository
