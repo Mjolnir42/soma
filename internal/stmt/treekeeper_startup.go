@@ -219,7 +219,8 @@ WHERE  soma.repository.id = $1::uuid;`
 SELECT sc.cluster_id,
        sc.cluster_name,
        sc.organizational_team_id,
-       sgmc.group_id
+       sgmc.group_id,
+       sc.bucket_id
 FROM   soma.repository
 JOIN   soma.buckets sb
 ON     soma.repository.id = sb.repository_id
