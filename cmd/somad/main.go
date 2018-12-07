@@ -142,7 +142,7 @@ func main() {
 		logrus.Fatalf("Unable to open error log: %s", err)
 	}
 	// it is called errorlog for a reason
-	errLog.SetLevel(logrus.ErrorLevel)
+	errLog.SetLevel(logrus.DebugLevel)
 	errLog.Out = lfhErr
 	errLog.Formatter = &logrus.TextFormatter{
 		DisableColors: true,

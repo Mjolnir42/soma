@@ -7,6 +7,11 @@
 
 package perm
 
+import (
+	"fmt"
+	"os"
+)
+
 // objectLookup is the cache data structure that allows lookup
 // of basic information about the repository trees.
 type objectLookup struct {
@@ -37,6 +42,8 @@ func newObjectLookup() *objectLookup {
 
 // addRepository inserts a new repository into the cache
 func (m *objectLookup) addRepository(repoID string) {
+	fmt.Fprintln(os.Stderr, `addRepository`, ` repoID: `, repoID)
+
 	if _, ok := m.byRepository[repoID]; ok {
 		return
 	}
@@ -45,6 +52,8 @@ func (m *objectLookup) addRepository(repoID string) {
 
 // addBucket inserts a new bucket into the cache
 func (m *objectLookup) addBucket(repoID, bucketID string) {
+	fmt.Fprintln(os.Stderr, `addBucket`, ` repoID: `, repoID, ` bucketID: `, bucketID)
+
 	if _, ok := m.byBucket[bucketID]; ok {
 		return
 	}
@@ -64,6 +73,8 @@ func (m *objectLookup) addBucket(repoID, bucketID string) {
 
 // addGroup inserts a new group into the cache
 func (m *objectLookup) addGroup(bucketID, groupID string) {
+	fmt.Fprintln(os.Stderr, `addGroup`, ` bucketID: `, bucketID, ` groupID: `, groupID)
+
 	if _, ok := m.byGroup[groupID]; ok {
 		return
 	}
@@ -92,6 +103,8 @@ func (m *objectLookup) addGroup(bucketID, groupID string) {
 
 // addCluster inserts a new cluster into the cache
 func (m *objectLookup) addCluster(bucketID, clusterID string) {
+	fmt.Fprintln(os.Stderr, `addCluster`, ` bucketID: `, bucketID, ` clusterID: `, clusterID)
+
 	if _, ok := m.byCluster[clusterID]; ok {
 		return
 	}
@@ -120,6 +133,8 @@ func (m *objectLookup) addCluster(bucketID, clusterID string) {
 
 // addNode inserts a new node into the cache
 func (m *objectLookup) addNode(bucketID, nodeID string) {
+	fmt.Fprintln(os.Stderr, `addNode`, ` bucketID: `, bucketID, ` nodeID: `, nodeID)
+
 	if _, ok := m.byNode[nodeID]; ok {
 		return
 	}

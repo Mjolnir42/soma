@@ -89,6 +89,11 @@ func registerJobs(app cli.App) *cli.App {
 						Description: help.Text(`job::prune`),
 						Action:      runtime(clientlocalJobPruneDB),
 					},
+					//					{
+					//						Name:   `search`,
+					//						Usage:  `Search for a job`,
+					//						Action: runtime(jobSearch),
+					//					},
 					{
 						Name:        `type-mgmt`,
 						Usage:       `SUBCOMMANDS for job type management`,
@@ -244,6 +249,10 @@ func jobWait(c *cli.Context) error {
 
 	path := fmt.Sprintf("/job/byID/%s/_processed", c.Args().First())
 	return adm.Perform(`get`, path, `wait`, nil, c)
+}
+
+func jobSearch(c *cli.Context) error {
+	return fmt.Errorf(`Not implemented`)
 }
 
 func clientlocalJobListOutstanding(c *cli.Context) error {

@@ -1,4 +1,13 @@
-package main
+/*-
+ * Copyright (c) 2015-2018, Jörg Pernfuß
+ * Copyright (c) 2018, 1&1 IONOS SE
+ * Copyright (c) 2016, 1&1 Internet SE
+ *
+ * Use of this source code is governed by a 2-clause BSD license
+ * that can be found in the LICENSE file.
+ */
+
+package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"fmt"
@@ -232,7 +241,6 @@ func cmdBucketDestroy(c *cli.Context) error {
 	}
 
 	path := fmt.Sprintf("/repository/%s/bucket/%s", repositoryID, bucketID)
-	return adm.Perform(`delete`, path, `command`, nil, c)
 }
 
 func cmdBucketRename(c *cli.Context) error {
@@ -297,8 +305,6 @@ func cmdBucketInstance(c *cli.Context) error {
 		repositoryID, bucketID)
 	return adm.Perform(`get`, path, `list`, nil, c)
 }
-
-///
 
 func cmdBucketSystemPropertyAdd(c *cli.Context) error {
 	return cmdBucketPropertyAdd(c, `system`)
