@@ -468,6 +468,8 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		tk.treeGroup(q)
 	case q.Section == msg.SectionBucket && q.Action == msg.ActionCreate:
 		tk.treeBucket(q)
+	case q.Section == msg.SectionBucket && q.Action == msg.ActionDestroy:
+		tk.treeBucket(q)
 	case q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy:
 		tk.treeRepository(q)
 	// tree object: rename requests

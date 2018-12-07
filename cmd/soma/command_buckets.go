@@ -15,13 +15,15 @@ func registerBuckets(app cli.App) *cli.App {
 		[]cli.Command{
 			// buckets
 			{
-				Name:  "bucket",
-				Usage: "SUBCOMMANDS for buckets",
+				Name:        `bucket`,
+				Usage:       `SUBCOMMANDS for repository bucket management`,
+				Description: help.Text(`bucket::`),
 				Subcommands: []cli.Command{
 					{
-						Name:         "create",
-						Usage:        "Create a new bucket inside a repository",
-						Action:       runtime(cmdBucketCreate),
+						Name:         `create`,
+						Usage:        `Create a new bucket inside a repository`,
+						Description:  help.Text(`bucket::create`),
+						Action:       runtime(bucketCreate),
 						BashComplete: cmpl.BucketCreate,
 					},
 					{
@@ -196,47 +198,6 @@ func cmdBucketTree(c *cli.Context) error {
 	path := fmt.Sprintf("/repository/%s/bucket/%s/tree",
 		repositoryID, bucketID)
 	return adm.Perform(`get`, path, `tree`, nil, c)
-}
-
-func cmdBucketCreate(c *cli.Context) error {
-	var err error
-	var repositoryID string
-
-	if err = adm.ValidateRuneCountRange(c.Args().First(), 4, 512); err != nil {
-		return err
-	}
-
-	opts := map[string][]string{}
-	multipleAllowed := []string{}
-	uniqueOptions := []string{`in`, `environment`}
-	mandatoryOptions := []string{`in`, `environment`}
-
-	if err = adm.ParseVariadicArguments(
-		opts,
-		multipleAllowed,
-		uniqueOptions,
-		mandatoryOptions,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-
-	if repositoryID, err = adm.LookupRepoID(opts[`in`][0]); err != nil {
-		return err
-	}
-
-	// fetch list of environments from SOMA to check if a valid
-	// environment was requested
-	if err = adm.ValidateEnvironment(opts[`environment`][0]); err != nil {
-		return err
-	}
-
-	req := proto.NewBucketRequest()
-	req.Bucket.Name = c.Args().First()
-	req.Bucket.RepositoryID = repositoryID
-	req.Bucket.Environment = opts[`environment`][0]
-
-	path := fmt.Sprintf("/repository/%s/bucket/", repositoryID)
-	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
 func cmdBucketDestroy(c *cli.Context) error {

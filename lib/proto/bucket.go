@@ -25,7 +25,7 @@ type Bucket struct {
 	Properties     *[]Property `json:"properties,omitempty"`
 }
 
-// Clone function
+// Clone returns a copy of b without Details
 func (b *Bucket) Clone() Bucket {
 	clone := Bucket{
 		ID:           b.ID,
@@ -36,11 +36,34 @@ func (b *Bucket) Clone() Bucket {
 		IsDeleted:    b.IsDeleted,
 		IsFrozen:     b.IsFrozen,
 	}
-	// XXX MemberGroups
-	// XXX MemberClusters
-	// XXX MemberNodes
-	// XXX Details
-	// XXX Properties
+	if b.MemberGroups != nil && *b.MemberGroups != nil {
+		g := make([]Group, 0)
+		for i := range *b.MemberGroups {
+			g = append(g, (*b.MemberGroups)[i].Clone())
+		}
+		clone.MemberGroups = &g
+	}
+	if b.MemberClusters != nil && *b.MemberClusters != nil {
+		c := make([]Cluster, 0)
+		for i := range *b.MemberClusters {
+			c = append(c, (*b.MemberClusters)[i].Clone())
+		}
+		clone.MemberClusters = &c
+	}
+	if b.MemberNodes != nil && *b.MemberNodes != nil {
+		n := make([]Node, 0)
+		for i := range *b.MemberNodes {
+			n = append(n, (*b.MemberNodes)[i].Clone())
+		}
+		clone.MemberNodes = &n
+	}
+	if b.Properties != nil && *b.Properties != nil {
+		p := make([]Property, 0)
+		for i := range *b.Properties {
+			p = append(p, (*b.Properties)[i].Clone())
+		}
+		clone.Properties = &p
+	}
 	return clone
 }
 

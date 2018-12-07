@@ -108,6 +108,8 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		switch q.Action {
 		case msg.ActionCreate, msg.ActionRename:
 			return q.Bucket.RepositoryID, ``
+		case msg.ActionDestroy:
+			return q.Bucket.RepositoryID, q.Bucket.ID
 		}
 		switch q.Action {
 		case msg.ActionPropertyCreate:

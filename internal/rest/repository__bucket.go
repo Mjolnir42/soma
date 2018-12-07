@@ -166,7 +166,23 @@ func (x *Rest) BucketCreate(w http.ResponseWriter, r *http.Request,
 // BucketDestroy function
 func (x *Rest) BucketDestroy(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
-	// TODO
+	defer panicCatcher(w)
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionBucket
+	request.Action = msg.ActionDestroy
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Bucket.RepositoryID = params.ByName(`repositoryID`)
+	request.Repository.ID = params.ByName(`repositoryID`)
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request, nil)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
 }
 
 // BucketRename function
