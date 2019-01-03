@@ -1,0 +1,47 @@
+### soma admin cli example configuration file
+
+## service settings
+#
+api: https://localhost:8888/
+timeout: 5
+cert: ca.pem
+activation.mode: ldap
+
+## client settings
+#
+# processor must be able to receive JSON via pipe on STDIN.
+# Unset disables postprocessing (default)
+# - python:     python -mjson.tool
+# - jq:         jq -c --indent 4 --ascii-output --sort-keys
+# - perl5:      json_pp
+# - p5-JSON-XS: json_xs
+# - yajl:       json_reformat
+# - py-demjson: jsonlint -f
+json.output.processor:
+#
+# Block the client on async requests. The job status information
+# is held by the server for 2 hours after the job has finished.
+# The client will be blocked for a maximum of 5 minutes, after which
+# it will always be unblocked.
+async.wait: false
+#
+# save IDs of issued jobs into local key/value cache
+save.jobs: false
+
+## authentication settings
+#
+auth: {
+  user: username
+# pass: secretPassword
+# token: static_token
+}
+
+## boltDB key/value cache database settings
+#
+boltdb: {
+  # path is relative to ~/.soma/adm
+  path: db
+  file: soma.db
+  mode: 0600
+  open.timeout: 30
+}

@@ -22,6 +22,7 @@ type Config struct {
 	Activation string       `json:"activation.mode"`
 	AsyncWait  bool         `json:"async.wait,string"`
 	JobSave    bool         `json:"save.jobs,string"`
+	ProcJSON   string       `json:"json.output.processor"`
 	Auth       AuthConfig   `json:"auth"`
 	AdminAuth  AuthConfig   `json:"admin.auth"`
 	BoltDB     ConfigBoltDB `json:"boltdb"`

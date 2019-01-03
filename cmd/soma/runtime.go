@@ -87,6 +87,7 @@ func initCommon(c *cli.Context) {
 	adm.ActivateAsyncWait(Cfg.AsyncWait)
 	adm.AutomaticJobSave(Cfg.JobSave)
 	adm.ConfigureCache(&store)
+	adm.ConfigureJSONPostProcessor(Cfg.ProcJSON)
 }
 
 // boottime is the pre-run target for bootstrapping SOMA or user
