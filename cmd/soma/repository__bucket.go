@@ -1,6 +1,6 @@
 /*-
- * Copyright (c) 2015-2018, Jörg Pernfuß
- * Copyright (c) 2018, 1&1 IONOS SE
+ * Copyright (c) 2015-2019, Jörg Pernfuß
+ * Copyright (c) 2018-2019, 1&1 IONOS SE
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -118,6 +118,34 @@ func bucketDestroy(c *cli.Context) error {
 		url.QueryEscape(bucketID),
 	)
 	return adm.Perform(`delete`, path, `command`, nil, c)
+}
+
+// bucketList function
+// soma bucket list in ${repository}
+func bucketList(c *cli.Context) error {
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`in`}
+	mandatoryOptions := []string{`in`}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		adm.AllArguments(c),
+	); err != nil {
+		return err
+	}
+
+	var err error
+	var repositoryID string
+	if repositoryID, err = adm.LookupRepoID(opts[`in`][0]); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/repository/%s/bucket/", repositoryID)
+	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

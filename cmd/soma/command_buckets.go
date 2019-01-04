@@ -39,10 +39,11 @@ func registerBuckets(app cli.App) *cli.App {
 						BashComplete: cmpl.BucketRename,
 					},
 					{
-						Name:         "list",
-						Usage:        "List existing buckets",
-						Action:       runtime(cmdBucketList),
-						BashComplete: cmpl.In,
+						Name:         `list`,
+						Usage:        `List all bucket in a repository`,
+						Description:  help.Text(`bucket::list`),
+						Action:       runtime(bucketList),
+						BashComplete: cmpl.DirectIn,
 					},
 					{
 						Name:   "show",
@@ -131,35 +132,6 @@ func registerBuckets(app cli.App) *cli.App {
 		}...,
 	)
 	return &app
-}
-
-func cmdBucketList(c *cli.Context) error {
-	var err error
-	var repositoryID, path string
-
-	if err = adm.VerifyNoArgument(c); err != nil {
-		path = `/bucket/`
-	} else {
-		uniqKeys := []string{`in`}
-		opts := map[string][]string{}
-
-		if err = adm.ParseVariadicArguments(
-			opts,
-			[]string{},
-			uniqKeys,
-			uniqKeys,
-			c.Args().Tail()); err != nil {
-			return err
-		}
-
-		if repositoryID, err = adm.LookupRepoByBucket(opts[`in`][0]); err != nil {
-			return err
-		}
-
-		path = fmt.Sprintf("/repository/%s/bucket/", repositoryID)
-	}
-
-	return adm.Perform(`get`, path, `list`, nil, c)
 }
 
 func cmdBucketShow(c *cli.Context) error {
