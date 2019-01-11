@@ -46,9 +46,11 @@ func registerBuckets(app cli.App) *cli.App {
 						BashComplete: cmpl.DirectIn,
 					},
 					{
-						Name:   "show",
-						Usage:  "Show information about a specific bucket",
-						Action: runtime(cmdBucketShow),
+						Name:         `show`,
+						Usage:        `Show full information about a specific bucket`,
+						Description:  help.Text(`bucket::show`),
+						Action:       runtime(bucketShow),
+						BashComplete: cmpl.In,
 					},
 					{
 						Name:   `tree`,
@@ -132,25 +134,6 @@ func registerBuckets(app cli.App) *cli.App {
 		}...,
 	)
 	return &app
-}
-
-func cmdBucketShow(c *cli.Context) error {
-	var err error
-	var repositoryID, bucketID string
-
-	if err = adm.VerifySingleArgument(c); err != nil {
-		return err
-	}
-	if bucketID, err = adm.LookupBucketID(c.Args().First()); err != nil {
-		return err
-	}
-	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/repository/%s/bucket/%s",
-		repositoryID, bucketID)
-	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
 func cmdBucketTree(c *cli.Context) error {

@@ -10,6 +10,7 @@ package soma
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/mjolnir42/soma/internal/handler"
@@ -26,6 +27,7 @@ type BucketRead struct {
 	conn            *sql.DB
 	stmtList        *sql.Stmt
 	stmtShow        *sql.Stmt
+	stmtSearch      *sql.Stmt
 	stmtPropOncall  *sql.Stmt
 	stmtPropService *sql.Stmt
 	stmtPropSystem  *sql.Stmt
@@ -59,6 +61,7 @@ func (r *BucketRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
 		msg.ActionShow,
+		msg.ActionSearch,
 	} {
 		hmap.Request(msg.SectionBucket, action, r.handlerName)
 	}
@@ -79,12 +82,13 @@ func (r *BucketRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.BucketList:     &r.stmtList,
-		stmt.BucketShow:     &r.stmtShow,
-		stmt.BucketOncProps: &r.stmtPropOncall,
-		stmt.BucketSvcProps: &r.stmtPropService,
-		stmt.BucketSysProps: &r.stmtPropSystem,
-		stmt.BucketCstProps: &r.stmtPropCustom,
+		stmt.BucketList:             &r.stmtList,
+		stmt.BucketShow:             &r.stmtShow,
+		stmt.AuthorizedBucketSearch: &r.stmtSearch,
+		stmt.BucketOncProps:         &r.stmtPropOncall,
+		stmt.BucketSvcProps:         &r.stmtPropService,
+		stmt.BucketSysProps:         &r.stmtPropSystem,
+		stmt.BucketCstProps:         &r.stmtPropCustom,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`bucket`, err, stmt.Name(statement))
@@ -116,7 +120,7 @@ func (r *BucketRead) process(q *msg.Request) {
 	case msg.ActionShow:
 		r.show(q, &result)
 	case msg.ActionSearch:
-		// XXX BUG r.search(q, &result)
+		r.search(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -217,6 +221,86 @@ func (r *BucketRead) show(q *msg.Request, mr *msg.Result) {
 	}
 
 	mr.Bucket = append(mr.Bucket, bucket)
+	mr.OK()
+}
+
+// search returns specific buckets that were searched for
+func (r *BucketRead) search(q *msg.Request, mr *msg.Result) {
+	var (
+		bucketID, bucketName, repositoryID, createdBy, environment string
+		isDeleted                                                  bool
+		rows                                                       *sql.Rows
+		err                                                        error
+		nullID, nullName, nullRepoID, nullEnv                      sql.NullString
+		createdAt                                                  time.Time
+		searchDeleted                                              sql.NullBool
+	)
+	if q.Search.Bucket.ID != `` {
+		nullID.String = q.Search.Bucket.ID
+		nullID.Valid = true
+	}
+	if q.Search.Bucket.Name != `` {
+		nullName.String = q.Search.Bucket.Name
+		nullName.Valid = true
+	}
+	if q.Search.Bucket.RepositoryID != `` {
+		nullRepoID.String = q.Search.Bucket.RepositoryID
+		nullRepoID.Valid = true
+	}
+	if q.Search.Bucket.Environment != `` {
+		nullEnv.String = q.Search.Bucket.Environment
+		nullEnv.Valid = true
+	}
+
+	searchDeleted.Bool = q.Search.Bucket.IsDeleted
+	searchDeleted.Valid = q.Search.Bucket.FilterOnIsDeleted
+
+	if rows, err = r.stmtSearch.Query(
+		q.Section,
+		q.Action,
+		q.AuthUser,
+		nullID,
+		nullName,
+		nullRepoID,
+		nullEnv,
+		searchDeleted,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&bucketID,
+			&bucketName,
+			&repositoryID,
+			&createdBy,
+			&createdAt,
+			&environment,
+			&isDeleted,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		mr.Bucket = append(mr.Bucket, proto.Bucket{
+			ID:           bucketID,
+			Name:         bucketName,
+			RepositoryID: repositoryID,
+			Environment:  environment,
+			IsDeleted:    isDeleted,
+			Details: &proto.BucketDetails{
+				Creation: &proto.DetailsCreation{
+					CreatedAt: createdAt.UTC().Format(time.RFC3339),
+					CreatedBy: createdBy,
+				},
+			},
+		})
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
 	mr.OK()
 }
 

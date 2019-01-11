@@ -43,7 +43,7 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
-	request.Action = msg.ActionList
+	request.Action = msg.ActionSearch
 
 	cReq := proto.NewBucketFilter()
 	if err := decodeJSONBody(r, &cReq); err != nil {
@@ -58,6 +58,10 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 	}
 	request.Search.Bucket.ID = cReq.Filter.Bucket.ID
 	request.Search.Bucket.Name = cReq.Filter.Bucket.Name
+	request.Search.Bucket.RepositoryID = cReq.Filter.Bucket.RepositoryID
+	request.Search.Bucket.Environment = cReq.Filter.Bucket.Environment
+	request.Search.Bucket.IsDeleted = cReq.Filter.Bucket.IsDeleted
+	request.Search.Bucket.FilterOnIsDeleted = cReq.Filter.Bucket.FilterOnIsDeleted
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
@@ -66,15 +70,6 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-
-	// XXX BUG filter in SQL statement
-	filtered := []proto.Bucket{}
-	for _, i := range result.Bucket {
-		if (i.Name == cReq.Filter.Bucket.Name) || (i.ID == cReq.Filter.Bucket.ID) {
-			filtered = append(filtered, i)
-		}
-	}
-	result.Bucket = filtered
 	x.send(&w, &result)
 }
 
@@ -87,7 +82,8 @@ func (x *Rest) BucketShow(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionShow
 	request.Bucket = proto.Bucket{
-		ID: params.ByName(`bucket`),
+		ID:           params.ByName(`bucketID`),
+		RepositoryID: params.ByName(`repositoryID`),
 	}
 
 	if !x.isAuthorized(&request) {

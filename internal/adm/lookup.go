@@ -707,8 +707,11 @@ abort:
 
 // repoIDByBucketID implements the actual serverside lookup of the
 // repo's UUID
-func repoIDByBucketID(bucket string) (string, error) {
-	res, err := fetchObjList(fmt.Sprintf("/bucket/%s", bucket))
+func repoIDByBucketID(bucketID string) (string, error) {
+	req := proto.NewBucketFilter()
+	req.Filter.Bucket.ID = bucketID
+
+	res, err := fetchFilter(req, `/search/bucket/`)
 	if err != nil {
 		goto abort
 	}
@@ -718,16 +721,19 @@ func repoIDByBucketID(bucket string) (string, error) {
 		goto abort
 	}
 
-	// check the received record against the input
-	if bucket != (*res.Buckets)[0].ID {
+	if bucketID != (*res.Buckets)[0].ID {
 		err = fmt.Errorf("BucketID mismatch: %s vs %s",
-			bucket, (*res.Buckets)[0].ID)
+			bucketID, (*res.Buckets)[0].ID)
+		goto abort
+	}
+	if (*res.Buckets)[0].RepositoryID == `` {
+		err = fmt.Errorf(`RepositoryID not returned by server`)
 		goto abort
 	}
 	return (*res.Buckets)[0].RepositoryID, nil
 
 abort:
-	return ``, fmt.Errorf("RepositoryId lookup failed: %s",
+	return ``, fmt.Errorf("RepositoryID lookup via bucketID failed: %s",
 		err.Error())
 }
 

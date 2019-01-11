@@ -73,7 +73,7 @@ func bucketCreate(c *cli.Context) error {
 	req.Bucket.Environment = opts[`environment`][0]
 
 	path := fmt.Sprintf("/repository/%s/bucket/", repositoryID)
-	return adm.Perform(`postbody`, path, `command`, req, c)
+	return adm.Perform(`postbody`, path, `bucket::create`, req, c)
 }
 
 // bucketDestroy function
@@ -117,7 +117,7 @@ func bucketDestroy(c *cli.Context) error {
 		url.QueryEscape(repositoryID),
 		url.QueryEscape(bucketID),
 	)
-	return adm.Perform(`delete`, path, `command`, nil, c)
+	return adm.Perform(`delete`, path, `bucket::destroy`, nil, c)
 }
 
 // bucketList function
@@ -145,7 +145,129 @@ func bucketList(c *cli.Context) error {
 	}
 
 	path := fmt.Sprintf("/repository/%s/bucket/", repositoryID)
-	return adm.Perform(`get`, path, `list`, nil, c)
+	return adm.Perform(`get`, path, `bucket::list`, nil, c)
+}
+
+// bucketShow function
+// soma bucket show ${bucket} [in ${repository}]
+func bucketShow(c *cli.Context) error {
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`in`}
+	mandatoryOptions := []string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail(),
+	); err != nil {
+		return err
+	}
+
+	var err error
+	var repositoryID, repositoryControlID, bucketID string
+
+	if bucketID, err = adm.LookupBucketID(c.Args().First()); err != nil {
+		return err
+	}
+	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
+		return err
+	}
+
+	// optional argument, must be correct if provided
+	if _, ok := opts[`in`]; ok {
+		if repositoryControlID, err = adm.LookupRepoID(opts[`in`][0]); err != nil {
+			return err
+		} else if repositoryControlID != repositoryID {
+			return fmt.Errorf("bucket %s is not in repository %s", c.Args().First(), opts[`in`][0])
+		}
+	}
+
+	path := fmt.Sprintf(
+		"/repository/%s/bucket/%s",
+		url.QueryEscape(repositoryID),
+		url.QueryEscape(bucketID),
+	)
+	return adm.Perform(`get`, path, `bucket::show`, nil, c)
+}
+
+// bucketSearch function
+// soma bucket search [id ${uuid}] [name ${bucket}] [repository ${repository}] [environment ${environment}] [deleted ${isDeleted}]
+func bucketSearch(c *cli.Context) error {
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`id`, `name`, `repository`, `environment`, `deleted`}
+	mandatoryOptions := []string{}
+
+	if err := adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		adm.AllArguments(c),
+	); err != nil {
+		return err
+	}
+
+	validCondition := false
+	req := proto.NewBucketFilter()
+
+	if _, ok := opts[`id`]; ok {
+		req.Filter.Bucket.ID = opts[`id`][0]
+		if err := adm.ValidateUUID(req.Filter.Bucket.ID); err != nil {
+			return err
+		}
+		validCondition = true
+	}
+
+	if _, ok := opts[`name`]; ok {
+		req.Filter.Bucket.Name = opts[`name`][0]
+		if err := adm.ValidateNotUUID(req.Filter.Bucket.Name); err != nil {
+			return err
+		}
+		validCondition = true
+	}
+
+	if _, ok := opts[`repository`]; ok {
+		repositoryID, err := adm.LookupRepoID(opts[`repository`][0])
+		if err != nil {
+			return err
+		}
+		req.Filter.Bucket.RepositoryID = repositoryID
+		if err := adm.ValidateUUID(req.Filter.Bucket.RepositoryID); err != nil {
+			return err
+		}
+		validCondition = true
+	}
+
+	if _, ok := opts[`environment`]; ok {
+		req.Filter.Bucket.Environment = opts[`environment`][0]
+		if err := adm.ValidateNotUUID(req.Filter.Bucket.Environment); err != nil {
+			return err
+		}
+		if err := adm.ValidateNoSlash(req.Filter.Bucket.Environment); err != nil {
+			return err
+		}
+		validCondition = true
+	}
+
+	if _, ok := opts[`deleted`]; ok {
+		if err := adm.ValidateBool(opts[`deleted`][0],
+			&req.Filter.Bucket.IsDeleted,
+		); err != nil {
+			return err
+		}
+		req.Filter.Bucket.FilterOnIsDeleted = true
+		validCondition = true
+	}
+
+	if !validCondition {
+		return fmt.Errorf(`Syntax error: at least one search condition must be specified`)
+	}
+
+	return adm.Perform(`postbody`, `/search/bucket/`, `list`, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

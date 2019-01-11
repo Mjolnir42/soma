@@ -297,9 +297,11 @@ func (r *TreeRead) bucket(id string, depth int) (*proto.Bucket, error) {
 		Environment:  environment,
 		IsDeleted:    isDeleted,
 		IsFrozen:     isFrozen,
-		Details: &proto.Details{
-			CreatedBy: createdBy,
-			CreatedAt: createdAt.UTC().Format(time.RFC3339),
+		Details: &proto.BucketDetails{
+			Creation: &proto.DetailsCreation{
+				CreatedAt: createdAt.UTC().Format(time.RFC3339),
+				CreatedBy: createdBy,
+			},
 		},
 	}
 

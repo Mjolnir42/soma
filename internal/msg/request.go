@@ -92,7 +92,7 @@ func New(r *http.Request, params httprouter.Params) Request {
 type Filter struct {
 	IsDetailed bool
 	ActionObj  proto.Action
-	Bucket     proto.Bucket
+	Bucket     proto.BucketFilter
 	Cluster    proto.Cluster
 	Grant      proto.Grant
 	Group      proto.Group
