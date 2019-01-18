@@ -41,7 +41,7 @@ func registerCommands(app cli.App) *cli.App {
 
 	app = *registerAction(app)
 	app = *registerAttributes(app)
-	app = *registerBuckets(app)
+	app = *registerBucket(app)
 	app = *registerCapability(app)
 	app = *registerCategories(app)
 	app = *registerChecks(app)
