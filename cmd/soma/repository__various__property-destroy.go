@@ -58,6 +58,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 	var (
 		repositoryID, bucketID, teamID, serviceID string
 		property, sourceID, path, command         string
+		clusterID                                 string
 		err                                       error
 	)
 
@@ -80,7 +81,18 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
-	case proto.EntityGroup, proto.EntityCluster, proto.EntityNode:
+	case proto.EntityGroup:
+	case proto.EntityCluster:
+		if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
+			return err
+		}
+		if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
+			return err
+		}
+		if clusterID, err = adm.LookupClusterID(opts[`on`][0], bucketID); err != nil {
+			return err
+		}
+	case proto.EntityNode:
 	default:
 		return fmt.Errorf("Unknown entity: %s", entity)
 	}
@@ -120,7 +132,17 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 			repositoryID, bucketID, propertyType, sourceID,
 		)
 		command = `bucket-config::property-destroy`
-	case proto.EntityGroup, proto.EntityCluster, proto.EntityNode:
+	case proto.EntityGroup:
+	case proto.EntityCluster:
+		if err = adm.FindClusterPropSrcID(propertyType, property,
+			opts[`view`][0], clusterID, &sourceID); err != nil {
+			return err
+		}
+		path = fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/property/%s/%s",
+			repositoryID, bucketID, clusterID, propertyType, sourceID,
+		)
+		command = `cluster-config::property-destroy`
+	case proto.EntityNode:
 	default:
 		return fmt.Errorf("Unknown entity: %s", entity)
 	}

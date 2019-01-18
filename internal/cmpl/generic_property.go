@@ -34,4 +34,8 @@ func PropertyOnView(c *cli.Context) {
 	Generic(c, []string{`on`, `view`})
 }
 
+func PropertyOnInView(c *cli.Context) {
+	Generic(c, []string{`on`, `in`, `view`})
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

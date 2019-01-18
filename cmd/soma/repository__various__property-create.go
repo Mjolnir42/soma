@@ -79,7 +79,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 	)
 	// id lookup
 	switch entity {
-	case `node`:
+	case proto.EntityNode:
 		if objectID, err = adm.LookupNodeID(opts[`on`][0]); err != nil {
 			return err
 		}
@@ -88,7 +88,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		}
 		repoID = config.RepositoryID
 		bucketID = config.BucketID
-	case `cluster`:
+	case proto.EntityCluster:
 		bucketID, err = adm.LookupBucketID(opts[`in`][0])
 		if err != nil {
 			return err
@@ -100,7 +100,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
-	case `group`:
+	case proto.EntityGroup:
 		bucketID, err = adm.LookupBucketID(opts[`in`][0])
 		if err != nil {
 			return err
@@ -112,7 +112,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
-	case `bucket`:
+	case proto.EntityBucket:
 		bucketID, err = adm.LookupBucketID(opts[`on`][0])
 		if err != nil {
 			return err
@@ -121,7 +121,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
-	case `repository`:
+	case proto.EntityRepository:
 		repoID, err = adm.LookupRepoID(opts[`on`][0])
 		if err != nil {
 			return err

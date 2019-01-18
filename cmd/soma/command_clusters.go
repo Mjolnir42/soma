@@ -6,21 +6,37 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
+	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
 func registerClusters(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
-			// clusters
 			{
-				Name:  "cluster",
-				Usage: "SUBCOMMANDS for clusters",
+				Name:        `cluster`,
+				Usage:       `SUBCOMMANDS for bucket cluster management`,
+				Description: help.Text(`cluster-config::`),
 				Subcommands: []cli.Command{
 					{
-						Name:         "create",
-						Usage:        "Create a new cluster in a bucket",
-						Action:       runtime(cmdClusterCreate),
+						Name:         `list`,
+						Usage:        `List all clusters in a bucket`,
+						Description:  help.Text(`cluster-config::list`),
+						Action:       runtime(clusterConfigList),
+						BashComplete: cmpl.DirectIn,
+					},
+					{
+						Name:         `show`,
+						Usage:        `Show details about a cluster`,
+						Description:  help.Text(`cluster-config::show`),
+						Action:       runtime(clusterConfigShow),
+						BashComplete: cmpl.In,
+					},
+					{
+						Name:         `create`,
+						Usage:        `Create a new cluster in a bucket`,
+						Description:  help.Text(`cluster-config::create`),
+						Action:       runtime(clusterConfigCreate),
 						BashComplete: cmpl.In,
 					},
 					{
@@ -34,18 +50,6 @@ func registerClusters(app cli.App) *cli.App {
 						Usage:        "Rename a cluster",
 						Action:       runtime(cmdClusterRename),
 						BashComplete: cmpl.InTo,
-					},
-					{
-						Name:         "list",
-						Usage:        "List all clusters in a bucket",
-						Action:       runtime(cmdClusterList),
-						BashComplete: cmpl.In,
-					},
-					{
-						Name:         "show",
-						Usage:        "Show details about a cluster",
-						Action:       runtime(cmdClusterShow),
-						BashComplete: cmpl.In,
 					},
 					{
 						Name:         "tree",
@@ -78,138 +82,87 @@ func registerClusters(app cli.App) *cli.App {
 						},
 					},
 					{
-						Name:  "property",
-						Usage: "SUBCOMMANDS for properties",
+						Name:        `property`,
+						Usage:       `SUBCOMMANDS for properties on clusters`,
+						Description: help.Text(`cluster-config::`),
 						Subcommands: []cli.Command{
 							{
-								Name:  "add",
-								Usage: "SUBCOMMANDS for property add",
+								Name:        `create`,
+								Usage:       `SUBCOMMANDS to create properties`,
+								Description: help.Text(`cluster-config::property-create`),
 								Subcommands: []cli.Command{
 									{
-										Name:         "system",
-										Usage:        "Add a system property to a cluster",
-										Action:       runtime(cmdClusterSystemPropertyAdd),
-										BashComplete: cmpl.PropertyAddValue,
+										Name:         `system`,
+										Usage:        `Add a system property to a cluster`,
+										Description:  help.Text(`cluster-config::property-create`),
+										Action:       runtime(clusterConfigPropertyCreateSystem),
+										BashComplete: cmpl.PropertyCreateInValue,
 									},
 									{
-										Name:         "service",
-										Usage:        "Add a service property to a cluster",
-										Action:       runtime(cmdClusterServicePropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
+										Name:         `service`,
+										Usage:        `Add a service property to a cluster`,
+										Description:  help.Text(`cluster-config::property-create`),
+										Action:       runtime(clusterConfigPropertyCreateService),
+										BashComplete: cmpl.PropertyCreateInValue,
 									},
 									{
 										Name:         `oncall`,
 										Usage:        `Add an oncall property to a cluster`,
-										Action:       runtime(cmdClusterOncallPropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
+										Description:  help.Text(`cluster-config::property-create`),
+										Action:       runtime(clusterConfigPropertyCreateOncall),
+										BashComplete: cmpl.PropertyCreateIn,
 									},
 									{
 										Name:         `custom`,
 										Usage:        `Add a custom property to a cluster`,
-										Action:       runtime(cmdClusterCustomPropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
+										Description:  help.Text(`cluster-config::property-create`),
+										Action:       runtime(clusterConfigPropertyCreateCustom),
+										BashComplete: cmpl.PropertyCreateIn,
 									},
 								},
 							},
 							{
-								Name:  `delete`,
-								Usage: `SUBCOMMANDS for property delete`,
+								Name:        `destroy`,
+								Usage:       `SUBCOMMANDS to destroy properties`,
+								Description: help.Text(`cluster-config::property-destroy`),
 								Subcommands: []cli.Command{
 									{
 										Name:         `system`,
 										Usage:        `Delete a system property from a cluster`,
-										Action:       runtime(cmdClusterSystemPropertyDelete),
-										BashComplete: cmpl.InFromView,
+										Description:  help.Text(`cluster-config::property-destroy`),
+										Action:       runtime(clusterConfigPropertyDestroySystem),
+										BashComplete: cmpl.PropertyOnInView,
 									},
 									{
 										Name:         `service`,
 										Usage:        `Delete a service property from a cluster`,
-										Action:       runtime(cmdClusterServicePropertyDelete),
-										BashComplete: cmpl.InFromView,
+										Description:  help.Text(`cluster-config::property-destroy`),
+										Action:       runtime(clusterConfigPropertyDestroyService),
+										BashComplete: cmpl.PropertyOnInView,
 									},
 									{
 										Name:         `oncall`,
 										Usage:        `Delete an oncall property from a cluster`,
-										Action:       runtime(cmdClusterOncallPropertyDelete),
-										BashComplete: cmpl.InFromView,
+										Description:  help.Text(`cluster-config::property-destroy`),
+										Action:       runtime(clusterConfigPropertyDestroyOncall),
+										BashComplete: cmpl.PropertyOnInView,
 									},
 									{
 										Name:         `custom`,
 										Usage:        `Delete a custom property from a cluster`,
-										Action:       runtime(cmdClusterCustomPropertyDelete),
-										BashComplete: cmpl.InFromView,
+										Description:  help.Text(`cluster-config::property-destroy`),
+										Action:       runtime(clusterConfigPropertyDestroyCustom),
+										BashComplete: cmpl.PropertyOnInView,
 									},
 								},
 							},
 						},
 					},
 				},
-			}, // end clusters
+			},
 		}...,
 	)
 	return &app
-}
-
-func cmdClusterList(c *cli.Context) error {
-	uniqKeys := []string{`in`}
-	opts := map[string][]string{}
-
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-
-	var (
-		err                    error
-		repositoryID, bucketID string
-	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/",
-		repositoryID, bucketID)
-	return adm.Perform(`get`, path, `list`, nil, c)
-}
-
-func cmdClusterShow(c *cli.Context) error {
-	uniqKeys := []string{`in`}
-	opts := map[string][]string{}
-
-	if err := adm.ParseVariadicArguments(
-		opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-
-	var (
-		err                               error
-		repositoryID, bucketID, clusterID string
-	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
-		return err
-	}
-	if clusterID, err = adm.LookupClusterID(c.Args().First(),
-		bucketID); err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s",
-		repositoryID, bucketID, clusterID)
-	return adm.Perform(`get`, path, `show`, nil, c)
 }
 
 func cmdClusterTree(c *cli.Context) error {
@@ -243,41 +196,6 @@ func cmdClusterTree(c *cli.Context) error {
 	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/tree",
 		repositoryID, bucketID, clusterID)
 	return adm.Perform(`get`, path, `tree`, nil, c)
-}
-
-func cmdClusterCreate(c *cli.Context) error {
-	uniqKeys := []string{`in`}
-	opts := map[string][]string{}
-
-	if err := adm.ParseVariadicArguments(opts,
-		[]string{},
-		uniqKeys,
-		uniqKeys,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-
-	bucketID, err := adm.LookupBucketID(opts[`in`][0])
-	if err != nil {
-		return err
-	}
-	repositoryID, err := adm.LookupRepoByBucket(bucketID)
-	if err != nil {
-		return err
-	}
-
-	req := proto.NewClusterRequest()
-	req.Cluster.Name = c.Args().First()
-	req.Cluster.RepositoryID = repositoryID
-	req.Cluster.BucketID = bucketID
-
-	if err := adm.ValidateRuneCountRange(
-		req.Cluster.Name, 4, 256); err != nil {
-		return err
-	}
-
-	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/", repositoryID, bucketID)
-	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
 func cmdClusterDestroy(c *cli.Context) error {
@@ -442,90 +360,6 @@ func cmdClusterMemberUnassign(c *cli.Context) error {
 	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/member/%s/%s",
 		repositoryID, bucketID, clusterID, `node`, nodeID)
 	return adm.Perform(`delete`, path, `command`, nil, c)
-}
-
-func cmdClusterSystemPropertyAdd(c *cli.Context) error {
-	return cmdClusterPropertyAdd(c, `system`)
-}
-
-func cmdClusterServicePropertyAdd(c *cli.Context) error {
-	return cmdClusterPropertyAdd(c, `service`)
-}
-
-func cmdClusterOncallPropertyAdd(c *cli.Context) error {
-	return cmdClusterPropertyAdd(c, `oncall`)
-}
-
-func cmdClusterCustomPropertyAdd(c *cli.Context) error {
-	return cmdClusterPropertyAdd(c, `custom`)
-}
-
-func cmdClusterPropertyAdd(c *cli.Context, pType string) error {
-	return cmdPropertyAdd(c, pType, `cluster`)
-}
-
-func cmdClusterSystemPropertyDelete(c *cli.Context) error {
-	return cmdClusterPropertyDelete(c, `system`)
-}
-
-func cmdClusterServicePropertyDelete(c *cli.Context) error {
-	return cmdClusterPropertyDelete(c, `service`)
-}
-
-func cmdClusterOncallPropertyDelete(c *cli.Context) error {
-	return cmdClusterPropertyDelete(c, `oncall`)
-}
-
-func cmdClusterCustomPropertyDelete(c *cli.Context) error {
-	return cmdClusterPropertyDelete(c, `custom`)
-}
-
-func cmdClusterPropertyDelete(c *cli.Context, pType string) error {
-	multiple := []string{}
-	unique := []string{`from`, `view`, `in`}
-	required := []string{`from`, `view`, `in`}
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(
-		opts,
-		multiple,
-		unique,
-		required,
-		c.Args().Tail()); err != nil {
-		return err
-	}
-	var (
-		err                                         error
-		repositoryID, bucketID, clusterID, sourceID string
-	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
-		return err
-	}
-	if clusterID, err = adm.LookupClusterID(opts[`from`][0],
-		bucketID); err != nil {
-		return err
-	}
-
-	if pType == `system` {
-		if err := adm.ValidateSystemProperty(
-			c.Args().First()); err != nil {
-			return err
-		}
-	}
-	if err := adm.FindClusterPropSrcID(pType, c.Args().First(),
-		opts[`view`][0], clusterID, &sourceID); err != nil {
-		return err
-	}
-
-	req := proto.NewClusterRequest()
-	req.Cluster.ID = clusterID
-	req.Cluster.BucketID = bucketID
-
-	path := fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/property/%s/%s",
-		repositoryID, bucketID, clusterID, pType, sourceID)
-	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 
 func cmdClusterRename(c *cli.Context) error {
