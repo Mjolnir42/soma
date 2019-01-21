@@ -330,26 +330,6 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionCluster
 	request.Action = msg.ActionPropertyDestroy
 
-	cReq := proto.NewClusterRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		x.replyBadRequest(&w, &request, err)
-		return
-	}
-
-	switch {
-	case params.ByName(`clusterID`) != cReq.Cluster.ID:
-		x.replyBadRequest(&w, &request, fmt.Errorf(
-			"Mismatched cluster ids: %s, %s",
-			params.ByName(`clusterID`),
-			cReq.Cluster.ID,
-		))
-		return
-	case cReq.Cluster.BucketID == ``:
-		x.replyBadRequest(&w, &request, fmt.Errorf(
-			`Missing bucketID in bucket property delete request`,
-		))
-		return
-	}
 	request.TargetEntity = msg.EntityCluster
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
@@ -361,7 +341,7 @@ func (x *Rest) ClusterPropertyDestroy(w http.ResponseWriter, r *http.Request,
 		Properties: &[]proto.Property{
 			proto.Property{
 				Type:             params.ByName(`propertyType`),
-				BucketID:         cReq.Cluster.BucketID,
+				BucketID:         params.ByName(`bucketID`),
 				SourceInstanceID: params.ByName(`sourceID`),
 			},
 		},
