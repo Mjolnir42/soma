@@ -121,6 +121,7 @@ func (r *ClusterRead) process(q *msg.Request) {
 		r.show(q, &result)
 	case msg.ActionSearch:
 		//XXX TODO r.search(q, &result)
+		r.list(q, &result)
 	case msg.ActionMemberList:
 		r.memberList(q, &result)
 	default:
