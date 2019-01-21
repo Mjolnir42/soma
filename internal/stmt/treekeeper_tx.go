@@ -599,11 +599,11 @@ SELECT $1::uuid,
        $3::uuid,
        $4::varchar,
        $5::uuid,
+       (SELECT bucket_id FROM soma.groups WHERE group_id = $3::uuid),
        $6::uuid,
-       $7::uuid,
+       $7::boolean,
        $8::boolean,
-       $9::boolean,
-       $10::text;`
+       $9::text;`
 
 	TxGroupPropertyCustomDelete = `
 DELETE FROM soma.group_custom_properties
@@ -743,11 +743,11 @@ SELECT $1::uuid,
        $3::uuid,
        $4::varchar,
        $5::uuid,
+       (SELECT bucket_id FROM soma.clusters WHERE cluster_id = $3::uuid),
        $6::uuid,
-       $7::uuid,
+       $7::boolean,
        $8::boolean,
-       $9::boolean,
-       $10::text;`
+       $9::text;`
 
 	TxClusterPropertyCustomDelete = `
 DELETE FROM soma.cluster_custom_properties
