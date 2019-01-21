@@ -363,24 +363,6 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionGroup
 	request.Action = msg.ActionPropertyDestroy
 
-	cReq := proto.NewGroupRequest()
-	if err := decodeJSONBody(r, &cReq); err != nil {
-		x.replyBadRequest(&w, &request, err)
-		return
-	}
-
-	switch {
-	case params.ByName(`groupID`) != cReq.Group.ID:
-		x.replyBadRequest(&w, &request, fmt.Errorf(
-			"Mismatched group ids: %s, %s",
-			params.ByName(`groupID`),
-			cReq.Group.ID))
-		return
-	case cReq.Group.BucketID == ``:
-		x.replyBadRequest(&w, &request, fmt.Errorf(
-			`Missing bucketId in group delete request`))
-		return
-	}
 	request.TargetEntity = msg.EntityGroup
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
@@ -388,8 +370,8 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request.Group.ID = params.ByName(`groupID`)
 	request.Group.Properties = &[]proto.Property{proto.Property{
 		Type:             params.ByName(`propertyType`),
-		RepositoryID:     request.Repository.ID,
-		BucketID:         request.Bucket.ID,
+		RepositoryID:     params.ByName(`repositoryID`),
+		BucketID:         params.ByName(`bucketID`),
 		SourceInstanceID: params.ByName(`sourceID`),
 	}}
 

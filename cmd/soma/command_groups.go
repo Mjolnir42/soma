@@ -6,13 +6,13 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
+	"github.com/mjolnir42/soma/internal/help"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
 func registerGroups(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
-			// groups
 			{
 				Name:  "groups",
 				Usage: "SUBCOMMANDS for groups",
@@ -113,73 +113,84 @@ func registerGroups(app cli.App) *cli.App {
 						},
 					},
 					{
-						Name:  "property",
-						Usage: "SUBCOMMANDS for properties",
+						Name:        `property`,
+						Usage:       `SUBCOMMANDS for properties on groups`,
+						Description: help.Text(`group-config::`),
 						Subcommands: []cli.Command{
 							{
-								Name:  "add",
-								Usage: "SUBCOMMANDS for property add",
+								Name:        `create`,
+								Usage:       `SUBCOMMANDS to create properties`,
+								Description: help.Text(`group-config::property-create`),
 								Subcommands: []cli.Command{
 									{
-										Name:         "system",
-										Usage:        "Add a system property to a group",
-										Action:       runtime(cmdGroupSystemPropertyAdd),
-										BashComplete: cmpl.PropertyAddValue,
+										Name:         `system`,
+										Usage:        `Add a system property to a group`,
+										Description:  help.Text(`group-config::property-create`),
+										Action:       runtime(clusterConfigPropertyCreateSystem),
+										BashComplete: cmpl.PropertyCreateInValue,
 									},
 									{
-										Name:         "service",
-										Usage:        "Add a service property to a group",
-										Action:       runtime(cmdGroupServicePropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
+										Name:         `service`,
+										Usage:        `Add a service property to a group`,
+										Description:  help.Text(`group-config::property-create`),
+										Action:       runtime(clusterConfigPropertyCreateService),
+										BashComplete: cmpl.PropertyCreateInValue,
 									},
 									{
 										Name:         `oncall`,
 										Usage:        `Add an oncall property to a group`,
-										Action:       runtime(cmdGroupOncallPropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
+										Description:  help.Text(`group-config::property-create`),
+										Action:       runtime(clusterConfigPropertyCreateOncall),
+										BashComplete: cmpl.PropertyCreateIn,
 									},
 									{
 										Name:         `custom`,
 										Usage:        `Add a custom property to a group`,
-										Action:       runtime(cmdGroupCustomPropertyAdd),
-										BashComplete: cmpl.PropertyAdd,
+										Description:  help.Text(`group-config::property-create`),
+										Action:       runtime(clusterConfigPropertyCreateCustom),
+										BashComplete: cmpl.PropertyCreateIn,
 									},
 								},
 							},
 							{
-								Name:  `delete`,
-								Usage: `SUBCOMMANDS for property delete`,
+								Name:        `destroy`,
+								Usage:       `SUBCOMMANDS to destroy properties`,
+								Description: help.Text(`group-config::property-destroy`),
 								Subcommands: []cli.Command{
 									{
 										Name:         `system`,
 										Usage:        `Delete a system property from a group`,
-										Action:       runtime(cmdGroupSystemPropertyDelete),
-										BashComplete: cmpl.InFromView,
+										Description:  help.Text(`group-config::property-destroy`),
+										Action:       runtime(clusterConfigPropertyDestroySystem),
+										BashComplete: cmpl.PropertyOnInView,
 									},
 									{
 										Name:         `service`,
 										Usage:        `Delete a service property from a group`,
-										Action:       runtime(cmdGroupServicePropertyDelete),
-										BashComplete: cmpl.InFromView,
+										Description:  help.Text(`group-config::property-destroy`),
+										Action:       runtime(clusterConfigPropertyDestroyService),
+										BashComplete: cmpl.PropertyOnInView,
 									},
 									{
 										Name:         `oncall`,
 										Usage:        `Delete an oncall property from a group`,
-										Action:       runtime(cmdGroupOncallPropertyDelete),
-										BashComplete: cmpl.InFromView,
+										Description:  help.Text(`group-config::property-destroy`),
+										Action:       runtime(clusterConfigPropertyDestroyOncall),
+										BashComplete: cmpl.PropertyOnInView,
 									},
 									{
 										Name:         `custom`,
 										Usage:        `Delete a custom property from a group`,
-										Action:       runtime(cmdGroupCustomPropertyDelete),
-										BashComplete: cmpl.InFromView,
+										Description:  help.Text(`group-config::property-destroy`),
+										Action:       runtime(clusterConfigPropertyDestroyCustom),
+										BashComplete: cmpl.PropertyOnInView,
 									},
 								},
 							},
 						},
 					},
 				},
-			}, // end groups
+			},
 		}...,
 	)
 	return &app
@@ -597,84 +608,6 @@ func cmdGroupMemberList(c *cli.Context) error {
 
 	path := fmt.Sprintf("/groups/%s/members/", groupID)
 	return adm.Perform(`get`, path, `list`, nil, c)
-}
-
-func cmdGroupSystemPropertyAdd(c *cli.Context) error {
-	return cmdGroupPropertyAdd(c, `system`)
-}
-
-func cmdGroupServicePropertyAdd(c *cli.Context) error {
-	return cmdGroupPropertyAdd(c, `service`)
-}
-
-func cmdGroupOncallPropertyAdd(c *cli.Context) error {
-	return cmdGroupPropertyAdd(c, `oncall`)
-}
-
-func cmdGroupCustomPropertyAdd(c *cli.Context) error {
-	return cmdGroupPropertyAdd(c, `custom`)
-}
-
-func cmdGroupPropertyAdd(c *cli.Context, pType string) error {
-	return cmdPropertyAdd(c, pType, `group`)
-}
-
-func cmdGroupSystemPropertyDelete(c *cli.Context) error {
-	return cmdGroupPropertyDelete(c, `system`)
-}
-
-func cmdGroupServicePropertyDelete(c *cli.Context) error {
-	return cmdGroupPropertyDelete(c, `service`)
-}
-
-func cmdGroupOncallPropertyDelete(c *cli.Context) error {
-	return cmdGroupPropertyDelete(c, `oncall`)
-}
-
-func cmdGroupCustomPropertyDelete(c *cli.Context) error {
-	return cmdGroupPropertyDelete(c, `custom`)
-}
-
-func cmdGroupPropertyDelete(c *cli.Context, pType string) error {
-	multiple := []string{}
-	unique := []string{`from`, `view`, `in`}
-	required := []string{`from`, `view`, `in`}
-	opts := map[string][]string{}
-	if err := adm.ParseVariadicArguments(opts, multiple, unique,
-		required, c.Args().Tail()); err != nil {
-		return err
-	}
-	var (
-		err               error
-		bucketID, groupID string
-	)
-	if bucketID, err = adm.LookupBucketID(opts["in"][0]); err != nil {
-		return err
-	}
-	if groupID, err = adm.LookupGroupID(opts[`from`][0],
-		bucketID); err != nil {
-		return err
-	}
-
-	if pType == `system` {
-		if err := adm.ValidateSystemProperty(
-			c.Args().First()); err != nil {
-			return err
-		}
-	}
-	var sourceID string
-	if err := adm.FindGroupPropSrcID(pType, c.Args().First(),
-		opts[`view`][0], groupID, &sourceID); err != nil {
-		return err
-	}
-
-	req := proto.NewGroupRequest()
-	req.Group.ID = groupID
-	req.Group.BucketID = bucketID
-
-	path := fmt.Sprintf("/groups/%s/property/%s/%s",
-		groupID, pType, sourceID)
-	return adm.Perform(`deletebody`, path, `command`, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
