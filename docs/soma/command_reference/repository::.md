@@ -1,7 +1,6 @@
 # repository management
 
-Repository management contains the global actions for managing
-repositories.
+Repository management contains the actions for managing configuration repositories.
 
 # SYNOPSIS OVERVIEW
 
