@@ -811,11 +811,24 @@ abort:
 
 //
 func clusterIDByName(cluster, bucketID string) (string, error) {
+	path := ``
+	res := &proto.Result{}
 	req := proto.NewClusterFilter()
+
+	repoID, err := LookupRepoByBucket(bucketID)
+	if err != nil {
+		goto abort
+	}
+
 	req.Filter.Cluster.Name = cluster
 	req.Filter.Cluster.BucketID = bucketID
+	path = fmt.Sprintf(
+		"/search/repository/%s/bucket/%s/cluster/",
+		repoID,
+		bucketID,
+	)
 
-	res, err := fetchFilter(req, `/search/clusters/`)
+	res, err = fetchFilter(req, path)
 	if err != nil {
 		goto abort
 	}
