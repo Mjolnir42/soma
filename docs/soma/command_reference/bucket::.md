@@ -22,4 +22,4 @@ soma bucket property destroy service ${service} on ${bucket} view ${view}
 soma bucket property destroy oncall  ${oncall}  on ${bucket} view ${view}
 ```
 
-See `soma bucket help ${command} for detailed help.
+See `soma bucket help ${command}` for detailed help.
