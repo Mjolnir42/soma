@@ -29,6 +29,8 @@ func (g *GuidePost) fillReqData(q *msg.Request) (bool, error) {
 		return g.fillCheckDeleteInfo(q)
 	case q.Section == msg.SectionBucket && q.Action == msg.ActionCreate:
 		return g.fillBucketID(q)
+	case q.Section == msg.SectionGroup && q.Action == msg.ActionCreate:
+		return g.fillGroupID(q)
 	case q.Action == msg.ActionPropertyDestroy:
 		return g.fillPropertyDeleteInfo(q)
 	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionCreate:
@@ -47,6 +49,12 @@ func (g *GuidePost) fillCheckConfigID(q *msg.Request) (bool, error) {
 // generate BucketID
 func (g *GuidePost) fillBucketID(q *msg.Request) (bool, error) {
 	q.Bucket.ID = uuid.Must(uuid.NewV4()).String()
+	return false, nil
+}
+
+// generate GroupID
+func (g *GuidePost) fillGroupID(q *msg.Request) (bool, error) {
+	q.Group.ID = uuid.Must(uuid.NewV4()).String()
 	return false, nil
 }
 

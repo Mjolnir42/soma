@@ -62,6 +62,7 @@ func (r *GroupRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
 		msg.ActionShow,
+		msg.ActionSearch,
 		msg.ActionMemberList,
 	} {
 		hmap.Request(msg.SectionGroup, action, r.handlerName)
@@ -122,6 +123,9 @@ func (r *GroupRead) process(q *msg.Request) {
 		r.list(q, &result)
 	case msg.ActionShow:
 		r.show(q, &result)
+	case msg.ActionSearch:
+		//XXX TODO r.search(q, &result)
+		r.list(q, &result)
 	case msg.ActionMemberList:
 		r.memberList(q, &result)
 	default:

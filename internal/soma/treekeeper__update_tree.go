@@ -71,7 +71,7 @@ func (tk *TreeKeeper) treeGroup(q *msg.Request) {
 		switch q.Action {
 		case msg.ActionCreate:
 			tree.NewGroup(tree.GroupSpec{
-				ID:   uuid.Must(uuid.NewV4()).String(),
+				ID:   q.Group.ID,
 				Name: q.Group.Name,
 				Team: tk.meta.teamID,
 			}).Attach(tree.AttachRequest{

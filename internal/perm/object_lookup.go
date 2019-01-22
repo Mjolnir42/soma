@@ -64,6 +64,10 @@ func (m *objectLookup) addBucket(repoID, bucketID string) {
 
 // addGroup inserts a new group into the cache
 func (m *objectLookup) addGroup(bucketID, groupID string) {
+	if bucketID == `` || groupID == `` {
+		panic(`permission cache: group registration added with empty object IDs -- supervisor corruption`)
+	}
+
 	if _, ok := m.byGroup[groupID]; ok {
 		return
 	}
