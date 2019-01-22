@@ -37,6 +37,10 @@ func newObjectLookup() *objectLookup {
 
 // addRepository inserts a new repository into the cache
 func (m *objectLookup) addRepository(repoID string) {
+	if repoID == `` {
+		panic(`permission cache: repository registration added with empty object IDs -- supervisor corruption`)
+	}
+
 	if _, ok := m.byRepository[repoID]; ok {
 		return
 	}
@@ -45,6 +49,10 @@ func (m *objectLookup) addRepository(repoID string) {
 
 // addBucket inserts a new bucket into the cache
 func (m *objectLookup) addBucket(repoID, bucketID string) {
+	if bucketID == `` || repoID == `` {
+		panic(`permission cache: bucket registration added with empty object IDs -- supervisor corruption`)
+	}
+
 	if _, ok := m.byBucket[bucketID]; ok {
 		return
 	}
@@ -96,6 +104,10 @@ func (m *objectLookup) addGroup(bucketID, groupID string) {
 
 // addCluster inserts a new cluster into the cache
 func (m *objectLookup) addCluster(bucketID, clusterID string) {
+	if bucketID == `` || clusterID == `` {
+		panic(`permission cache: cluster registration added with empty object IDs -- supervisor corruption`)
+	}
+
 	if _, ok := m.byCluster[clusterID]; ok {
 		return
 	}
@@ -124,6 +136,10 @@ func (m *objectLookup) addCluster(bucketID, clusterID string) {
 
 // addNode inserts a new node into the cache
 func (m *objectLookup) addNode(bucketID, nodeID string) {
+	if bucketID == `` || nodeID == `` {
+		panic(`permission cache: node registration added with empty object IDs -- supervisor corruption`)
+	}
+
 	if _, ok := m.byNode[nodeID]; ok {
 		return
 	}
