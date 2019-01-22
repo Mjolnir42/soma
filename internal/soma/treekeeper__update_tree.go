@@ -11,7 +11,6 @@ package soma
 import (
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
-	"github.com/satori/go.uuid"
 )
 
 func (tk *TreeKeeper) treeRepository(q *msg.Request) {
@@ -117,7 +116,7 @@ func (tk *TreeKeeper) treeCluster(q *msg.Request) {
 		switch q.Action {
 		case msg.ActionCreate:
 			tree.NewCluster(tree.ClusterSpec{
-				ID:   uuid.Must(uuid.NewV4()).String(),
+				ID:   q.Cluster.ID,
 				Name: q.Cluster.Name,
 				Team: tk.meta.teamID,
 			}).Attach(tree.AttachRequest{
