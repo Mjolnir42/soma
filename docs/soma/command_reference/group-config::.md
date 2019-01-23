@@ -7,7 +7,12 @@ soma group list in ${bucket}
 soma group show ${group} in ${bucket}
 soma group dumptree ${group} in ${bucket}
 soma group member assign group ${child-group} to ${group} in ${bucket}
+soma group member assign cluster ${cluster} to ${group} in ${bucket}
+soma group member assign node ${node} to ${group} [in ${bucket}]
 soma group member unassign group ${child-group} from ${group} in ${bucket}
+soma group member unassign cluster ${cluster} from ${group} in ${bucket}
+soma group member unassign node ${node} from ${group} [in ${bucket}]
+soma group member list of ${group} in ${bucket}
 soma group property create system  ${system}  on ${group} in ${bucket} view ${view} value ${value} [inheritance ${inherit}] [childrenonly ${child}]
 soma group property create custom  ${custom}  on ${group} in ${bucket} view ${view} value ${value} [inheritance ${inherit}] [childrenonly ${child}]
 soma group property create service ${service} on ${group} in ${bucket} view ${view} [inheritance ${inherit}] [childrenonly ${child}]
