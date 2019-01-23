@@ -1037,7 +1037,7 @@ func upgradeSomaTo201811150001(curr int, tool string, printOnly bool) int {
 		`ALTER TABLE soma.permission_map DROP CONSTRAINT permission_map_section_id_fkey1;`,
 		`ALTER TABLE soma.permission_map DROP CONSTRAINT permission_map_section_id_fkey2;`,
 		`ALTER TABLE soma.permission_map ALTER COLUMN mapping_id SET NOT NULL;`,
-		`ALTER TABLE soma.permission_map ALTER COLUMN mapping_id DEFAULT gen_random_uuid();`,
+		`ALTER TABLE soma.permission_map ALTER COLUMN mapping_id SET DEFAULT gen_random_uuid();`,
 		`ALTER TABLE soma.permission_map RENAME mapping_id TO id;`,
 		`ALTER TABLE soma.permission_map ADD CONSTRAINT _permission_map_permission_in_category FOREIGN KEY ( permission_id, category ) REFERENCES soma.permission (id, category) DEFERRABLE;`,
 		`ALTER TABLE soma.permission_map ADD CONSTRAINT _permission_map_section_in_category FOREIGN KEY (section_id, category) REFERENCES sections(section_id, category) DEFERRABLE;`,
