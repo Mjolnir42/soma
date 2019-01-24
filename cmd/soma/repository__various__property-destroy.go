@@ -10,6 +10,7 @@ package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
@@ -57,8 +58,8 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 
 	var (
 		repositoryID, bucketID, teamID, serviceID string
-		property, sourceID, path, command         string
-		groupID, clusterID                        string
+		property, sourceID, path                  string
+		groupID, clusterID, nodeID                string
 		err                                       error
 	)
 
@@ -102,6 +103,15 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 			return err
 		}
 	case proto.EntityNode:
+		config := &proto.NodeConfig{}
+		if nodeID, err = adm.LookupNodeID(opts[`on`][0]); err != nil {
+			return err
+		}
+		if config, err = adm.LookupNodeConfig(nodeID); err != nil {
+			return err
+		}
+		bucketID = config.BucketID
+		repositoryID = config.RepositoryID
 	default:
 		return fmt.Errorf("Unknown entity: %s", entity)
 	}
@@ -129,40 +139,61 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 			return err
 		}
 		path = fmt.Sprintf("/repository/%s/property/%s/%s",
-			repositoryID, propertyType, sourceID,
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
 		)
-		command = `repository-config::property-destroy`
 	case proto.EntityBucket:
 		if err = adm.FindBucketPropSrcID(propertyType, property,
 			opts[`view`][0], bucketID, &sourceID); err != nil {
 			return err
 		}
 		path = fmt.Sprintf("/repository/%s/bucket/%s/property/%s/%s",
-			repositoryID, bucketID, propertyType, sourceID,
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
 		)
-		command = `bucket-config::property-destroy`
 	case proto.EntityGroup:
 		if err = adm.FindGroupPropSrcID(propertyType, property,
 			opts[`view`][0], groupID, &sourceID); err != nil {
 			return err
 		}
 		path = fmt.Sprintf("/repository/%s/bucket/%s/group/%s/property/%s/%s",
-			repositoryID, bucketID, groupID, propertyType, sourceID,
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(groupID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
 		)
-		command = `group-config::property-destroy`
 	case proto.EntityCluster:
 		if err = adm.FindClusterPropSrcID(propertyType, property,
 			opts[`view`][0], clusterID, &sourceID); err != nil {
 			return err
 		}
 		path = fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/property/%s/%s",
-			repositoryID, bucketID, clusterID, propertyType, sourceID,
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(clusterID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
 		)
-		command = `cluster-config::property-destroy`
 	case proto.EntityNode:
+		if err = adm.FindNodePropSrcID(propertyType, property,
+			opts[`view`][0], nodeID, &sourceID); err != nil {
+			return err
+		}
+		path = fmt.Sprintf("/repository/%s/bucket/%s/node/%s/property/%s/%s",
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(nodeID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
+		)
 	default:
 		return fmt.Errorf("Unknown entity: %s", entity)
 	}
+	command := fmt.Sprintf("%s-config::property-destroy", entity)
 
 	return adm.Perform(`delete`, path, command, nil, c)
 }

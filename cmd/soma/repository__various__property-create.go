@@ -10,6 +10,7 @@ package main // import "github.com/mjolnir42/soma/cmd/soma"
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/codegangsta/cli"
 	"github.com/mjolnir42/soma/internal/adm"
@@ -244,19 +245,25 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 
 	var path string
 	switch entity {
-	case `cluster`, `group`, `node`:
+	case proto.EntityGroup, proto.EntityCluster, proto.EntityNode:
 		path = fmt.Sprintf("/repository/%s/bucket/%s/%s/%s/property/",
-			repoID, bucketID, entity, objectID)
-	case `bucket`:
-		path = fmt.Sprintf("/repository/%s/%s/%s/property/",
-			repoID, entity, objectID)
+			url.QueryEscape(repoID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(entity),
+			url.QueryEscape(objectID),
+		)
+	case proto.EntityBucket:
+		path = fmt.Sprintf("/repository/%s/bucket/%s/property/",
+			url.QueryEscape(repoID),
+			url.QueryEscape(objectID),
+		)
 	case proto.EntityRepository:
-		path = fmt.Sprintf("/%s/%s/property/",
-			proto.EntityRepository,
-			objectID,
+		path = fmt.Sprintf("/repository/%s/property/",
+			url.QueryEscape(objectID),
 		)
 	}
-	return adm.Perform(`postbody`, path, `command`, req, c)
+	command := fmt.Sprintf("%s-config::property-create", entity)
+	return adm.Perform(`postbody`, path, command, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -507,4 +507,30 @@ func parseConstraintChain(result proto.CheckConfigConstraint,
 	return nil
 }
 
+// VariadicArguments calls ParseVariadicArguments with a predefined
+// argument configuration suitable for a given command
+func VariadicArguments(command string, c *cli.Context, result *map[string][]string) error {
+	multipleAllowed, uniqueOptions, mandatoryOptions := argumentsForCommand(command)
+	return ParseVariadicArguments(
+		*result,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail(),
+	)
+}
+
+// argumentsForCommand contains the database of argument configurations
+// for VariadicArguments
+func argumentsForCommand(s string) (multipleAllowed, uniqueOptions, mandatoryOptions []string) {
+	switch s {
+	case `node::assign`:
+		return []string{}, []string{`to`}, []string{`to`}
+	case `node::unassign`:
+		return []string{}, []string{`from`}, []string{}
+	default:
+		return []string{}, []string{}, []string{}
+	}
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
