@@ -33,9 +33,13 @@ func (p *Node) Clone() Node {
 		State:     p.State,
 		IsOnline:  p.IsOnline,
 		IsDeleted: p.IsDeleted,
-		Details:   p.Details.Clone(),
 	}
-	// XXX Config
+	if p.Details != nil {
+		clone.Details = p.Details.Clone()
+	}
+	if p.Config != nil {
+		clone.Config = p.Config.Clone()
+	}
 	// XXX Properties
 	return clone
 }
@@ -58,6 +62,13 @@ type NodeFilter struct {
 type NodeConfig struct {
 	RepositoryID string `json:"repositoryID,omitempty"`
 	BucketID     string `json:"bucketID,omitempty"`
+}
+
+func (n *NodeConfig) Clone() *NodeConfig {
+	return &NodeConfig{
+		RepositoryID: n.RepositoryID,
+		BucketID:     n.BucketID,
+	}
 }
 
 // DeepCompare function
