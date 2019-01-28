@@ -59,6 +59,7 @@ func (r *NodeRead) Register(c *sql.DB, l ...*logrus.Logger) {
 func (r *NodeRead) RegisterRequests(hmap *handler.Map) {
 	for _, action := range []string{
 		msg.ActionList,
+		msg.ActionSearch,
 		msg.ActionShow,
 		msg.ActionSync,
 		msg.ActionShowConfig,
@@ -117,6 +118,9 @@ func (r *NodeRead) process(q *msg.Request) {
 
 	switch q.Action {
 	case msg.ActionList:
+		r.list(q, &result)
+	case msg.ActionSearch:
+		// TODO r.search(q, &result)
 		r.list(q, &result)
 	case msg.ActionSync:
 		r.sync(q, &result)
