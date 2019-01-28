@@ -25,6 +25,11 @@ func nodeConfigTree(c *cli.Context) error {
 	uniqueOptions := []string{`in`}
 	mandatoryOptions := []string{}
 
+	// check deferred errors
+	if err := popError(); err != nil {
+		return err
+	}
+
 	if err := adm.ParseVariadicArguments(
 		opts,
 		multipleAllowed,

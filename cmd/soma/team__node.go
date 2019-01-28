@@ -34,6 +34,12 @@ func nodeShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
+
+	// check deferred errors
+	if err := popError(); err != nil {
+		return err
+	}
+
 	nodeID, err := adm.LookupNodeID(c.Args().First())
 	if err != nil {
 		return err
@@ -49,6 +55,12 @@ func nodeShowConfig(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
+
+	// check deferred errors
+	if err := popError(); err != nil {
+		return err
+	}
+
 	nodeID, err := adm.LookupNodeID(c.Args().First())
 	if err != nil {
 		return err
@@ -63,6 +75,11 @@ func nodeShowConfig(c *cli.Context) error {
 func nodeAssign(c *cli.Context) error {
 	opts := map[string][]string{}
 	if err := adm.VariadicArguments(`node::assign`, c, &opts); err != nil {
+		return err
+	}
+
+	// check deferred errors
+	if err := popError(); err != nil {
 		return err
 	}
 
@@ -109,6 +126,11 @@ func nodeAssign(c *cli.Context) error {
 func nodeUnassign(c *cli.Context) error {
 	opts := map[string][]string{}
 	if err := adm.VariadicArguments(`node::unassign`, c, &opts); err != nil {
+		return err
+	}
+
+	// check deferred errors
+	if err := popError(); err != nil {
 		return err
 	}
 

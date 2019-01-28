@@ -54,6 +54,17 @@ func To(c *cli.Context) {
 	Generic(c, []string{`to`})
 }
 
+func Augmented(c *cli.Context, dispatcher string, data []string) {
+	switch dispatcher {
+	case `to`:
+		GenericDataFirst(c, data, []string{`to`})
+	case `from`:
+		GenericDataFirst(c, data, []string{`from`})
+	case `in`:
+		GenericDataFirst(c, data, []string{`in`})
+	}
+}
+
 func TripleToOn(c *cli.Context) {
 	GenericTriple(c, []string{`to`, `on`})
 }

@@ -1,8 +1,15 @@
 # node management
 
 ```
+soma node add ${node} assetid ${id} team ${team} [server ${server}] [online ${isOnline}]
+soma node remove ${node}
+soma node update ${nodeUUID} name ${name} assetid ${id} team ${team} server ${server} online ${isOnline} deleted ${isDeleted}
+soma node repossess ${node} to ${team}
+soma node rename ${node} to ${name}
+soma node relocate ${node} to ${server}
 soma node list
 soma node show ${node}
+soma node sync
 soma node config ${node}
 soma node assign ${node} to ${bucket}
 soma node unassign ${node} [from ${bucket}]

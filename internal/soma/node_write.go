@@ -177,12 +177,12 @@ func (w *NodeWrite) update(q *msg.Request, mr *msg.Result) {
 	)
 
 	if res, err = w.stmtUpdate.Exec(
-		q.Node.AssetID,
-		q.Node.Name,
-		q.Node.TeamID,
-		q.Node.ServerID,
-		q.Node.IsOnline,
-		q.Node.IsDeleted,
+		q.Update.Node.AssetID,
+		q.Update.Node.Name,
+		q.Update.Node.TeamID,
+		q.Update.Node.ServerID,
+		q.Update.Node.IsOnline,
+		q.Update.Node.IsDeleted,
 		q.Node.ID,
 	); err != nil {
 		mr.ServerError(err, q.Section)

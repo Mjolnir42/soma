@@ -3,7 +3,7 @@ package cmpl
 import "github.com/codegangsta/cli"
 
 func NodeAdd(c *cli.Context) {
-	Generic(c, []string{`assetid`, `name`, `team`, `server`, `online`})
+	Generic(c, []string{`assetid`, `team`, `server`, `online`})
 }
 
 func NodeUpdate(c *cli.Context) {

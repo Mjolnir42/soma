@@ -119,6 +119,7 @@ type UpdateData struct {
 	Datacenter  proto.Datacenter
 	Entity      proto.Entity
 	Environment proto.Environment
+	Node        proto.Node
 	Oncall      proto.Oncall
 	Property    proto.Property
 	Repository  proto.Repository

@@ -461,6 +461,43 @@ func LookupJobTypeID(s string) (string, error) {
 	return jobMetaIDByName(`type`, s)
 }
 
+// LookupNode looks up the data for the node with name s from the
+// server
+func LookupNode(s string) (proto.Node, error) {
+	if IsUUID(s) {
+		return nodeByID(s)
+	}
+	nodeID, err := nodeIDByName(s)
+	if err != nil {
+		return proto.Node{}, err
+	}
+	return nodeByID(nodeID)
+}
+
+// nodeByID implements the lookup of full node data from the server
+func nodeByID(nodeID string) (proto.Node, error) {
+	res, err := fetchObjList(fmt.Sprintf("/node/%s", nodeID))
+	if err != nil {
+		goto abort
+	}
+
+	if res.Nodes == nil || len(*res.Nodes) == 0 {
+		err = fmt.Errorf(`no object returned`)
+		goto abort
+	}
+
+	if nodeID != (*res.Nodes)[0].ID {
+		err = fmt.Errorf("Id mismatch: %s vs %s",
+			nodeID, (*res.Nodes)[0].ID)
+		goto abort
+	}
+	return (*res.Nodes)[0], nil
+
+abort:
+	return proto.Node{}, fmt.Errorf("nodeByID lookup failed: %s",
+		err.Error())
+}
+
 // oncallIDByName implements the actual serverside lookup of the
 // oncall duty UUID
 func oncallIDByName(oncall string) (string, error) {

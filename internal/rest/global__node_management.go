@@ -92,7 +92,9 @@ func (x *Rest) NodeMgmtUpdate(w http.ResponseWriter, r *http.Request,
 	}
 
 	request.Node = proto.Node{
-		ID:        cReq.Node.ID,
+		ID: cReq.Node.ID,
+	}
+	request.Update.Node = proto.Node{
 		AssetID:   cReq.Node.AssetID,
 		Name:      cReq.Node.Name,
 		TeamID:    cReq.Node.TeamID,
