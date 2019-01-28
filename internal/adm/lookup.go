@@ -640,8 +640,12 @@ abort:
 
 // teamIDByBucketID implements the actual serverside lookup of
 // a bucket's TeamID
-func teamIDByBucketID(bucket string) (string, error) {
-	res, err := fetchObjList(fmt.Sprintf("/bucket/%s", bucket))
+func teamIDByBucketID(bucketID string) (string, error) {
+	repoID, err := repoIDByBucketID(bucketID)
+	if err != nil {
+		return ``, err
+	}
+	res, err := fetchObjList(fmt.Sprintf("/repository/%s/bucket/%s", repoID, bucketID))
 	if err != nil {
 		goto abort
 	}
@@ -652,15 +656,15 @@ func teamIDByBucketID(bucket string) (string, error) {
 	}
 
 	// check the received record against the input
-	if bucket != (*res.Buckets)[0].ID {
+	if bucketID != (*res.Buckets)[0].ID {
 		err = fmt.Errorf("BucketID mismatch: %s vs %s",
-			bucket, (*res.Buckets)[0].ID)
+			bucketID, (*res.Buckets)[0].ID)
 		goto abort
 	}
 	return (*res.Buckets)[0].TeamID, nil
 
 abort:
-	return ``, fmt.Errorf("TeamID lookup failed: %s",
+	return ``, fmt.Errorf("TeamID lookup failed (via bucketID): %s",
 		err.Error())
 }
 
