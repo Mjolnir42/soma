@@ -33,8 +33,10 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 
 	// XXX check params.ByName(`nodeID`) == cReq.Node.ID
 	request.Node.ID = cReq.Node.ID
-	request.Node.Config.RepositoryID = cReq.Node.Config.RepositoryID
-	request.Node.Config.BucketID = cReq.Node.Config.BucketID
+	request.Node.Config = &proto.NodeConfig{
+		RepositoryID: cReq.Node.Config.RepositoryID,
+		BucketID:     cReq.Node.Config.BucketID,
+	}
 	request.Repository.ID = cReq.Node.Config.RepositoryID
 	request.Bucket.ID = cReq.Node.Config.BucketID
 
