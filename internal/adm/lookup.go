@@ -1166,12 +1166,12 @@ abort:
 // nodeConfigByID implements the actual lookup of the node's repo
 // and bucket assignment information from the server
 func nodeConfigByID(node string) (*proto.NodeConfig, error) {
-	path := fmt.Sprintf("/nodes/%s/config", node)
+	path := fmt.Sprintf("/node/%s/config", node)
 	var (
 		err  error
 		resp *resty.Response
-		res  *proto.Result
 	)
+	res := &proto.Result{}
 	if resp, err = GetReq(path); err != nil {
 		goto abort
 	}
