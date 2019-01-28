@@ -230,6 +230,16 @@ func (f *ForestCustodian) create(q *msg.Request, mr *msg.Result) {
 
 	mr.Repository = append(mr.Repository, q.Repository)
 	mr.OK()
+	switch q.Section {
+	case msg.SectionRepositoryMgmt:
+		switch q.Action {
+		case msg.ActionCreate:
+			go func() {
+				super := f.soma.getSupervisor()
+				super.Update <- msg.CacheUpdateFromRequest(q)
+			}()
+		}
+	}
 }
 
 // ShutdownNow signals the handler to shut down
