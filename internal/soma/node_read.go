@@ -61,8 +61,8 @@ func (r *NodeRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionList,
 		msg.ActionSearch,
 		msg.ActionShow,
-		msg.ActionSync,
 		msg.ActionShowConfig,
+		msg.ActionSync,
 	} {
 		hmap.Request(msg.SectionNode, action, r.handlerName)
 	}
