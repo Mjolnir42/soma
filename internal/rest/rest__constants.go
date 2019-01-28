@@ -47,6 +47,7 @@ const (
 	rtGroupInstanceID            = `/repository/:repositoryID/bucket/:bucketID/group/:groupID/instance/:instanceID`
 	rtGroupInstanceVersions      = `/repository/:repositoryID/bucket/:bucketID/group/:groupID/instance/:instanceID/versions`
 	rtGroupMember                = `/repository/:repositoryID/bucket/:bucketID/group/:groupID/member/`
+	rtGroupMemberAssign          = `/repository/:repositoryID/bucket/:bucketID/group/:groupID/member/:memberType/`
 	rtGroupMemberID              = `/repository/:repositoryID/bucket/:bucketID/group/:groupID/member/:memberType/:memberID`
 	rtGroupProperty              = `/repository/:repositoryID/bucket/:bucketID/group/:groupID/property/`
 	rtGroupPropertyID            = `/repository/:repositoryID/bucket/:bucketID/group/:groupID/property/:propertyType/:sourceID`

@@ -137,10 +137,11 @@ func groupConfigMemberAssign(c *cli.Context, childEntity string) error {
 		})
 	}
 
-	path := fmt.Sprintf("/repository/%s/bucket/%s/group/%s/member/",
+	path := fmt.Sprintf("/repository/%s/bucket/%s/group/%s/member/%s/",
 		url.QueryEscape(repositoryID),
 		url.QueryEscape(bucketID),
 		url.QueryEscape(groupID),
+		url.QueryEscape(childEntity),
 	)
 	return adm.Perform(`postbody`, path, `group-config::member-assign`, req, c)
 }

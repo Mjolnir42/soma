@@ -266,7 +266,7 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.POST(rtClusterMember, x.Authenticated(x.ClusterMemberAssign))
 			router.POST(rtClusterProperty, x.Authenticated(x.ClusterPropertyCreate))
 			router.POST(rtGroup, x.Authenticated(x.GroupCreate))
-			router.POST(rtGroupMember, x.Authenticated(x.GroupMemberAssign))
+			router.POST(rtGroupMemberAssign, x.Authenticated(x.GroupMemberAssign))
 			router.POST(rtGroupProperty, x.Authenticated(x.GroupPropertyCreate))
 			router.POST(rtJobResultMgmt, x.Authenticated(x.JobResultMgmtAdd))
 			router.POST(rtJobStatusMgmt, x.Authenticated(x.JobStatusMgmtAdd))
