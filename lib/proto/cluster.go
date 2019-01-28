@@ -34,16 +34,18 @@ func (c *Cluster) Clone() Cluster {
 		clone.Details = c.Details.Clone()
 	}
 	if c.Members != nil {
-		*clone.Members = make([]Node, len(*c.Members))
+		nd := make([]Node, len(*c.Members))
 		for i := range *c.Members {
-			(*clone.Members)[i] = (*c.Members)[i].Clone()
+			nd[i] = (*c.Members)[i].Clone()
 		}
+		clone.Members = &nd
 	}
 	if c.Properties != nil {
-		*clone.Properties = make([]Property, len(*c.Properties))
+		prp := make([]Property, len(*c.Properties))
 		for i := range *c.Properties {
-			(*clone.Properties)[i] = (*c.Properties)[i].Clone()
+			prp[i] = (*c.Properties)[i].Clone()
 		}
+		clone.Properties = &prp
 	}
 	return clone
 }
