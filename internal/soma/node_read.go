@@ -265,6 +265,7 @@ func (r *NodeRead) show(q *msg.Request, mr *msg.Result) {
 		// valid and not an error. But an unconfigured node can
 		// not have properties or checks, which means the request
 		// is done.
+		mr.Node = append(mr.Node, node)
 		mr.OK()
 		return
 	} else if err != nil {
