@@ -45,8 +45,12 @@ func attributeFetch() []proto.Attribute {
 		return []proto.Attribute{}
 	}
 
-	if res.Attributes == nil || len(*res.Attributes) == 0 {
-		pushError(fmt.Errorf(`server returned no attributes for parsing`))
+	if res.Attributes == nil {
+		pushError(fmt.Errorf(`SOMA server returned no attributes for parsing`))
+		return []proto.Attribute{}
+	}
+
+	if len(*res.Attributes) == 0 {
 		return []proto.Attribute{}
 	}
 
