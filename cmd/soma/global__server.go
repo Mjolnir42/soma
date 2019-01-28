@@ -1,7 +1,7 @@
 /*-
- * Copyright (c) 2015-2018, Jörg Pernfuß
+ * Copyright (c) 2015-2019, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
- * Copyright (c) 2018, 1&1 IONOS SE
+ * Copyright (c) 2018-2019, 1&1 IONOS SE
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -36,16 +36,18 @@ func registerServer(app cli.App) *cli.App {
 						BashComplete: cmpl.ServerAdd,
 					},
 					{
-						Name:        `remove`,
-						Usage:       `Remove a physical server`,
-						Description: help.Text(`server::remove`),
-						Action:      runtime(serverRemove),
+						Name:         `remove`,
+						Usage:        `Remove a physical server`,
+						Description:  help.Text(`server::remove`),
+						Action:       runtime(serverRemove),
+						BashComplete: comptime(bashCompServer),
 					},
 					{
-						Name:        `purge`,
-						Usage:       `Purge a removed physical server`,
-						Description: help.Text(`server::purge`),
-						Action:      runtime(serverPurge),
+						Name:         `purge`,
+						Usage:        `Purge a removed physical server`,
+						Description:  help.Text(`server::purge`),
+						Action:       runtime(serverPurge),
+						BashComplete: comptime(bashCompServer),
 					},
 					{
 						Name:         `update`,
@@ -55,22 +57,25 @@ func registerServer(app cli.App) *cli.App {
 						BashComplete: cmpl.ServerUpdate,
 					},
 					{
-						Name:        `list`,
-						Usage:       `List all servers, see full description for possible filters`,
-						Description: help.Text(`server::list`),
-						Action:      runtime(serverList),
+						Name:         `list`,
+						Usage:        `List all servers, see full description for possible filters`,
+						Description:  help.Text(`server::list`),
+						Action:       runtime(serverList),
+						BashComplete: cmpl.None,
 					},
 					{
-						Name:        `show`,
-						Usage:       `Show details about a specific server`,
-						Description: help.Text(`server::show`),
-						Action:      runtime(serverShow),
+						Name:         `show`,
+						Usage:        `Show details about a specific server`,
+						Description:  help.Text(`server::show`),
+						Action:       runtime(serverShow),
+						BashComplete: comptime(bashCompServer),
 					},
 					{
-						Name:        `sync`,
-						Usage:       "Export a list of all servers suitable for sync",
-						Description: help.Text(`server::sync`),
-						Action:      runtime(serverSync),
+						Name:         `sync`,
+						Usage:        "Export a list of all servers suitable for sync",
+						Description:  help.Text(`server::sync`),
+						Action:       runtime(serverSync),
+						BashComplete: cmpl.None,
 					},
 					{
 						Name:         `null`,
@@ -145,6 +150,11 @@ func serverAdd(c *cli.Context) error {
 // serverRemove function
 // soma server remove ${name}
 func serverRemove(c *cli.Context) error {
+	// check deferred errors
+	if err := popError(); err != nil {
+		return err
+	}
+
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -164,6 +174,11 @@ func serverRemove(c *cli.Context) error {
 // serverPurge function
 // soma server purge ${name}
 func serverPurge(c *cli.Context) error {
+	// check deferred errors
+	if err := popError(); err != nil {
+		return err
+	}
+
 	if err := adm.VerifySingleArgument(c); err != nil {
 		return err
 	}
@@ -279,6 +294,11 @@ func serverSync(c *cli.Context) error {
 // soma server show ${name}
 func serverShow(c *cli.Context) error {
 	if err := adm.VerifySingleArgument(c); err != nil {
+		return err
+	}
+
+	// check deferred errors
+	if err := popError(); err != nil {
 		return err
 	}
 
