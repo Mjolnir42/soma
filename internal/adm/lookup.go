@@ -1054,7 +1054,7 @@ func nodeIDByName(node string) (string, error) {
 	req := proto.NewNodeFilter()
 	req.Filter.Node.Name = node
 
-	res, err := fetchFilter(req, `/filter/nodes/`)
+	res, err := fetchFilter(req, `/search/node/`)
 	if err != nil {
 		goto abort
 	}
