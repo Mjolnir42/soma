@@ -156,7 +156,7 @@ SELECT soma.section.id,
        soma.section.name,
        soma.section.category
 FROM   soma.permission
-JOIN   soma.permission_map spm
+JOIN   soma.permission_map
   ON   soma.permission.id = soma.permission_map.permission_id
 JOIN   soma.section
   ON   soma.permission_map.section_id = soma.section.id
