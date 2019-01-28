@@ -671,7 +671,7 @@ abort:
 // teamIDByNodeID implements the actual serverside lookup of a
 // node's TeamID
 func teamIDByNodeID(node string) (string, error) {
-	res, err := fetchObjList(fmt.Sprintf("/nodes/%s", node))
+	res, err := fetchObjList(fmt.Sprintf("/node/%s", node))
 	if err != nil {
 		goto abort
 	}
@@ -690,7 +690,7 @@ func teamIDByNodeID(node string) (string, error) {
 	return (*res.Nodes)[0].TeamID, nil
 
 abort:
-	return ``, fmt.Errorf("TeamID lookup failed: %s",
+	return ``, fmt.Errorf("TeamID lookup failed (via nodeID): %s",
 		err.Error())
 }
 
