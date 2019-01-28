@@ -86,12 +86,16 @@ func GenericDirect(c *cli.Context, keywords []string) {
 			fmt.Println(t)
 		}
 		return
+	case c.NArg() == 1:
+		return
 	}
 
 	skip := 0
 	match := make(map[string]bool)
 
-	for _, t := range c.Args().Tail() {
+	fullArgs := append([]string{c.Args().First()}, c.Args().Tail()...)
+
+	for _, t := range fullArgs {
 		if skip > 0 {
 			skip--
 			continue
