@@ -134,7 +134,7 @@ func (p *PropertyCustom) GetInstanceID(objType string, objID uuid.UUID, l *log.L
 	}
 	for _, instance := range p.Instances {
 		if objType == instance.ObjectType && uuid.Equal(instance.ObjectID, objID) {
-			l.Printf("tree.Property.GetInstanceID() found existing instance: %s\n", instance.InstanceID)
+			l.Printf("tree.Property.GetInstanceID() found existing instance: %s", instance.InstanceID)
 			return instance.InstanceID
 		}
 	}
@@ -277,7 +277,7 @@ func (p *PropertyService) GetInstanceID(objType string, objID uuid.UUID, l *log.
 	}
 	for _, instance := range p.Instances {
 		if objType == instance.ObjectType && uuid.Equal(instance.ObjectID, objID) {
-			l.Printf("tree.Property.GetInstanceID() found existing instance: %s\n", instance.InstanceID)
+			l.Printf("tree.Property.GetInstanceID() found existing instance: %s", instance.InstanceID)
 			return instance.InstanceID
 		}
 	}
@@ -434,7 +434,7 @@ func (p *PropertySystem) GetInstanceID(objType string, objID uuid.UUID, l *log.L
 	}
 	for _, instance := range p.Instances {
 		if objType == instance.ObjectType && uuid.Equal(instance.ObjectID, objID) {
-			l.Printf("tree.Property.GetInstanceID() found existing instance: %s\n", instance.InstanceID)
+			l.Printf("tree.Property.GetInstanceID() found existing instance: %s", instance.InstanceID)
 			return instance.InstanceID
 		}
 	}
@@ -583,7 +583,7 @@ func (p *PropertyOncall) GetInstanceID(objType string, objID uuid.UUID, l *log.L
 	}
 	for _, instance := range p.Instances {
 		if objType == instance.ObjectType && uuid.Equal(instance.ObjectID, objID) {
-			l.Printf("tree.Property.GetInstanceID() found existing instance: %s\n", instance.InstanceID)
+			l.Printf("tree.Property.GetInstanceID() found existing instance: %s", instance.InstanceID)
 			return instance.InstanceID
 		}
 	}
