@@ -132,6 +132,8 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		property = c.Args().First()
 	}
 
+	req := proto.Request{}
+
 	switch entity {
 	case proto.EntityRepository:
 		if err = adm.FindRepoPropSrcID(propertyType, property,
@@ -143,6 +145,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 			url.QueryEscape(propertyType),
 			url.QueryEscape(sourceID),
 		)
+		req = proto.NewRepositoryRequest()
 	case proto.EntityBucket:
 		if err = adm.FindBucketPropSrcID(propertyType, property,
 			opts[`view`][0], repositoryID, bucketID, &sourceID); err != nil {
@@ -154,6 +157,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 			url.QueryEscape(propertyType),
 			url.QueryEscape(sourceID),
 		)
+		req = proto.NewBucketRequest()
 	case proto.EntityGroup:
 		if err = adm.FindGroupPropSrcID(propertyType, property,
 			opts[`view`][0], repositoryID, bucketID, groupID, &sourceID); err != nil {
@@ -166,6 +170,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 			url.QueryEscape(propertyType),
 			url.QueryEscape(sourceID),
 		)
+		req = proto.NewGroupRequest()
 	case proto.EntityCluster:
 		if err = adm.FindClusterPropSrcID(propertyType, property,
 			opts[`view`][0], repositoryID, bucketID, clusterID, &sourceID); err != nil {
@@ -178,6 +183,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 			url.QueryEscape(propertyType),
 			url.QueryEscape(sourceID),
 		)
+		req = proto.NewClusterRequest()
 	case proto.EntityNode:
 		if err = adm.FindNodePropSrcID(propertyType, property,
 			opts[`view`][0], nodeID, &sourceID); err != nil {
@@ -190,12 +196,18 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 			url.QueryEscape(propertyType),
 			url.QueryEscape(sourceID),
 		)
+		req = proto.NewNodeRequest()
+		req.Node.ID = nodeID
+		req.Node.Config = &proto.NodeConfig{
+			BucketID:     bucketID,
+			RepositoryID: repositoryID,
+		}
 	default:
 		return fmt.Errorf("Unknown entity: %s", entity)
 	}
 	command := fmt.Sprintf("%s-config::property-destroy", entity)
 
-	return adm.Perform(`delete`, path, command, nil, c)
+	return adm.Perform(`deletebody`, path, command, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -163,7 +163,7 @@ func FindNodePropSrcID(pType, pName, view, nodeID string,
 		res  *proto.Result
 		node proto.Node
 	)
-	res, err = fetchObjList(fmt.Sprintf("/nodes/%s", nodeID))
+	res, err = fetchObjList(fmt.Sprintf("/node/%s", nodeID))
 	if err != nil {
 		goto abort
 	}
