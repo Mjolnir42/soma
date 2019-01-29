@@ -236,6 +236,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 	case proto.EntityBucket:
 		req = proto.NewBucketRequest()
 		req.Bucket.ID = objectID
+		req.Bucket.RepositoryID = repoID
 		req.Bucket.Properties = &[]proto.Property{prop}
 	case proto.EntityRepository:
 		req = proto.NewRepositoryRequest()
