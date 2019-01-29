@@ -24,13 +24,13 @@ WHERE  soma.repository.id = $1::uuid;`
 
 	TreeShowBucket = `
 SELECT bucket_name,
-	   bucket_frozen,
-	   bucket_deleted,
-	   repository_id,
-	   environment,
-	   organizational_team_id,
-	   created_by,
-	   created_at
+       bucket_frozen,
+       bucket_deleted,
+       repository_id,
+       environment,
+       organizational_team_id,
+       created_by,
+       created_at
 FROM   soma.buckets
 WHERE  bucket_id = $1::uuid
   AND  NOT bucket_deleted;`
@@ -38,20 +38,20 @@ WHERE  bucket_id = $1::uuid
 	TreeShowGroup = `
 SELECT sg.bucket_id,
        sg.group_name,
-	   sg.object_state,
-	   sg.organizational_team_id,
-	   sg.created_by,
-	   sg.created_at
+       sg.object_state,
+       sg.organizational_team_id,
+       sg.created_by,
+       sg.created_at
 FROM   soma.groups sg
 WHERE  sg.group_id = $1::uuid;`
 
 	TreeShowCluster = `
 SELECT sc.cluster_name,
        sc.bucket_id,
-	   sc.object_state,
-	   sc.organizational_team_id,
-	   sc.created_by,
-	   sc.created_at
+       sc.object_state,
+       sc.organizational_team_id,
+       sc.created_by,
+       sc.created_at
 FROM   soma.clusters sc
 WHERE  sc.cluster_id = $1::uuid;`
 
@@ -59,14 +59,14 @@ WHERE  sc.cluster_id = $1::uuid;`
 SELECT sn.node_asset_id,
        sn.node_name,
        sn.organizational_team_id,
-	   sn.server_id,
-	   sn.object_state,
-	   sn.node_online,
-	   sn.node_deleted,
-	   sn.created_by,
-	   sn.created_at,
-	   sb.repository_id,
-	   snba.bucket_id
+       sn.server_id,
+       sn.object_state,
+       sn.node_online,
+       sn.node_deleted,
+       sn.created_by,
+       sn.created_at,
+       sb.repository_id,
+       snba.bucket_id
 FROM   soma.nodes sn
 JOIN   soma.node_bucket_assignment snba
   ON   sn.node_id = snba.node_id
