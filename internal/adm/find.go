@@ -57,18 +57,13 @@ abort:
 
 // FindBucketPropSrcID fetches the source id of a locally set
 // property on a bucket
-func FindBucketPropSrcID(pType, pName, view, bucketID string,
+func FindBucketPropSrcID(pType, pName, view, repositoryID, bucketID string,
 	id *string) error {
 	var (
-		err          error
-		res          *proto.Result
-		bucket       proto.Bucket
-		repositoryID string
+		err    error
+		res    *proto.Result
+		bucket proto.Bucket
 	)
-	repositoryID, err = LookupRepoByBucket(bucketID)
-	if err != nil {
-		goto abort
-	}
 	res, err = fetchObjList(fmt.Sprintf("/repository/%s/bucket/%s",
 		repositoryID, bucketID))
 	if err != nil {

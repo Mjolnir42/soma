@@ -145,7 +145,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		)
 	case proto.EntityBucket:
 		if err = adm.FindBucketPropSrcID(propertyType, property,
-			opts[`view`][0], bucketID, &sourceID); err != nil {
+			opts[`view`][0], repositoryID, bucketID, &sourceID); err != nil {
 			return err
 		}
 		path = fmt.Sprintf("/repository/%s/bucket/%s/property/%s/%s",
