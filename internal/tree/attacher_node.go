@@ -72,6 +72,7 @@ func (ten *Node) Destroy() {
 		panic(`Node.Destroy called without Parent to unlink from`)
 	}
 	// call before unlink since it requires tec.Parent.*
+	ten.State = `unassigned`
 	ten.actionDelete()
 	ten.deletePropertyAllLocal()
 	ten.deletePropertyAllInherited()
