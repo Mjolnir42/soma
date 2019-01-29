@@ -191,7 +191,8 @@ SELECT sb.bucket_id,
 FROM   soma.repository
 JOIN   soma.buckets sb
 ON     soma.repository.id = sb.repository_id
-WHERE  soma.repository.id = $1::uuid;`
+WHERE  soma.repository.id = $1::uuid
+AND    NOT sb.bucket_deleted;`
 
 	TkStartLoadGroups = `
 SELECT sg.group_id,
@@ -203,7 +204,8 @@ JOIN   soma.buckets sb
 ON     soma.repository.id = sb.repository_id
 JOIN   soma.groups sg
 ON     sb.bucket_id = sg.bucket_id
-WHERE  soma.repository.id = $1::uuid;`
+WHERE  soma.repository.id = $1::uuid
+AND    NOT sb.bucket_deleted;`
 
 	TkStartLoadGroupMemberGroups = `
 SELECT sgmg.group_id,
@@ -213,7 +215,8 @@ JOIN   soma.buckets sb
 ON     soma.repository.id = sb.repository_id
 JOIN   soma.group_membership_groups sgmg
 ON     sb.bucket_id = sgmg.bucket_id
-WHERE  soma.repository.id = $1::uuid;`
+WHERE  soma.repository.id = $1::uuid
+AND    NOT sb.bucket_deleted;`
 
 	TkStartLoadGroupedClusters = `
 SELECT sc.cluster_id,
@@ -229,7 +232,8 @@ ON     sb.bucket_id = sc.bucket_id
 JOIN   soma.group_membership_clusters sgmc
 ON     sc.bucket_id = sgmc.bucket_id
 AND    sc.cluster_id = sgmc.child_cluster_id
-WHERE  soma.repository.id = $1::uuid;`
+WHERE  soma.repository.id = $1::uuid
+AND    NOT sb.bucket_deleted;`
 
 	TkStartLoadCluster = `
 SELECT sc.cluster_id,
@@ -242,7 +246,8 @@ ON     soma.repository.id = sb.repository_id
 JOIN   soma.clusters sc
 ON     sb.bucket_id = sc.bucket_id
 WHERE  soma.repository.id = $1::uuid
-AND    sc.object_state != 'grouped';`
+AND    sc.object_state != 'grouped'
+AND    NOT sb.bucket_deleted;`
 
 	TkStartLoadNode = `
 SELECT    sn.node_id,
@@ -266,7 +271,8 @@ LEFT JOIN soma.cluster_membership scm
 ON        sn.node_id = scm.node_id
 LEFT JOIN soma.group_membership_nodes sgmn
 ON        sn.node_id = sgmn.child_node_id
-WHERE     soma.repository.id = $1::uuid`
+WHERE     soma.repository.id = $1::uuid
+AND       NOT sb.bucket_deleted;`
 
 	TkStartLoadJob = `
 SELECT   job
