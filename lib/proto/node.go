@@ -40,7 +40,13 @@ func (p *Node) Clone() Node {
 	if p.Config != nil {
 		clone.Config = p.Config.Clone()
 	}
-	// XXX Properties
+	if p.Properties != nil {
+		prp := make([]Property, len(*p.Properties))
+		for i := range *p.Properties {
+			prp[i] = (*p.Properties)[i].Clone()
+		}
+		clone.Properties = &prp
+	}
 	return clone
 }
 
