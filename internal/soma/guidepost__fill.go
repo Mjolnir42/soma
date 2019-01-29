@@ -298,7 +298,7 @@ func (g *GuidePost) fillPropertyDeleteInfo(q *msg.Request) (bool, error) {
 	case msg.SectionCluster:
 		row = g.conn.QueryRow(queryStmt,
 			(*q.Cluster.Properties)[0].SourceInstanceID)
-	case msg.SectionNode:
+	case msg.SectionNodeConfig:
 		row = g.conn.QueryRow(queryStmt,
 			(*q.Node.Properties)[0].SourceInstanceID)
 	}
