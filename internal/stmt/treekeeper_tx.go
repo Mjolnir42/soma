@@ -427,11 +427,11 @@ SELECT $1::uuid,
        $3::uuid,
        $4::varchar,
        $5::uuid,
+       (SELECT bucket_id FROM soma.node_bucket_assignment WHERE node_id = $3::uuid),
        $6::uuid,
-       $7::uuid,
+       $7::boolean,
        $8::boolean,
-       $9::boolean,
-       $10::text;`
+       $9::text;`
 
 	TxNodePropertyCustomDelete = `
 DELETE FROM soma.node_custom_properties
