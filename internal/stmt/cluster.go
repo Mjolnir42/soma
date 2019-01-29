@@ -115,14 +115,14 @@ WHERE  scop.source_instance_id = $1::uuid
   AND  scop.source_instance_id = scop.instance_id;`
 
 	ClusterServicePropertyForDelete = `
-SELECT scsp.view,
-       scsp.service_id
-FROM   soma.cluster_service_property scsp
-JOIN   soma.service_property ssp
-  ON   scsp.organizational_team_id = ssp.team_id
- AND   scsp.service_id = ssp.id
-WHERE  scsp.source_instance_id = $1::uuid
-  AND  scsp.source_instance_id = scsp.instance_id;`
+SELECT soma.cluster_service_property.view,
+       soma.cluster_service_property.service_id
+FROM   soma.cluster_service_property
+JOIN   soma.service_property
+  ON   soma.cluster_service_property.team_id = soma.service_property.team_id
+ AND   soma.cluster_service_property.service_id = soma.service_property.id
+WHERE  soma.cluster_service_property.source_instance_id = $1::uuid
+  AND  soma.cluster_service_property.source_instance_id = soma.cluster_service_property.instance_id;`
 )
 
 func init() {
