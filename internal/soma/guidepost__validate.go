@@ -394,8 +394,8 @@ func (g *GuidePost) validateBucketInRepository(
 		return false, err
 	}
 	if repo != repoID {
-		return false, fmt.Errorf("Bucket is in different repository: %s",
-			repoID)
+		return false, fmt.Errorf("Bucket is in different repository: %s(%s) vs %s",
+			repoID, repoName, repo)
 	}
 	return false, nil
 }
