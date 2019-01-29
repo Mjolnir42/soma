@@ -96,7 +96,8 @@ WHERE  sbsp.source_instance_id = $1::uuid
 	BucketList = `
 SELECT bucket_id,
        bucket_name
-FROM   soma.buckets;`
+FROM   soma.buckets
+WHERE  NOT bucket_deleted;`
 
 	BucketShow = `
 SELECT bucket_id,

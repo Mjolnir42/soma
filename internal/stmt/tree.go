@@ -32,7 +32,8 @@ SELECT bucket_name,
 	   created_by,
 	   created_at
 FROM   soma.buckets
-WHERE  bucket_id = $1::uuid;`
+WHERE  bucket_id = $1::uuid
+  AND  NOT bucket_deleted;`
 
 	TreeShowGroup = `
 SELECT sg.bucket_id,
@@ -79,7 +80,8 @@ WHERE  sn.node_id = $1::uuid;`
 	TreeBucketsInRepository = `
 SELECT bucket_id
 FROM   soma.buckets
-WHERE  repository_id = $1::uuid;`
+WHERE  repository_id = $1::uuid
+  AND  NOT bucket_deleted;`
 
 	TreeGroupsInBucket = `
 SELECT group_id
