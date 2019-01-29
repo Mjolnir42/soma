@@ -86,6 +86,9 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
 			return err
 		}
+		if teamID, err = adm.LookupTeamByBucket(bucketID); err != nil {
+			return err
+		}
 		if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
@@ -94,6 +97,9 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		}
 	case proto.EntityCluster:
 		if bucketID, err = adm.LookupBucketID(opts[`in`][0]); err != nil {
+			return err
+		}
+		if teamID, err = adm.LookupTeamByBucket(bucketID); err != nil {
 			return err
 		}
 		if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
@@ -112,6 +118,9 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		}
 		bucketID = config.BucketID
 		repositoryID = config.RepositoryID
+		if teamID, err = adm.LookupTeamByBucket(bucketID); err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("Unknown entity: %s", entity)
 	}
