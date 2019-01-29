@@ -96,7 +96,7 @@ func (ter Repository) Clone() Repository {
 		log:            ter.log,
 	}
 	cl.ID, _ = uuid.FromString(ter.ID.String())
-	cl.Team, _ = uuid.FromString(ter.ID.String())
+	cl.Team, _ = uuid.FromString(ter.Team.String())
 	f := make(map[string]RepositoryAttacher)
 	for k, child := range ter.Children {
 		f[k] = child.CloneRepository()

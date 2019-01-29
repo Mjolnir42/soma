@@ -99,6 +99,7 @@ func (teg Group) Clone() *Group {
 		lock:           sync.RWMutex{},
 	}
 	cl.ID, _ = uuid.FromString(teg.ID.String())
+	cl.Team, _ = uuid.FromString(teg.Team.String())
 
 	f := make(map[string]GroupAttacher, 0)
 	for k, child := range teg.Children {
