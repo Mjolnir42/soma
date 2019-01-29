@@ -60,11 +60,17 @@ abort:
 func FindBucketPropSrcID(pType, pName, view, bucketID string,
 	id *string) error {
 	var (
-		err    error
-		res    *proto.Result
-		bucket proto.Bucket
+		err          error
+		res          *proto.Result
+		bucket       proto.Bucket
+		repositoryID string
 	)
-	res, err = fetchObjList(fmt.Sprintf("/bucket/%s", bucketID))
+	repositoryID, err = LookupRepoByBucket(bucketID)
+	if err != nil {
+		goto abort
+	}
+	res, err = fetchObjList(fmt.Sprintf("/repository/%s/bucket/%s",
+		repositoryID, bucketID))
 	if err != nil {
 		goto abort
 	}
