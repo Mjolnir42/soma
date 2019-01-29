@@ -168,7 +168,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		)
 	case proto.EntityCluster:
 		if err = adm.FindClusterPropSrcID(propertyType, property,
-			opts[`view`][0], clusterID, &sourceID); err != nil {
+			opts[`view`][0], repositoryID, bucketID, clusterID, &sourceID); err != nil {
 			return err
 		}
 		path = fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/property/%s/%s",

@@ -128,14 +128,15 @@ abort:
 
 // FindClusterPropSrcID fetches the source id of a locally set
 // property on a cluster
-func FindClusterPropSrcID(pType, pName, view, clusterID string,
+func FindClusterPropSrcID(pType, pName, view, repositoryID, bucketID, clusterID string,
 	id *string) error {
 	var (
 		err     error
 		res     *proto.Result
 		cluster proto.Cluster
 	)
-	res, err = fetchObjList(fmt.Sprintf("/clusters/%s", clusterID))
+	res, err = fetchObjList(fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s",
+		repositoryID, bucketID, clusterID))
 	if err != nil {
 		goto abort
 	}
