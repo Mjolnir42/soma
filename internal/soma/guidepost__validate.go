@@ -51,6 +51,8 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 	switch q.Action {
 	case msg.ActionMemberAssign:
 		return g.validateObjectMatch(q)
+	case msg.ActionMemberUnassign:
+		return g.validateObjectMatch(q)
 	}
 
 	switch q.Section {
@@ -80,7 +82,7 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 			msg.SectionNodeConfig:
 			return false, nil
 		}
-	case msg.ActionAssign:
+	case msg.ActionAssign, msg.ActionUnassign:
 		switch q.Section {
 		case msg.SectionNodeConfig:
 			return false, nil
@@ -92,7 +94,11 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 		}
 	case msg.ActionDestroy:
 		switch q.Section {
-		case msg.SectionCheckConfig, msg.SectionRepository, msg.SectionBucket:
+		case msg.SectionCheckConfig,
+			msg.SectionRepository,
+			msg.SectionBucket,
+			msg.SectionGroup,
+			msg.SectionCluster:
 			return false, nil
 		}
 	case msg.ActionRename:
@@ -116,7 +122,7 @@ func (g *GuidePost) validateObjectMatch(q *msg.Request) (bool, error) {
 	)
 
 	switch q.Action {
-	case msg.ActionMemberAssign:
+	case msg.ActionMemberAssign, msg.ActionMemberUnassign:
 		switch q.Section {
 		case msg.SectionCluster:
 			switch q.TargetEntity {

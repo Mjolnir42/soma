@@ -70,6 +70,8 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 	case msg.SectionNodeConfig:
 		switch q.Action {
 		case msg.ActionAssign:
+		case msg.ActionUnassign:
+			return q.Repository.ID, q.Bucket.ID
 		case msg.ActionPropertyCreate:
 		case msg.ActionPropertyDestroy:
 		default:
@@ -87,7 +89,10 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 	case msg.SectionCluster:
 		switch q.Action {
 		case msg.ActionCreate:
+		case msg.ActionDestroy:
+			return q.Repository.ID, q.Bucket.ID
 		case msg.ActionMemberAssign:
+		case msg.ActionMemberUnassign:
 		case msg.ActionPropertyCreate:
 		case msg.ActionPropertyDestroy:
 		default:
@@ -97,7 +102,10 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 	case msg.SectionGroup:
 		switch q.Action {
 		case msg.ActionCreate:
+		case msg.ActionDestroy:
+			return q.Repository.ID, q.Bucket.ID
 		case msg.ActionMemberAssign:
+		case msg.ActionMemberUnassign:
 		case msg.ActionPropertyCreate:
 		case msg.ActionPropertyDestroy:
 		default:

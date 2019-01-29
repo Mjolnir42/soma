@@ -176,6 +176,8 @@ func (x *Rest) GroupDestroy(w http.ResponseWriter, r *http.Request,
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Group.ID = params.ByName(`groupID`)
+	request.Group.RepositoryID = params.ByName(`repositoryID`)
+	request.Group.BucketID = params.ByName(`bucketID`)
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)

@@ -67,6 +67,10 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Node.ID = params.ByName(`nodeID`)
+	request.Node.Config = &proto.NodeConfig{
+		RepositoryID: params.ByName(`repositoryID`),
+		BucketID:     params.ByName(`bucketID`),
+	}
 
 	// check if the user is allowed to unassign nodes from this team
 	request.Section = msg.SectionNode

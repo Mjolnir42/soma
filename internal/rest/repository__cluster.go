@@ -173,6 +173,8 @@ func (x *Rest) ClusterDestroy(w http.ResponseWriter, r *http.Request,
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster.ID = params.ByName(`clusterID`)
+	request.Cluster.RepositoryID = params.ByName(`repositoryID`)
+	request.Cluster.BucketID = params.ByName(`bucketID`)
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
