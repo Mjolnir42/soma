@@ -244,6 +244,10 @@ func (g *GuidePost) process(q *msg.Request) {
 
 	switch q.Section {
 	case msg.SectionRepository:
+		fallthrough
+	case msg.SectionRepositoryConfig:
+		fallthrough
+	case msg.SectionRepositoryMgmt:
 		result.Repository = append(result.Repository,
 			q.Repository)
 	case msg.SectionBucket:
