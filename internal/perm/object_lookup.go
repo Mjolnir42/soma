@@ -220,6 +220,7 @@ func (m *objectLookup) rmBucket(bucketID string) {
 			m.byRepository[repoID][`bucket`][:i],
 			m.byRepository[repoID][`bucket`][i+1:]...)
 		m.compactionCounter++
+		break
 	}
 
 	// remove bucket
@@ -245,6 +246,7 @@ func (m *objectLookup) rmGroup(groupID string) {
 			m.byBucket[bucketID][`group`][:i],
 			m.byBucket[bucketID][`group`][i+1:]...)
 		m.compactionCounter++
+		break
 	}
 
 	// remove group from repository
@@ -256,6 +258,7 @@ func (m *objectLookup) rmGroup(groupID string) {
 			m.byRepository[repoID][`group`][:i],
 			m.byRepository[repoID][`group`][i+1:]...)
 		m.compactionCounter++
+		break
 	}
 
 	// remove group
@@ -281,6 +284,7 @@ func (m *objectLookup) rmCluster(clusterID string) {
 			m.byBucket[bucketID][`cluster`][:i],
 			m.byBucket[bucketID][`cluster`][i+1:]...)
 		m.compactionCounter++
+		break
 	}
 
 	// remove cluster from repository
@@ -292,6 +296,7 @@ func (m *objectLookup) rmCluster(clusterID string) {
 			m.byRepository[repoID][`cluster`][:i],
 			m.byRepository[repoID][`cluster`][i+1:]...)
 		m.compactionCounter++
+		break
 	}
 
 	// remove cluster
