@@ -156,7 +156,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		)
 	case proto.EntityGroup:
 		if err = adm.FindGroupPropSrcID(propertyType, property,
-			opts[`view`][0], groupID, &sourceID); err != nil {
+			opts[`view`][0], repositoryID, bucketID, groupID, &sourceID); err != nil {
 			return err
 		}
 		path = fmt.Sprintf("/repository/%s/bucket/%s/group/%s/property/%s/%s",

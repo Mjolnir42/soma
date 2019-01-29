@@ -95,14 +95,15 @@ abort:
 
 // FindGroupPropSrcID fetches the source id of a locally set
 // property on a group
-func FindGroupPropSrcID(pType, pName, view, groupID string,
+func FindGroupPropSrcID(pType, pName, view, repositoryID, bucketID, groupID string,
 	id *string) error {
 	var (
 		err   error
 		res   *proto.Result
 		group proto.Group
 	)
-	res, err = fetchObjList(fmt.Sprintf("/groups/%s", groupID))
+	res, err = fetchObjList(fmt.Sprintf("/repository/%s/bucket/%s/group/%s",
+		repositoryID, bucketID, groupID))
 	if err != nil {
 		goto abort
 	}

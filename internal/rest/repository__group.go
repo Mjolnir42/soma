@@ -368,6 +368,8 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Property.Type = params.ByName(`propertyType`)
 	request.Group.ID = params.ByName(`groupID`)
+	request.Group.BucketID = params.ByName(`bucketID`)
+	request.Group.RepositoryID = params.ByName(`repositoryID`)
 	request.Group.Properties = &[]proto.Property{proto.Property{
 		Type:             params.ByName(`propertyType`),
 		RepositoryID:     params.ByName(`repositoryID`),
