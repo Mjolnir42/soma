@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"time"
 
 	"github.com/Sirupsen/logrus"
@@ -424,6 +425,15 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 	jobLog.Out = lfh
 	hasJobLog = true
 
+	// open multi-statement transaction
+	if tx, stm, err = tk.startTx(); err != nil {
+		goto bailout
+	}
+	defer tx.Rollback()
+
+	// protect job via panicGuard
+	defer panicGuard(tk, tx, q)
+
 	tk.tree.Begin()
 
 	// q.Action == `rebuild` will fall through switch
@@ -494,12 +504,6 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 	default:
 		tk.tree.ComputeCheckInstances()
 	}
-
-	// open multi-statement transaction
-	if tx, stm, err = tk.startTx(); err != nil {
-		goto bailout
-	}
-	defer tx.Rollback()
 
 	// defer constraint checks
 	if _, err = tx.Exec(stmt.TxDeferAllConstraints); err != nil {
@@ -931,6 +935,47 @@ bailout:
 		defer tx.Rollback()
 	}
 	return nil, nil, err
+}
+
+// panicGuard besides protecting the server process, the main job of
+// this function is to cancel jobs that cause a server PANIC
+func panicGuard(tk *TreeKeeper, tx *sql.Tx, q *msg.Request) {
+	if r := recover(); r != nil {
+		tk.appLog.Printf(
+			"panicGuard invoked on TreeKeeper.%s: JobID %s / RequestID %s",
+			tk.meta.repoName,
+			q.JobID.String(),
+			q.ID.String(),
+		)
+		tk.treeLog.Printf(
+			"panicGuard invoked on TreeKeeper.%s: JobID %s / RequestID %s",
+			tk.meta.repoName,
+			q.JobID.String(),
+			q.ID.String(),
+		)
+		tk.treeLog.Printf("PANIC error: %s", r)
+		tk.treeLog.Printf("PANIC stacktrace: %s", debug.Stack())
+		tx.Rollback()
+		_, err := tk.conn.Exec(
+			stmt.TxFinishJob,
+			q.JobID.String(),
+			time.Now().UTC(),
+			`failed`,
+			`job canceled by panicGuard`,
+		)
+		if err != nil {
+			tk.appLog.Println("panicGuard job(%s) cancelation error: %s",
+				q.JobID.String(),
+				err.Error(),
+			)
+		}
+		go func() {
+			tk.stop()
+			tk.status.isBroken = true
+			tk.ShutdownNow()
+		}()
+		return
+	}
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
