@@ -11,7 +11,7 @@ func createTablesBuckets(printOnly bool, verbose bool) {
 	queryMap["createTableBuckets"] = `
 create table if not exists soma.buckets (
     bucket_id                   uuid            PRIMARY KEY,
-    bucket_name                 varchar(512)    UNIQUE NOT NULL,
+    bucket_name                 varchar(512)    NOT NULL,
     bucket_frozen               boolean         NOT NULL DEFAULT 'no',
     bucket_deleted              boolean         NOT NULL DEFAULT 'no',
     repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
@@ -30,6 +30,14 @@ create unique index _singleton_default_bucket
     on soma.buckets ( organizational_team_id, environment )
     where environment = 'default';`
 	queries[idx] = `singletonDefaultBucket`
+	idx++
+
+	queryMap[`create__soma.buckets__index_unique_name`] = `
+CREATE UNIQUE INDEX _bucket_unique_name
+    ON soma.buckets ( bucket_name, bucket_deleted )
+    WHERE NOT bucket_deleted;`
+	queries[idx] = `create__soma.buckets__index_unique_name`
+	idx++
 
 	performDatabaseTask(printOnly, verbose, queries, queryMap)
 }

@@ -43,6 +43,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 		201811060001: upgradeSomaTo201811120001,
 		201811120001: upgradeSomaTo201811120002,
 		201811120002: upgradeSomaTo201811150001,
+		201811150001: upgradeSomaTo201901300001,
 	},
 	`root`: map[int]func(int, string, bool) int{
 		000000000001: installRoot201605150001,
@@ -1103,6 +1104,23 @@ func upgradeSomaTo201811150001(curr int, tool string, printOnly bool) int {
 	)
 	executeUpgrades(stmts, printOnly)
 	return 201811150001
+}
+
+func upgradeSomaTo201901300001(curr int, tool string, printOnly bool) int {
+	if curr != 201811150001 {
+		return 0
+	}
+	stmts := []string{
+		`ALTER TABLE soma.buckets DROP CONSTRAINT buckets_bucket_name_key;`,
+		`CREATE UNIQUE INDEX CONCURRENTLY _bucket_unique_name ON soma.buckets ( bucket_name, bucket_deleted ) WHERE NOT bucket_deleted;`,
+		`ALTER TABLE soma.repository DROP CONSTRAINT _repository_unique_name;`,
+		`CREATE UNIQUE INDEX CONCURRENTLY _repository_unique_name ON soma.repository ( name, is_deleted ) WHERE NOT is_deleted;`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201901300001, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+	return 201901300001
 }
 
 func installRoot201605150001(curr int, tool string, printOnly bool) int {

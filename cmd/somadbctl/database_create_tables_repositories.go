@@ -20,10 +20,17 @@ create table if not exists soma.repository (
     CONSTRAINT _repository_primary_key PRIMARY KEY (id),
     CONSTRAINT _repository_creator_exists FOREIGN KEY (created_by) REFERENCES inventory.user (id) DEFERRABLE,
     CONSTRAINT _repository_team_exists FOREIGN KEY (team_id) REFERENCES inventory.team (id) DEFERRABLE,
-    CONSTRAINT _repository_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' ),
-    CONSTRAINT _repository_unique_name UNIQUE (name)
+    CONSTRAINT _repository_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' )
 );`
 	queries[idx] = `create__soma.repository`
+	idx++
+
+	queryMap[`create__soma.repository__index__unique_name`] = `
+CREATE UNIQUE INDEX _repository_unique_name
+    ON soma.repository ( name, is_deleted )
+    WHERE NOT is_deleted;`
+	queries[idx] = `create__soma.repository__index__unique_name`
+	idx++
 
 	performDatabaseTask(printOnly, verbose, queries, queryMap)
 }
