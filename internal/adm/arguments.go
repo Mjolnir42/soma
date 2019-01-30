@@ -239,14 +239,25 @@ argloop:
 	}
 
 	// check if all required keywords were collected
+requiredKeywordsLoop:
 	for _, key := range required {
 		if _, ok := result[key]; !ok {
+			// `in` keyword is not required for global objects
+			if key == `in` {
+				if _, ok := result[`on/type`]; ok {
+					switch result[`on/type`][0] {
+					case `repository`, `bucket`, `node`:
+						continue requiredKeywordsLoop
+					default:
+					}
+				}
+			}
 			errors = append(errors, fmt.Sprintf("Syntax error,"+
 				" missing keyword: %s", key))
 		}
 	}
 
-	// check if unique keywords were only specuified once
+	// check if unique keywords were only specified once
 	for _, key := range unique {
 		// check ok since unique may still be optional
 		if sl, ok := result[key]; ok && (len(sl) > 1) {
