@@ -89,4 +89,12 @@ func RepositoryConfigSearch(c *cli.Context) {
 	GenericDirect(c, []string{`id`, `name`, `team`, `deleted`, `active`})
 }
 
+func CheckConfigList(c *cli.Context) {
+	GenericDirectTriple(c, []string{`in`})
+}
+
+func CheckConfigDestroy(c *cli.Context) {
+	GenericTriple(c, []string{`in`})
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

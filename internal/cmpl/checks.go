@@ -7,7 +7,7 @@ import (
 )
 
 // I'm sorry as well.
-func CheckAdd(c *cli.Context) {
+func CheckConfigCreate(c *cli.Context) {
 	topArgs := []string{`in`, `on`, `with`, `interval`, `inheritance`, `childrenonly`, `extern`, `threshold`, `constraint`}
 	thrArgs := []string{`predicate`, `level`, `value`}
 	ctrArgs := []string{`service`, `oncall`, `attribute`, `system`, `native`, `custom`}
