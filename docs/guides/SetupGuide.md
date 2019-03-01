@@ -28,10 +28,11 @@ statements for the other, restricted users.
 `soma_inv` is a currently unused third account, to allow for inventory
 updates to be split into another daemon.
 
-2. mkdir -p ~/.soma/dbctl
+2. `mkdir -p ~/.soma/dbctl`
 
-3. vim ~/.soma/dbctl/somadbctl.conf
+3. `vim ~/.soma/dbctl/somadbctl.conf`
 
+```
 	# somadbctl configuration file
 	environment: production
 	timeout: 5
@@ -43,17 +44,22 @@ updates to be split into another daemon.
 	  port: 5432
 	  password: *************
 	}
+```
 
 4. Initialize database:
+```
 	% somadbctl init
 	...
 	The generated boostrap token was: 79f4fce4c2ef288bbea0ddd53067f86da90ea662ab57f20c60d5ad74729f98fd
+```
 
 5. Create server directory structure for default instance `huxley`
 
+```
     * mkdir -p /srv/soma/huxley/conf/
     * mkdir -p /srv/soma/huxley/log/job
     * mkdir -p /srv/soma/huxley/log/repository
+```
 
 6. vim /srv/soma/huxley/conf/soma.conf --- the '' around ldap.base.dn are important! (suspected UCL bug)
 
@@ -107,7 +113,7 @@ updates to be split into another daemon.
 	% openssl req -new -x509 -key /srv/soma/huxley/conf/soma.key.pem -out /srv/soma/huxley/conf/soma.pem -days 365 -config /etc/ssl/openssl.cnf
 ```
 
-8. Copy certificate chain for ldap.example.org to /srv/soma/huxley/conf/ldap.example.org.chain.pem
+8. Copy certificate chain for `ldap.example.org` to `/srv/soma/huxley/conf/ldap.example.org.chain.pem`
 
 9. Startup SOMA
 
