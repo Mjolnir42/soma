@@ -118,7 +118,7 @@ create table if not exists soma.authorizations_global (
     category                    varchar(32)     NOT NULL REFERENCES soma.category (name) DEFERRABLE,
     created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
-    FOREIGN KEY ( permission_id, category ) REFERENCES soma.permissions ( permission_id, category ) DEFERRABLE,
+    FOREIGN KEY ( permission_id, category ) REFERENCES soma.permission ( id, category ) DEFERRABLE,
     CHECK (   ( admin_id IS NOT NULL AND user_id IS     NULL AND tool_id IS     NULL AND team_id IS     NULL )
            OR ( admin_id IS     NULL AND user_id IS NOT NULL AND tool_id IS     NULL AND team_id IS     NULL )
            OR ( admin_id IS     NULL AND user_id IS     NULL AND tool_id IS NOT NULL AND team_id IS     NULL )
