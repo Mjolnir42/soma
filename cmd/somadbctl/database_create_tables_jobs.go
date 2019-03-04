@@ -73,7 +73,7 @@ create table if not exists soma.job (
     CONSTRAINT _job_user_exists                 FOREIGN KEY ( user_id ) REFERENCES inventory.user ( id ) DEFERRABLE,
     CONSTRAINT _job_team_exists                 FOREIGN KEY ( team_id ) REFERENCES inventory.team ( id ) DEFERRABLE
 );`
-	queries[idx] = `createTableJobs`
+	queries[idx] = `createTableJob`
 	idx++
 
 	queryMap[`createIndexJobStatus`] = `
