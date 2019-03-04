@@ -10,7 +10,7 @@ func createTablesProperties(printOnly bool, verbose bool) {
 
 	queryMap["createTableTemplateProperties"] = `
 create table if not exists soma.template_property (
-    id                          uuid            PRIMARY KEY DEFAULT public.gen_random_uuid(),
+    id                          uuid            PRIMARY KEY DEFAULT gen_random_uuid(),
     name                        varchar(128)    NOT NULL
 );`
 	queries[idx] = "createTableTemplateProperties"
