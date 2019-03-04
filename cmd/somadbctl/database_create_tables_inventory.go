@@ -74,7 +74,7 @@ create table if not exists inventory.team (
     CONSTRAINT _team_unique_ldap_id_per_dictionary UNIQUE (dictionary_id, ldap_id),
     CONSTRAINT _team_unique_name UNIQUE (name),
     CONSTRAINT _team_timezone_utc CHECK( EXTRACT( TIMEZONE FROM created_at ) = '0' ),
-    CONSTRAINT _team_dictionary_exists FOREIGN KEY (dictionary_id) REFERENCES inventory.dictionary (id) DEFERRABLE,
+    CONSTRAINT _team_dictionary_exists FOREIGN KEY (dictionary_id) REFERENCES inventory.dictionary (id) DEFERRABLE
 );`
 	queries[idx] = `create__inventory.team`
 	idx++
