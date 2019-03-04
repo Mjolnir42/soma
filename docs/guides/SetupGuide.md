@@ -14,7 +14,7 @@ GRANT CONNECT ON DATABASE soma TO soma_dba;
 GRANT CONNECT ON DATABASE soma TO soma_svc;
 GRANT CONNECT ON DATABASE soma TO soma_inv;
 \connect soma;
-CREATE EXTENSION pgcrypto SCHEMA public;
+CREATE EXTENSION pgcrypto SCHEMA pg_catalog;
 ```
     2. update `pg_hba.conf` so all three users can connect to the
        database via TCP socket
