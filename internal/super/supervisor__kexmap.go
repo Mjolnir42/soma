@@ -25,6 +25,7 @@ type kexMap struct {
 func newKexMap() *kexMap {
 	m := kexMap{}
 	m.KMap = make(map[string]auth.Kex)
+	m.gcMap = make(map[string]bool)
 	return &m
 }
 
