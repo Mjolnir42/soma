@@ -187,7 +187,7 @@ create table if not exists soma.constraints_service_attribute (
 	queryMap["createTableCheckConstraintsOncallProperty"] = `
 create table if not exists soma.constraints_oncall_property (
     configuration_id            uuid            NOT NULL REFERENCES soma.check_configurations ( configuration_id ) DEFERRABLE,
-    oncall_duty_id              uuid            NOT NULL REFERENCES inventory.oncall_duty_teams ( oncall_duty_id ) DEFERRABLE
+    oncall_duty_id              uuid            NOT NULL REFERENCES inventory.oncall_team ( id ) DEFERRABLE
 );`
 	queries[idx] = "createTableCheckConstraintsOncallProperty"
 

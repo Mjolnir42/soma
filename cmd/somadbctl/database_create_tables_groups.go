@@ -101,7 +101,7 @@ create table if not exists soma.group_oncall_properties (
     source_instance_id          uuid            NOT NULL,
     group_id                    uuid            NOT NULL REFERENCES soma.groups ( group_id ) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
-    oncall_duty_id              uuid            NOT NULL REFERENCES inventory.oncall_duty_teams ( oncall_duty_id ) DEFERRABLE,
+    oncall_duty_id              uuid            NOT NULL REFERENCES inventory.oncall_team ( id ) DEFERRABLE,
     repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',
