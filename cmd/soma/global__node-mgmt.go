@@ -286,6 +286,9 @@ func nodeMgmtRemove(c *cli.Context) (err error) {
 	if err := popError(); err != nil {
 		return err
 	}
+	req := proto.Request{Flags: &proto.Flags{
+		Purge: false,
+	}}
 
 	if err = adm.VerifySingleArgument(c); err != nil {
 		return err
@@ -296,7 +299,7 @@ func nodeMgmtRemove(c *cli.Context) (err error) {
 	}
 	path = fmt.Sprintf("/node/%s", id)
 
-	return adm.Perform(`delete`, path, `node-mgmt::remove`, nil, c)
+	return adm.Perform(`deletebody`, path, `node-mgmt::remove`, req, c)
 }
 
 // nodeMgmtPurge function
