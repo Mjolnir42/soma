@@ -188,6 +188,7 @@ func repositoryMgmtCreate(c *cli.Context) error {
 	req := proto.NewRepositoryRequest()
 	req.Repository.Name = c.Args().First()
 	req.Repository.TeamID = teamID
+	req.Repository.IsActive = true
 
 	if err := adm.ValidateRuneCountRange(req.Repository.Name,
 		4, 128); err != nil {
