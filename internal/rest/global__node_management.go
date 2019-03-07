@@ -63,7 +63,7 @@ func (x *Rest) NodeMgmtSync(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	request := msg.New(r, params)
-	request.Section = msg.SectionNodeMgmt
+	request.Section = msg.SectionNode
 	request.Action = msg.ActionSync
 
 	if !x.isAuthorized(&request) {
