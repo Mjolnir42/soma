@@ -105,8 +105,8 @@ password_read:
 
 	switch Cfg.Activation {
 	case `ldap`:
-		fmt.Println(`Please provide your LDAP password to"+
-		" establish ownership.`)
+		fmt.Println("Please provide your LDAP password to" +
+			" establish ownership.")
 		passKey = adm.ReadVerified(`password`)
 	case `mailtoken`:
 		fmt.Println(`Please provide the token you received via email.`)
