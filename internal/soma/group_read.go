@@ -142,7 +142,7 @@ func (r *GroupRead) list(q *msg.Request, mr *msg.Result) {
 		err                          error
 	)
 
-	if rows, err = r.stmtList.Query(); err != nil {
+	if rows, err = r.stmtList.Query(q.Bucket.ID); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
