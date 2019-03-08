@@ -146,7 +146,7 @@ func (tk *TreeKeeper) txCheck(a *tree.Action,
 func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	var id string
-	bucket := sql.NullString{String: a.Bucket.ID, Valid: true}
+	bucket := sql.NullString{String: a.Check.BucketID, Valid: true}
 	switch a.Type {
 	case msg.EntityRepository:
 		id = a.Repository.ID
