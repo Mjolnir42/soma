@@ -101,7 +101,7 @@ create table if not exists auth.admin (
     CONSTRAINT _admin_unique_name UNIQUE (uid),
     CONSTRAINT _admin_check_uid_prefix CHECK( left( uid, 6 ) = 'admin_' ),
     CONSTRAINT _admin_uid_contains_user_uid CHECK( position( user_uid in uid ) != 0 ),
-    CONSTRAINT _admin_user_exists FOREIGN KEY (user_uid) REFERENCES inventory.user (uid) ON DELETE CASCADE DEFERRABLE,
+    CONSTRAINT _admin_user_exists FOREIGN KEY (user_uid) REFERENCES inventory.user (uid) ON DELETE CASCADE DEFERRABLE
 );`
 	queries[idx] = `create__auth.admin`
 	idx++

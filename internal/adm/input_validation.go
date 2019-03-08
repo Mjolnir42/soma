@@ -342,7 +342,7 @@ func ValidateCheckConstraints(repoID, teamID string,
 		switch prop.ConstraintType {
 		case `native`:
 			if _, err := fetchObjList(
-				fmt.Sprintf("/property/native/%s", prop.Native.Name),
+				fmt.Sprintf("/property-mgmt/native/%s", prop.Native.Name),
 			); err != nil {
 				return nil, err
 			}
@@ -350,7 +350,7 @@ func ValidateCheckConstraints(repoID, teamID string,
 
 		case `system`:
 			if _, err := fetchObjList(
-				fmt.Sprintf("/property/system/%s", prop.System.Name),
+				fmt.Sprintf("/property-mgmt/system/%s", prop.System.Name),
 			); err != nil {
 				return nil, err
 			}

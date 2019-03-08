@@ -49,7 +49,7 @@ create table if not exists soma.repository_oncall_properties (
     source_instance_id          uuid            NOT NULL,
     repository_id               uuid            NOT NULL REFERENCES soma.repository (id) DEFERRABLE,
     view                        varchar(64)     NOT NULL DEFAULT 'any' REFERENCES soma.views ( view ) DEFERRABLE,
-    oncall_duty_id              uuid            NOT NULL REFERENCES inventory.oncall_duty_teams ( oncall_duty_id ) DEFERRABLE,
+    oncall_duty_id              uuid            NOT NULL REFERENCES inventory.oncall_team ( id ) DEFERRABLE,
     inheritance_enabled         boolean         NOT NULL DEFAULT 'yes',
     children_only               boolean         NOT NULL DEFAULT 'no',
     FOREIGN KEY ( source_instance_id, repository_id ) REFERENCES soma.property_instances ( instance_id, repository_id ) DEFERRABLE

@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -25,6 +26,7 @@ func (tk *TreeKeeper) txCheckConfig(conf proto.CheckConfig,
 		nullBucket sql.NullString
 		err        error
 	)
+	spew.Dump(conf)
 	if conf.BucketID != "" {
 		nullBucket = sql.NullString{
 			String: conf.BucketID,
@@ -146,7 +148,7 @@ func (tk *TreeKeeper) txCheck(a *tree.Action,
 func (tk *TreeKeeper) txCheckNew(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	var id string
-	bucket := sql.NullString{String: a.Bucket.ID, Valid: true}
+	bucket := sql.NullString{String: a.Check.BucketID, Valid: true}
 	switch a.Type {
 	case msg.EntityRepository:
 		id = a.Repository.ID

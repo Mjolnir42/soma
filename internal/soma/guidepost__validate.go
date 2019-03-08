@@ -413,7 +413,9 @@ func (g *GuidePost) validateCheckThresholds(q *msg.Request) (bool, error) {
 		thrLimit int
 		err      error
 	)
-
+	if len(q.CheckConfig.Thresholds) == 0 {
+		return false, fmt.Errorf("no thresholds for check defined")
+	}
 	if err = g.stmtCapabilityThresholds.QueryRow(
 		q.CheckConfig.CapabilityID,
 	).Scan(

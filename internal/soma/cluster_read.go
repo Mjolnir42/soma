@@ -138,7 +138,7 @@ func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
 		err                              error
 	)
 
-	if rows, err = r.stmtList.Query(); err != nil {
+	if rows, err = r.stmtList.Query(q.Bucket.ID); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
@@ -153,6 +153,7 @@ func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err, q.Section)
 			return
 		}
+
 		mr.Cluster = append(mr.Cluster, proto.Cluster{
 			ID:       clusterID,
 			Name:     clusterName,

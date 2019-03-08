@@ -16,7 +16,8 @@ const (
 SELECT group_id,
        group_name,
        bucket_id
-FROM soma.groups;`
+FROM soma.groups
+WHERE bucket_id = $1::uuid;`
 
 	GroupShow = `
 SELECT group_id,

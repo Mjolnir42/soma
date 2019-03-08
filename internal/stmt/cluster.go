@@ -16,7 +16,8 @@ const (
 SELECT cluster_id,
        cluster_name,
        bucket_id
-FROM   soma.clusters;`
+FROM   soma.clusters
+WHERE  bucket_id = $1::uuid;`
 
 	ClusterShow = `
 SELECT cluster_id,

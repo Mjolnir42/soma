@@ -118,11 +118,11 @@ create table if not exists soma.authorizations_global (
     category                    varchar(32)     NOT NULL REFERENCES soma.category (name) DEFERRABLE,
     created_by                  uuid            NOT NULL REFERENCES inventory.user ( id ) DEFERRABLE,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW(),
-    FOREIGN KEY ( permission_id, category ) REFERENCES soma.permissions ( permission_id, category ) DEFERRABLE,
-    CHECK (   ( admin_id IS NOT NULL AND user_id IS     NULL AND tool_id IS     NULL AND organizational_team_id IS     NULL )
-           OR ( admin_id IS     NULL AND user_id IS NOT NULL AND tool_id IS     NULL AND organizational_team_id IS     NULL )
-           OR ( admin_id IS     NULL AND user_id IS     NULL AND tool_id IS NOT NULL AND organizational_team_id IS     NULL )
-           OR ( admin_id IS     NULL AND user_id IS     NULL AND tool_id IS     NULL AND organizational_team_id IS NOT NULL ) ),
+    FOREIGN KEY ( permission_id, category ) REFERENCES soma.permission ( id, category ) DEFERRABLE,
+    CHECK (   ( admin_id IS NOT NULL AND user_id IS     NULL AND tool_id IS     NULL AND team_id IS     NULL )
+           OR ( admin_id IS     NULL AND user_id IS NOT NULL AND tool_id IS     NULL AND team_id IS     NULL )
+           OR ( admin_id IS     NULL AND user_id IS     NULL AND tool_id IS NOT NULL AND team_id IS     NULL )
+           OR ( admin_id IS     NULL AND user_id IS     NULL AND tool_id IS     NULL AND team_id IS NOT NULL ) ),
     CHECK ( category IN ( 'omnipotence','system','global','global:grant','permission','permission:grant','operations','operations:grant' ) ),
     -- if system, then it has to be an admin account
     CHECK ( category != 'system' OR admin_id IS NOT NULL ),
@@ -130,7 +130,7 @@ create table if not exists soma.authorizations_global (
     CHECK ( admin_id IS NULL OR category = 'system' ),
     -- only root can have omnipotence
     CHECK ( permission_id != '00000000-0000-0000-0000-000000000000'::uuid OR user_id = '00000000-0000-0000-0000-000000000000'::uuid ),
-    UNIQUE( admin_id, user_id, tool_id, organizational_team_id, category, permission_id )
+    UNIQUE( admin_id, user_id, tool_id, team_id, category, permission_id )
 );`
 	queries[idx] = "createTableGlobalAuthorizations"
 	idx++

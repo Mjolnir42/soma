@@ -56,7 +56,7 @@ INSERT INTO inventory.user (
             is_deleted,
             team_id,
             dictionary_id,
-            created_by,
+            created_by
 ) VALUES (
             '00000000-0000-0000-0000-000000000000',
             'root',
@@ -107,8 +107,8 @@ ALTER TABLE inventory.user ADD CONSTRAINT _user_creator_exists FOREIGN KEY (crea
 	idx++
 
 	queryMap["insertCategoryOmnipotence"] = `
-INSERT INTO soma.categories (
-            category,
+INSERT INTO soma.category (
+            name,
             created_by
 ) VALUES (
             'omnipotence',
@@ -122,9 +122,9 @@ INSERT INTO soma.categories (
 	idx++
 
 	queryMap["insertPermissionOmnipotence"] = `
-INSERT INTO soma.permissions (
-            permission_id,
-            permission_name,
+INSERT INTO soma.permission (
+            id,
+            name,
             category,
             created_by
 ) VALUES (
@@ -210,7 +210,7 @@ INSERT INTO public.schema_versions (
             description
 ) VALUES (
             'soma',
-            201811150001,
+            201901300001,
             'Initial create - somadbctl %s'
 );`, version)
 	queryMap["insertSomaSchemaVersion"] = somaString
