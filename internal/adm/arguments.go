@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -48,7 +47,7 @@ func ParseVariadicArguments(
 
 	// helper to skip over next value in args slice
 	skip := false
-	spew.Dump(args)
+
 	for pos, val := range args {
 		// skip current arg if last argument was a keyword
 		if skip {
@@ -57,6 +56,7 @@ func ParseVariadicArguments(
 		}
 
 		if sliceContainsString(val, keys) {
+
 			// there must be at least one arguments left
 			if len(args[pos+1:]) < 1 {
 				errors = append(errors,
@@ -199,7 +199,6 @@ argloop:
 				if len(args[pos+1:]) < 3 {
 					errors = append(errors, `Syntax error, incomplete`+
 						` constraint specification`)
-					goto abort
 				}
 				constr := proto.CheckConfigConstraint{}
 				if err := parseConstraintChain(
