@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
@@ -376,7 +377,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 		q.JobID.String(),
 		q.ID.String(),
 	)
-
+	spew.Dump(q)
 	// check if the user is still permitted to issue the asynchronous
 	// request at execution time
 	if !super.IsAuthorized(q) {
@@ -515,6 +516,7 @@ func (tk *TreeKeeper) process(q *msg.Request) {
 	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionCreate:
 		// save the check configuration as part of the transaction before
 		// processing the action channel
+		spew.Dump(q)
 		if err = tk.txCheckConfig(
 			q.CheckConfig,
 			stm,

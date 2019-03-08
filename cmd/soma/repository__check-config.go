@@ -14,6 +14,7 @@ import (
 	"net/url"
 
 	"github.com/codegangsta/cli"
+
 	"github.com/mjolnir42/soma/internal/adm"
 	"github.com/mjolnir42/soma/internal/cmpl"
 	"github.com/mjolnir42/soma/internal/help"
@@ -38,7 +39,7 @@ func registerChecks(app cli.App) *cli.App {
 						Name:         `destroy`,
 						Usage:        "Destroy a check configuration",
 						Description:  help.Text(`check-config::destroy`),
-						Action:       runtime(checkConfigCreate),
+						Action:       runtime(checkConfigDestroy),
 						BashComplete: cmpl.CheckConfigDestroy,
 					},
 					{
@@ -72,15 +73,14 @@ func checkConfigCreate(c *cli.Context) error {
 	thresholds := []proto.CheckConfigThreshold{}
 	req := proto.NewCheckConfigRequest()
 
-	if err = adm.ParseVariadicCheckArguments(
+	if err := adm.ParseVariadicCheckArguments(
+		&constraints,
+		&thresholds,
 		opts,
-		constraints,
-		thresholds,
 		c.Args().Tail(),
 	); err != nil {
 		return err
 	}
-
 	if err = adm.ValidateLBoundUint64(opts[`interval`][0],
 		&req.CheckConfig.Interval, 1); err != nil {
 		return err
@@ -100,7 +100,7 @@ func checkConfigCreate(c *cli.Context) error {
 	if err = adm.ValidateNotUUID(req.CheckConfig.Name); err != nil {
 		return err
 	}
-
+	fmt.Println("Pre Switch statement")
 	switch req.CheckConfig.ObjectType {
 	case `repository`:
 		if req.CheckConfig.RepositoryID, err = adm.LookupRepoID(opts[`on/object`][0]); err != nil {
@@ -141,6 +141,7 @@ func checkConfigCreate(c *cli.Context) error {
 	default:
 		return fmt.Errorf("Unknown object entity: %s", req.CheckConfig.ObjectType)
 	}
+	fmt.Println("Post Switch statement")
 
 	// optional argument: inheritance
 	if iv, ok := opts[`inheritance`]; ok {
@@ -171,18 +172,18 @@ func checkConfigCreate(c *cli.Context) error {
 		}
 		req.CheckConfig.ExternalID = ex[0]
 	}
-
+	fmt.Println("Pre LookupTeamByRepo")
 	if err = adm.LookupTeamByRepo(
 		req.CheckConfig.RepositoryID, &teamID); err != nil {
 		return err
 	}
-
+	fmt.Println("Pre ValidateThresholds")
 	if req.CheckConfig.Thresholds, err = adm.ValidateThresholds(
 		thresholds,
 	); err != nil {
 		return err
 	}
-
+	fmt.Println("Pre ValidateCheckConstraints")
 	if req.CheckConfig.Constraints, err = adm.ValidateCheckConstraints(
 		req.CheckConfig.RepositoryID,
 		teamID,
@@ -190,10 +191,10 @@ func checkConfigCreate(c *cli.Context) error {
 	); err != nil {
 		return err
 	}
-
 	path := fmt.Sprintf("/checkconfig/%s/",
 		url.QueryEscape(req.CheckConfig.RepositoryID),
 	)
+	fmt.Println("Pre Perform")
 	return adm.Perform(`postbody`, path, `check-config::create`, req, nil)
 }
 

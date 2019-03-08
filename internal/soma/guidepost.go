@@ -104,6 +104,8 @@ func (g *GuidePost) RegisterRequests(hmap *handler.Map) {
 		{Section: msg.SectionGroup, Action: msg.ActionMemberUnassign},
 		{Section: msg.SectionCluster, Action: msg.ActionMemberAssign},
 		{Section: msg.SectionCluster, Action: msg.ActionMemberUnassign},
+		{Section: msg.SectionCheckConfig, Action: msg.ActionCreate},
+		{Section: msg.SectionCheckConfig, Action: msg.ActionDestroy},
 	} {
 		hmap.Request(request.Section, request.Action, `guidepost`)
 	}

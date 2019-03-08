@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
@@ -47,7 +48,7 @@ func ParseVariadicArguments(
 
 	// helper to skip over next value in args slice
 	skip := false
-
+	spew.Dump(args)
 	for pos, val := range args {
 		// skip current arg if last argument was a keyword
 		if skip {
@@ -111,9 +112,9 @@ abort:
 // checks, which consist of multiple key/value pairs. Keywords do not
 // have to be passed in.
 func ParseVariadicCheckArguments(
+	constraints *[]proto.CheckConfigConstraint,
+	thresholds *[]proto.CheckConfigThreshold,
 	result map[string][]string,
-	constraints []proto.CheckConfigConstraint,
-	thresholds []proto.CheckConfigThreshold,
 	args []string,
 ) error {
 	// used to hold found errors, so if three keywords are missing they can
@@ -181,12 +182,12 @@ argloop:
 				}
 				thr := proto.CheckConfigThreshold{}
 				if err := parseThresholdChain(
-					thr,
+					&thr,
 					args[pos+1:pos+7],
 				); err != nil {
 					errors = append(errors, err.Error())
 				} else {
-					thresholds = append(thresholds, thr)
+					*thresholds = append(*thresholds, thr)
 				}
 				skip = true
 				skipcount = 6
@@ -198,15 +199,16 @@ argloop:
 				if len(args[pos+1:]) < 3 {
 					errors = append(errors, `Syntax error, incomplete`+
 						` constraint specification`)
+					goto abort
 				}
 				constr := proto.CheckConfigConstraint{}
 				if err := parseConstraintChain(
-					constr,
-					args[pos+1:pos+3],
+					&constr,
+					args[pos+1:pos+4],
 				); err != nil {
 					errors = append(errors, err.Error())
 				} else {
-					constraints = append(constraints, constr)
+					*constraints = append(*constraints, constr)
 				}
 				skip = true
 				skipcount = 3
@@ -435,9 +437,10 @@ func combineStrings(s ...string) string {
 
 // parseThresholdChain parses a single threshold specification given
 // to ParseVariadicCheckArguments
-func parseThresholdChain(result proto.CheckConfigThreshold,
+func parseThresholdChain(result *proto.CheckConfigThreshold,
 	args []string) error {
 	tParse := make(map[string][]string)
+	fmt.Println("parseThresholdChain - Begin")
 	if err := ParseVariadicArguments(
 		tParse,
 		[]string{},
@@ -445,6 +448,7 @@ func parseThresholdChain(result proto.CheckConfigThreshold,
 		[]string{`predicate`, `level`, `value`},
 		args,
 	); err != nil {
+		fmt.Println("parseThresholdChain - ", err.Error())
 		return err
 	}
 	var err error
@@ -456,12 +460,13 @@ func parseThresholdChain(result proto.CheckConfigThreshold,
 		return fmt.Errorf("Syntax error, value argument not"+
 			" numeric: %s", tParse[`value`][0])
 	}
+	fmt.Println("parseThresholdChain - End")
 	return nil
 }
 
 // parseConstraintChain parses a single constraint specification
 // given to ParseVariadicCheckArguments
-func parseConstraintChain(result proto.CheckConfigConstraint,
+func parseConstraintChain(result *proto.CheckConfigConstraint,
 	args []string) error {
 	result.ConstraintType = args[0]
 	switch result.ConstraintType {
