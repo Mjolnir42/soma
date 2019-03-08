@@ -56,7 +56,7 @@ INSERT INTO inventory.user (
             is_deleted,
             team_id,
             dictionary_id,
-            created_by,
+            created_by
 ) VALUES (
             '00000000-0000-0000-0000-000000000000',
             'root',
