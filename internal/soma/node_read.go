@@ -62,9 +62,13 @@ func (r *NodeRead) RegisterRequests(hmap *handler.Map) {
 		msg.ActionSearch,
 		msg.ActionShow,
 		msg.ActionShowConfig,
-		msg.ActionSync,
 	} {
 		hmap.Request(msg.SectionNode, action, r.handlerName)
+	}
+	for _, action := range []string{
+		msg.ActionSync,
+	} {
+		hmap.Request(msg.SectionNodeMgmt, action, r.handlerName)
 	}
 }
 
