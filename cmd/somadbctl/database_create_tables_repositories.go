@@ -10,7 +10,7 @@ func createTableRepositories(printOnly bool, verbose bool) {
 
 	queryMap[`create__soma.repository`] = `
 create table if not exists soma.repository (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                        varchar(128)    NOT NULL,
     is_deleted                  boolean         NOT NULL DEFAULT 'no',
     is_active                   boolean         NOT NULL DEFAULT 'yes',

@@ -10,7 +10,7 @@ func createTablesJobs(printOnly bool, verbose bool) {
 
 	queryMap[`createTableJobStatus`] = `
 create table if not exists soma.job_status (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                        varchar(32)     NOT NULL,
     created_by                  uuid            NOT NULL,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
@@ -24,7 +24,7 @@ create table if not exists soma.job_status (
 
 	queryMap[`createTableJobResult`] = `
 create table if not exists soma.job_result (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                        varchar(32)     NOT NULL,
     created_by                  uuid            NOT NULL,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
@@ -38,7 +38,7 @@ create table if not exists soma.job_result (
 
 	queryMap[`createTableJobType`] = `
 create table if not exists soma.job_type (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                        varchar(128)    NOT NULL,
     created_by                  uuid            NOT NULL,
     created_at                  timestamptz(3)  NOT NULL DEFAULT NOW()::timestamptz(3),
@@ -52,7 +52,7 @@ create table if not exists soma.job_type (
 
 	queryMap[`createTableJob`] = `
 create table if not exists soma.job (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     status                      varchar(32)     NOT NULL,
     result                      varchar(32)     NOT NULL,
     type                        varchar(128)    NOT NULL,

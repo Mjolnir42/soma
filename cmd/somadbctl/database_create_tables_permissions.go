@@ -21,7 +21,7 @@ create table if not exists soma.category (
 
 	queryMap[`create__soma.section`] = `
 create table if not exists soma.section (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                        varchar(64)     NOT NULL,
     category                    varchar(32)     NOT NULL,
     created_by                  uuid            NOT NULL,
@@ -37,7 +37,7 @@ create table if not exists soma.section (
 
 	queryMap[`create__soma.action`] = `
 create table if not exists soma.action (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                        varchar(64)     NOT NULL,
     section_id                  uuid            NOT NULL,
     category                    varchar(32)     NOT NULL,
@@ -54,7 +54,7 @@ create table if not exists soma.action (
 
 	queryMap[`create__soma.permission`] = `
 create table if not exists soma.permission (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                        varchar(128)    NOT NULL,
     category                    varchar(32)     NOT NULL,
     created_by                  uuid            NOT NULL,
@@ -73,7 +73,7 @@ create table if not exists soma.permission (
 
 	queryMap[`create__soma.permission_map`] = `
 create table if not exists soma.permission_map (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     category                    varchar(32)     NOT NULL,
     permission_id               uuid            NOT NULL,
     section_id                  uuid            NOT NULL,

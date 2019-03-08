@@ -93,7 +93,7 @@ create unique index _unique_active_user_cert
 
 	queryMap[`create__auth.admin`] = `
 create table if not exists auth.admin (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     uid                         varchar(256)    NOT NULL,
     user_uid                    varchar(256)    NOT NULL,
     is_active                   boolean         NOT NULL DEFAULT 'yes',

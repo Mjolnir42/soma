@@ -49,7 +49,7 @@ func createTablesInventoryAccounts(printOnly bool, verbose bool) {
 
 	queryMap[`create__inventory.dictionary`] = `
 create table if not exists inventory.dictionary (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     name                        varchar(128)    NOT NULL,
     created_by                  uuid            NOT NULL,
     created_at                  timestamptz(3)  NOT NULL DEFAULT now(),
@@ -62,7 +62,7 @@ create table if not exists inventory.dictionary (
 
 	queryMap[`create__inventory.team`] = `
 create table if not exists inventory.team (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     dictionary_id               uuid            NOT NULL,
     name                        varchar(384)    NOT NULL,
     ldap_id                     numeric(16,0)   NOT NULL,
@@ -81,7 +81,7 @@ create table if not exists inventory.team (
 
 	queryMap[`create__inventory.user`] = `
 create table if not exists inventory.user (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     dictionary_id               uuid            NOT NULL,
     uid                         varchar(256)    NOT NULL,
     first_name                  varchar(256)    NOT NULL,
@@ -128,7 +128,7 @@ create index _user_is_inactive on inventory.user ( is_active, id )
 
 	queryMap[`create__inventory.oncall_team`] = `
 create table if not exists inventory.oncall_team (
-    id                          uuid            NOT NULL DEFAULT gen_random_uuid(),
+    id                          uuid            NOT NULL DEFAULT public.gen_random_uuid(),
     dictionary_id               uuid            NOT NULL,
     name                        varchar(256)    NOT NULL,
     phone_number                numeric(5,0)    NOT NULL,
