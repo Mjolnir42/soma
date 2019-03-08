@@ -431,7 +431,10 @@ func (g *GuidePost) validateCheckThresholds(q *msg.Request) (bool, error) {
 			"Specified %d thresholds exceed limit of %d for capability",
 			len(q.CheckConfig.Thresholds),
 			thrLimit)
+	} else if len(q.CheckConfig.Thresholds) == 0 {
+		return false, fmt.Errorf("no thresholds for check defined")
 	}
+
 	return false, nil
 }
 
