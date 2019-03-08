@@ -14,7 +14,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/tree"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -26,7 +25,6 @@ func (tk *TreeKeeper) txCheckConfig(conf proto.CheckConfig,
 		nullBucket sql.NullString
 		err        error
 	)
-	spew.Dump(conf)
 	if conf.BucketID != "" {
 		nullBucket = sql.NullString{
 			String: conf.BucketID,

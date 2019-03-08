@@ -143,12 +143,15 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	request := msg.New(r, params)
-	request.Section = msg.SectionCheckConfig
-	request.Action = msg.ActionDestroy
-	request.CheckConfig = proto.CheckConfig{
-		ID:           params.ByName(`checkID`),
-		RepositoryID: params.ByName(`repositoryID`),
+	request.Section = msg.SectionMonitoring
+	request.Action = msg.ActionUse
+
+	cReq := proto.NewCheckConfigRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
 	}
+	request.CheckConfig = cReq.CheckConfig.Clone()
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request, nil)
