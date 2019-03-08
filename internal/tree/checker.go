@@ -563,8 +563,9 @@ type checkContext struct {
 
 func newCheckContext(uuid, view string, startup bool) *checkContext {
 	cc := checkContext{
-		uuid: uuid,
-		view: view,
+		uuid:    uuid,
+		view:    view,
+		startup: startup,
 	}
 	cc.attributes = []CheckConstraint{}
 	cc.systemConstr = make(map[string]string)
