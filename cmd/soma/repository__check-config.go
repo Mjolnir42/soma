@@ -38,7 +38,7 @@ func registerChecks(app cli.App) *cli.App {
 						Name:         `destroy`,
 						Usage:        "Destroy a check configuration",
 						Description:  help.Text(`check-config::destroy`),
-						Action:       runtime(checkConfigCreate),
+						Action:       runtime(checkConfigDestroy),
 						BashComplete: cmpl.CheckConfigDestroy,
 					},
 					{

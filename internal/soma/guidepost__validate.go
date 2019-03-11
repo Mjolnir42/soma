@@ -18,8 +18,11 @@ import (
 func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 	switch q.Section {
 	case msg.SectionCheckConfig:
-		if nf, err := g.validateCheckObjectInBucket(q); err != nil {
-			return nf, err
+		switch q.Action {
+		case msg.ActionCreate:
+			if nf, err := g.validateCheckObjectInBucket(q); err != nil {
+				return nf, err
+			}
 		}
 	case msg.SectionNodeConfig:
 		if nf, err := g.validateNodeConfig(q); err != nil {
