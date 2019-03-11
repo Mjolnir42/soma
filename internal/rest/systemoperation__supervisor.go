@@ -14,7 +14,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/auth"
-	"github.com/satori/go.uuid"
 )
 
 // SupervisorValidate is a noop function wrapped in HTTP basic
