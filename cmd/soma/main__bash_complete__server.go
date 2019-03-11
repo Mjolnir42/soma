@@ -30,7 +30,7 @@ func bashCompServer(c *cli.Context) {
 // pushed onto the error stack.
 func serverFetch() []proto.Server {
 	var err error
-	resp := &resty.Response{}
+	var resp *resty.Response
 	res := &proto.Result{}
 
 	// fetch server list

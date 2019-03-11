@@ -66,7 +66,7 @@ func bashCompNodeConfigTree(c *cli.Context) {
 // onto the error stack.
 func nodeFetch() []proto.Node {
 	var err error
-	resp := &resty.Response{}
+	var resp *resty.Response
 	res := &proto.Result{}
 
 	// fetch nodes list
