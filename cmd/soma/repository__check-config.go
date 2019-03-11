@@ -38,7 +38,7 @@ func registerChecks(app cli.App) *cli.App {
 						Name:         `destroy`,
 						Usage:        "Destroy a check configuration",
 						Description:  help.Text(`check-config::destroy`),
-						Action:       runtime(checkConfigDestroy),
+						Action:       runtime(checkConfigCreate),
 						BashComplete: cmpl.CheckConfigDestroy,
 					},
 					{
@@ -204,7 +204,6 @@ func checkConfigDestroy(c *cli.Context) error {
 	multipleAllowed := []string{}
 	uniqueOptions := []string{`in`}
 	mandatoryOptions := []string{`in`}
-	req := proto.NewCheckConfigRequest()
 
 	var err error
 	if err = adm.ParseVariadicTriples(
@@ -217,33 +216,33 @@ func checkConfigDestroy(c *cli.Context) error {
 		return err
 	}
 
+	var bucketID, repoID, checkID string
+
 	switch opts[`in`][0][0] {
 	case proto.EntityRepository:
-		req.CheckConfig.ObjectType = proto.EntityRepository
-		if req.CheckConfig.RepositoryID, err = adm.LookupRepoID(opts[`in`][0][1]); err != nil {
+		if repoID, err = adm.LookupRepoID(opts[`in`][0][1]); err != nil {
 			return err
 		}
-		req.CheckConfig.ObjectID = req.CheckConfig.RepositoryID
 	case proto.EntityBucket:
-		req.CheckConfig.ObjectType = proto.EntityBucket
-		if req.CheckConfig.BucketID, err = adm.LookupBucketID(opts[`in`][0][1]); err != nil {
+		if bucketID, err = adm.LookupBucketID(opts[`in`][0][1]); err != nil {
 			return err
 		}
-		if req.CheckConfig.RepositoryID, err = adm.LookupRepoByBucket(req.CheckConfig.BucketID); err != nil {
+		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
 	default:
 		return fmt.Errorf("Invalid entity: %s", opts[`in`][0][0])
 	}
-	if req.CheckConfig.ID, _, err = adm.LookupCheckConfigID(c.Args().First(), req.CheckConfig.RepositoryID, ``); err != nil {
+
+	if checkID, _, err = adm.LookupCheckConfigID(c.Args().First(), repoID, ``); err != nil {
 		return err
 	}
 
 	path := fmt.Sprintf("/checkconfig/%s/%s",
-		url.QueryEscape(req.CheckConfig.RepositoryID),
-		url.QueryEscape(req.CheckConfig.ID),
+		url.QueryEscape(repoID),
+		url.QueryEscape(checkID),
 	)
-	return adm.Perform(`deletebody`, path, `check-config::destroy`, req, c)
+	return adm.Perform(`delete`, path, `check-config::destroy`, nil, c)
 }
 
 // checkConfigList function
