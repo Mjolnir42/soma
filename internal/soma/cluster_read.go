@@ -158,6 +158,7 @@ func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err, q.Section)
 			return
 		}
+
 		mr.Cluster = append(mr.Cluster, proto.Cluster{
 			ID:       clusterID,
 			Name:     clusterName,
