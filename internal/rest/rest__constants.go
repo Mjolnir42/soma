@@ -97,6 +97,8 @@ const (
 	rtDeploymentStateID          = `/monitoringsystem/:monitoringID/deployment/state/:state`
 	rtAliasDeploymentID          = `/deployment/id/:deploymentID`
 	rtAliasDeploymentIDAction    = `/deployment/id/:deploymentID/:action`
+	rtCompatDeploymentID         = `/deployments/id/:deploymentID`
+	rtCompatDeploymentIDAction   = `/deployments/id/:deploymentID/:action`
 	rtOncallMember               = `/oncall/:oncallID/member/`
 	rtOncallMemberID             = `/oncall/:oncallID/member/:userID`
 	rtJob                        = `/job/`
