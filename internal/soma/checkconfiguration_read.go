@@ -130,6 +130,7 @@ func (r *CheckConfigurationRead) process(q *msg.Request) {
 		r.show(q, &result)
 	case msg.ActionSearch:
 		// XXX BUG x.search(q, &result)
+		r.list(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}

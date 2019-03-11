@@ -112,8 +112,8 @@ abort:
 // have to be passed in.
 func ParseVariadicCheckArguments(
 	result map[string][]string,
-	constraints []proto.CheckConfigConstraint,
-	thresholds []proto.CheckConfigThreshold,
+	constraints *[]proto.CheckConfigConstraint,
+	thresholds *[]proto.CheckConfigThreshold,
 	args []string,
 ) error {
 	// used to hold found errors, so if three keywords are missing they can
@@ -181,13 +181,13 @@ argloop:
 				}
 				thr := proto.CheckConfigThreshold{}
 				if err := parseThresholdChain(
-					thr,
+					&thr,
 					args[pos+1:pos+7],
 				); err != nil {
 					errors = append(errors, err.Error())
-				} else {
-					thresholds = append(thresholds, thr)
+					goto abort
 				}
+				*thresholds = append(*thresholds, thr)
 				skip = true
 				skipcount = 6
 				continue argloop
@@ -198,16 +198,17 @@ argloop:
 				if len(args[pos+1:]) < 3 {
 					errors = append(errors, `Syntax error, incomplete`+
 						` constraint specification`)
+					goto abort
 				}
 				constr := proto.CheckConfigConstraint{}
 				if err := parseConstraintChain(
-					constr,
-					args[pos+1:pos+3],
+					&constr,
+					args[pos+1:pos+4],
 				); err != nil {
 					errors = append(errors, err.Error())
-				} else {
-					constraints = append(constraints, constr)
+					goto abort
 				}
+				*constraints = append(*constraints, constr)
 				skip = true
 				skipcount = 3
 				continue argloop
@@ -435,7 +436,7 @@ func combineStrings(s ...string) string {
 
 // parseThresholdChain parses a single threshold specification given
 // to ParseVariadicCheckArguments
-func parseThresholdChain(result proto.CheckConfigThreshold,
+func parseThresholdChain(result *proto.CheckConfigThreshold,
 	args []string) error {
 	tParse := make(map[string][]string)
 	if err := ParseVariadicArguments(
@@ -461,7 +462,7 @@ func parseThresholdChain(result proto.CheckConfigThreshold,
 
 // parseConstraintChain parses a single constraint specification
 // given to ParseVariadicCheckArguments
-func parseConstraintChain(result proto.CheckConfigConstraint,
+func parseConstraintChain(result *proto.CheckConfigConstraint,
 	args []string) error {
 	result.ConstraintType = args[0]
 	switch result.ConstraintType {

@@ -74,13 +74,12 @@ func checkConfigCreate(c *cli.Context) error {
 
 	if err = adm.ParseVariadicCheckArguments(
 		opts,
-		constraints,
-		thresholds,
+		&constraints,
+		&thresholds,
 		c.Args().Tail(),
 	); err != nil {
 		return err
 	}
-
 	if err = adm.ValidateLBoundUint64(opts[`interval`][0],
 		&req.CheckConfig.Interval, 1); err != nil {
 		return err
