@@ -48,8 +48,10 @@ type Supervisor struct {
 	permCache                         *perm.Cache
 	stmtTokenSelect                   *sql.Stmt
 	stmtFindUserID                    *sql.Stmt
+	stmtFindAdminID                   *sql.Stmt
 	stmtFindUserName                  *sql.Stmt
 	stmtCheckUserActive               *sql.Stmt
+	stmtCheckAdminActive              *sql.Stmt
 	stmtCategoryList                  *sql.Stmt
 	stmtCategoryShow                  *sql.Stmt
 	stmtSectionList                   *sql.Stmt
@@ -218,14 +220,15 @@ func (s *Supervisor) Run() {
 	s.startupLoad()
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.SelectToken:                   &s.stmtTokenSelect,
-		stmt.FindUserName:                  &s.stmtFindUserName,
-		stmt.FindUserID:                    &s.stmtFindUserID,
 		stmt.CategoryList:                  &s.stmtCategoryList,
 		stmt.CategoryShow:                  &s.stmtCategoryShow,
+		stmt.FindAdminID:                   &s.stmtFindAdminID,
+		stmt.FindUserID:                    &s.stmtFindUserID,
+		stmt.FindUserName:                  &s.stmtFindUserName,
 		stmt.PermissionList:                &s.stmtPermissionList,
 		stmt.PermissionSearchByName:        &s.stmtPermissionSearch,
 		stmt.SectionList:                   &s.stmtSectionList,
+		stmt.SelectToken:                   &s.stmtTokenSelect,
 		stmt.SectionShow:                   &s.stmtSectionShow,
 		stmt.SectionSearch:                 &s.stmtSectionSearch,
 		stmt.ActionList:                    &s.stmtActionList,
@@ -253,6 +256,7 @@ func (s *Supervisor) Run() {
 	if !s.readonly {
 		for statement, prepStmt := range map[string]**sql.Stmt{
 			stmt.CheckUserActive:               &s.stmtCheckUserActive,
+			stmt.CheckAdminActive:              &s.stmtCheckAdminActive,
 			stmt.SectionAdd:                    &s.stmtSectionAdd,
 			stmt.ActionAdd:                     &s.stmtActionAdd,
 			stmt.RevokeGlobalAuthorization:     &s.stmtRevokeAuthorizationGlobal,

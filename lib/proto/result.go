@@ -55,6 +55,7 @@ type Result struct {
 
 	// Request dependent data
 	Actions          *[]Action          `json:"actions,omitempty"`
+	Admins           *[]Admin           `json:"admins,omitempty"`
 	Attributes       *[]Attribute       `json:"attributes,omitempty"`
 	Buckets          *[]Bucket          `json:"buckets,omitempty"`
 	Capabilities     *[]Capability      `json:"capability,omitempty"`
@@ -196,6 +197,7 @@ func (r *Result) DataClean() {
 	r.Errors = &[]string{`Internal server error forced empty result`}
 	r.DeploymentsList = nil
 	r.Actions = nil
+	r.Admins = nil
 	r.Attributes = nil
 	r.Buckets = nil
 	r.Capabilities = nil

@@ -33,6 +33,14 @@ func (s *Supervisor) txInsertCred(tx *sql.Tx, user uuid.UUID, subject, mcf strin
 	var err error
 
 	switch subject {
+	case msg.SubjectAdmin:
+		_, err = tx.Exec(
+			stmt.SetAdminCredential,
+			user,
+			mcf,
+			validFrom,
+			expireAt,
+		)
 	case msg.SubjectUser:
 		_, err = tx.Exec(
 			stmt.SetUserCredential,

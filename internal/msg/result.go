@@ -27,6 +27,7 @@ type Result struct {
 	Super Supervisor
 
 	ActionObj      []proto.Action
+	Admin          []proto.Admin
 	Attribute      []proto.Attribute
 	Bucket         []proto.Bucket
 	Capability     []proto.Capability
@@ -143,6 +144,8 @@ func (r *Result) Clear(s string) {
 	switch s {
 	case `action`:
 		r.ActionObj = []proto.Action{}
+	case `admin`:
+		r.Admin = []proto.Admin{}
 	case `attribute`:
 		r.Attribute = []proto.Attribute{}
 	case `bucket`:

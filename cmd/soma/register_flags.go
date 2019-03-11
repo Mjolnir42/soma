@@ -31,7 +31,7 @@ func registerFlags(app cli.App) *cli.App {
 			Usage:  "configuration file location",
 			EnvVar: "SOMA_ADM_CONFIG",
 		},
-		cli.StringFlag{
+		cli.BoolFlag{
 			Name:  "admin, A",
 			Usage: "Use configured elevated privilege account",
 		},

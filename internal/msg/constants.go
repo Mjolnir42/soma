@@ -65,6 +65,7 @@ const (
 // related to identity management
 const (
 	CategoryIdentity = `identity`
+	SectionAdminMgmt = `admin-mgmt`
 	SectionTeamMgmt  = `team-mgmt`
 	SectionUserMgmt  = `user-mgmt`
 )

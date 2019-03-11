@@ -52,8 +52,8 @@ func supervisorLogout(c *cli.Context) error {
 
 func supervisorActivate(c *cli.Context) error {
 	// administrative use, full runtime is available
-	if c.GlobalIsSet(`admin`) {
-		if err := adm.VerifySingleArgument(c); err != nil {
+	if c.GlobalBool(`admin`) {
+		if err := adm.VerifyNoArgument(c); err != nil {
 			return err
 		}
 		return runtime(supervisorActivateAdmin)(c)
@@ -141,6 +141,67 @@ password_read:
 }
 
 func supervisorActivateAdmin(c *cli.Context) error {
+	var err error
+	var password string
+	var passKey string
+	var happy bool
+	var cred *auth.Token
+
+	if Cfg.AdminAuth.User == `` {
+		fmt.Println(`Please specify which admin account to activate.`)
+		if Cfg.AdminAuth.User, err = adm.Read(`user`); err != nil {
+			return err
+		}
+	} else {
+		fmt.Printf("Starting with activation of admin account '%s' in"+
+			" 2 seconds.\n", Cfg.AdminAuth.User)
+		time.Sleep(2 * time.Second)
+	}
+	if strings.Contains(Cfg.AdminAuth.User, `:`) {
+		return fmt.Errorf(`Usernames must not contain : character.`)
+	}
+
+	fmt.Printf("\nPlease provide the password you want to use.\n")
+password_read:
+	password = adm.ReadVerified(`password`)
+
+	if happy, err = adm.EvaluatePassword(3, password,
+		Cfg.AdminAuth.User, `soma`); err != nil {
+		return err
+	} else if !happy {
+		goto password_read
+	}
+
+	fmt.Printf("\nTo confirm that this is your account, an" +
+		" additional credential is required" +
+		" this once.\n")
+
+	fmt.Println("Please provide your SOMA password to" +
+		" establish ownership.")
+	passKey = adm.ReadVerified(`password`)
+
+	if cred, err = adm.ActivateAccount(Client, &auth.Token{
+		UserName: Cfg.AdminAuth.User,
+		Password: password,
+		Token:    passKey,
+	}); err != nil {
+		return err
+	}
+
+	// validate received token
+	if err = adm.ValidateToken(Client, Cfg.AdminAuth.User,
+		cred.Token); err != nil {
+		return err
+	}
+	// save received token
+	if err = store.SaveToken(
+		Cfg.AdminAuth.User,
+		cred.ValidFrom,
+		cred.ExpiresAt,
+		cred.Token,
+	); err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -35,6 +35,7 @@ type Request struct {
 	Cache *Request
 
 	ActionObj   proto.Action
+	Admin       proto.Admin
 	Attribute   proto.Attribute
 	Bucket      proto.Bucket
 	Capability  proto.Capability

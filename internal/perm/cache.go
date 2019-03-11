@@ -71,6 +71,8 @@ func (c *Cache) Perform(q *msg.Request) {
 	switch q.Cache.Section {
 	case msg.SectionAction:
 		c.performAction(q.Cache)
+	case msg.SectionAdminMgmt:
+		c.performAdmin(q.Cache)
 	case msg.SectionBucket:
 		c.performBucket(q.Cache)
 	case msg.SectionCategory:

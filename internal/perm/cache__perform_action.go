@@ -382,4 +382,48 @@ func (c *Cache) performUserUpdate(q *msg.Request) {
 	}
 }
 
+// performAdminAdd registers a admin
+func (c *Cache) performAdminAdd(q *msg.Request) {
+	c.lock.Lock()
+	c.user.add(
+		q.Admin.ID,
+		q.Admin.Name,
+		`admins`,
+	)
+	c.lock.Unlock()
+}
+
+// performAdminRemove removes a user
+func (c *Cache) performAdminRemove(q *msg.Request) {
+	c.lock.Lock()
+	u := c.user.getByID(q.Admin.ID)
+	if u == nil {
+		c.lock.Unlock()
+		return
+	}
+	// revoke all global grants for the user
+	grantIDs := c.grantGlobal.getSubjectGrantID(`admin`, u.ID)
+	for _, grantID := range grantIDs {
+		c.grantGlobal.revoke(grantID)
+	}
+	// revoke all monitoring grants for the user
+	grantIDs = c.grantMonitoring.getSubjectGrantID(`admin`, u.ID)
+	for _, grantID := range grantIDs {
+		c.grantMonitoring.revoke(grantID)
+	}
+	// revoke all repository grants for the user
+	grantIDs = c.grantRepository.getSubjectGrantID(`admin`, u.ID)
+	for _, grantID := range grantIDs {
+		c.grantRepository.revoke(grantID)
+	}
+	// revoke all team grants for the user
+	grantIDs = c.grantTeam.getSubjectGrantID(`admin`, u.ID)
+	for _, grantID := range grantIDs {
+		c.grantTeam.revoke(grantID)
+	}
+	// remove user
+	c.user.rmByID(u.ID)
+	c.lock.Unlock()
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

@@ -33,6 +33,8 @@ func (s *Supervisor) startupLoad() {
 
 	s.startupUser()
 
+	s.startupAdmin()
+
 	s.startupCategory()
 
 	s.startupSection()
@@ -279,6 +281,47 @@ func (s *Supervisor) startupUser() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-user,next: `, err)
+	}
+}
+
+func (s *Supervisor) startupAdmin() {
+	var (
+		err                                  error
+		adminID, adminName, userID, userName string
+		rows                                 *sql.Rows
+	)
+
+	rows, err = s.conn.Query(stmt.AdminLoad)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-admin,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&adminID,
+			&adminName,
+			&userID,
+			&userName,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-admin,scan: `, err)
+		}
+		go func(aID, aName, uID, uName string) {
+			s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+				Section: msg.SectionAdminMgmt,
+				Action:  msg.ActionAdd,
+				Admin: proto.Admin{
+					ID:       aID,
+					Name:     aName,
+					UserID:   uID,
+					UserName: uName,
+				},
+			})
+		}(adminID, adminName, userID, userName)
+		s.appLog.Infof("supervisor/startup: permCache update - loaded admin: %s", adminName)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-admin,next: `, err)
 	}
 }
 

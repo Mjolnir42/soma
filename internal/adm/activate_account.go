@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/mjolnir42/soma/lib/auth"
 	"gopkg.in/resty.v0"
@@ -20,6 +21,14 @@ func ActivateAccount(c *resty.Client, a *auth.Token) (*auth.Token, error) {
 	cipher := &[]byte{}
 	plain := &[]byte{}
 	cred := &auth.Token{}
+
+	var subject string
+	switch {
+	case strings.HasPrefix(`admin_`, a.UserName):
+		subject = `admin`
+	default:
+		subject = `user`
+	}
 
 	if *jBytes, err = json.Marshal(a); err != nil {
 		return nil, err
@@ -40,7 +49,8 @@ func ActivateAccount(c *resty.Client, a *auth.Token) (*auth.Token, error) {
 		SetHeader(`Content-Type`, `application/octet-stream`).
 		SetBody(*cipher).
 		Put(fmt.Sprintf(
-			"/accounts/activate/user/%s",
+			"/accounts/activate/%s/%s",
+			subject,
 			kex.Request.String()),
 		); err != nil {
 		return nil, err

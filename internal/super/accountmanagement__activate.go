@@ -60,6 +60,7 @@ func (s *Supervisor) activate(q *msg.Request) {
 	switch q.Super.Task {
 	case msg.SubjectRoot:
 	case msg.SubjectUser:
+	case msg.SubjectAdmin:
 	default:
 		result.UnknownTask(q)
 		result.Super.Audit.
@@ -74,6 +75,8 @@ func (s *Supervisor) activate(q *msg.Request) {
 		s.activateRoot(q, &result)
 	case msg.SubjectUser:
 		s.activateUser(q, &result)
+	case msg.SubjectAdmin:
+		s.activateAdmin(q, &result)
 	}
 
 	// wait for delay timer to trigger

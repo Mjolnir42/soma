@@ -113,6 +113,15 @@ func (x *Rest) SupervisorActivateUser(w http.ResponseWriter, r *http.Request,
 	x.SupervisorEncryptedData(&w, r, &params, `activate/user`)
 }
 
+// SupervisorActivateAdmin is the encrypted endpoint used to
+// activate a admin account using internal ownership verification
+func (x *Rest) SupervisorActivateAdmin(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	x.SupervisorEncryptedData(&w, r, &params, `activate/admin`)
+}
+
 // SupervisorActivateRoot is the encrypted endpoint used to
 // activate the root account using external ownership verification
 func (x *Rest) SupervisorActivateRoot(w http.ResponseWriter, r *http.Request,
@@ -164,6 +173,9 @@ func (x *Rest) SupervisorEncryptedData(w *http.ResponseWriter,
 	case `activate/user`:
 		action = msg.ActionActivate
 		task = msg.SubjectUser
+	case `activate/admin`:
+		action = msg.ActionActivate
+		task = msg.SubjectAdmin
 	case `activate/root`:
 		action = msg.ActionActivate
 		task = msg.SubjectRoot

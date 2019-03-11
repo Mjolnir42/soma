@@ -20,6 +20,15 @@ func (c *Cache) performAction(q *msg.Request) {
 	}
 }
 
+func (c *Cache) performAdmin(q *msg.Request) {
+	switch q.Action {
+	case msg.ActionAdd:
+		c.performAdminAdd(q)
+	case msg.ActionRemove:
+		c.performAdminRemove(q)
+	}
+}
+
 func (c *Cache) performBucket(q *msg.Request) {
 	switch q.Action {
 	case msg.ActionCreate:

@@ -23,6 +23,7 @@ func (s *Soma) Start() {
 	s.handlerMap.Run(`supervisor`)
 
 	// start regular handlers
+	s.handlerMap.Add(newAdminRead(s.conf.QueueLen))
 	s.handlerMap.Add(newAttributeRead(s.conf.QueueLen))
 	s.handlerMap.Add(newBucketRead(s.conf.QueueLen))
 	s.handlerMap.Add(newCapabilityRead(s.conf.QueueLen))
@@ -65,6 +66,7 @@ func (s *Soma) Start() {
 		s.handlerMap.Add(`lifecycle`, newLifeCycle(s))
 
 		if !s.conf.Observer {
+			s.handlerMap.Add(newAdminWrite(s.conf.QueueLen, s))
 			s.handlerMap.Add(newAttributeWrite(s.conf.QueueLen))
 			s.handlerMap.Add(newCapabilityWrite(s.conf.QueueLen))
 			s.handlerMap.Add(newDatacenterWrite(s.conf.QueueLen))

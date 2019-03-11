@@ -192,6 +192,9 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 	case msg.SectionUserMgmt:
 		result = proto.NewUserResult()
 		*result.Users = append(*result.Users, r.User...)
+	case msg.SectionAdminMgmt:
+		result = proto.NewAdminResult()
+		*result.Admins = append(*result.Admins, r.Admin...)
 
 	// tree configuration results have different result data based on
 	// the action and may have multiple scopes

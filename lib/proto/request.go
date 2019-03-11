@@ -14,6 +14,7 @@ type Request struct {
 	Flags  *Flags  `json:"flags,omitempty"`
 
 	Action          *Action          `json:"action,omitempty"`
+	Admin           *Admin           `json:"admin,omitempty"`
 	Attribute       *Attribute       `json:"attribute,omitempty"`
 	Bucket          *Bucket          `json:"bucket,omitempty"`
 	Capability      *Capability      `json:"capability,omitempty"`

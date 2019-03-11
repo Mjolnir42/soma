@@ -292,4 +292,103 @@ func (s *Supervisor) saveCred(tx *sql.Tx, user, subject string, userUUID uuid.UU
 	return true
 }
 
+// checkAdmin verifies that a admin exists and is either active or
+// inactive depending on the target state. It returns the adminID of the
+// admin.
+func (s *Supervisor) checkAdmin(name string, mr *msg.Result, target bool) (string, error) {
+	var (
+		adminID string
+		active  bool
+		err     error
+		cred    *credential
+	)
+
+	// verify the user to activate exists
+	if err = s.stmtFindAdminID.QueryRow(
+		name,
+	).Scan(
+		&adminID,
+	); err == sql.ErrNoRows {
+		str := fmt.Sprintf("Unknown user: %s", name)
+		mr.NotFound(fmt.Errorf(str), mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	} else if err != nil {
+		mr.ServerError(err, mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	}
+
+	// query user active status
+	if err = s.stmtCheckAdminActive.QueryRow(
+		adminID,
+	).Scan(
+		&active,
+	); err == sql.ErrNoRows {
+		str := fmt.Sprintf("Unknown user: %s", name)
+		mr.NotFound(fmt.Errorf(str), mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	} else if err != nil {
+		mr.ServerError(err, mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	}
+
+	// verify the user is not already in target state
+	if active != target {
+		str := fmt.Sprintf("User %s (%s) is active: %t",
+			name, adminID, target)
+		mr.BadRequest(fmt.Errorf(str), mr.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
+		return ``, mr.Error
+	}
+
+	// if the user should already be active, it should also
+	// be in the credentials cache and active there as well
+	if target {
+		if cred = s.credentials.read(name); cred == nil {
+			str := fmt.Sprintf("Active user not found in credentials"+
+				" cache: %s (%s)", name, adminID)
+			mr.ServerError(fmt.Errorf(str), mr.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+			return ``, mr.Error
+		}
+
+		if !cred.isActive {
+			str := fmt.Sprintf("Active user inactive in credentials"+
+				" cache: %s (%s)", name, adminID)
+			mr.ServerError(fmt.Errorf(str), mr.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Errorln(mr.Error)
+			return ``, mr.Error
+		}
+	}
+
+	return adminID, nil
+}
+
+// saveAdminCred persists newly generated credentials
+func (s *Supervisor) saveAdminCred(tx *sql.Tx, user, subject string, userUUID uuid.UUID, mcf scrypth64.Mcf, validFrom, expiresAt time.Time, mr *msg.Result) bool {
+	// Insert new credentials
+	if s.txInsertCred(
+		tx,
+		userUUID,
+		user,
+		mcf.String(),
+		validFrom,
+		expiresAt,
+		mr,
+	) {
+		return false
+	}
+	s.credentials.insert(
+		user,
+		userUUID,
+		validFrom,
+		expiresAt,
+		mcf,
+	)
+	return true
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

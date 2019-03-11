@@ -78,6 +78,25 @@ func registerUserMgmt(app cli.App) *cli.App {
 						Action:      supervisorActivate,
 					},
 					{
+						Name:        `admin`,
+						Usage:       `SUBCOMMANDS for admin account management`,
+						Description: help.Text(`admin-mgmt::`),
+						Subcommands: []cli.Command{
+							{
+								Name:        `grant`,
+								Usage:       `Grant admin account`,
+								Description: help.Text(`admin-mgmt::add`),
+								Action:      runtime(adminMgmtAdd),
+							},
+							{
+								Name:        `revoke`,
+								Usage:       `Revoke admin account`,
+								Description: help.Text(`admin-mgmt::revoke`),
+								Action:      runtime(adminMgmtRemove),
+							},
+						},
+					},
+					{
 						Name:        `password`,
 						Usage:       `SUBCOMMANDS for user password management`,
 						Description: help.Text(`supervisor::password`),

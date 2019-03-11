@@ -33,6 +33,11 @@ FROM   inventory.user
 WHERE  uid = $1::varchar
 AND    NOT is_deleted;`
 
+	FindAdminID = `
+SELECT id
+FROM   auth.admin
+WHERE  uid = $1::varchar;`
+
 	FindUserName = `
 SELECT uid
 FROM   inventory.user
@@ -45,9 +50,29 @@ FROM   inventory.user
 WHERE  id = $1::uuid
 AND    NOT is_deleted;`
 
+	CheckAdminActive = `
+SELECT is_active
+FROM   auth.admin
+WHERE  id = $1::uuid;`
+
 	SetUserCredential = `
 INSERT INTO auth.user_authentication (
             user_id,
+            crypt,
+            reset_pending,
+            valid_from,
+            valid_until
+) VALUES (
+            $1::uuid,
+            $2::text,
+            'no'::boolean,
+            $3::timestamptz,
+			$4::timestamptz
+);`
+
+	SetAdminCredential = `
+INSERT INTO auth.admin_authentication (
+            admin_id,
             crypt,
             reset_pending,
             valid_from,
@@ -65,6 +90,11 @@ UPDATE inventory.user
 SET    is_active = 'yes'::boolean
 WHERE  id = $1::uuid;`
 
+	ActivateAdminUser = `
+UPDATE auth.admin
+SET    is_active = 'yes'::boolean
+WHERE  id = $1::uuid;`
+
 	InvalidateUserCredential = `
 UPDATE auth.user_authentication aua
 SET    valid_until = $1::timestamptz
@@ -79,12 +109,16 @@ WHERE  aua.user_id = iu.id
 
 func init() {
 	m[ActivateUser] = `ActivateUser`
+	m[ActivateAdminUser] = `ActivateAdminUser`
 	m[CheckUserActive] = `CheckUserActive`
+	m[CheckAdminActive] = `CheckAdminActive`
 	m[FindUserID] = `FindUserID`
+	m[FindAdminID] = `FindAdminID`
 	m[FindUserName] = `FindUserName`
 	m[InvalidateUserCredential] = `InvalidateUserCredential`
 	m[LoadAllUserCredentials] = `LoadAllUserCredentials`
 	m[SetUserCredential] = `SetUserCredential`
+	m[SetAdminCredential] = `SetAdminCredential`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

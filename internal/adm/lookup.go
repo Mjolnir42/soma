@@ -55,6 +55,22 @@ func LookupUserID(s string) (string, error) {
 	return userIDByUserName(s)
 }
 
+// LookupAdminID looks up the UUID for an admin account of a
+// user on the server with username s. Error is set if no such
+// admin account was found or an error occurred.
+// If s is already a UUID, then it is considered the user's
+// userID.
+func LookupAdminID(s string) (string, error) {
+	if IsUUID(s) {
+		return lookupAdminIDByUserID(s)
+	}
+	userID, err := userIDByUserName(s)
+	if err != nil {
+		return ``, err
+	}
+	return lookupAdminIDByUserID(userID)
+}
+
 // LookupTeamID looks up the UUID for a team on the server
 // with teamname s. Error is set if no such team was found
 // or an error occurred.
@@ -665,6 +681,32 @@ func teamIDByBucketID(bucketID string) (string, error) {
 
 abort:
 	return ``, fmt.Errorf("TeamID lookup failed (via bucketID): %s",
+		err.Error())
+}
+
+// lookupAdminIDByUserID implements the serverside lookup of
+// an adminID
+func lookupAdminIDByUserID(userID string) (string, error) {
+	res, err := fetchObjList(fmt.Sprintf("/user/%s/admin", userID))
+	if err != nil {
+		goto abort
+	}
+
+	if res.Admins == nil || len(*res.Admins) == 0 {
+		err = fmt.Errorf(`lookupAdminIDByUserID: no object returned`)
+		goto abort
+	}
+
+	// check the received record against the input
+	if userID != (*res.Admins)[0].UserID {
+		err = fmt.Errorf("UserID mismatch: %s vs %s",
+			userID, (*res.Admins)[0].UserID)
+		goto abort
+	}
+	return (*res.Admins)[0].ID, nil
+
+abort:
+	return ``, fmt.Errorf("AdminID lookup failed: %s",
 		err.Error())
 }
 
