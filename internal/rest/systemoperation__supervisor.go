@@ -40,11 +40,6 @@ func (x *Rest) SupervisorKex(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	// generate RequestID
-	params = append(params, httprouter.Param{
-		Key:   `RequestID`,
-		Value: uuid.Must(uuid.NewV4()).String(),
-	})
 	request.Super = &msg.Supervisor{
 		Kex: auth.Kex{
 			Public:               kex.Public,
