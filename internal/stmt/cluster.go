@@ -12,12 +12,6 @@ package stmt
 const (
 	ClusterStatements = ``
 
-	ClusterList = `
-SELECT cluster_id,
-       cluster_name,
-       bucket_id
-FROM   soma.clusters;`
-
 	ClusterShow = `
 SELECT cluster_id,
        bucket_id,
@@ -129,7 +123,6 @@ func init() {
 	m[ClusterBucketID] = `ClusterBucketID`
 	m[ClusterCstProps] = `ClusterCstProps`
 	m[ClusterCustomPropertyForDelete] = `ClusterCustomPropertyForDelete`
-	m[ClusterList] = `ClusterList`
 	m[ClusterMemberList] = `ClusterMemberList`
 	m[ClusterOncProps] = `ClusterOncProps`
 	m[ClusterOncallPropertyForDelete] = `ClusterOncallPropertyForDelete`

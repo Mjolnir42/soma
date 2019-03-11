@@ -82,13 +82,13 @@ func (r *ClusterRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.ClusterList:       &r.stmtList,
-		stmt.ClusterShow:       &r.stmtShow,
-		stmt.ClusterMemberList: &r.stmtMemberList,
-		stmt.ClusterOncProps:   &r.stmtPropOncall,
-		stmt.ClusterSvcProps:   &r.stmtPropService,
-		stmt.ClusterSysProps:   &r.stmtPropSystem,
-		stmt.ClusterCstProps:   &r.stmtPropCustom,
+		stmt.AuthorizedClusterList: &r.stmtList,
+		stmt.ClusterShow:           &r.stmtShow,
+		stmt.ClusterMemberList:     &r.stmtMemberList,
+		stmt.ClusterOncProps:       &r.stmtPropOncall,
+		stmt.ClusterSvcProps:       &r.stmtPropService,
+		stmt.ClusterSysProps:       &r.stmtPropSystem,
+		stmt.ClusterCstProps:       &r.stmtPropCustom,
 	} {
 		if *prepStmt, err = r.conn.Prepare(statement); err != nil {
 			r.errLog.Fatal(`cluster`, err, stmt.Name(statement))
@@ -138,7 +138,12 @@ func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
 		err                              error
 	)
 
-	if rows, err = r.stmtList.Query(); err != nil {
+	if rows, err = r.stmtList.Query(
+		q.Section,
+		q.Action,
+		q.AuthUser,
+		q.Bucket.ID,
+	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
