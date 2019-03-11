@@ -44,7 +44,7 @@ func LookupOncallDetails(s string) (string, string, error) {
 	return oncallDetailsByID(oID)
 }
 
-// LookupOncallId looks up the UUID for a user on the server
+// LookupUserID looks up the UUID for a user on the server
 // with username s. Error is set if no such user was found
 // or an error occurred.
 // If s is already a UUID, then s is immediately returned.
