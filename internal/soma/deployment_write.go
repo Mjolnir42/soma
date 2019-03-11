@@ -240,10 +240,12 @@ func (w *DeploymentWrite) show(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err, q.Section)
 			return
 		}
-	}
-
-	if mr.RowCnt(res.RowsAffected()) {
+		if mr.RowCnt(res.RowsAffected()) {
+			mr.Deployment = append(mr.Deployment, depl)
+		}
+	} else {
 		mr.Deployment = append(mr.Deployment, depl)
+		mr.OK()
 	}
 }
 
