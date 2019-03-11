@@ -22,7 +22,7 @@ type LogHandleMap struct {
 	sync.RWMutex
 }
 
-// New returns an initialized LogHandleMap
+// NewLogHandleMap returns an initialized LogHandleMap
 func NewLogHandleMap() *LogHandleMap {
 	lm := &LogHandleMap{}
 	lm.hmap = make(map[string]*reopen.FileWriter)

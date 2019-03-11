@@ -964,7 +964,7 @@ func panicGuard(tk *TreeKeeper, tx *sql.Tx, q *msg.Request) {
 			`job canceled by panicGuard`,
 		)
 		if err != nil {
-			tk.appLog.Println("panicGuard job(%s) cancelation error: %s",
+			tk.appLog.Printf("panicGuard job(%s) cancelation error: %s",
 				q.JobID.String(),
 				err.Error(),
 			)
