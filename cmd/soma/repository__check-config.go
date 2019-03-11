@@ -193,7 +193,7 @@ func checkConfigCreate(c *cli.Context) error {
 	path := fmt.Sprintf("/checkconfig/%s/",
 		url.QueryEscape(req.CheckConfig.RepositoryID),
 	)
-	return adm.Perform(`postbody`, path, `check-config::create`, req, nil)
+	return adm.Perform(`postbody`, path, `check-config::create`, req, c)
 }
 
 // checkConfigDestroy function
