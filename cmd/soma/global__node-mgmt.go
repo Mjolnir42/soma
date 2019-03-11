@@ -244,7 +244,7 @@ func nodeMgmtAdd(c *cli.Context) error {
 
 	// optional arguments, defaults to true
 	if _, ok := opts[`online`]; ok {
-		if err := adm.ValidateBool(opts[`online`][0],
+		if err = adm.ValidateBool(opts[`online`][0],
 			&req.Node.IsOnline); err != nil {
 			return err
 		}
@@ -261,7 +261,7 @@ func nodeMgmtAdd(c *cli.Context) error {
 	}
 
 	req.Node.Name = c.Args().First()
-	if err := adm.ValidateNotUUID(req.Node.Name); err != nil {
+	if err = adm.ValidateNotUUID(req.Node.Name); err != nil {
 		return err
 	}
 	if err = adm.LookupTeamID(
@@ -283,7 +283,7 @@ func nodeMgmtAdd(c *cli.Context) error {
 // soma node remove ${node}
 func nodeMgmtRemove(c *cli.Context) (err error) {
 	// check deferred errors
-	if err := popError(); err != nil {
+	if err = popError(); err != nil {
 		return err
 	}
 	req := proto.Request{Flags: &proto.Flags{

@@ -132,7 +132,7 @@ func variousPropertyDestroy(c *cli.Context, propertyType, entity string) error {
 		}
 		property = serviceID
 	case proto.PropertyTypeSystem:
-		if err := adm.ValidateSystemProperty(
+		if err = adm.ValidateSystemProperty(
 			c.Args().First()); err != nil {
 			return err
 		}
