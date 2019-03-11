@@ -25,7 +25,7 @@ JOIN        soma.authorizations_global
 JOIN        soma.permission
   ON        soma.authorizations_global.permission_id = soma.permission.id
             -- unscoped, use carthesian product on all repositories
-CROSS JOIN  soma.repository
+CROSS JOIN  soma.groups
 WHERE       inventory.user.uid = $3::varchar
   AND       soma.authorizations_global.category = 'omnipotence'
   AND       soma.permission.name = 'omnipotence'
@@ -49,7 +49,7 @@ JOIN        soma.section
 JOIN        soma.action
   ON        soma.section.id = soma.action.section_id
             -- unscoped, use carthesian product on all repositories
-CROSS JOIN  soma.repository
+CROSS JOIN  soma.groups
 WHERE       auth.admin.uid = $3::varchar
   AND       auth.admin.is_active
   AND       soma.authorizations_global.category = 'system'
@@ -76,8 +76,10 @@ JOIN        soma.section
 JOIN        soma.action
   ON        soma.section.id = soma.action.section_id
             -- grant must be scoped on target repository
-JOIN        soma.repository
-  ON        soma.authorizations_repository.repository_id = soma.repository.id
+JOIN        soma.buckets
+  ON        soma.authorizations_repository.repository_id = soma.buckets.repository_id
+JOIN        soma.groups
+  ON        soma.buckets.bucket_id = soma.groups.bucket_id
 WHERE       inventory.user.uid = $3::varchar
   AND       inventory.user.is_active
   AND NOT   inventory.user.is_deleted
