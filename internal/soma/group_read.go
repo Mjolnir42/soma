@@ -84,7 +84,7 @@ func (r *GroupRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.GroupList:              &r.stmtList,
+		stmt.AuthorizedGroupList:    &r.stmtList,
 		stmt.GroupShow:              &r.stmtShow,
 		stmt.GroupMemberGroupList:   &r.stmtMemberListGroup,
 		stmt.GroupMemberClusterList: &r.stmtMemberListCluster,
@@ -142,7 +142,12 @@ func (r *GroupRead) list(q *msg.Request, mr *msg.Result) {
 		err                          error
 	)
 
-	if rows, err = r.stmtList.Query(); err != nil {
+	if rows, err = r.stmtList.Query(
+		q.Section,
+		q.Action,
+		q.AuthUser,
+		q.Bucket.ID,
+	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}

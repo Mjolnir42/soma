@@ -12,12 +12,6 @@ package stmt
 const (
 	GroupStatements = ``
 
-	GroupList = `
-SELECT group_id,
-       group_name,
-       bucket_id
-FROM soma.groups;`
-
 	GroupShow = `
 SELECT group_id,
        bucket_id,
@@ -151,7 +145,6 @@ func init() {
 	m[GroupBucketID] = `GroupBucketID`
 	m[GroupCstProps] = `GroupCstProps`
 	m[GroupCustomPropertyForDelete] = `GroupCustomPropertyForDelete`
-	m[GroupList] = `GroupList`
 	m[GroupMemberClusterList] = `GroupMemberClusterList`
 	m[GroupMemberGroupList] = `GroupMemberGroupList`
 	m[GroupMemberNodeList] = `GroupMemberNodeList`
