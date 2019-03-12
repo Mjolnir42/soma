@@ -24,7 +24,7 @@ func ActivateAccount(c *resty.Client, a *auth.Token) (*auth.Token, error) {
 
 	var subject string
 	switch {
-	case strings.HasPrefix(`admin_`, a.UserName):
+	case strings.HasPrefix(a.UserName, `admin_`):
 		subject = `admin`
 	default:
 		subject = `user`
