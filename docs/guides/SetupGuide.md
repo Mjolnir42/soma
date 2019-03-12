@@ -229,6 +229,7 @@ soma category add team
 
 ```
 soma section add action to permission
+soma section add admin-mgmt to identity
 soma section add attribute to global
 soma section add bucket to repository
 soma section add capability to monitoring
@@ -288,6 +289,8 @@ soma section add workflow to operation
 3. Create the actions for each section
 
 ```
+soma action add add to action
+soma action add add to admin-mgmt
 soma action add add to capability
 soma action add add to category
 soma action add add to datacenter
@@ -418,6 +421,7 @@ soma action add purge to team-mgmt
 soma action add purge to user-mgmt
 soma action add rebuild-repository to system
 soma action add remove to action
+soma action add remove to admin-mgmt
 soma action add remove to attribute
 soma action add remove to capability
 soma action add remove to category
