@@ -68,9 +68,12 @@ func (s *Supervisor) activateAdmin(q *msg.Request, mr *msg.Result) {
 
 	// no account ownership verification in open mode
 	if !s.conf.OpenInstance {
+		originalUser := token.UserName
+		token.UserName = strings.TrimPrefix(token.UserName, `admin_`)
 		if !s.authenticatePassword(token, mr) {
 			return
 		}
+		token.UserName = originalUser
 	}
 	// OK: validation success
 
