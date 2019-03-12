@@ -854,3 +854,16 @@ soma node add ${node-name} team ${team-name} online ${isOnline} server ${server-
 soma monitoringsystem-mgmt add ${name} mode public contact ${username} team ${teamname}
 soma capability declare ${monitoringsystem-name} view ${view} metric ${metric} thresholds 3
 ```
+
+10. Elevate initial user account to admin
+
+```
+soma user-mgmt admin grant ${username}
+soma right grant system::global to admin admin_${username}
+soma right grant system::repository to admin admin_${username}
+soma right grant system::team to admin admin_${username}
+soma right grant system::identity to admin admin_${username}
+soma right grant system::monitoring to admin admin_${username}
+soma right grant system::permission to admin admin_${username}
+soma right grant system::operation to admin admin_${username}
+```
