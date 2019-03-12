@@ -413,6 +413,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			switch r.Super.Task {
 			case msg.SubjectRoot:
 			case msg.SubjectUser:
+			case msg.SubjectAdmin:
 			default:
 				logEntry.WithField(`Code`, r.Code).
 					WithField(`Masked`, 403).
