@@ -27,6 +27,25 @@ AND    NOW() < aua.valid_until
 AND    NOT iu.is_deleted
 AND    iu.is_active;`
 
+	LoadAllAdminCredentials = `
+SELECT auth.admin_authentication.admin_id,
+       auth.admin_authentication.crypt,
+       auth.admin_authentication.reset_pending,
+       auth.admin_authentication.valid_from,
+       auth.admin_authentication.valid_until,
+       auth.admin.uid
+FROM   auth.admin
+JOIN   auth.admin_authentication
+ON     auth.admin.id = auth.admin_authentication.admin_id
+JOIN   inventory.user
+ON     auth.admin.user_uid = inventory.user.uid
+WHERE  inventory.user.id != '00000000-0000-0000-0000-000000000000'::uuid
+AND    NOT inventory.user.is_deleted
+AND    inventory.user.is_active
+AND    auth.admin.is_active
+AND    NOW() > auth.admin_authentication.valid_from
+AND    NOW() < auth.admin_authentication.valid_until;`
+
 	FindUserID = `
 SELECT id
 FROM   inventory.user
@@ -117,6 +136,7 @@ func init() {
 	m[FindUserName] = `FindUserName`
 	m[InvalidateUserCredential] = `InvalidateUserCredential`
 	m[LoadAllUserCredentials] = `LoadAllUserCredentials`
+	m[LoadAllAdminCredentials] = `LoadAllAdminCredentials`
 	m[SetUserCredential] = `SetUserCredential`
 	m[SetAdminCredential] = `SetAdminCredential`
 }

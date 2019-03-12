@@ -25,6 +25,7 @@ func (s *Supervisor) startupLoad() {
 
 	if !s.readonly {
 		s.startupCredentials()
+		s.startupAdminCredentials()
 	}
 
 	s.startupTokens()
@@ -147,6 +148,49 @@ func (s *Supervisor) startupCredentials() {
 	}
 	if err = rows.Err(); err != nil {
 		s.errLog.Fatal(`supervisor/load-credentials,next: `, err)
+	}
+}
+
+func (s *Supervisor) startupAdminCredentials() {
+	var (
+		err                   error
+		rows                  *sql.Rows
+		adminID, admin, crypt string
+		reset                 bool
+		validFrom, expiresAt  time.Time
+		id                    uuid.UUID
+		mcf                   scrypth64.Mcf
+	)
+
+	rows, err = s.conn.Query(stmt.LoadAllAdminCredentials)
+	if err != nil {
+		s.errLog.Fatal(`supervisor/load-admin-credentials,query: `, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&adminID,
+			&crypt,
+			&reset,
+			&validFrom,
+			&expiresAt,
+			&admin,
+		); err != nil {
+			s.errLog.Fatal(`supervisor/load-admin-credentials,scan: `, err)
+		}
+
+		if id, err = uuid.FromString(adminID); err != nil {
+			s.errLog.Fatal(`supervisor/admin-string-to-uuid: `, err)
+		}
+		if mcf, err = scrypth64.FromString(crypt); err != nil {
+			s.errLog.Fatal(`supervisor/admin-string-to-mcf: `, err)
+		}
+
+		s.credentials.restore(admin, id, validFrom, expiresAt, mcf, reset, true)
+	}
+	if err = rows.Err(); err != nil {
+		s.errLog.Fatal(`supervisor/load-admin-credentials,next: `, err)
 	}
 }
 
