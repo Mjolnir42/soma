@@ -56,7 +56,7 @@ func supervisorActivate(c *cli.Context) error {
 		if err := adm.VerifyNoArgument(c); err != nil {
 			return err
 		}
-		return runtime(supervisorActivateAdmin)(c)
+		return boottime(supervisorActivateAdmin)(c)
 	}
 	// user trying to activate the account for the first
 	// time, reduced runtime
