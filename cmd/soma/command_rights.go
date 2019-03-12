@@ -16,13 +16,13 @@ func registerRights(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  "rights",
+				Name:  "right",
 				Usage: "SUBCOMMANDS for rights",
 				Subcommands: []cli.Command{
 					{
 						Name:         "grant",
 						Usage:        "Grant a permission",
-						Action:       runtime(cmdRightGrant),
+						Action:       runtime(rightGrant),
 						Description:  help.Text(`RightsGrant`),
 						BashComplete: cmpl.TripleToOn,
 					},
@@ -53,7 +53,11 @@ func registerRights(app cli.App) *cli.App {
 	return &app
 }
 
-func cmdRightGrant(c *cli.Context) error {
+// rightGrant function
+// soma right grant $category::$permission
+//            to user|admin $username
+//           [on repository|bucket|monitoring $name]
+func rightGrant(c *cli.Context) error {
 	opts := map[string][][2]string{}
 	if err := adm.ParseVariadicTriples(
 		opts,
@@ -123,7 +127,11 @@ func cmdRightGrant(c *cli.Context) error {
 			return err
 		}
 	case `admin`:
-		return fmt.Errorf(`Admin permissions are not implemented.`)
+		req.Grant.RecipientType = `admin`
+		if req.Grant.RecipientID, err = adm.LookupAdminID(
+			opts[`to`][0][1]); err != nil {
+			return err
+		}
 	case `tool`:
 		return fmt.Errorf(`Tool permissions are not implemented.`)
 	case `team`:
