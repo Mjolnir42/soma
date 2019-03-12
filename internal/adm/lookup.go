@@ -64,6 +64,7 @@ func LookupAdminID(s string) (string, error) {
 	if IsUUID(s) {
 		return lookupAdminIDByUserID(s)
 	}
+	s = strings.TrimPrefix(s, `admin_`)
 	userID, err := userIDByUserName(s)
 	if err != nil {
 		return ``, err
