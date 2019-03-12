@@ -36,6 +36,15 @@ auth: {
 # token: static_token
 }
 
+## elevated authentication settings
+#
+# these are used if the -A|--admin flag is provided
+admin.auth: {
+  user: username
+# pass: secretPassword
+# token: static_token
+}
+
 ## boltDB key/value cache database settings
 #
 boltdb: {
