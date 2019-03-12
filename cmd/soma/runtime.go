@@ -124,6 +124,12 @@ func runtime(action cli.ActionFunc) cli.ActionFunc {
 			}
 		}
 
+		if c.GlobalBool(`admin`) {
+			Cfg.Auth.User = Cfg.AdminAuth.User
+			Cfg.Auth.Pass = Cfg.AdminAuth.Pass
+			Cfg.Auth.Token = Cfg.AdminAuth.Token
+		}
+
 		// prompt for user
 		for Cfg.Auth.User == `` {
 			if Cfg.Auth.User, err = adm.Read(`user`); err == liner.ErrPromptAborted {
@@ -215,6 +221,12 @@ func comptime(completion cli.BashCompleteFunc) cli.BashCompleteFunc {
 				fmt.Fprintf(os.Stderr, "Database bucket error: %s\n", err)
 				return
 			}
+		}
+
+		if c.GlobalBool(`admin`) {
+			Cfg.Auth.User = Cfg.AdminAuth.User
+			Cfg.Auth.Pass = Cfg.AdminAuth.Pass
+			Cfg.Auth.Token = Cfg.AdminAuth.Token
 		}
 
 		// prompt for user
