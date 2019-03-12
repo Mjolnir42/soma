@@ -56,7 +56,11 @@ SELECT      $1::uuid,
             $4::boolean,
             -- hardcoded dictionary system
             '00000000-0000-0000-0000-000000000000'::uuid,
-            ( SELECT id FROM inventory.user WHERE uid = $5::varchar )
+            ( SELECT inventory.user.id FROM inventory.user
+              LEFT JOIN auth.admin
+              ON inventory.user.uid = auth.admin.user_uid
+              WHERE (   inventory.user.uid = $5::varchar
+                     OR auth.admin.uid     = $5::varchar ))
 WHERE  NOT EXISTS (
    SELECT id
    FROM   inventory.team

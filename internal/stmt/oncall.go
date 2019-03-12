@@ -50,7 +50,11 @@ SELECT $1::uuid,
        $2::varchar,
        $3::numeric,
        '00000000-0000-0000-0000-000000000000'::uuid,
-       (SELECT inventory.user.id FROM inventory.user WHERE inventory.user.uid = $4::varchar)
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $4::varchar
+                OR auth.admin.uid     = $4::varchar ))
 WHERE  NOT EXISTS (
    SELECT inventory.oncall_team.id
    FROM   inventory.oncall_team
@@ -81,7 +85,11 @@ INSERT INTO inventory.oncall_membership (
             created_by)
 SELECT $1::uuid,
        $2::uuid,
-       (SELECT inventory.user.id FROM inventory.user WHERE inventory.user.uid = $3::varchar)
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $3::varchar
+                OR auth.admin.uid     = $3::varchar ))
 WHERE NOT EXISTS (
    SELECT inventory.oncall_membership.oncall_id
    FROM   inventory.oncall_membership

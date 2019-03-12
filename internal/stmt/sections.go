@@ -66,9 +66,11 @@ INSERT INTO soma.section (
 SELECT      $1::uuid,
             $2::varchar,
             $3::varchar,
-            ( SELECT inventory.user.id
-              FROM   inventory.user
-              WHERE  inventory.user.uid = $4::varchar)
+            ( SELECT inventory.user.id FROM inventory.user
+              LEFT JOIN auth.admin
+              ON inventory.user.uid = auth.admin.user_uid
+              WHERE (   inventory.user.uid = $4::varchar
+                     OR auth.admin.uid     = $4::varchar ))
 WHERE       NOT EXISTS (
      SELECT soma.section.id
      FROM   soma.section

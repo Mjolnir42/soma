@@ -18,9 +18,11 @@ INSERT INTO soma.category (
             created_by
 )
 SELECT $1::varchar,
-       ( SELECT inventory.user.id
-         FROM   inventory.user
-         WHERE  inventory.user.uid = $2::varchar)
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $2::varchar
+                OR auth.admin.uid     = $2::varchar ))
 WHERE NOT EXISTS (
       SELECT soma.category.name
       FROM   soma.category

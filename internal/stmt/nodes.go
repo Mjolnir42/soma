@@ -179,9 +179,12 @@ SELECT $1::uuid,
        $6,
        $7,
        $8,
-       id
-FROM   inventory.user iu
-WHERE  iu.uid = $9::varchar
+       inventory.user.id
+FROM   inventory.user
+LEFT   JOIN auth.admin
+  ON   inventory.user.uid = auth.admin.user_uid
+WHERE  (   inventory.user.uid = $9::varchar
+        OR auth.admin.uid     = $9::varchar )
 AND    NOT EXISTS (
          SELECT node_id
          FROM   soma.nodes

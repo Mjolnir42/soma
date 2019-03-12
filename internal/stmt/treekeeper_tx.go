@@ -450,9 +450,12 @@ SELECT $1::uuid,
        $3::varchar,
        $4::varchar,
        $5::uuid,
-       id
-FROM   inventory.user iu
-WHERE  iu.uid = $6::varchar;`
+       inventory.user.id
+FROM   inventory.user
+LEFT   JOIN auth.admin
+  ON   inventory.user.uid = auth.admin.user_uid
+WHERE  (   inventory.user.uid = $6::varchar
+        OR auth.admin.uid     = $6::varchar );`
 
 	TxGroupUpdate = `
 UPDATE soma.groups
@@ -622,9 +625,12 @@ SELECT $1::uuid,
        $3::uuid,
        $4::varchar,
        $5::uuid,
-       id
-FROM   inventory.user iu
-WHERE  iu.uid = $6::varchar;`
+       inventory.user.id
+FROM   inventory.user
+LEFT   JOIN auth.admin
+  ON   inventory.user.uid = auth.admin.user_uid
+WHERE  (   inventory.user.uid = $6::varchar
+        OR auth.admin.uid     = $6::varchar );`
 
 	TxClusterUpdate = `
 UPDATE soma.clusters
@@ -770,9 +776,12 @@ SELECT $1::uuid,
        $5::uuid,
        $6::varchar,
        $7::uuid,
-       id
-FROM   inventory.user iu
-WHERE  iu.uid = $8::varchar;`
+       inventory.user.id
+FROM   inventory.user
+LEFT   JOIN auth.admin
+  ON   inventory.user.uid = auth.admin.user_uid
+WHERE  (   inventory.user.uid = $8::varchar
+        OR auth.admin.uid     = $8::varchar );`
 
 	TxBucketAssignNode = `
 INSERT INTO soma.node_bucket_assignment (
@@ -912,8 +921,12 @@ WHERE  check_instance_config_id = $3::uuid;`
 	TxRepositoryRename = `
 UPDATE soma.repository
 SET    name = $2::varchar,
-       created_by = ( SELECT id FROM inventory.user
-                      WHERE uid = $3::varchar)
+       created_by = ( SELECT    inventory.user.id
+                      FROM      inventory.user
+                      LEFT JOIN auth.admin
+                      ON inventory.user.uid = auth.admin.user_uid
+                      WHERE (   inventory.user.uid = $3::varchar
+                             OR auth.admin.uid = $3::varchar     ))
 WHERE  id = $1::uuid;`
 
 	TxRepositoryDestroy = `
@@ -924,8 +937,12 @@ WHERE  id = $1::uuid;`
 	TxBucketRename = `
 UPDATE soma.buckets
 SET    bucket_name = $2::varchar,
-       created_by = ( SELECT id FROM inventory.user
-                      WHERE uid = $3::varchar)
+       created_by = ( SELECT    inventory.user.id
+                      FROM      inventory.user
+                      LEFT JOIN auth.admin
+                      ON inventory.user.uid = auth.admin.user_uid
+                      WHERE (   inventory.user.uid = $3::varchar
+                             OR auth.admin.uid = $3::varchar     ))
 WHERE  bucket_id = $1::uuid;`
 
 	TxBucketDestroy = `
@@ -936,36 +953,56 @@ WHERE  bucket_id = $1::uuid;`
 	TxRepositoryRepossess = `
 UPDATE soma.repository
 SET    team_id = $2::uuid,
-       created_by = ( SELECT id FROM inventory.user
-                      WHERE uid = $3::varchar)
+       created_by = ( SELECT    inventory.user.id
+                      FROM      inventory.user
+                      LEFT JOIN auth.admin
+                      ON inventory.user.uid = auth.admin.user_uid
+                      WHERE (   inventory.user.uid = $3::varchar
+                             OR auth.admin.uid = $3::varchar     ))
 WHERE  id = $1::uuid;`
 
 	TxBucketRepossess = `
 UPDATE soma.buckets
 SET    organizational_team_id = $2::uuid,
-       created_by = ( SELECT id FROM inventory.user
-                      WHERE uid = $3::varchar)
+       created_by = ( SELECT    inventory.user.id
+                      FROM      inventory.user
+                      LEFT JOIN auth.admin
+                      ON inventory.user.uid = auth.admin.user_uid
+                      WHERE (   inventory.user.uid = $3::varchar
+                             OR auth.admin.uid = $3::varchar     ))
 WHERE  bucket_id = $1::uuid;`
 
 	TxGroupRepossess = `
 UPDATE soma.groups
 SET    organizational_team_id = $2::uuid,
-       created_by = ( SELECT id FROM inventory.user
-                      WHERE uid = $3::varchar)
+       created_by = ( SELECT    inventory.user.id
+                      FROM      inventory.user
+                      LEFT JOIN auth.admin
+                      ON inventory.user.uid = auth.admin.user_uid
+                      WHERE (   inventory.user.uid = $3::varchar
+                             OR auth.admin.uid = $3::varchar     ))
 WHERE  group_id = $1::uuid;`
 
 	TxClusterRepossess = `
 UPDATE soma.clusters
 SET    organizational_team_id = $2::uuid,
-       created_by = ( SELECT id FROM inventory.user
-                      WHERE uid = $3::varchar)
+       created_by = ( SELECT    inventory.user.id
+                      FROM      inventory.user
+                      LEFT JOIN auth.admin
+                      ON inventory.user.uid = auth.admin.user_uid
+                      WHERE (   inventory.user.uid = $3::varchar
+                             OR auth.admin.uid = $3::varchar     ))
 WHERE  cluster_id = $1::uuid;`
 
 	TxNodeRepossess = `
 UPDATE soma.nodes
 SET    organizational_team_id = $2::uuid,
-       created_by = ( SELECT id FROM inventory.user
-                      WHERE uid = $3::varchar)
+       created_by = ( SELECT    inventory.user.id
+                      FROM      inventory.user
+                      LEFT JOIN auth.admin
+                      ON inventory.user.uid = auth.admin.user_uid
+                      WHERE (   inventory.user.uid = $3::varchar
+                             OR auth.admin.uid = $3::varchar     ))
 WHERE  node_id = $1::uuid;`
 
 	TxDeployDetailsCheckInstance = `

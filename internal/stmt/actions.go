@@ -73,9 +73,11 @@ SELECT      $1::uuid,
             ( SELECT soma.section.category
               FROM   soma.section
               WHERE  soma.section.id = $3::uuid),
-            ( SELECT inventory.user.id
-              FROM   inventory.user
-              WHERE  inventory.user.uid = $4::varchar)
+            ( SELECT inventory.user.id FROM inventory.user
+              LEFT JOIN auth.admin
+              ON inventory.user.uid = auth.admin.user_uid
+              WHERE (   inventory.user.uid = $4::varchar
+                     OR auth.admin.uid     = $4::varchar ))
 WHERE       NOT EXISTS (
      SELECT soma.action.id
      FROM   soma.action

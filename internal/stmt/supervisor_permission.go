@@ -28,9 +28,11 @@ INSERT INTO soma.permission (
 SELECT $1::uuid,
        $2::varchar,
        $3::varchar,
-       ( SELECT id
-         FROM   inventory.user
-         WHERE  uid = $4::varchar)
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $4::varchar
+                OR auth.admin.uid     = $4::varchar ))
 WHERE NOT EXISTS (
       SELECT id
       FROM   soma.permission
@@ -177,9 +179,11 @@ SELECT $1::uuid,
        $3::uuid,
        $4::uuid,
        $5::uuid,
-       ( SELECT inventory.user.id
-         FROM   inventory.user
-         WHERE  inventory.user.uid = $6::varchar);`
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $6::varchar
+                OR auth.admin.uid     = $6::varchar ));`
 
 	PermissionUnmapEntry = `
 DELETE FROM soma.permission_map

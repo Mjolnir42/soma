@@ -51,9 +51,12 @@ SELECT      $1::uuid,
             $3::boolean,
             $4::boolean,
             $5::uuid,
-            id
+            inventory.user.id
 FROM        inventory.user
-WHERE       uid = $6::varchar
+LEFT JOIN   auth.admin
+  ON        inventory.user.uid = auth.admin.user_uid
+WHERE       (   inventory.user.uid = $6::varchar
+             OR auth.admin.uid     = $6::varchar )
 AND NOT EXISTS (
 	SELECT  id
 	FROM    soma.repository

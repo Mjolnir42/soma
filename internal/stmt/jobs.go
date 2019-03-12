@@ -112,9 +112,11 @@ INSERT INTO soma.job_type (
             created_by)
 SELECT $1::uuid,
        $2::varchar,
-       ( SELECT id
-         FROM   inventory.user
-         WHERE  uid = $3::varchar)
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $3::varchar
+                OR auth.admin.uid     = $3::varchar ))
 WHERE  NOT EXISTS (
    SELECT  id
    FROM    soma.job_type
@@ -154,9 +156,11 @@ INSERT INTO soma.job_result (
             created_by)
 SELECT $1::uuid,
        $2::varchar,
-       ( SELECT id
-         FROM   inventory.user
-         WHERE  uid = $3::varchar)
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $3::varchar
+                OR auth.admin.uid     = $3::varchar ))
 WHERE  NOT EXISTS (
    SELECT  id
    FROM    soma.job_result
@@ -196,9 +200,11 @@ INSERT INTO soma.job_status (
             created_by)
 SELECT $1::uuid,
        $2::varchar,
-       ( SELECT id
-         FROM   inventory.user
-         WHERE  uid = $3::varchar)
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $3::varchar
+                OR auth.admin.uid     = $3::varchar ))
 WHERE  NOT EXISTS (
    SELECT  id
    FROM    soma.job_status

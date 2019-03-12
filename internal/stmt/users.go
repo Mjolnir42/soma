@@ -84,7 +84,11 @@ SELECT $1::uuid,
        $10::uuid,
        -- hardcoded dictionary system
        '00000000-0000-0000-0000-000000000000'::uuid,
-       ( SELECT id FROM inventory.user WHERE uid = $11::varchar )
+       ( SELECT inventory.user.id FROM inventory.user
+         LEFT JOIN auth.admin
+         ON inventory.user.uid = auth.admin.user_uid
+         WHERE (   inventory.user.uid = $11::varchar
+                OR auth.admin.uid     = $11::varchar ))
 WHERE  NOT EXISTS (
   SELECT id
   FROM   inventory.user
