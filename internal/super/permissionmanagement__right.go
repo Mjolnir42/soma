@@ -24,7 +24,10 @@ func (s *Supervisor) right(q *msg.Request) {
 		WithField(`Section`, q.Section).
 		WithField(`Action`, q.Action)
 
-	if q.Grant.RecipientType != msg.SubjectUser {
+	switch q.Grant.RecipientType {
+	case msg.SubjectUser:
+	case msg.SubjectAdmin:
+	default:
 		result.NotImplemented(
 			fmt.Errorf("Rights for recipient type"+
 				" %s are currently not implemented",
