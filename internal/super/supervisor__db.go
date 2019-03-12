@@ -9,6 +9,7 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/mjolnir42/soma/internal/msg"
@@ -56,6 +57,8 @@ func (s *Supervisor) txInsertCred(tx *sql.Tx, user uuid.UUID, subject, mcf strin
 			mcf,
 			validFrom,
 		)
+	default:
+		err = fmt.Errorf("Unhandled case in supervisor.txInsertCred")
 	}
 
 	if err != nil {
