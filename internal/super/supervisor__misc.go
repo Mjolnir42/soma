@@ -274,7 +274,7 @@ func (s *Supervisor) saveCred(tx *sql.Tx, user, subject string, userUUID uuid.UU
 	if s.txInsertCred(
 		tx,
 		userUUID,
-		user,
+		subject,
 		mcf.String(),
 		validFrom,
 		expiresAt,
@@ -373,7 +373,7 @@ func (s *Supervisor) saveAdminCred(tx *sql.Tx, user, subject string, userUUID uu
 	if s.txInsertCred(
 		tx,
 		userUUID,
-		user,
+		subject,
 		mcf.String(),
 		validFrom,
 		expiresAt,
