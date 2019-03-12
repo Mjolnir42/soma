@@ -160,8 +160,9 @@ func (c *Config) ReadConfigFile(fname string) error {
 	}
 
 	if c.PokePath == `` {
-		log.Println(`Setting default value for notify.path.element: /deployments/id`)
 		c.PokePath = `/deployment/id`
+		log.Printf("Setting default value for notify.path.element: %s",
+			c.PokePath)
 	}
 
 	if c.Auth.Activation == `ldap` && !c.Ldap.TLS {
