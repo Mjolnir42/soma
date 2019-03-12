@@ -10,6 +10,7 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/mjolnir42/soma/internal/msg"
@@ -29,8 +30,15 @@ func (s *Supervisor) tokenInvalidate(q *msg.Request, mr *msg.Result) {
 
 	// check the user exists and is active, this is for updating
 	// the auditlog only
-	if userID, err = s.checkUser(q.AuthUser, mr, true); err != nil {
-		return
+	switch {
+	case strings.HasPrefix(q.AuthUser, `admin_`):
+		if userID, err = s.checkAdmin(q.AuthUser, mr, true); err != nil {
+			return
+		}
+	default:
+		if userID, err = s.checkUser(q.AuthUser, mr, true); err != nil {
+			return
+		}
 	}
 
 	// update auditlog entry
@@ -99,8 +107,15 @@ func (s *Supervisor) tokenInvalidateAccount(q *msg.Request, mr *msg.Result) {
 
 	// check the user exists and is active, this is for updating
 	// the auditlog only
-	if userID, err = s.checkUser(q.AuthUser, mr, true); err != nil {
-		return
+	switch {
+	case strings.HasPrefix(q.AuthUser, `admin_`):
+		if userID, err = s.checkAdmin(q.AuthUser, mr, true); err != nil {
+			return
+		}
+	default:
+		if userID, err = s.checkUser(q.AuthUser, mr, true); err != nil {
+			return
+		}
 	}
 
 	// check the user to revoke exists and is active
@@ -180,8 +195,15 @@ func (s *Supervisor) tokenInvalidateGlobal(q *msg.Request, mr *msg.Result) {
 
 	// check the user exists and is active, this is for updating
 	// the auditlog only
-	if userID, err = s.checkUser(q.AuthUser, mr, true); err != nil {
-		return
+	switch {
+	case strings.HasPrefix(q.AuthUser, `admin_`):
+		if userID, err = s.checkAdmin(q.AuthUser, mr, true); err != nil {
+			return
+		}
+	default:
+		if userID, err = s.checkUser(q.AuthUser, mr, true); err != nil {
+			return
+		}
 	}
 
 	// update auditlog entry

@@ -10,6 +10,7 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/mjolnir42/soma/internal/msg"
@@ -48,8 +49,15 @@ func (s *Supervisor) tokenRequest(q *msg.Request, mr *msg.Result) {
 	}
 
 	// check the user exists and is active
-	if userID, err = s.checkUser(token.UserName, mr, true); err != nil {
-		return
+	switch {
+	case strings.HasPrefix(token.UserName, `admin_`):
+		if userID, err = s.checkAdmin(token.UserName, mr, true); err != nil {
+			return
+		}
+	default:
+		if userID, err = s.checkUser(token.UserName, mr, true); err != nil {
+			return
+		}
 	}
 	// update auditlog entry
 	mr.Super.Audit = mr.Super.Audit.WithField(`UserID`, userID)
