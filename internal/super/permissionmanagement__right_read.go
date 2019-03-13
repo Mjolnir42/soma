@@ -224,10 +224,10 @@ func (s *Supervisor) rightSearchGlobal(q *msg.Request, mr *msg.Result) {
 	}
 	mr.Grant = append(mr.Grant, proto.Grant{
 		ID:            grantID,
-		PermissionID:  q.Grant.PermissionID,
-		Category:      q.Grant.Category,
-		RecipientID:   q.Grant.RecipientID,
-		RecipientType: q.Grant.RecipientType,
+		PermissionID:  q.Search.Grant.PermissionID,
+		Category:      q.Search.Grant.Category,
+		RecipientID:   q.Search.Grant.RecipientID,
+		RecipientType: q.Search.Grant.RecipientType,
 	})
 	mr.OK()
 	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
@@ -271,12 +271,12 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
 	}
 	mr.Grant = append(mr.Grant, proto.Grant{
 		ID:            grantID,
-		PermissionID:  q.Grant.PermissionID,
-		Category:      q.Grant.Category,
-		RecipientID:   q.Grant.RecipientID,
-		RecipientType: q.Grant.RecipientType,
-		ObjectType:    q.Grant.ObjectType,
-		ObjectID:      q.Grant.ObjectID,
+		PermissionID:  q.Search.Grant.PermissionID,
+		Category:      q.Search.Grant.Category,
+		RecipientID:   q.Search.Grant.RecipientID,
+		RecipientType: q.Search.Grant.RecipientType,
+		ObjectType:    q.Search.Grant.ObjectType,
+		ObjectID:      q.Search.Grant.ObjectID,
 	})
 	mr.OK()
 	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
