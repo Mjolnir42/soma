@@ -866,4 +866,13 @@ soma right grant system::identity to admin admin_${username}
 soma right grant system::monitoring to admin admin_${username}
 soma right grant system::permission to admin admin_${username}
 soma right grant system::operation to admin admin_${username}
+soma right grant system::self to admin admin_${username}
+```
+
+11. Permissions to grant to regulat users
+
+```
+soma --admin right grant global::browse to user ${username}
+soma --admin right grant permission::viewer to user ${username}
+soma --admin right grant self::information to user ${username}
 ```
