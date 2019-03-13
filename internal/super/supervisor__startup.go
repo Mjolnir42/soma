@@ -677,8 +677,8 @@ func (s *Supervisor) startupGrantGlobalAuthorization() {
 				Action:  msg.ActionGrant,
 				Grant: proto.Grant{
 					ID:            gID,
-					Category:      category,
-					PermissionID:  permissionID,
+					Category:      cat,
+					PermissionID:  pID,
 					RecipientType: rTyp,
 					RecipientID:   rID,
 				},
@@ -783,8 +783,8 @@ func (s *Supervisor) startupGrantRepositoryAuthorization() {
 				Action:  msg.ActionGrant,
 				Grant: proto.Grant{
 					ID:            gID,
-					Category:      category,
-					PermissionID:  permissionID,
+					Category:      cat,
+					PermissionID:  pID,
 					RecipientType: rTyp,
 					RecipientID:   rID,
 					ObjectType:    oTyp,
@@ -854,8 +854,8 @@ func (s *Supervisor) startupGrantMonitoringAuthorization() {
 				Action:  msg.ActionGrant,
 				Grant: proto.Grant{
 					ID:            gID,
-					Category:      category,
-					PermissionID:  permissionID,
+					Category:      cat,
+					PermissionID:  pID,
 					RecipientType: rTyp,
 					RecipientID:   rID,
 					ObjectType:    msg.EntityMonitoring,
@@ -924,8 +924,8 @@ func (s *Supervisor) startupGrantTeamAuthorization() {
 				Action:  msg.ActionGrant,
 				Grant: proto.Grant{
 					ID:            gID,
-					Category:      category,
-					PermissionID:  permissionID,
+					Category:      cat,
+					PermissionID:  pID,
 					RecipientType: rTyp,
 					RecipientID:   rID,
 					ObjectType:    msg.EntityTeam,
