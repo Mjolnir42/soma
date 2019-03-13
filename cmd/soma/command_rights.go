@@ -29,7 +29,7 @@ func registerRights(app cli.App) *cli.App {
 					{
 						Name:         "revoke",
 						Usage:        "Revoke a permission",
-						Action:       runtime(cmdRightRevoke),
+						Action:       runtime(rightRevoke),
 						Description:  help.Text(`RightsRevoke`),
 						BashComplete: cmpl.TripleFromOn,
 					},
@@ -205,42 +205,170 @@ func rightGrant(c *cli.Context) error {
 	return adm.Perform(`postbody`, path, `right::grant`, req, c)
 }
 
-func cmdRightRevoke(c *cli.Context) error {
-	// XXX TODO
-	return fmt.Errorf(`Not implemented - TODO`)
-	/*
-		opts := map[string][][2]string{}
-		if err := adm.ParseVariadicTriples(
-			opts,
-			[]string{},
-			[]string{`from`, `on`},
-			[]string{`from`},
-			c.Args().Tail(),
+// rightRevoke function
+// soma right revoke $category::$permission
+//            from user|admin $username
+//           [on repository|bucket|monitoring $name]
+func rightRevoke(c *cli.Context) error {
+	opts := map[string][][2]string{}
+	if err := adm.ParseVariadicTriples(
+		opts,
+		[]string{},
+		[]string{`from`, `on`},
+		[]string{`from`},
+		c.Args().Tail(),
+	); err != nil {
+		return err
+	}
+
+	var err error
+	var grantID string
+	req := proto.NewGrantFilter()
+
+	permissionSlice := strings.Split(c.Args().First(), `::`)
+	if len(permissionSlice) != 2 {
+		return fmt.Errorf("Invalid split of permission into %s",
+			permissionSlice)
+	}
+	req.Filter.Grant.Category = permissionSlice[0]
+
+	// validate category
+	if err = adm.ValidateCategory(req.Filter.Grant.Category); err != nil {
+		return err
+	}
+
+	// check optional argument chain
+	switch req.Filter.Grant.Category {
+	case msg.CategoryGlobal,
+		msg.CategoryIdentity,
+		msg.CategoryOperation,
+		msg.CategoryPermission,
+		msg.CategorySelf,
+		msg.CategorySystem:
+		fallthrough
+	case msg.CategoryGrantGlobal,
+		msg.CategoryGrantIdentity,
+		msg.CategoryGrantOperation,
+		msg.CategoryGrantPermission,
+		msg.CategoryGrantSelf:
+		if len(opts[`on`]) != 0 {
+			return fmt.Errorf("Permissions in category %s are global"+
+				" and require no 'on' keyword target.",
+				req.Grant.Category)
+		}
+	case msg.CategoryMonitoring,
+		msg.CategoryRepository,
+		msg.CategoryTeam:
+		fallthrough
+	case msg.CategoryGrantMonitoring,
+		msg.CategoryGrantRepository,
+		msg.CategoryGrantTeam:
+		if len(opts[`on`]) != 1 {
+			return fmt.Errorf("Permissions in category %s require a"+
+				" target, specified via 'on' keyword.",
+				req.Grant.Category)
+		}
+	default:
+		return fmt.Errorf("Unknown category: %s", permissionSlice[0])
+	}
+
+	// lookup permissionID
+	if err = adm.LookupPermIDRef(
+		permissionSlice[1],
+		req.Filter.Grant.Category,
+		&req.Filter.Grant.PermissionID,
+	); err != nil {
+		return err
+	}
+
+	// lookup recipientID
+	req.Filter.Grant.RecipientType = opts[`from`][0][0]
+	switch req.Filter.Grant.RecipientType {
+	case `user`:
+		if req.Filter.Grant.RecipientID, err = adm.LookupUserID(
+			opts[`from`][0][1],
 		); err != nil {
 			return err
 		}
+	case `admin`:
+		if req.Filter.Grant.RecipientID, err = adm.LookupAdminID(
+			opts[`from`][0][1],
+		); err != nil {
+			return err
+		}
+	case `tool`:
+		return fmt.Errorf(`Tool permissions are not implemented.`)
+	case `team`:
+		return fmt.Errorf(`Team permissions are not implemented.`)
+	}
 
-		var (
-			err                     error
-			userId, permId, grantId string
-		)
-		if err = adm.LookupPermIDRef(c.Args().First(),
-			`foobar`, // dummy value for new structs
-			&permId); err != nil {
-			return err
+	// parse optional object spec
+	if len(opts[`on`]) == 1 {
+		switch req.Filter.Grant.Category {
+		case msg.CategoryRepository,
+			msg.CategoryGrantRepository:
+			switch opts[`on`][0][0] {
+			case msg.EntityRepository:
+				req.Filter.Grant.ObjectType = msg.EntityRepository
+				if req.Filter.Grant.ObjectID, err = adm.LookupRepoID(
+					opts[`on`][0][1],
+				); err != nil {
+					return err
+				}
+			case msg.EntityBucket:
+				req.Filter.Grant.ObjectType = msg.EntityBucket
+				if req.Filter.Grant.ObjectID, err = adm.LookupBucketID(
+					opts[`on`][0][1],
+				); err != nil {
+					return err
+				}
+			default:
+				return fmt.Errorf(`Invalid`)
+			}
+		case msg.CategoryTeam,
+			msg.CategoryGrantTeam:
+			switch opts[`on`][0][0] {
+			case msg.EntityTeam:
+				req.Filter.Grant.ObjectType = msg.EntityTeam
+				if err = adm.LookupTeamID(
+					opts[`on`][0][1],
+					&req.Filter.Grant.ObjectID,
+				); err != nil {
+					return err
+				}
+			default:
+				return fmt.Errorf(`Invalid`)
+			}
+		case msg.CategoryMonitoring,
+			msg.CategoryGrantMonitoring:
+			switch opts[`on`][0][0] {
+			case msg.EntityMonitoring:
+				req.Filter.Grant.ObjectType = msg.EntityMonitoring
+				if req.Filter.Grant.ObjectID, err = adm.LookupMonitoringID(
+					opts[`on`][0][1],
+				); err != nil {
+					return err
+				}
+			default:
+				return fmt.Errorf(`Invalid`)
+			}
 		}
-		if userId, err = adm.LookupUserID(opts[`from`][0][1]); err != nil {
-			return err
-		}
-		if err = adm.LookupGrantIdRef(`user`, userId, permId, `category`,
-			&grantId); err != nil {
-			return err
-		}
+	}
 
-		path := fmt.Sprintf( "/category/%s/permission/%s/grant/%s"
-			`category`, permId, grantId)
-		return adm.Perform(`delete`, path, `command`, nil, c)
-	*/
+	// lookup grantID
+	if err = adm.LookupGrantIDRef(
+		req,
+		&grantID,
+	); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/category/%s/permission/%s/grant/%s",
+		req.Filter.Grant.Category,
+		req.Filter.Grant.PermissionID,
+		grantID,
+	)
+	return adm.Perform(`delete`, path, `right::revoke`, nil, c)
 }
 
 func cmdRightList(c *cli.Context) error {
