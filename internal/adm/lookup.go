@@ -274,9 +274,8 @@ func LookupPermIDRef(s, c string, id *string) error {
 // LookupGrantIDRef looks up the UUID of a permission grant from
 // the server and fills it into the provided id pointer.
 // Error is set if no such grant was found or an error occurred.
-func LookupGrantIDRef(rcptType, rcptID, permID, cat string,
-	id *string) error {
-	return grantIDFromServer(rcptType, rcptID, permID, cat, id)
+func LookupGrantIDRef(req proto.Request, id *string) error {
+	return grantIDFromServer(req, id)
 }
 
 // LookupMonitoringID looks up the UUID of the monitoring system
@@ -1038,15 +1037,8 @@ abort:
 }
 
 // grantIDFromServer implements the actual lookup of the grant UUID
-func grantIDFromServer(rcptType, rcptID, permID, cat string,
-	id *string) error {
-	req := proto.NewGrantFilter()
-	req.Filter.Grant.RecipientType = rcptType
-	req.Filter.Grant.RecipientID = rcptID
-	req.Filter.Grant.PermissionID = permID
-	req.Filter.Grant.Category = cat
-
-	res, err := fetchFilter(req, `/filter/grant/`)
+func grantIDFromServer(req proto.Request, id *string) error {
+	res, err := fetchFilter(req, `/search/right/`)
 	if err != nil {
 		goto abort
 	}
@@ -1056,15 +1048,17 @@ func grantIDFromServer(rcptType, rcptID, permID, cat string,
 		goto abort
 	}
 
-	if permID != (*res.Grants)[0].PermissionID {
+	if req.Filter.Grant.PermissionID != (*res.Grants)[0].PermissionID {
 		err = fmt.Errorf("PermissionID mismatch: %s vs %s",
-			permID, (*res.Grants)[0].PermissionID)
+			req.Filter.Grant.PermissionID,
+			(*res.Grants)[0].PermissionID)
 		goto abort
 	}
 	*id = (*res.Grants)[0].ID
+	return nil
 
 abort:
-	return fmt.Errorf("GrantId lookup failed: %s",
+	return fmt.Errorf("GrantID lookup failed: %s",
 		err.Error())
 }
 
