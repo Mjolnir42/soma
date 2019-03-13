@@ -50,17 +50,25 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 
 		switch q.Grant.Category {
 		case msg.CategorySystem,
-			msg.CategoryGlobal, msg.CategoryGrantGlobal,
-			msg.CategoryIdentity, msg.CategoryGrantIdentity,
-			msg.CategorySelf, msg.CategoryGrantSelf,
-			msg.CategoryPermission, msg.CategoryGrantPermission,
-			msg.CategoryOperation, msg.CategoryGrantOperation:
+			msg.CategoryGlobal,
+			msg.CategoryGrantGlobal,
+			msg.CategoryIdentity,
+			msg.CategoryGrantIdentity,
+			msg.CategorySelf,
+			msg.CategoryGrantSelf,
+			msg.CategoryPermission,
+			msg.CategoryGrantPermission,
+			msg.CategoryOperation,
+			msg.CategoryGrantOperation:
 			s.rightGrantGlobal(q, mr)
-		case msg.CategoryRepository, msg.CategoryGrantRepository:
+		case msg.CategoryRepository,
+			msg.CategoryGrantRepository:
 			s.rightGrantRepository(q, mr)
-		case msg.CategoryTeam, msg.CategoryGrantTeam:
+		case msg.CategoryTeam,
+			msg.CategoryGrantTeam:
 			s.rightGrantTeam(q, mr)
-		case msg.CategoryMonitoring, msg.CategoryGrantMonitoring:
+		case msg.CategoryMonitoring,
+			msg.CategoryGrantMonitoring:
 			s.rightGrantMonitoring(q, mr)
 		default:
 			mr.NotImplemented(
@@ -70,17 +78,25 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 	case msg.ActionRevoke:
 		switch q.Grant.Category {
 		case msg.CategorySystem,
-			msg.CategoryGlobal, msg.CategoryGrantGlobal,
-			msg.CategoryIdentity, msg.CategoryGrantIdentity,
-			msg.CategorySelf, msg.CategoryGrantSelf,
-			msg.CategoryPermission, msg.CategoryGrantPermission,
-			msg.CategoryOperation, msg.CategoryGrantOperation:
+			msg.CategoryGlobal,
+			msg.CategoryGrantGlobal,
+			msg.CategoryIdentity,
+			msg.CategoryGrantIdentity,
+			msg.CategorySelf,
+			msg.CategoryGrantSelf,
+			msg.CategoryPermission,
+			msg.CategoryGrantPermission,
+			msg.CategoryOperation,
+			msg.CategoryGrantOperation:
 			s.rightRevokeGlobal(q, mr)
-		case msg.CategoryRepository, msg.CategoryGrantRepository:
+		case msg.CategoryRepository,
+			msg.CategoryGrantRepository:
 			s.rightRevokeRepository(q, mr)
-		case msg.CategoryTeam, msg.CategoryGrantTeam:
+		case msg.CategoryTeam,
+			msg.CategoryGrantTeam:
 			s.rightRevokeTeam(q, mr)
-		case msg.CategoryMonitoring, msg.CategoryGrantMonitoring:
+		case msg.CategoryMonitoring,
+			msg.CategoryGrantMonitoring:
 			s.rightRevokeMonitoring(q, mr)
 		default:
 			mr.NotImplemented(
