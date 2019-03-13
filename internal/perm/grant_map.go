@@ -7,7 +7,11 @@
 
 package perm
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/mjolnir42/soma/internal/msg"
+)
 
 // unscopedGrantMap is the cache data structure for global permission
 // grants. It covers the categories 'omnipotence', 'system', 'global',
@@ -100,31 +104,47 @@ func (m *unscopedGrantMap) getSubjectGrantID(subjType,
 // assess evaluates whether a subject has been granted a
 // specific permission
 func (m *unscopedGrantMap) assess(subjType, subjID, category,
-	permissionID string) bool {
+	permissionID string, result *msg.Result) bool {
+
+	subject := fmt.Sprintf("%s:%s", subjType, subjID)
+	result.Super.Audit = result.Super.Audit.
+		WithField(`permCache::assessment-subject`, subject).
+		WithField(`permCache::assessment-category`, category).
+		WithField(`permCache::assessment-permissionID`, permissionID)
+
 	// only accept these four types
 	switch subjType {
 	case `user`, `admin`, `tool`, `team`:
 	default:
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::assessment`, `InvalidSubjectType`)
 		return false
 	}
-	subject := fmt.Sprintf("%s:%s", subjType, subjID)
 
 	if _, ok := m.grants[subject]; !ok {
 		// subject has no grants
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::assessment`, `SubjectHasNoGrants`)
 		return false
 	}
 
 	if _, ok := m.grants[subject][category]; !ok {
 		// subject has no grants in category
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::assessment`, `SubjectHasNoGrantsInCategory`)
 		return false
 	}
 
 	if grantID, ok := m.grants[subject][category][permissionID]; ok {
 		if grantID != `` {
 			// subject has been granted the requested permission
+			result.Super.Audit = result.Super.Audit.
+				WithField(`permCache::assessment`, `SuccessFindingGrant`)
 			return true
 		}
 	}
+	result.Super.Audit = result.Super.Audit.
+		WithField(`permCache::assessment`, `SubjectHasNoGrantForPermission`)
 	return false
 }
 

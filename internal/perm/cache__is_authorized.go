@@ -53,7 +53,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	}
 
 	// check if the subject has omnipotence
-	if c.checkOmnipotence(subjType, user.ID) {
+	if c.checkOmnipotence(subjType, user.ID, &result) {
 		result.Super.Audit = result.Super.Audit.
 			WithField(`permCache::status`, `evaluated`).
 			WithField(`permCache::result`, `omnipotent`)
@@ -90,7 +90,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 
 	// check if the user has the correct system permission
 	if ok, invalid := c.checkSystem(category, subjType,
-		user.ID); invalid {
+		user.ID, &result); invalid {
 		result.Super.Audit = result.Super.Audit.
 			WithField(`permCache::status`, `processing`).
 			WithField(`permCache::result`, `InternalError`).
@@ -131,7 +131,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	// check if the user has one the permissions that map the
 	// requested action
 	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, subjType, user.ID,
-		category) {
+		category, &result) {
 		result.Super.Audit = result.Super.Audit.
 			WithField(`permCache::status`, `evaluated`).
 			WithField(`permCache::result`, `userpermission`)
@@ -150,7 +150,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 
 	// check if the user's team has a specific grant for the action
 	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, `team`, user.TeamID,
-		category) {
+		category, &result) {
 		result.Super.Audit = result.Super.Audit.
 			WithField(`permCache::status`, `evaluated`).
 			WithField(`permCache::result`, `teampermission`)
@@ -164,12 +164,13 @@ dispatch:
 }
 
 // checkOmnipotence returns true if the subject is omnipotent
-func (c *Cache) checkOmnipotence(subjectType, subjectID string) bool {
+func (c *Cache) checkOmnipotence(subjectType, subjectID string, result *msg.Result) bool {
 	return c.grantGlobal.assess(
 		subjectType,
 		subjectID,
 		`omnipotence`,
 		`00000000-0000-0000-0000-000000000000`,
+		result,
 	)
 }
 
@@ -177,7 +178,7 @@ func (c *Cache) checkOmnipotence(subjectType, subjectID string) bool {
 // permission for the category. If no system permission exists it
 // returns false,true
 func (c *Cache) checkSystem(category, subjectType,
-	subjectID string) (bool, bool) {
+	subjectID string, result *msg.Result) (bool, bool) {
 	permID := c.pmap.getIDByName(`system`, category)
 	if permID == `` {
 		// there must be a system permission for every category,
@@ -189,13 +190,14 @@ func (c *Cache) checkSystem(category, subjectType,
 		subjectID,
 		`system`,
 		permID,
+		result,
 	), false
 }
 
 // checkPermission returns true if the subject has a grant for the
 // requested action
 func (c *Cache) checkPermission(permIDs []string, any bool,
-	q *msg.Request, subjectType, subjectID, category string) bool {
+	q *msg.Request, subjectType, subjectID, category string, result *msg.Result) bool {
 	var objID string
 
 permloop:
@@ -268,7 +270,7 @@ permloop:
 		default:
 			// global sections
 			if c.grantGlobal.assess(subjectType, subjectID, category,
-				permID) {
+				permID, result) {
 				return true
 			}
 		}
