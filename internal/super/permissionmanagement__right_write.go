@@ -34,6 +34,20 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 
 	switch q.Action {
 	case msg.ActionGrant:
+		switch q.Grant.RecipientType {
+		case msg.SubjectUser:
+		case msg.SubjectAdmin:
+		default:
+			mr.NotImplemented(
+				fmt.Errorf("Rights for recipient type"+
+					" %s are currently not implemented",
+					q.Grant.RecipientType))
+			mr.Super.Audit.
+				WithField(`Code`, mr.Code).
+				Warningln(mr.Error)
+			return
+		}
+
 		switch q.Grant.Category {
 		case msg.CategorySystem,
 			msg.CategoryGlobal, msg.CategoryGrantGlobal,

@@ -9,6 +9,7 @@ package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -17,6 +18,20 @@ import (
 func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 	switch q.Action {
 	case msg.ActionList:
+		switch q.Grant.RecipientType {
+		case msg.SubjectUser:
+		case msg.SubjectAdmin:
+		default:
+			mr.NotImplemented(
+				fmt.Errorf("Rights for recipient type"+
+					" %s are currently not implemented",
+					q.Grant.RecipientType))
+			mr.Super.Audit.
+				WithField(`Code`, mr.Code).
+				Warningln(mr.Error)
+			return
+		}
+
 		switch q.Grant.Category {
 		case msg.CategorySystem,
 			msg.CategoryGlobal,
@@ -39,6 +54,20 @@ func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 			s.rightListScoped(q, mr)
 		}
 	case msg.ActionShow:
+		switch q.Grant.RecipientType {
+		case msg.SubjectUser:
+		case msg.SubjectAdmin:
+		default:
+			mr.NotImplemented(
+				fmt.Errorf("Rights for recipient type"+
+					" %s are currently not implemented",
+					q.Grant.RecipientType))
+			mr.Super.Audit.
+				WithField(`Code`, mr.Code).
+				Warningln(mr.Error)
+			return
+		}
+
 		switch q.Grant.Category {
 		case msg.CategorySystem,
 			msg.CategoryGlobal,
@@ -61,6 +90,20 @@ func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 			s.rightShowScoped(q, mr)
 		}
 	case msg.ActionSearch:
+		switch q.Search.Grant.RecipientType {
+		case msg.SubjectUser:
+		case msg.SubjectAdmin:
+		default:
+			mr.NotImplemented(
+				fmt.Errorf("Rights for recipient type"+
+					" %s are currently not implemented",
+					q.Search.Grant.RecipientType))
+			mr.Super.Audit.
+				WithField(`Code`, mr.Code).
+				Warningln(mr.Error)
+			return
+		}
+
 		switch q.Search.Grant.Category {
 		case msg.CategorySystem,
 			msg.CategoryGlobal,

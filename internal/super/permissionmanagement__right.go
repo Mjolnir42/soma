@@ -8,8 +8,6 @@
 package super // import "github.com/mjolnir42/soma/internal/super"
 
 import (
-	"fmt"
-
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
@@ -24,20 +22,6 @@ func (s *Supervisor) right(q *msg.Request) {
 		WithField(`Section`, q.Section).
 		WithField(`Action`, q.Action)
 
-	switch q.Grant.RecipientType {
-	case msg.SubjectUser:
-	case msg.SubjectAdmin:
-	default:
-		result.NotImplemented(
-			fmt.Errorf("Rights for recipient type"+
-				" %s are currently not implemented",
-				q.Grant.RecipientType))
-		result.Super.Audit.
-			WithField(`Code`, result.Code).
-			Warningln(result.Error)
-		goto dispatch
-	}
-
 	switch q.Action {
 	case msg.ActionGrant, msg.ActionRevoke:
 		s.rightWrite(q, &result)
@@ -50,7 +34,6 @@ func (s *Supervisor) right(q *msg.Request) {
 			Warningln(result.Error)
 	}
 
-dispatch:
 	q.Reply <- result
 }
 
