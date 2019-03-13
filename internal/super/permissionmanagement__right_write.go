@@ -23,15 +23,6 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 		return
 	}
 
-	// admin accounts can only receive system permissions
-	if q.Grant.RecipientType == msg.SubjectAdmin && q.Grant.Category != msg.CategorySystem {
-		mr.BadRequest(fmt.Errorf(
-			"Admin accounts can not receive grants"+
-				" in category %s", q.Grant.Category))
-		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
-		return
-	}
-
 	switch q.Action {
 	case msg.ActionGrant:
 		switch q.Grant.RecipientType {
@@ -45,6 +36,15 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 			mr.Super.Audit.
 				WithField(`Code`, mr.Code).
 				Warningln(mr.Error)
+			return
+		}
+
+		// admin accounts can only receive system permissions
+		if q.Grant.RecipientType == msg.SubjectAdmin && q.Grant.Category != msg.CategorySystem {
+			mr.BadRequest(fmt.Errorf(
+				"Admin accounts can not receive grants"+
+					" in category %s", q.Grant.Category))
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(mr.Error)
 			return
 		}
 
