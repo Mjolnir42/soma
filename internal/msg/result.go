@@ -79,7 +79,8 @@ func FromRequest(rq *Request) Result {
 			Section:    rq.Section,
 			Action:     rq.Action,
 			Super: Supervisor{
-				Task: rq.Super.Task,
+				Task:  rq.Super.Task,
+				Audit: rq.Super.Audit,
 			},
 		}
 	}
