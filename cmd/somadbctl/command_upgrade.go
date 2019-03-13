@@ -44,6 +44,7 @@ var UpgradeVersions = map[string]map[int]func(int, string, bool) int{
 		201811120001: upgradeSomaTo201811120002,
 		201811120002: upgradeSomaTo201811150001,
 		201811150001: upgradeSomaTo201901300001,
+		201901300001: upgradeSomaTo201903130001,
 	},
 	`root`: map[int]func(int, string, bool) int{
 		000000000001: installRoot201605150001,
@@ -1121,6 +1122,21 @@ func upgradeSomaTo201901300001(curr int, tool string, printOnly bool) int {
 	)
 	executeUpgrades(stmts, printOnly)
 	return 201901300001
+}
+
+func upgradeSomaTo201903130001(curr int, tool string, printOnly bool) int {
+	if curr != 201901300001 {
+		return 0
+	}
+	stmts := []string{
+		`ALTER TABLE soma.authorizations_global DROP CONSTRAINT authorizations_global_category_check;`,
+		`ALTER TABLE soma.authorizations_global ADD CONSTRAINT authorizations_global_category_check CHECK ( category IN ( 'omnipotence','system','global','global:grant','permission','permission:grant','operations','operations:grant', 'self', 'self:grant', 'identity', 'identity:grant' ));`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201903130001, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+	return 201903130001
 }
 
 func installRoot201605150001(curr int, tool string, printOnly bool) int {

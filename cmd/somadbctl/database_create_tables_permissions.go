@@ -123,7 +123,7 @@ create table if not exists soma.authorizations_global (
            OR ( admin_id IS     NULL AND user_id IS NOT NULL AND tool_id IS     NULL AND team_id IS     NULL )
            OR ( admin_id IS     NULL AND user_id IS     NULL AND tool_id IS NOT NULL AND team_id IS     NULL )
            OR ( admin_id IS     NULL AND user_id IS     NULL AND tool_id IS     NULL AND team_id IS NOT NULL ) ),
-    CHECK ( category IN ( 'omnipotence','system','global','global:grant','permission','permission:grant','operations','operations:grant' ) ),
+    CONSTRAINT authorizations_global_category_check CHECK ( category IN ( 'omnipotence','system','global','global:grant','permission','permission:grant','operations','operations:grant','self','self:grant','identity','identity:grant' ) ),
     -- if system, then it has to be an admin account
     CHECK ( category != 'system' OR admin_id IS NOT NULL ),
     -- admins can only have system
