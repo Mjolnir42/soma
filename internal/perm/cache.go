@@ -59,9 +59,9 @@ func New() *Cache {
 	c.object = newObjectLookup()
 	c.pmap = newPermissionMapping()
 	c.grantGlobal = newUnscopedGrantMap()
-	c.grantRepository = newScopedGrantMap()
-	c.grantTeam = newScopedGrantMap()
-	c.grantMonitoring = newScopedGrantMap()
+	c.grantRepository = newScopedGrantMap(`repository`)
+	c.grantTeam = newScopedGrantMap(`team`)
+	c.grantMonitoring = newScopedGrantMap(`monitoring`)
 	return &c
 }
 

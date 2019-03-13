@@ -48,7 +48,9 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	// look up the user, also handles admin and tool accounts
 	result.Super.Audit = result.Super.Audit.WithField(`permCache::subject`, q.Super.Authorize.AuthUser)
 	if user = c.user.getByName(q.Super.Authorize.AuthUser); user == nil {
-		result.Super.Audit = result.Super.Audit.WithField(`permCache::error`, `UserNotFound`)
+		result.Super.Audit = result.Super.Audit.WithField(`permCache::status`, `processing`).
+			WithField(`permCache::result`, `InternalError`).
+			WithField(`permCache::error`, `UserNotFound`)
 		goto dispatch
 	}
 
@@ -60,6 +62,8 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 		result.Super.Verdict = 200
 		goto dispatch
 	}
+	result.Super.Audit = result.Super.Audit.WithField(`permCache::omnipotence`, `false`)
+
 	// root can not receive additional permissions
 	switch q.Super.Authorize.AuthUser {
 	case `root`:
@@ -103,6 +107,8 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 		result.Super.Verdict = 200
 		goto dispatch
 	}
+	result.Super.Audit = result.Super.Audit.WithField(`permCache::system`, `false`)
+
 	// admin accounts can not receive regular permissions
 	switch subjType {
 	case `admin`:
@@ -138,6 +144,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 		result.Super.Verdict = 200
 		goto dispatch
 	}
+	result.Super.Audit = result.Super.Audit.WithField(`permCache::direct-user`, `false`)
 
 	// admin and tool accounts do not inherit team rights,
 	// authorization check ends here
@@ -157,6 +164,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 		result.Super.Verdict = 200
 	}
 	result.Super.Audit = result.Super.Audit.
+		WithField(`permCache::inherited-team`, `false`).
 		WithField(`permCache::status`, `exhausted`)
 
 dispatch:
@@ -237,7 +245,7 @@ permloop:
 		case msg.SectionMonitoring, msg.SectionCapability, msg.SectionDeployment:
 			// per-monitoring sections
 			if c.grantMonitoring.assess(subjectType, subjectID,
-				category, objID, permID, any) {
+				category, objID, permID, any, result) {
 				return true
 			}
 		case msg.SectionBucket, msg.SectionCheckConfig, msg.SectionCluster,
@@ -245,7 +253,7 @@ permloop:
 			msg.SectionPropertyCustom, msg.SectionRepositoryConfig:
 			// per-repository sections
 			if c.grantRepository.assess(subjectType, subjectID,
-				category, objID, permID, any) {
+				category, objID, permID, any, result) {
 				return true
 			}
 			switch q.Section {
@@ -257,14 +265,14 @@ permloop:
 					continue permloop
 				}
 				if c.grantRepository.assess(subjectType, subjectID,
-					category, objID, permID, any) {
+					category, objID, permID, any, result) {
 					return true
 				}
 			}
 		case msg.SectionNode, msg.SectionPropertyService, msg.SectionRepository:
 			// per-team sections
 			if c.grantTeam.assess(subjectType, subjectID,
-				category, objID, permID, any) {
+				category, objID, permID, any, result) {
 				return true
 			}
 		default:

@@ -106,32 +106,34 @@ func (m *unscopedGrantMap) getSubjectGrantID(subjType,
 func (m *unscopedGrantMap) assess(subjType, subjID, category,
 	permissionID string, result *msg.Result) bool {
 
+	prefix := fmt.Sprintf("permCache/grant/%s::assessment", `global`)
+
 	subject := fmt.Sprintf("%s:%s", subjType, subjID)
 	result.Super.Audit = result.Super.Audit.
-		WithField(`permCache::assessment-subject`, subject).
-		WithField(`permCache::assessment-category`, category).
-		WithField(`permCache::assessment-permissionID`, permissionID)
+		WithField(prefix+`-subject`, subject).
+		WithField(prefix+`-category`, category).
+		WithField(prefix+`-permissionID`, permissionID)
 
 	// only accept these four types
 	switch subjType {
 	case `user`, `admin`, `tool`, `team`:
 	default:
 		result.Super.Audit = result.Super.Audit.
-			WithField(`permCache::assessment`, `InvalidSubjectType`)
+			WithField(prefix, `InvalidSubjectType`)
 		return false
 	}
 
 	if _, ok := m.grants[subject]; !ok {
 		// subject has no grants
 		result.Super.Audit = result.Super.Audit.
-			WithField(`permCache::assessment`, `SubjectHasNoGrants`)
+			WithField(prefix, `SubjectHasNoGrants`)
 		return false
 	}
 
 	if _, ok := m.grants[subject][category]; !ok {
 		// subject has no grants in category
 		result.Super.Audit = result.Super.Audit.
-			WithField(`permCache::assessment`, `SubjectHasNoGrantsInCategory`)
+			WithField(prefix, `SubjectHasNoGrantsInCategory`)
 		return false
 	}
 
@@ -139,18 +141,19 @@ func (m *unscopedGrantMap) assess(subjType, subjID, category,
 		if grantID != `` {
 			// subject has been granted the requested permission
 			result.Super.Audit = result.Super.Audit.
-				WithField(`permCache::assessment`, `SuccessFindingGrant`)
+				WithField(prefix, `SuccessFindingGrant`)
 			return true
 		}
 	}
 	result.Super.Audit = result.Super.Audit.
-		WithField(`permCache::assessment`, `SubjectHasNoGrantForPermission`)
+		WithField(prefix, `SubjectHasNoGrantForPermission`)
 	return false
 }
 
 // scopedGrantMap is the cache data structure for permission grants
 // on an object.
 type scopedGrantMap struct {
+	scope string
 	// subjectID -> category -> permissionID -> objectID -> grantID
 	// The subjectID is built as follows:
 	//	user:${userUUID}
@@ -163,8 +166,9 @@ type scopedGrantMap struct {
 }
 
 // newScopedGrantMap return ans initialized scopedGrantMap
-func newScopedGrantMap() *scopedGrantMap {
+func newScopedGrantMap(mapscope string) *scopedGrantMap {
 	s := scopedGrantMap{}
+	s.scope = mapscope
 	s.grants = map[string]map[string]map[string]map[string]string{}
 	s.byGrant = map[string]map[string]string{}
 	return &s
@@ -257,27 +261,43 @@ func (m *scopedGrantMap) getSubjectGrantID(subjType,
 // specific permission. If any is true, then it is only checked
 // if the permission applies on any object
 func (m *scopedGrantMap) assess(subjType, subjID, category,
-	objID, permissionID string, any bool) bool {
+	objID, permissionID string, any bool, result *msg.Result) bool {
+
+	prefix := fmt.Sprintf("permCache/grant/%s::assessment", m.scope)
+
+	subject := fmt.Sprintf("%s:%s", subjType, subjID)
+	result.Super.Audit = result.Super.Audit.
+		WithField(prefix+`-subject`, subject).
+		WithField(prefix+`-category`, category).
+		WithField(prefix+`-permissionID`, permissionID)
+
 	// only accept these four types
 	switch subjType {
 	case `user`, `admin`, `tool`, `team`:
 	default:
+		result.Super.Audit = result.Super.Audit.
+			WithField(prefix, `InvalidSubjectType`)
 		return false
 	}
-	subject := fmt.Sprintf("%s:%s", subjType, subjID)
 
 	if _, ok := m.grants[subject]; !ok {
 		// subject has no grants
+		result.Super.Audit = result.Super.Audit.
+			WithField(prefix, `SubjectHasNoGrants`)
 		return false
 	}
 
 	if _, ok := m.grants[subject][category]; !ok {
 		// subject has no grants in category
+		result.Super.Audit = result.Super.Audit.
+			WithField(prefix, `SubjectHasNoGrantsInCategory`)
 		return false
 	}
 
 	if _, ok := m.grants[subject][category][permissionID]; !ok {
 		// subject has no grants of that permission
+		result.Super.Audit = result.Super.Audit.
+			WithField(prefix, `SubjectHasNoGrantsOfPermission`)
 		return true
 	}
 
@@ -286,6 +306,8 @@ func (m *scopedGrantMap) assess(subjType, subjID, category,
 	// on some objects
 	if any {
 		if len(m.grants[subject][category][permissionID]) > 0 {
+			result.Super.Audit = result.Super.Audit.
+				WithField(prefix, `SuccessFindingAnyGrant`)
 			return true
 		}
 	}
@@ -294,9 +316,13 @@ func (m *scopedGrantMap) assess(subjType, subjID, category,
 		if grantID != `` {
 			// subject has been granted the requested permission
 			// on the indicated object
+			result.Super.Audit = result.Super.Audit.
+				WithField(prefix, `SuccessFindingGrant`)
 			return true
 		}
 	}
+	result.Super.Audit = result.Super.Audit.
+		WithField(prefix, `SubjectHasNoGrantForPermissionOnObject`)
 	return false
 }
 
