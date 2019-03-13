@@ -20,6 +20,10 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	result := msg.FromRequest(q)
 	// default action is to deny
 	result.Super.Verdict = 403
+	result.Super.Audit = result.Super.Audit.
+		WithField(`permCache::status`, `received`).
+		WithField(`permCache::result`, `forbidden`).
+		WithField(`permCache::error`, `none`)
 
 	var user *proto.User
 	var subjType, category, actionID, sectionID string
@@ -35,19 +39,32 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	default:
 		subjType = `user`
 	}
+	result.Super.Audit = result.Super.Audit.WithField(`permCache::subjectType`, subjType)
 
 	// set readlock on the cache
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
 	// look up the user, also handles admin and tool accounts
+	result.Super.Audit = result.Super.Audit.WithField(`permCache::subject`, q.Super.Authorize.AuthUser)
 	if user = c.user.getByName(q.Super.Authorize.AuthUser); user == nil {
+		result.Super.Audit = result.Super.Audit.WithField(`permCache::error`, `UserNotFound`)
 		goto dispatch
 	}
 
 	// check if the subject has omnipotence
 	if c.checkOmnipotence(subjType, user.ID) {
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `evaluated`).
+			WithField(`permCache::result`, `omnipotent`)
 		result.Super.Verdict = 200
+		goto dispatch
+	}
+	// root can not receive additional permissions
+	switch q.Super.Authorize.AuthUser {
+	case `root`:
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `exhausted`)
 		goto dispatch
 	}
 
@@ -61,6 +78,10 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 		q.Super.Authorize.Section,
 		q.Super.Authorize.Action,
 	); action == nil {
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `processing`).
+			WithField(`permCache::result`, `InternalError`).
+			WithField(`permCache::error`, `ActionNotFound`)
 		goto dispatch
 	} else {
 		sectionID = action.SectionID
@@ -70,9 +91,23 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	// check if the user has the correct system permission
 	if ok, invalid := c.checkSystem(category, subjType,
 		user.ID); invalid {
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `processing`).
+			WithField(`permCache::result`, `InternalError`).
+			WithField(`permCache::error`, `InvalidMissingSystemPermission`)
 		goto dispatch
 	} else if ok {
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `evaluated`).
+			WithField(`permCache::result`, `systempermission`)
 		result.Super.Verdict = 200
+		goto dispatch
+	}
+	// admin accounts can not receive regular permissions
+	switch subjType {
+	case `admin`:
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `exhausted`)
 		goto dispatch
 	}
 
@@ -97,6 +132,9 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	// requested action
 	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, subjType, user.ID,
 		category) {
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `evaluated`).
+			WithField(`permCache::result`, `userpermission`)
 		result.Super.Verdict = 200
 		goto dispatch
 	}
@@ -105,14 +143,21 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	// authorization check ends here
 	switch subjType {
 	case `admin`, `tool`:
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `exhausted`)
 		goto dispatch
 	}
 
 	// check if the user's team has a specific grant for the action
 	if c.checkPermission(mergedPermIDs, any, q.Super.Authorize, `team`, user.TeamID,
 		category) {
+		result.Super.Audit = result.Super.Audit.
+			WithField(`permCache::status`, `evaluated`).
+			WithField(`permCache::result`, `teampermission`)
 		result.Super.Verdict = 200
 	}
+	result.Super.Audit = result.Super.Audit.
+		WithField(`permCache::status`, `exhausted`)
 
 dispatch:
 	return result
