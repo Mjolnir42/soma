@@ -870,10 +870,55 @@ soma right grant system::operation to admin admin_${username}
 soma right grant system::self to admin admin_${username}
 ```
 
-11. Permissions to grant to regulat users
+11. Global permissions to grant to regular users
 
 ```
 soma --admin right grant global::browse to user ${username}
 soma --admin right grant permission::viewer to user ${username}
 soma --admin right grant self::information to user ${username}
 ```
+
+12. Per-object worker permissions for regular users
+
+Allow the user to work with a repository. Grant on every repository the user
+must work with.
+
+```
+soma permission add worker to repository
+soma permission map repository-config to repository::worker
+soma permission map bucket to repository::worker
+soma permission map group to repository::worker
+soma permission map cluster to repository::worker
+soma permission map node-config to repository::worker
+soma permission map property-custom to repository::worker
+soma permission map check-config to repository::worker
+soma permission map instance to repository::worker
+soma right grant repository::worker to user ${username} on repository ${repo}
+```
+
+Allow the user to work with a specific team's assets.
+
+```
+soma permission add worker to team
+soma permission map node to team::worker
+soma permission map property-service to team::worker
+soma right grant team::worker to user ${username} on team ${team}
+```
+
+Allow the user to deploy checks on a specific monitoringsystem.
+
+```
+soma permission add worker to monitoring
+soma permission map monitoringsystem::list to monitoring::worker
+soma permission map monitoringsystem::search to monitoring::worker
+soma permission map monitoringsystem::show to monitoring::worker
+soma permission map monitoringsystem::use to monitoring::worker
+soma permission map capability::list to monitoring::worker
+soma permission map capability::show to monitoring::worker
+soma permission map capability::search to monitoring::worker
+soma right grant monitoring::worker to user ${username} on monitoring ${name}
+```
+
+These three in combination allow a user to manage the assets of a team in
+a configuration repository and deploy checks on a monitoring system for
+them.
