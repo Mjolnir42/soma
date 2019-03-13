@@ -47,6 +47,7 @@ func IsAuthorized(q *msg.Request) bool {
 		Reply:   returnChannel,
 		Super: &msg.Supervisor{
 			Authorize: q,
+			Audit:     audit,
 		},
 	}
 	result := <-returnChannel
@@ -54,12 +55,12 @@ func IsAuthorized(q *msg.Request) bool {
 	switch result.Super.Verdict {
 	case 200:
 		// the request is authorized
-		audit.WithField(`Code`, result.Code).
+		result.Super.Audit.WithField(`Code`, result.Code).
 			WithField(`Verdict`, result.Super.Verdict).
 			Infoln(`Request authorized`)
 		return true
 	default:
-		audit.WithField(`Code`, result.Code).
+		result.Super.Audit.WithField(`Code`, result.Code).
 			WithField(`Verdict`, result.Super.Verdict).
 			Warningln(`Request forbidden`)
 	}
