@@ -48,6 +48,10 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 			s.rightGrantTeam(q, mr)
 		case msg.CategoryMonitoring, msg.CategoryGrantMonitoring:
 			s.rightGrantMonitoring(q, mr)
+		default:
+			mr.NotImplemented(
+				fmt.Errorf("Unhandled category in right::grant: %s", q.Grant.Category),
+			)
 		}
 	case msg.ActionRevoke:
 		switch q.Grant.Category {
@@ -64,7 +68,15 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 			s.rightRevokeTeam(q, mr)
 		case msg.CategoryMonitoring, msg.CategoryGrantMonitoring:
 			s.rightRevokeMonitoring(q, mr)
+		default:
+			mr.NotImplemented(
+				fmt.Errorf("Unhandled category in right::revoke: %s", q.Grant.Category),
+			)
 		}
+	default:
+		mr.NotImplemented(
+			fmt.Errorf("Unhandled action in section right: %s", q.Action),
+		)
 	}
 
 	if mr.IsOK() {
