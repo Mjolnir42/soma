@@ -123,7 +123,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	mergedPermIDs = append(sectionPermIDs, actionPermIDs...)
 
 	// check if we care about the specific object
-	switch q.Action {
+	switch q.Super.Authorize.Action {
 	case `list`, `search`:
 		any = true
 	}
