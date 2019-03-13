@@ -501,6 +501,7 @@ soma action add search to workflow
 soma action add search-all to monitoringsystem-mgmt
 soma action add set to workflow
 soma action add show to action
+soma action add show to admin-mgmt
 soma action add show to attribute
 soma action add show to bucket
 soma action add show to capability
