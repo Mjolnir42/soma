@@ -37,6 +37,8 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 		switch q.Grant.Category {
 		case msg.CategorySystem,
 			msg.CategoryGlobal, msg.CategoryGrantGlobal,
+			msg.CategoryIdentity, msg.CategoryGrantIdentity,
+			msg.CategorySelf, msg.CategoryGrantSelf,
 			msg.CategoryPermission, msg.CategoryGrantPermission,
 			msg.CategoryOperation, msg.CategoryGrantOperation:
 			s.rightGrantGlobal(q, mr)
@@ -51,6 +53,8 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 		switch q.Grant.Category {
 		case msg.CategorySystem,
 			msg.CategoryGlobal, msg.CategoryGrantGlobal,
+			msg.CategoryIdentity, msg.CategoryGrantIdentity,
+			msg.CategorySelf, msg.CategoryGrantSelf,
 			msg.CategoryPermission, msg.CategoryGrantPermission,
 			msg.CategoryOperation, msg.CategoryGrantOperation:
 			s.rightRevokeGlobal(q, mr)
