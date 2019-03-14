@@ -208,13 +208,31 @@ func (c *Cache) performRepositoryDestroy(q *msg.Request) {
 func (c *Cache) performRightGrant(q *msg.Request) {
 	c.lock.Lock()
 	switch q.Grant.Category {
-	case `omnipotence`, `system`, `global`, `permission`, `operations`:
+	case
+		msg.CategoryOmnipotence,
+		msg.CategorySystem,
+		msg.CategoryGlobal,
+		msg.CategoryGrantGlobal,
+		msg.CategoryIdentity,
+		msg.CategoryGrantIdentity,
+		msg.CategorySelf,
+		msg.CategoryGrantSelf,
+		msg.CategoryOperation,
+		msg.CategoryGrantOperation,
+		msg.CategoryPermission,
+		msg.CategoryGrantPermission:
 		c.performRightGrantUnscoped(q)
-	case `repository`:
+	case
+		msg.CategoryRepository,
+		msg.CategoryGrantRepository:
 		c.performRightGrantScopeRepository(q)
-	case `team`:
+	case
+		msg.CategoryTeam,
+		msg.CategoryGrantTeam:
 		c.performRightGrantScopeTeam(q)
-	case `monitoring`:
+	case
+		msg.CategoryMonitoring,
+		msg.CategoryGrantMonitoring:
 		c.performRightGrantScopeMonitoring(q)
 	}
 	c.lock.Unlock()
@@ -224,13 +242,31 @@ func (c *Cache) performRightGrant(q *msg.Request) {
 func (c *Cache) performRightRevoke(q *msg.Request) {
 	c.lock.Lock()
 	switch q.Grant.Category {
-	case `omnipotence`, `system`, `global`, `permission`, `operations`:
+	case
+		msg.CategoryOmnipotence,
+		msg.CategorySystem,
+		msg.CategoryGlobal,
+		msg.CategoryGrantGlobal,
+		msg.CategoryIdentity,
+		msg.CategoryGrantIdentity,
+		msg.CategorySelf,
+		msg.CategoryGrantSelf,
+		msg.CategoryOperation,
+		msg.CategoryGrantOperation,
+		msg.CategoryPermission,
+		msg.CategoryGrantPermission:
 		c.performRightRevokeUnscoped(q)
-	case `repository`:
+	case
+		msg.CategoryRepository,
+		msg.CategoryGrantRepository:
 		c.performRightRevokeScopeRepository(q)
-	case `team`:
+	case
+		msg.CategoryTeam,
+		msg.CategoryGrantTeam:
 		c.performRightRevokeScopeTeam(q)
-	case `monitoring`:
+	case
+		msg.CategoryMonitoring,
+		msg.CategoryGrantMonitoring:
 		c.performRightRevokeScopeMonitoring(q)
 	}
 	c.lock.Unlock()
