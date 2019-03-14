@@ -894,7 +894,7 @@ abort:
 
 //
 func clusterIDByName(cluster, bucketID string) (string, error) {
-	path := ``
+	var path string
 	res := &proto.Result{}
 	req := proto.NewClusterFilter()
 
