@@ -81,7 +81,7 @@ func WorkflowSet(c *cli.Context) {
 	Generic(c, []string{`status`, `next`})
 }
 
-func DirectIdName(c *cli.Context) {
+func DirectIDName(c *cli.Context) {
 	GenericDirect(c, []string{`id`, `name`})
 }
 
