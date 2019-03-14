@@ -29,7 +29,7 @@ func (x *Rest) MonitoringMgmtAll(w http.ResponseWriter, r *http.Request,
 	request.Flag.Unscoped = true
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (x *Rest) MonitoringMgmtSearchAll(w http.ResponseWriter, r *http.Request,
 	request.Search.Monitoring.Name = cReq.Filter.Monitoring.Name
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (x *Rest) MonitoringMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.Monitoring.Callback = cReq.Monitoring.Callback
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -118,7 +118,7 @@ func (x *Rest) MonitoringMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.Monitoring.ID = params.ByName(`monitoringID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

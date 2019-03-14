@@ -27,7 +27,7 @@ func (x *Rest) MonitoringList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (x *Rest) MonitoringSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Monitoring.Name = cReq.Filter.Monitoring.Name
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -78,7 +78,7 @@ func (x *Rest) MonitoringShow(w http.ResponseWriter, r *http.Request,
 	request.Monitoring.ID = params.ByName(`monitoringID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

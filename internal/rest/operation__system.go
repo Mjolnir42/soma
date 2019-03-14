@@ -45,7 +45,7 @@ func (x *Rest) SystemOperation(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (x *Rest) SupervisorTokenInvalidateGlobal(w http.ResponseWriter, r *http.Re
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) SupervisorTokenInvalidateAccount(w http.ResponseWriter, r *http.R
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

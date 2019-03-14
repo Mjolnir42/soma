@@ -25,7 +25,7 @@ func (x *Rest) DatacenterList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (x *Rest) DatacenterSync(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionSync
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (x *Rest) DatacenterShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) DatacenterAdd(w http.ResponseWriter, r *http.Request,
 	request.Datacenter = cReq.Datacenter.Clone()
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -114,7 +114,7 @@ func (x *Rest) DatacenterRemove(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -146,7 +146,7 @@ func (x *Rest) DatacenterRename(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

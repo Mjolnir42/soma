@@ -40,7 +40,7 @@ func (x *Rest) AdminMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.Admin.UserName = cReq.Admin.UserName
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (x *Rest) AdminMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.Admin.UserID = params.ByName(`userID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (x *Rest) AdminMgmtShow(w http.ResponseWriter, r *http.Request,
 	request.Admin.UserID = params.ByName(`userID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

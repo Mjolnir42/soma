@@ -29,7 +29,7 @@ func (x *Rest) GroupList(w http.ResponseWriter, r *http.Request,
 	request.Bucket.ID = params.ByName(`bucketID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (x *Rest) GroupShow(w http.ResponseWriter, r *http.Request,
 	request.Group.ID = params.ByName(`groupID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -122,7 +122,7 @@ func (x *Rest) GroupTree(w http.ResponseWriter, r *http.Request,
 	request.Tree.Type = msg.EntityGroup
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -156,7 +156,7 @@ func (x *Rest) GroupCreate(w http.ResponseWriter, r *http.Request,
 	request.Group = cReq.Group.Clone()
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -180,7 +180,7 @@ func (x *Rest) GroupDestroy(w http.ResponseWriter, r *http.Request,
 	request.Group.BucketID = params.ByName(`bucketID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -202,7 +202,7 @@ func (x *Rest) GroupMemberList(w http.ResponseWriter, r *http.Request,
 	request.Group.ID = params.ByName(`groupID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -258,7 +258,7 @@ func (x *Rest) GroupMemberAssign(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -301,7 +301,7 @@ func (x *Rest) GroupMemberUnassign(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -347,7 +347,7 @@ func (x *Rest) GroupPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -380,7 +380,7 @@ func (x *Rest) GroupPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	}}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

@@ -26,7 +26,7 @@ func (x *Rest) JobList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (x *Rest) JobShow(w http.ResponseWriter, r *http.Request,
 	request.Job.ID = params.ByName(`jobID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (x *Rest) JobSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Job.IDList = cReq.Filter.Job.IDList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (x *Rest) JobWait(w http.ResponseWriter, r *http.Request,
 	request.Job.ID = params.ByName(`jobID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

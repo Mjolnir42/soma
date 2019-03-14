@@ -26,7 +26,7 @@ func (x *Rest) MetricList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) MetricShow(w http.ResponseWriter, r *http.Request,
 	request.Metric.Path = params.ByName(`metric`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (x *Rest) MetricAdd(w http.ResponseWriter, r *http.Request,
 	request.Metric = cReq.Metric.Clone()
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) MetricRemove(w http.ResponseWriter, r *http.Request,
 	request.Metric.Path = params.ByName(`metric`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

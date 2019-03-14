@@ -26,7 +26,7 @@ func (x *Rest) StatusList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) StatusShow(w http.ResponseWriter, r *http.Request,
 	request.Status.Name = params.ByName(`status`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (x *Rest) StatusAdd(w http.ResponseWriter, r *http.Request,
 	request.Status = cReq.Status.Clone()
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) StatusRemove(w http.ResponseWriter, r *http.Request,
 	request.Status.Name = params.ByName(`status`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

@@ -32,7 +32,7 @@ func (x *Rest) DeploymentShow(w http.ResponseWriter, r *http.Request,
 	request.Deployment.ID = params.ByName(`deploymentID`)
 
 	// BUG	if !x.isAuthorized(&request) {
-	// BUG		x.replyForbidden(&w, &request, nil)
+	// BUG		x.replyForbidden(&w, &request)
 	// BUG		return
 	// BUG	}
 
@@ -73,7 +73,7 @@ func (x *Rest) DeploymentUpdate(w http.ResponseWriter, r *http.Request,
 	}
 
 	// BUG	if !x.isAuthorized(&request) {
-	// BUG		x.replyForbidden(&w, &request, nil)
+	// BUG		x.replyForbidden(&w, &request)
 	// BUG		return
 	// BUG	}
 
@@ -98,7 +98,7 @@ func (x *Rest) DeploymentList(w http.ResponseWriter, r *http.Request,
 	request.Monitoring.ID = params.ByName(`monitoringID`)
 
 	// BUG	if !x.isAuthorized(&request) {
-	// BUG		x.replyForbidden(&w, &request, nil)
+	// BUG		x.replyForbidden(&w, &request)
 	// BUG		return
 	// BUG	}
 
@@ -123,7 +123,7 @@ func (x *Rest) DeploymentPending(w http.ResponseWriter, r *http.Request,
 	request.Monitoring.ID = params.ByName(`monitoringID`)
 
 	// BUG	if !x.isAuthorized(&request) {
-	// BUG		x.replyForbidden(&w, &request, nil)
+	// BUG		x.replyForbidden(&w, &request)
 	// BUG		return
 	// BUG	}
 

@@ -26,7 +26,7 @@ func (x *Rest) NodeList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -52,7 +52,7 @@ func (x *Rest) NodeSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Node.Name = cReq.Filter.Node.Name
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (x *Rest) NodeShow(w http.ResponseWriter, r *http.Request,
 	request.Node.ID = params.ByName(`nodeID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -101,7 +101,7 @@ func (x *Rest) NodeShowConfig(w http.ResponseWriter, r *http.Request,
 	request.Node.ID = params.ByName(`nodeID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

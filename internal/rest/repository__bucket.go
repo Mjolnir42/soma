@@ -27,7 +27,7 @@ func (x *Rest) BucketList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (x *Rest) BucketSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Bucket.FilterOnIsDeleted = cReq.Filter.Bucket.FilterOnIsDeleted
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -87,7 +87,7 @@ func (x *Rest) BucketShow(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -110,7 +110,7 @@ func (x *Rest) BucketTree(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -150,7 +150,7 @@ func (x *Rest) BucketCreate(w http.ResponseWriter, r *http.Request,
 	request.Bucket = cReq.Bucket.Clone()
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -172,7 +172,7 @@ func (x *Rest) BucketDestroy(w http.ResponseWriter, r *http.Request,
 	request.Repository.ID = params.ByName(`repositoryID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -200,7 +200,7 @@ func (x *Rest) BucketRename(w http.ResponseWriter, r *http.Request,
 	request.Update.Bucket.Name = cReq.Bucket.Name
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -264,7 +264,7 @@ func (x *Rest) BucketPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request.Property.Type = params.ByName(`propertyType`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -298,7 +298,7 @@ func (x *Rest) BucketPropertyDestroy(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

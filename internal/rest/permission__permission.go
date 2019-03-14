@@ -29,7 +29,7 @@ func (x *Rest) PermissionList(w http.ResponseWriter, r *http.Request,
 	request.Permission.Category = params.ByName(`category`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (x *Rest) PermissionShow(w http.ResponseWriter, r *http.Request,
 	request.Permission.Category = params.ByName(`category`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -83,7 +83,7 @@ func (x *Rest) PermissionSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Permission.Category = cReq.Filter.Permission.Category
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -118,14 +118,14 @@ func (x *Rest) PermissionAdd(w http.ResponseWriter, r *http.Request,
 	}
 	if params.ByName(`category`) == msg.CategorySystem ||
 		params.ByName(`category`) == msg.CategoryOmnipotence {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 	request.Permission.Name = cReq.Permission.Name
 	request.Permission.Category = cReq.Permission.Category
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -150,14 +150,14 @@ func (x *Rest) PermissionRemove(w http.ResponseWriter, r *http.Request,
 	}
 	if params.ByName(`category`) == msg.CategorySystem ||
 		params.ByName(`category`) == msg.CategoryOmnipotence {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 	request.Permission.ID = params.ByName(`permissionID`)
 	request.Permission.Category = params.ByName(`category`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -196,7 +196,7 @@ func (x *Rest) PermissionEdit(w http.ResponseWriter, r *http.Request,
 	}
 	if params.ByName(`category`) == msg.CategorySystem ||
 		params.ByName(`category`) == msg.CategoryOmnipotence {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 	// invalid: map+unmap at the same time
@@ -238,7 +238,7 @@ func (x *Rest) PermissionEdit(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

@@ -28,7 +28,7 @@ func (x *Rest) RightList(w http.ResponseWriter, r *http.Request,
 	request.Grant.PermissionID = params.ByName(`permissionID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (x *Rest) RightShow(w http.ResponseWriter, r *http.Request,
 	request.Grant.PermissionID = params.ByName(`permissionID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -82,7 +82,7 @@ func (x *Rest) RightSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Grant.ObjectID = crq.Filter.Grant.ObjectID
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -115,7 +115,7 @@ func (x *Rest) RightGrant(w http.ResponseWriter, r *http.Request,
 	request.Grant = cReq.Grant.Clone()
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -137,7 +137,7 @@ func (x *Rest) RightRevoke(w http.ResponseWriter, r *http.Request,
 	request.Grant.PermissionID = params.ByName(`permissionID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

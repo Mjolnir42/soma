@@ -26,7 +26,7 @@ func (x *Rest) JobResultMgmtList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) JobResultMgmtShow(w http.ResponseWriter, r *http.Request,
 	request.JobResult.ID = params.ByName(`resultID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (x *Rest) JobResultMgmtAdd(w http.ResponseWriter, r *http.Request,
 	request.JobResult = cReq.JobResult.Clone()
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) JobResultMgmtRemove(w http.ResponseWriter, r *http.Request,
 	request.JobResult.ID = params.ByName(`resultID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -119,7 +119,7 @@ func (x *Rest) JobResultMgmtSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.JobResult.Name = cReq.Filter.JobResult.Name
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

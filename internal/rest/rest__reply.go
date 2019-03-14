@@ -31,9 +31,9 @@ func (x *Rest) replyBadRequest(w *http.ResponseWriter, q *msg.Request, err error
 
 // replyForbidden returns a 403 application error inside the returned
 // JSON body
-func (x *Rest) replyForbidden(w *http.ResponseWriter, q *msg.Request, err error) {
+func (x *Rest) replyForbidden(w *http.ResponseWriter, q *msg.Request) {
 	result := msg.FromRequest(q)
-	result.Forbidden(err, q.Section)
+	result.Forbidden(nil, q.Section)
 	x.send(w, &result)
 }
 

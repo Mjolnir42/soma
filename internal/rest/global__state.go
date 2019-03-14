@@ -26,7 +26,7 @@ func (x *Rest) StateList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) StateShow(w http.ResponseWriter, r *http.Request,
 	request.State.Name = params.ByName(`state`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (x *Rest) StateAdd(w http.ResponseWriter, r *http.Request,
 	request.State.Name = cReq.State.Name
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) StateRemove(w http.ResponseWriter, r *http.Request,
 	request.State.Name = params.ByName(`state`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -120,7 +120,7 @@ func (x *Rest) StateRename(w http.ResponseWriter, r *http.Request,
 	request.State.Name = params.ByName(`state`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

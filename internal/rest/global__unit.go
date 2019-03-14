@@ -26,7 +26,7 @@ func (x *Rest) UnitList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (x *Rest) UnitShow(w http.ResponseWriter, r *http.Request,
 	request.Unit.Unit = params.ByName(`unit`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (x *Rest) UnitAdd(w http.ResponseWriter, r *http.Request,
 	request.Unit.Name = cReq.Unit.Name
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -93,7 +93,7 @@ func (x *Rest) UnitRemove(w http.ResponseWriter, r *http.Request,
 	request.Unit.Unit = params.ByName(`unit`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

@@ -28,7 +28,7 @@ func (x *Rest) InstanceShow(w http.ResponseWriter, r *http.Request,
 	request.Instance.ID = params.ByName(`instanceID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -51,7 +51,7 @@ func (x *Rest) InstanceVersions(w http.ResponseWriter, r *http.Request,
 	request.Instance.ID = params.ByName(`instanceID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (x *Rest) InstanceList(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 

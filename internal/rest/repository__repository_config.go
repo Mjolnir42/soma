@@ -26,7 +26,7 @@ func (x *Rest) RepositoryConfigList(w http.ResponseWriter, r *http.Request,
 	request.Action = msg.ActionList
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (x *Rest) RepositoryConfigSearch(w http.ResponseWriter, r *http.Request,
 	request.Search.Repository.FilterOnIsActive = cReq.Filter.Repository.FilterOnIsActive
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (x *Rest) RepositoryConfigShow(w http.ResponseWriter, r *http.Request,
 	request.Repository.TeamID = params.ByName(`teamID`)
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -113,7 +113,7 @@ func (x *Rest) RepositoryConfigTree(w http.ResponseWriter, r *http.Request,
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -159,7 +159,7 @@ func (x *Rest) RepositoryConfigPropertyCreate(w http.ResponseWriter, r *http.Req
 	request.Property.Type = (*cReq.Repository.Properties)[0].Type
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -188,7 +188,7 @@ func (x *Rest) RepositoryConfigPropertyDestroy(w http.ResponseWriter, r *http.Re
 	}
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
@@ -241,7 +241,7 @@ func (x *Rest) RepositoryConfigPropertyUpdate(w http.ResponseWriter, r *http.Req
 	request.Repository.Properties = nil
 
 	if !x.isAuthorized(&request) {
-		x.replyForbidden(&w, &request, nil)
+		x.replyForbidden(&w, &request)
 		return
 	}
 
