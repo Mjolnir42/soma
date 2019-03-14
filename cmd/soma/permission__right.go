@@ -16,8 +16,9 @@ func registerRights(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `right`,
-				Usage: `SUBCOMMANDS for permission grant`,
+				Name:        `right`,
+				Usage:       `SUBCOMMANDS for permission grant`,
+				Description: help.Text(`right::`),
 				Subcommands: []cli.Command{
 					{
 						Name:         `grant`,
