@@ -25,6 +25,9 @@ func (x *Rest) BucketList(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionList
+	request.Bucket = proto.Bucket{
+		RepositoryID: params.ByName(`repositoryID`),
+	}
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)

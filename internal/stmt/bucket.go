@@ -93,12 +93,6 @@ JOIN   soma.service_property ssp
 WHERE  sbsp.source_instance_id = $1::uuid
   AND  sbsp.source_instance_id = sbsp.instance_id;`
 
-	BucketList = `
-SELECT bucket_id,
-       bucket_name
-FROM   soma.buckets
-WHERE  NOT bucket_deleted;`
-
 	BucketShow = `
 SELECT bucket_id,
        bucket_name,
@@ -114,7 +108,6 @@ WHERE  bucket_id = $1::uuid;`
 func init() {
 	m[BucketCstProps] = `BucketCstProps`
 	m[BucketCustomPropertyForDelete] = `BucketCustomPropertyForDelete`
-	m[BucketList] = `BucketList`
 	m[BucketOncProps] = `BucketOncProps`
 	m[BucketOncallPropertyForDelete] = `BucketOncallPropertyForDelete`
 	m[BucketServicePropertyForDelete] = `BucketServicePropertyForDelete`

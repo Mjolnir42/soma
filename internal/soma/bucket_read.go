@@ -82,7 +82,7 @@ func (r *BucketRead) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.BucketList:             &r.stmtList,
+		stmt.AuthorizedBucketList:   &r.stmtList,
 		stmt.BucketShow:             &r.stmtShow,
 		stmt.AuthorizedBucketSearch: &r.stmtSearch,
 		stmt.BucketOncProps:         &r.stmtPropOncall,
@@ -135,7 +135,9 @@ func (r *BucketRead) list(q *msg.Request, mr *msg.Result) {
 		err                  error
 	)
 
-	if rows, err = r.stmtList.Query(); err != nil {
+	if rows, err = r.stmtList.Query(
+		q.Bucket.RepositoryID,
+	); err != nil {
 		mr.ServerError(err, q.Section)
 		return
 	}
