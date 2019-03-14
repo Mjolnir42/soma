@@ -162,6 +162,7 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 			WithField(`permCache::status`, `evaluated`).
 			WithField(`permCache::result`, `teampermission`)
 		result.Super.Verdict = 200
+		goto dispatch
 	}
 	result.Super.Audit = result.Super.Audit.
 		WithField(`permCache::inherited-team`, `false`).
