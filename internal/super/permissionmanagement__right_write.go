@@ -28,6 +28,7 @@ func (s *Supervisor) rightWrite(q *msg.Request, mr *msg.Result) {
 		switch q.Grant.RecipientType {
 		case msg.SubjectUser:
 		case msg.SubjectAdmin:
+		case msg.SubjectTeam:
 		default:
 			mr.NotImplemented(
 				fmt.Errorf("Rights for recipient type"+

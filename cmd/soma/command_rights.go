@@ -55,8 +55,8 @@ func registerRights(app cli.App) *cli.App {
 
 // rightGrant function
 // soma right grant $category::$permission
-//            to user|admin $username
-//           [on repository|bucket|monitoring $name]
+//            to user|admin|team $name
+//           [on repository|bucket|monitoring|team $name]
 func rightGrant(c *cli.Context) error {
 	opts := map[string][][2]string{}
 	if err := adm.ParseVariadicTriples(
@@ -142,10 +142,16 @@ func rightGrant(c *cli.Context) error {
 			opts[`to`][0][1]); err != nil {
 			return err
 		}
+	case `team`:
+		req.Grant.RecipientType = `team`
+		if err = adm.LookupTeamID(
+			opts[`to`][0][1],
+			&req.Grant.RecipientID,
+		); err != nil {
+			return err
+		}
 	case `tool`:
 		return fmt.Errorf(`Tool permissions are not implemented.`)
-	case `team`:
-		return fmt.Errorf(`Team permissions are not implemented.`)
 	}
 
 	if len(opts[`on`]) == 1 {
@@ -207,8 +213,8 @@ func rightGrant(c *cli.Context) error {
 
 // rightRevoke function
 // soma right revoke $category::$permission
-//            from user|admin $username
-//           [on repository|bucket|monitoring $name]
+//            from user|admin|team $name
+//           [on repository|bucket|monitoring|team $name]
 func rightRevoke(c *cli.Context) error {
 	opts := map[string][][2]string{}
 	if err := adm.ParseVariadicTriples(
@@ -296,10 +302,16 @@ func rightRevoke(c *cli.Context) error {
 		); err != nil {
 			return err
 		}
+	case `team`:
+		req.Filter.Grant.RecipientType = `team`
+		if err = adm.LookupTeamID(
+			opts[`from`][0][1],
+			&req.Filter.Grant.RecipientID,
+		); err != nil {
+			return err
+		}
 	case `tool`:
 		return fmt.Errorf(`Tool permissions are not implemented.`)
-	case `team`:
-		return fmt.Errorf(`Team permissions are not implemented.`)
 	}
 
 	// parse optional object spec

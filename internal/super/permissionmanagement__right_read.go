@@ -21,6 +21,7 @@ func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 		switch q.Grant.RecipientType {
 		case msg.SubjectUser:
 		case msg.SubjectAdmin:
+		case msg.SubjectTeam:
 		default:
 			mr.NotImplemented(
 				fmt.Errorf("Rights for recipient type"+
@@ -57,6 +58,7 @@ func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 		switch q.Grant.RecipientType {
 		case msg.SubjectUser:
 		case msg.SubjectAdmin:
+		case msg.SubjectTeam:
 		default:
 			mr.NotImplemented(
 				fmt.Errorf("Rights for recipient type"+
@@ -93,6 +95,7 @@ func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 		switch q.Search.Grant.RecipientType {
 		case msg.SubjectUser:
 		case msg.SubjectAdmin:
+		case msg.SubjectTeam:
 		default:
 			mr.NotImplemented(
 				fmt.Errorf("Rights for recipient type"+
@@ -240,7 +243,7 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
 		scope   *sql.Stmt
 	)
 
-	switch q.Grant.Category {
+	switch q.Search.Grant.Category {
 	case msg.CategoryRepository,
 		msg.CategoryGrantRepository:
 		scope = s.stmtSearchAuthorizationRepository
