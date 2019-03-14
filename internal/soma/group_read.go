@@ -120,12 +120,12 @@ func (r *GroupRead) process(q *msg.Request) {
 
 	switch q.Action {
 	case msg.ActionList:
-		r.list(q, &result)
+		r.list(q, &result, false)
 	case msg.ActionShow:
 		r.show(q, &result)
 	case msg.ActionSearch:
-		//XXX TODO r.search(q, &result)
-		r.list(q, &result)
+		r.search(q, &result)
+		// r.list(q, &result)
 	case msg.ActionMemberList:
 		r.memberList(q, &result)
 	default:
@@ -134,8 +134,12 @@ func (r *GroupRead) process(q *msg.Request) {
 	q.Reply <- result
 }
 
+func (r *GroupRead) search(q *msg.Request, mr *msg.Result) {
+	r.list(q, mr, true)
+}
+
 // list returns all groups
-func (r *GroupRead) list(q *msg.Request, mr *msg.Result) {
+func (r *GroupRead) list(q *msg.Request, mr *msg.Result, search bool) {
 	var (
 		groupID, groupName, bucketID string
 		rows                         *sql.Rows
@@ -144,7 +148,7 @@ func (r *GroupRead) list(q *msg.Request, mr *msg.Result) {
 
 	if rows, err = r.stmtList.Query(
 		q.Section,
-		q.Action,
+		`list`,
 		q.AuthUser,
 		q.Bucket.ID,
 	); err != nil {
@@ -162,11 +166,14 @@ func (r *GroupRead) list(q *msg.Request, mr *msg.Result) {
 			mr.ServerError(err, q.Section)
 			return
 		}
-		mr.Group = append(mr.Group, proto.Group{
-			ID:       groupID,
-			Name:     groupName,
-			BucketID: bucketID,
-		})
+
+		if !search || groupName == q.Search.Group.Name {
+			mr.Group = append(mr.Group, proto.Group{
+				ID:       groupID,
+				Name:     groupName,
+				BucketID: bucketID,
+			})
+		}
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err, q.Section)

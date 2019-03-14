@@ -116,12 +116,12 @@ func (r *ClusterRead) process(q *msg.Request) {
 
 	switch q.Action {
 	case msg.ActionList:
-		r.list(q, &result)
+		r.list(q, &result, false)
 	case msg.ActionShow:
 		r.show(q, &result)
 	case msg.ActionSearch:
-		//XXX TODO r.search(q, &result)
-		r.list(q, &result)
+		r.search(q, &result)
+		//		r.list(q, &result)
 	case msg.ActionMemberList:
 		r.memberList(q, &result)
 	default:
@@ -130,8 +130,12 @@ func (r *ClusterRead) process(q *msg.Request) {
 	q.Reply <- result
 }
 
+func (r *ClusterRead) search(q *msg.Request, mr *msg.Result) {
+	r.list(q, mr, true)
+}
+
 // list returns all clusters
-func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
+func (r *ClusterRead) list(q *msg.Request, mr *msg.Result, search bool) {
 	var (
 		clusterID, clusterName, bucketID string
 		rows                             *sql.Rows
@@ -140,7 +144,7 @@ func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
 
 	if rows, err = r.stmtList.Query(
 		q.Section,
-		q.Action,
+		msg.ActionList,
 		q.AuthUser,
 		q.Bucket.ID,
 	); err != nil {
@@ -159,11 +163,13 @@ func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
 			return
 		}
 
-		mr.Cluster = append(mr.Cluster, proto.Cluster{
-			ID:       clusterID,
-			Name:     clusterName,
-			BucketID: bucketID,
-		})
+		if !search || clusterName == q.Search.Cluster.Name {
+			mr.Cluster = append(mr.Cluster, proto.Cluster{
+				ID:       clusterID,
+				Name:     clusterName,
+				BucketID: bucketID,
+			})
+		}
 	}
 	if err = rows.Err(); err != nil {
 		mr.ServerError(err, q.Section)

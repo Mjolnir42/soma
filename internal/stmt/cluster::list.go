@@ -29,8 +29,8 @@ CROSS JOIN  soma.clusters
 WHERE       inventory.user.uid = $3::varchar
   AND       soma.authorizations_global.category = 'omnipotence'
   AND       soma.permission.name = 'omnipotence'
-  AND       (   $1::varchar = 'group'
-             OR $1::varchar = 'group-config')
+  AND       (   $1::varchar = 'cluster'
+             OR $1::varchar = 'cluster-config')
   AND       $2::varchar = 'list'
   AND       soma.clusters.bucket_id = $4::uuid
 UNION
@@ -55,8 +55,8 @@ WHERE       auth.admin.uid = $3::varchar
   AND       soma.authorizations_global.category = 'system'
   AND       soma.section.name = $1::varchar
   AND       soma.action.name  = $2::varchar
-  AND       (   $1::varchar = 'group'
-             OR $1::varchar = 'group-config')
+  AND       (   $1::varchar = 'cluster'
+             OR $1::varchar = 'cluster-config')
   AND       $2::varchar = 'list'
   AND       soma.clusters.bucket_id = $4::uuid
 UNION
