@@ -576,7 +576,7 @@ func (s *Supervisor) startupPermissionMap() {
 			actionName = ``
 			sectionMapping = true
 		}
-		go func(pID, pNam, mID, cat, sID, sNam, aID, aNam string, sm bool) {
+		go func(pID, pNam, cat, sID, sNam, aID, aNam string, sm bool) {
 			switch sm {
 			case true:
 				s.Update <- msg.CacheUpdateFromRequest(&msg.Request{
@@ -610,7 +610,7 @@ func (s *Supervisor) startupPermissionMap() {
 					},
 				})
 			}
-		}(permissionID, permissionName, mappingID, category, sectionID, sectionName, actionID, actionName, sectionMapping)
+		}(permissionID, permissionName, category, sectionID, sectionName, actionID, actionName, sectionMapping)
 
 		s.appLog.Infof("supervisor/startup: permCache update - loaded permission map: %s|%s|%s|%s|%s|%s|%s|%s",
 			mappingID,
