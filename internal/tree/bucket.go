@@ -249,7 +249,7 @@ func (teb *Bucket) ComputeCheckInstances() {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range teb.Children {
+		for child := range teb.Children {
 			wg.Add(1)
 			go func(c string) {
 				defer wg.Done()

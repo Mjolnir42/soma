@@ -76,7 +76,7 @@ func (teg *Group) setCheckOnChildren(c Check) {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range teg.Children {
+		for child := range teg.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
 				defer wg.Done()
@@ -129,7 +129,7 @@ func (teg *Group) deleteCheckOnChildren(c Check) {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range teg.Children {
+		for child := range teg.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
 				defer wg.Done()

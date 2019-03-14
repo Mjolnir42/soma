@@ -75,7 +75,7 @@ func (teb *Bucket) setCheckOnChildren(c Check) {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range teb.Children {
+		for child := range teb.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
 				defer wg.Done()
@@ -127,7 +127,7 @@ func (teb *Bucket) deleteCheckOnChildren(c Check) {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range teb.Children {
+		for child := range teb.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
 				defer wg.Done()

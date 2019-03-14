@@ -63,7 +63,7 @@ func (ter *Repository) setCheckOnChildren(c Check) {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range ter.Children {
+		for child := range ter.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
 				defer wg.Done()
@@ -103,7 +103,7 @@ func (ter *Repository) deleteCheckOnChildren(c Check) {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range ter.Children {
+		for child := range ter.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
 				defer wg.Done()

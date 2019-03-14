@@ -64,7 +64,7 @@ func (tec *Cluster) setCheckOnChildren(c Check) {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range tec.Children {
+		for child := range tec.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
 				defer wg.Done()
@@ -104,7 +104,7 @@ func (tec *Cluster) deleteCheckOnChildren(c Check) {
 		}
 	default:
 		var wg sync.WaitGroup
-		for child, _ := range tec.Children {
+		for child := range tec.Children {
 			wg.Add(1)
 			go func(stc Check, ch string) {
 				defer wg.Done()
