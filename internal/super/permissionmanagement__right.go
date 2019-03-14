@@ -25,7 +25,7 @@ func (s *Supervisor) right(q *msg.Request) {
 	switch q.Action {
 	case msg.ActionGrant, msg.ActionRevoke:
 		s.rightWrite(q, &result)
-	case msg.ActionSearch:
+	case msg.ActionList, msg.ActionSearch:
 		s.rightRead(q, &result)
 	default:
 		result.UnknownRequest(q)

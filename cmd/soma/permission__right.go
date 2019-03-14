@@ -16,36 +16,39 @@ func registerRights(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  "right",
-				Usage: "SUBCOMMANDS for rights",
+				Name:  `right`,
+				Usage: `SUBCOMMANDS for permission grant`,
 				Subcommands: []cli.Command{
 					{
-						Name:         "grant",
-						Usage:        "Grant a permission",
+						Name:         `grant`,
+						Usage:        `Grant a permission`,
 						Action:       runtime(rightGrant),
-						Description:  help.Text(`RightsGrant`),
+						Description:  help.Text(`right::grant`),
 						BashComplete: cmpl.TripleToOn,
 					},
 					{
-						Name:         "revoke",
-						Usage:        "Revoke a permission",
+						Name:         `revoke`,
+						Usage:        `Revoke a permission grant`,
 						Action:       runtime(rightRevoke),
-						Description:  help.Text(`RightsRevoke`),
+						Description:  help.Text(`right::revoke`),
 						BashComplete: cmpl.TripleFromOn,
 					},
 					{
-						Name:        `list`,
-						Usage:       `List all grants of a permission`,
-						Action:      runtime(cmdRightList),
-						Description: help.Text(`RightsList`),
+						Name:         `list`,
+						Usage:        `List all grants of a permission`,
+						Action:       runtime(rightList),
+						Description:  help.Text(`right::list`),
+						BashComplete: cmpl.None,
 					},
-					{
-						Name:   `show`,
-						Usage:  `Show a permission grant for a recipient`,
-						Action: runtime(cmdRightShow),
-						// BashComplete: cmpl.Triple_For,
-						Description: help.Text(`RightsShow`),
-					},
+					/*
+						{
+							Name:   `show`,
+							Usage:  `Show a permission grant for a recipient`,
+							Action: runtime(cmdRightShow),
+							// BashComplete: cmpl.Triple_For,
+							Description: help.Text(`RightsShow`),
+						},
+					*/
 				},
 			},
 		}...,
@@ -383,8 +386,36 @@ func rightRevoke(c *cli.Context) error {
 	return adm.Perform(`delete`, path, `right::revoke`, nil, c)
 }
 
-func cmdRightList(c *cli.Context) error {
-	return fmt.Errorf(`Not implemented - TODO`)
+// rightList function
+// soma right list $category::$permission
+func rightList(c *cli.Context) error {
+	var permissionID string
+
+	permissionSlice := strings.Split(c.Args().First(), `::`)
+	if len(permissionSlice) != 2 {
+		return fmt.Errorf("Invalid split of permission into %s",
+			permissionSlice)
+	}
+
+	// validate category
+	if err := adm.ValidateCategory(permissionSlice[0]); err != nil {
+		return err
+	}
+
+	// lookup permissionID
+	if err := adm.LookupPermIDRef(
+		permissionSlice[1],
+		permissionSlice[0],
+		&permissionID,
+	); err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("/category/%s/permission/%s/grant/",
+		permissionSlice[0],
+		permissionID,
+	)
+	return adm.Perform(`get`, path, `right::list`, nil, c)
 }
 
 func cmdRightShow(c *cli.Context) error {

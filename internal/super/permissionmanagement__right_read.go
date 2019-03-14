@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2019, Jörg Pernfuß
  *
  * Use of this source code is governed by a 2-clause BSD license
  * that can be found in the LICENSE file.
@@ -18,21 +18,6 @@ import (
 func (s *Supervisor) rightRead(q *msg.Request, mr *msg.Result) {
 	switch q.Action {
 	case msg.ActionList:
-		switch q.Grant.RecipientType {
-		case msg.SubjectUser:
-		case msg.SubjectAdmin:
-		case msg.SubjectTeam:
-		default:
-			mr.NotImplemented(
-				fmt.Errorf("Rights for recipient type"+
-					" %s are currently not implemented",
-					q.Grant.RecipientType))
-			mr.Super.Audit.
-				WithField(`Code`, mr.Code).
-				Warningln(mr.Error)
-			return
-		}
-
 		switch q.Grant.Category {
 		case msg.CategorySystem,
 			msg.CategoryGlobal,
@@ -140,8 +125,8 @@ func (s *Supervisor) rightListGlobal(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = s.stmtListAuthorizationGlobal.Query(
-		q.Search.Grant.PermissionID,
-		q.Search.Grant.Category,
+		q.Grant.PermissionID,
+		q.Grant.Category,
 	); err != nil {
 		mr.ServerError(err, q.Section)
 		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
@@ -192,7 +177,104 @@ func (s *Supervisor) rightListGlobal(q *msg.Request, mr *msg.Result) {
 }
 
 func (s *Supervisor) rightListScoped(q *msg.Request, mr *msg.Result) {
-	// XXX BUG TODO
+	var (
+		grantID, objType                                   string
+		scope                                              *sql.Stmt
+		err                                                error
+		rows                                               *sql.Rows
+		adminID, userID, toolID, teamID                    sql.NullString
+		repositoryID, bucketID, groupID, clusterID, nodeID sql.NullString
+	)
+
+	switch q.Grant.Category {
+	case
+		msg.CategoryRepository,
+		msg.CategoryGrantRepository:
+		scope = s.stmtListAuthorizationRepository
+	case
+		msg.CategoryTeam,
+		msg.CategoryGrantTeam:
+		scope = s.stmtListAuthorizationTeam
+	case
+		msg.CategoryMonitoring,
+		msg.CategoryGrantMonitoring:
+		scope = s.stmtListAuthorizationMonitoring
+	default:
+		err = fmt.Errorf("Unhandled list category: %s", q.Search.Grant.Category)
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
+	}
+
+	if rows, err = scope.Query(
+		q.Grant.PermissionID,
+		q.Grant.Category,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(
+			&grantID,
+			&adminID,
+			&userID,
+			&toolID,
+			&teamID,
+			&objType,
+			&repositoryID,
+			&bucketID,
+			&groupID,
+			&clusterID,
+			&nodeID,
+		); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+			return
+		}
+		grant := proto.Grant{
+			ID:           grantID,
+			PermissionID: q.Search.Grant.PermissionID,
+			Category:     q.Search.Grant.Category,
+			ObjectType:   objType,
+		}
+		switch {
+		case adminID.Valid:
+			grant.RecipientID = adminID.String
+			grant.RecipientType = msg.SubjectAdmin
+		case userID.Valid:
+			grant.RecipientID = userID.String
+			grant.RecipientType = msg.SubjectUser
+		case toolID.Valid:
+			grant.RecipientID = toolID.String
+			grant.RecipientType = msg.SubjectTool
+		case teamID.Valid:
+			grant.RecipientID = teamID.String
+			grant.RecipientType = msg.SubjectTeam
+		}
+		switch {
+		case repositoryID.Valid:
+			grant.ObjectID = repositoryID.String
+		case bucketID.Valid:
+			grant.ObjectID = bucketID.String
+		case groupID.Valid:
+			grant.ObjectID = groupID.String
+		case clusterID.Valid:
+			grant.ObjectID = clusterID.String
+		case nodeID.Valid:
+			grant.ObjectID = nodeID.String
+		}
+		mr.Grant = append(mr.Grant, grant)
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
+	}
+	mr.OK()
+	mr.Super.Audit.WithField(`Code`, mr.Code).Infoln(`OK`)
 }
 
 func (s *Supervisor) rightShowGlobal(q *msg.Request, mr *msg.Result) {
