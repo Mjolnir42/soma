@@ -253,6 +253,11 @@ func (s *Supervisor) rightSearchScoped(q *msg.Request, mr *msg.Result) {
 	case msg.CategoryMonitoring,
 		msg.CategoryGrantMonitoring:
 		scope = s.stmtSearchAuthorizationMonitoring
+	default:
+		err = fmt.Errorf("Unhandled search category: %s", q.Search.Grant.Category)
+		mr.ServerError(err, q.Section)
+		mr.Super.Audit.WithField(`Code`, mr.Code).Warningln(err)
+		return
 	}
 	if err = scope.QueryRow(
 		q.Search.Grant.PermissionID,
