@@ -41,7 +41,7 @@ type Node struct {
 	loadedInstances map[string]map[string]CheckInstance
 	hasUpdate       bool
 	log             *log.Logger
-	lock            sync.RWMutex
+	lock            *sync.RWMutex
 }
 
 type NodeSpec struct {
@@ -63,6 +63,7 @@ func NewNode(spec NodeSpec) *Node {
 	}
 
 	ten := new(Node)
+	ten.lock = &sync.RWMutex{}
 	ten.ID, _ = uuid.FromString(spec.ID)
 	ten.Name = spec.Name
 	ten.AssetID = spec.AssetID
@@ -93,6 +94,7 @@ func (ten Node) Clone() *Node {
 		Deleted: ten.Deleted,
 		Type:    ten.Type,
 		log:     ten.log,
+		lock:    &sync.RWMutex{},
 	}
 	cl.ID, _ = uuid.FromString(ten.ID.String())
 	cl.AssetID = ten.AssetID

@@ -44,7 +44,7 @@ type Group struct {
 	ordChildrenNod  map[int]string
 	hasUpdate       bool
 	log             *log.Logger
-	lock            sync.RWMutex
+	lock            *sync.RWMutex
 }
 
 type GroupSpec struct {
@@ -62,6 +62,7 @@ func NewGroup(spec GroupSpec) *Group {
 	}
 
 	teg := new(Group)
+	teg.lock = &sync.RWMutex{}
 	teg.ID, _ = uuid.FromString(spec.ID)
 	teg.Name = spec.Name
 	teg.Team, _ = uuid.FromString(spec.Team)
@@ -96,7 +97,7 @@ func (teg Group) Clone() *Group {
 		ordNumChildClr: teg.ordNumChildClr,
 		ordNumChildNod: teg.ordNumChildNod,
 		log:            teg.log,
-		lock:           sync.RWMutex{},
+		lock:           &sync.RWMutex{},
 	}
 	cl.ID, _ = uuid.FromString(teg.ID.String())
 	cl.Team, _ = uuid.FromString(teg.Team.String())

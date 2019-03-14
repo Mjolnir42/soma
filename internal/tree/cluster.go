@@ -40,7 +40,7 @@ type Cluster struct {
 	ordChildrenNod  map[int]string
 	hasUpdate       bool
 	log             *log.Logger
-	lock            sync.RWMutex
+	lock            *sync.RWMutex
 }
 
 type ClusterSpec struct {
@@ -58,6 +58,7 @@ func NewCluster(spec ClusterSpec) *Cluster {
 	}
 
 	tec := new(Cluster)
+	tec.lock = &sync.RWMutex{}
 	tec.ID, _ = uuid.FromString(spec.ID)
 	tec.Name = spec.Name
 	tec.Team, _ = uuid.FromString(spec.Team)
@@ -86,6 +87,7 @@ func (tec Cluster) Clone() *Cluster {
 		Type:           tec.Type,
 		ordNumChildNod: tec.ordNumChildNod,
 		log:            tec.log,
+		lock:           &sync.RWMutex{},
 	}
 	cl.ID, _ = uuid.FromString(tec.ID.String())
 	cl.Team, _ = uuid.FromString(tec.Team.String())
