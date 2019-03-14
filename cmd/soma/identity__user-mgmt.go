@@ -24,7 +24,7 @@ func registerUserMgmt(app cli.App) *cli.App {
 		[]cli.Command{
 			{
 				Name:        `user-mgmt`,
-				Usage:       `SUBCOMMANDS for user management`,
+				Usage:       `SUBCOMMANDS for account management`,
 				Description: help.Text(`user-mgmt::`),
 				Subcommands: []cli.Command{
 					{
@@ -98,18 +98,18 @@ func registerUserMgmt(app cli.App) *cli.App {
 					},
 					{
 						Name:        `password`,
-						Usage:       `SUBCOMMANDS for user password management`,
+						Usage:       `SUBCOMMANDS for password management`,
 						Description: help.Text(`supervisor::password`),
 						Subcommands: []cli.Command{
 							{
 								Name:        `update`,
-								Usage:       `Update the password of one's own user account`,
+								Usage:       `Update the password of one's own account`,
 								Description: help.Text(`supervisor::password-update`),
 								Action:      boottime(supervisorPasswordUpdate),
 							},
 							{
 								Name:        `reset`,
-								Usage:       `Reset the password of one's own user account via activation credentials`,
+								Usage:       `Reset the password of one's own account via activation credentials`,
 								Description: help.Text(`supervisor::password-reset`),
 								Action:      boottime(supervisorPasswordReset),
 							},

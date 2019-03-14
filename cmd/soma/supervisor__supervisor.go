@@ -330,32 +330,26 @@ password_read:
 		goto password_read
 	}
 
-	if c.Bool(`reset`) {
-		fmt.Printf("\nTo confirm that you are allowed to reset" +
-			" this account, an additional" +
-			"credential is required.\n")
+	fmt.Printf("\nTo confirm that you are allowed to reset" +
+		" this account, an additional" +
+		"credential is required.\n")
 
-		switch Cfg.Activation {
-		case `ldap`:
-			fmt.Println(`Please provide your LDAP password to` +
-				`establish ownership.`)
-			passKey = adm.ReadVerified(`password`)
-		case `mailtoken`:
-			fmt.Println(`Please provide the token you received` +
-				`via email.`)
-			passKey = adm.ReadVerified(`token`)
-		default:
-			return fmt.Errorf(`Unknown activation mode`)
-		}
-	} else {
-		fmt.Printf("\nPlease provide your currently active/old" +
-			" password.\n")
+	switch Cfg.Activation {
+	case `ldap`:
+		fmt.Println(`Please provide your LDAP password to` +
+			`establish ownership.`)
 		passKey = adm.ReadVerified(`password`)
+	case `mailtoken`:
+		fmt.Println(`Please provide the token you received` +
+			`via email.`)
+		passKey = adm.ReadVerified(`token`)
+	default:
+		return fmt.Errorf(`Unknown activation mode`)
 	}
 
 	if cred, err = adm.ChangeAccountPassword(
 		Client,
-		c.Bool(`reset`),
+		true,
 		&auth.Token{
 			UserName: Cfg.Auth.User,
 			Password: password,
