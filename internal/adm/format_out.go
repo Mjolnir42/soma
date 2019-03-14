@@ -17,18 +17,18 @@ func FormatOut(c *cli.Context, data []byte, cmd string) error {
 	}
 
 	if c.GlobalBool(`json`) {
-		return printJSON(c, data, cmd)
+		return printJSON(data)
 	}
 
 	switch cmd {
 	// TODO
 	default:
 		// hardwire JSON output for now
-		return printJSON(c, data, cmd)
+		return printJSON(data)
 	}
 }
 
-func printJSON(c *cli.Context, data []byte, cmd string) error {
+func printJSON(data []byte) error {
 	var outputDevice io.WriteCloser
 	var proc *exec.Cmd
 	var err error
