@@ -143,9 +143,9 @@ func (x *Rest) ClusterCreate(w http.ResponseWriter, r *http.Request,
 	}
 
 	nameLen := utf8.RuneCountInString(cReq.Cluster.Name)
-	if nameLen < 4 || nameLen > 256 {
+	if nameLen < 2 || nameLen > 256 {
 		x.replyBadRequest(&w, &request,
-			fmt.Errorf(`Illegal cluster name length (4 <= x <= 256)`))
+			fmt.Errorf(`Illegal cluster name length (2 <= x <= 256)`))
 		return
 	}
 	request.Repository.ID = params.ByName(`repositoryID`)

@@ -284,7 +284,7 @@ func clusterConfigCreate(c *cli.Context) error {
 	req.Cluster.BucketID = bucketID
 
 	if err := adm.ValidateRuneCountRange(
-		req.Cluster.Name, 4, 256); err != nil {
+		req.Cluster.Name, 2, 256); err != nil {
 		return err
 	}
 

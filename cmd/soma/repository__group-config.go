@@ -251,7 +251,7 @@ func groupConfigCreate(c *cli.Context) error {
 	req.Group.BucketID = bucketID
 
 	if err := adm.ValidateRuneCountRange(
-		req.Group.Name, 4, 256); err != nil {
+		req.Group.Name, 2, 256); err != nil {
 		return err
 	}
 	if err := adm.ValidateNotUUID(req.Group.Name); err != nil {
