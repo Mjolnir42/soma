@@ -234,6 +234,8 @@ func (c *Cache) performRightGrant(q *msg.Request) {
 		msg.CategoryMonitoring,
 		msg.CategoryGrantMonitoring:
 		c.performRightGrantScopeMonitoring(q)
+	default:
+		panic(`NO!`)
 	}
 	c.lock.Unlock()
 }
@@ -268,6 +270,8 @@ func (c *Cache) performRightRevoke(q *msg.Request) {
 		msg.CategoryMonitoring,
 		msg.CategoryGrantMonitoring:
 		c.performRightRevokeScopeMonitoring(q)
+	default:
+		panic(`NO!`)
 	}
 	c.lock.Unlock()
 }
