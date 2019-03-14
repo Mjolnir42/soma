@@ -298,7 +298,7 @@ func (m *scopedGrantMap) assess(subjType, subjID, category,
 		// subject has no grants of that permission
 		result.Super.Audit = result.Super.Audit.
 			WithField(prefix, `SubjectHasNoGrantsOfPermission`)
-		return true
+		return false
 	}
 
 	// for list and similar actions, it is irrelevant on which specific
