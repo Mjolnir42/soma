@@ -24,7 +24,7 @@ func FindRepoPropSrcID(pType, pName, view, repoID string,
 		repo   proto.Repository
 		teamID string
 	)
-	if err := LookupTeamByRepo(repoID, &teamID); err != nil {
+	if err = LookupTeamByRepo(repoID, &teamID); err != nil {
 		return err
 	}
 
