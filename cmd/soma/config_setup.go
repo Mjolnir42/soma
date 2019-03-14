@@ -51,6 +51,11 @@ func configSetup(c *cli.Context) error {
 		if c.GlobalIsSet(params[p]) {
 			switch params[p] {
 			case "user":
+				if Cfg.Auth.User != c.GlobalString(params[p]) {
+					// clean credential fields if cli changed the user
+					Cfg.Auth.Pass = ``
+					Cfg.Auth.Token = ``
+				}
 				Cfg.Auth.User = c.GlobalString(params[p])
 			case "timeout":
 				Cfg.Timeout = uint(c.GlobalInt(params[p]))
