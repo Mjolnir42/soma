@@ -203,10 +203,10 @@ func (g *GuidePost) process(q *msg.Request) {
 	}
 
 	// check we have a treekeeper for that repository
-	if nf, err = g.validateKeeper(repoName); err != nil {
+	if nf, err = g.validateKeeper(repoName, repoID); err != nil {
 		goto bailout
 	}
-	keeper = fmt.Sprintf("repository_%s", repoName)
+	keeper = fmt.Sprintf("repository_%s_%s", repoName, repoID)
 	handler = g.soma.handlerMap.Get(keeper).(*TreeKeeper)
 
 	// store job in database
@@ -313,7 +313,7 @@ func (g *GuidePost) sysprocess(q *msg.Request) {
 	}
 
 	// check we have a treekeeper for that repository
-	keeper = fmt.Sprintf("repository_%s", repoName)
+	keeper = fmt.Sprintf("repository_%s_%s", repoName, repoID)
 	if _, ok := g.soma.handlerMap.Get(keeper).(*TreeKeeper); !ok {
 		// no handler running, nothing to stop
 		result.OK()

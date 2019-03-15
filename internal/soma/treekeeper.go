@@ -700,7 +700,7 @@ actionloop:
 	switch {
 	case q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy:
 		tk.ShutdownNow()
-		keeper := fmt.Sprintf("repository_%s", tk.meta.repoName)
+		keeper := fmt.Sprintf("repository_%s_%s", tk.meta.repoName, tk.meta.repoID)
 		tk.soma.handlerMap.Del(keeper)
 	}
 	return
