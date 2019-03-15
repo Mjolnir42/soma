@@ -88,7 +88,8 @@ func (c *CheckConfigConstraint) Clone() CheckConfigConstraint {
 		clone.Service = c.Service.Clone()
 	}
 	if c.Attribute != nil {
-		*clone.Attribute = c.Attribute.Clone()
+		ac := c.Attribute.Clone()
+		clone.Attribute = &ac
 	}
 	return clone
 }
