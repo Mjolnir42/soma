@@ -136,6 +136,9 @@ func (r *BucketRead) list(q *msg.Request, mr *msg.Result) {
 	)
 
 	if rows, err = r.stmtList.Query(
+		q.Section,
+		q.Action,
+		q.AuthUser,
 		q.Bucket.RepositoryID,
 	); err != nil {
 		mr.ServerError(err, q.Section)
