@@ -201,24 +201,24 @@ func (tk *TreeKeeper) Run() {
 	// close the startup logfile
 	func() {
 		fh := tk.soma.logMap.Get(
-			fmt.Sprintf("startup_repository_%s", tk.meta.repoName),
+			fmt.Sprintf("startup_repository_%s_%s", tk.meta.repoName, tk.meta.repoID),
 		)
 		if fh == nil {
 			return
 		}
 		tk.soma.logMap.Del(fmt.Sprintf(
-			"startup_repository_%s", tk.meta.repoName,
+			"startup_repository_%s_%s", tk.meta.repoName, tk.meta.repoID,
 		))
 		fh.Close()
 	}()
 
 	// deferred close the regular logfile
 	defer func() {
-		fh := tk.soma.logMap.Get(fmt.Sprintf("repository_%s", tk.meta.repoName))
+		fh := tk.soma.logMap.Get(fmt.Sprintf("repository__%s_%s", tk.meta.repoName, tk.meta.repoID))
 		if fh == nil {
 			return
 		}
-		tk.soma.logMap.Del(fmt.Sprintf("repository_%s", tk.meta.repoName))
+		tk.soma.logMap.Del(fmt.Sprintf("repository__%s_%s", tk.meta.repoName, tk.meta.repoID))
 		fh.Close()
 	}()
 
