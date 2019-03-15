@@ -741,6 +741,8 @@ abort:
 func repoIDByName(repo string) (string, error) {
 	req := proto.NewRepositoryFilter()
 	req.Filter.Repository.Name = repo
+	req.Filter.Repository.IsDeleted = false
+	req.Filter.Repository.FilterOnIsDeleted = true
 
 	res, err := fetchFilter(req, `/search/repository/`)
 	if err != nil {
@@ -825,6 +827,8 @@ abort:
 func bucketIDByName(bucket string) (string, error) {
 	req := proto.NewBucketFilter()
 	req.Filter.Bucket.Name = bucket
+	req.Filter.Bucket.IsDeleted = false
+	req.Filter.Bucket.FilterOnIsDeleted = true
 
 	res, err := fetchFilter(req, `/search/bucket/`)
 	if err != nil {
