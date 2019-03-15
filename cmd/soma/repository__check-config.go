@@ -50,7 +50,7 @@ func registerChecks(app cli.App) *cli.App {
 					},
 					{
 						Name:         `show`,
-						Usage:        `Show details about a check configuration`,
+						Usage:        `Show details about a check configuration in a repository`,
 						Description:  help.Text(`check-config::show`),
 						Action:       runtime(checkConfigShow),
 						BashComplete: cmpl.In,
