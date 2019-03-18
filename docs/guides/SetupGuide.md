@@ -476,6 +476,7 @@ soma action add search to job
 soma action add search to job-result-mgmt
 soma action add search to job-status-mgmt
 soma action add search to job-type-mgmt
+soma action add search to level
 soma action add search to monitoringsystem
 soma action add search to monitoringsystem-mgmt
 soma action add search to node
@@ -616,6 +617,7 @@ soma permission map job-type-mgmt::list to global::browse
 soma permission map job-type-mgmt::search to global::browse
 soma permission map job-type-mgmt::show to global::browse
 soma permission map level::list to global::browse
+soma permission map level::search to global::browse
 soma permission map level::show to global::browse
 soma permission map metric::list to global::browse
 soma permission map metric::show to global::browse
