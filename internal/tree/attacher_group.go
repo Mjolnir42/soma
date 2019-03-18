@@ -37,7 +37,9 @@ func (teg *Group) ReAttach(a AttachRequest) {
 	if teg.Parent == nil {
 		panic(`Group.ReAttach: not attached`)
 	}
+	teg.deletePropertyAllLocal()
 	teg.deletePropertyAllInherited()
+	teg.deleteCheckLocalAll()
 	// TODO delete all inherited checks + check instances
 
 	teg.Parent.Unlink(UnlinkRequest{
@@ -62,6 +64,9 @@ func (teg *Group) ReAttach(a AttachRequest) {
 	if teg.Parent == nil {
 		panic(`Group.ReAttach: not reattached`)
 	}
+	// updateCheckInstances needs to run after the unlink request
+	// this allows the function to take the unlink event into account
+	teg.updateCheckInstances()
 	teg.actionUpdate()
 	teg.Parent.(Propertier).syncProperty(teg.ID.String())
 	teg.Parent.(Checker).syncCheck(teg.ID.String())
@@ -77,7 +82,6 @@ func (teg *Group) Destroy() {
 	teg.deletePropertyAllLocal()
 	teg.deletePropertyAllInherited()
 	teg.deleteCheckLocalAll()
-	teg.updateCheckInstances()
 
 	wg := new(sync.WaitGroup)
 	for child := range teg.Children {
@@ -98,7 +102,9 @@ func (teg *Group) Destroy() {
 		ChildID:    teg.GetID(),
 	},
 	)
-
+	// updateCheckInstances needs to run after the unlink request
+	// this allows the function to take the unlink event into account
+	teg.updateCheckInstances()
 	teg.setFault(nil)
 	teg.setAction(nil)
 }
@@ -109,8 +115,10 @@ func (teg *Group) Detach() {
 	}
 	bucket := teg.Parent.(Bucketeer).GetBucket()
 
-	teg.deletePropertyAllInherited()
 	// TODO delete all inherited checks + check instances
+	teg.deletePropertyAllLocal()
+	teg.deletePropertyAllInherited()
+	teg.deleteCheckLocalAll()
 
 	teg.Parent.Unlink(UnlinkRequest{
 		ParentType: teg.Parent.(Builder).GetType(),
@@ -130,9 +138,12 @@ func (teg *Group) Detach() {
 		Group:      teg,
 	},
 	)
-
+	// updateCheckInstances needs to run after the unlink request
+	// this allows the function to take the unlink event into account
+	teg.updateCheckInstances()
 	teg.actionUpdate()
 	teg.Parent.(Propertier).syncProperty(teg.ID.String())
+	teg.Parent.(Checker).syncCheck(teg.ID.String())
 }
 
 func (teg *Group) SetName(s string) {

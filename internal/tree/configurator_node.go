@@ -152,6 +152,24 @@ func (n *Node) updateCheckInstances() {
 func (n *Node) deleteOrphanCheckInstances() {
 	n.lock.Lock()
 	defer n.lock.Unlock()
+	// Check if the node is unassigned, there should be no check instances on
+	// unassigned nodes.
+	if n.State == "unassigned" || n.State == "floating" || n.Parent == nil {
+		for ck := range n.CheckInstances {
+			inst := n.CheckInstances[ck]
+			for _, i := range inst {
+				n.actionCheckInstanceDelete(n.Instances[i].MakeAction())
+				n.log.Printf(
+					"TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
+					n.GetRepositoryName(), `CleanupInstance`, `node`, n.ID.String(),
+					ck, i,
+				)
+				delete(n.Instances, i)
+			}
+			delete(n.CheckInstances, ck)
+		}
+		return
+	}
 	// scan over all current checkinstances if their check still exists.
 	// If not the check has been deleted and the spawned instances need
 	// a good deletion

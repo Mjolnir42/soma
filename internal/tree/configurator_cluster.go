@@ -154,9 +154,30 @@ func (c *Cluster) updateCheckInstances() {
 func (c *Cluster) deleteOrphanCheckInstances() {
 	c.lock.Lock()
 	defer c.lock.Unlock()
+	if c.State == "floating" || c.State == "unassigned" || c.Parent == nil {
+		for ck := range c.CheckInstances {
+			inst := c.CheckInstances[ck]
+
+			for _, i := range inst {
+				c.actionCheckInstanceDelete(c.Instances[i].MakeAction())
+				c.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
+					c.GetRepositoryName(),
+					`CleanupInstance`,
+					`group`,
+					c.ID.String(),
+					ck,
+					i,
+				)
+				delete(c.Instances, i)
+			}
+			delete(c.CheckInstances, ck)
+			return
+		}
+	}
 	// scan over all current checkinstances if their check still exists.
 	// If not the check has been deleted and the spawned instances need
 	// a good deletion
+
 	for ck := range c.CheckInstances {
 		if _, ok := c.Checks[ck]; ok {
 			// check still exists
@@ -165,6 +186,7 @@ func (c *Cluster) deleteOrphanCheckInstances() {
 
 		// check no longer exists -> cleanup
 		inst := c.CheckInstances[ck]
+
 		for _, i := range inst {
 			c.actionCheckInstanceDelete(c.Instances[i].MakeAction())
 			c.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
