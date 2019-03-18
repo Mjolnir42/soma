@@ -85,11 +85,15 @@ SELECT $1::uuid,
        $3::varchar,
        $4::varchar,
        $5::uuid,
-       iu.id,
-       iu.team_id,
+       inventory.user.id,
+       inventory.user.team_id,
        $7::jsonb
-FROM   inventory.user iu
-WHERE  iu.uid = $6::varchar;`
+FROM   inventory.user
+LEFT   JOIN auth.admin
+  ON   inventory.user.uid = auth.admin.user_uid
+WHERE  (   inventory.user.uid = $6::varchar
+        OR auth.admin.uid     = $6::varchar );`
+
 
 	JobTypeMgmtList = `
 SELECT id
