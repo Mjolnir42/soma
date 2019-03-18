@@ -154,27 +154,6 @@ func (g *Group) updateCheckInstances() {
 func (g *Group) deleteOrphanCheckInstances() {
 	g.lock.Lock()
 	defer g.lock.Unlock()
-	// check if the group is in floating / unassigned state & cleanup the check instances
-	if g.State == "floating" || g.State == "unassigned" || g.Parent == nil {
-		// group is no longer part of the tree -> cleanup
-		for ck := range g.CheckInstances {
-			inst := g.CheckInstances[ck]
-			for _, i := range inst {
-				g.actionCheckInstanceDelete(g.Instances[i].MakeAction())
-				g.log.Printf("TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, InstanceID=%s",
-					g.GetRepositoryName(),
-					`CleanupInstance`,
-					`group`,
-					g.ID.String(),
-					ck,
-					i,
-				)
-				delete(g.Instances, i)
-			}
-			delete(g.CheckInstances, ck)
-			return
-		}
-	}
 	// scan over all current checkinstances if their check still exists.
 	// If not the check has been deleted and the spawned instances need
 	// a good deletion

@@ -179,7 +179,6 @@ func (ten *Node) GetType() string {
 func (ten *Node) setParent(p Receiver) {
 	switch p.(type) {
 	case *Bucket:
-
 		ten.setNodeParent(p.(NodeReceiver))
 		ten.State = "standalone"
 	case *Group:

@@ -37,9 +37,7 @@ func (ten *Node) ReAttach(a AttachRequest) {
 	if ten.Parent == nil {
 		panic(`Node.ReAttach: not attached`)
 	}
-	ten.deletePropertyAllLocal()
 	ten.deletePropertyAllInherited()
-	ten.deleteCheckLocalAll()
 	// TODO delete all inherited checks + check instances
 
 	ten.Parent.Unlink(UnlinkRequest{
@@ -64,9 +62,6 @@ func (ten *Node) ReAttach(a AttachRequest) {
 	if ten.Parent == nil {
 		panic(`Node.ReAttach: not reattached`)
 	}
-	// updateCheckInstances needs to run after the unlink request
-	// this allows the function to take the unlink event into account
-	ten.updateCheckInstances()
 	ten.actionUpdate()
 	ten.Parent.(Propertier).syncProperty(ten.ID.String())
 	ten.Parent.(Checker).syncCheck(ten.ID.String())
@@ -82,6 +77,7 @@ func (ten *Node) Destroy() {
 	ten.deletePropertyAllLocal()
 	ten.deletePropertyAllInherited()
 	ten.deleteCheckLocalAll()
+	ten.updateCheckInstances()
 
 	ten.Parent.Unlink(UnlinkRequest{
 		ParentType: ten.Parent.(Builder).GetType(),
@@ -92,9 +88,7 @@ func (ten *Node) Destroy() {
 		ChildID:    ten.GetID(),
 	},
 	)
-	// updateCheckInstances needs to run after the unlink request
-	// this allows the function to take the unlink event into account
-	ten.updateCheckInstances()
+
 	ten.setFault(nil)
 	ten.setAction(nil)
 }
@@ -105,9 +99,7 @@ func (ten *Node) Detach() {
 	}
 	bucket := ten.Parent.(Bucketeer).GetBucket()
 
-	ten.deletePropertyAllLocal()
 	ten.deletePropertyAllInherited()
-	ten.deleteCheckLocalAll()
 	// TODO delete all inherited checks + check instances
 
 	ten.Parent.Unlink(UnlinkRequest{
@@ -128,12 +120,9 @@ func (ten *Node) Detach() {
 		Node:       ten,
 	},
 	)
-	// updateCheckInstances needs to run after the unlink request
-	// this allows the function to take the unlink event into account
-	ten.updateCheckInstances()
+
 	ten.actionUpdate()
 	ten.Parent.(Propertier).syncProperty(ten.ID.String())
-	ten.Parent.(Checker).syncCheck(ten.ID.String())
 }
 
 func (ten *Node) SetName(s string) {
