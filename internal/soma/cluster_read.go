@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016-2017, Jörg Pernfuß
+ * Copyright (c) 2016-2019, Jörg Pernfuß
  * Copyright (c) 2016, 1&1 Internet SE
  *
  * Use of this source code is governed by a 2-clause BSD license
@@ -120,8 +120,7 @@ func (r *ClusterRead) process(q *msg.Request) {
 	case msg.ActionShow:
 		r.show(q, &result)
 	case msg.ActionSearch:
-		//XXX TODO r.search(q, &result)
-		r.list(q, &result)
+		r.search(q, &result)
 	case msg.ActionMemberList:
 		r.memberList(q, &result)
 	default:
@@ -170,6 +169,13 @@ func (r *ClusterRead) list(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.OK()
+}
+
+// search returns a specific cluster
+func (r *ClusterRead) search(q *msg.Request, mr *msg.Result) {
+	q.Action = msg.ActionList
+	r.list(q, mr)
+	q.Action = msg.ActionSearch
 }
 
 // show returns the details of a specific cluster
