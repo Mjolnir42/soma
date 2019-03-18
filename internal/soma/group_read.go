@@ -175,7 +175,7 @@ func (r *GroupRead) list(q *msg.Request, mr *msg.Result) {
 }
 
 // search returns a specific group
-func (r *GroupRead) show(q *msg.Request, mr *msg.Result) {
+func (r *GroupRead) search(q *msg.Request, mr *msg.Result) {
 	q.Action = msg.ActionList
 	r.list(q, mr)
 	q.Action = msg.ActionSearch
