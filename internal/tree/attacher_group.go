@@ -38,7 +38,8 @@ func (teg *Group) ReAttach(a AttachRequest) {
 		panic(`Group.ReAttach: not attached`)
 	}
 	teg.deletePropertyAllInherited()
-	// TODO delete all inherited checks + check instances
+	teg.deleteCheckAllInherited()
+	teg.updateCheckInstances()
 
 	teg.Parent.Unlink(UnlinkRequest{
 		ParentType: teg.Parent.(Builder).GetType(),
@@ -77,6 +78,7 @@ func (teg *Group) Destroy() {
 	teg.deletePropertyAllLocal()
 	teg.deletePropertyAllInherited()
 	teg.deleteCheckLocalAll()
+	teg.deleteCheckAllInherited()
 	teg.updateCheckInstances()
 
 	wg := new(sync.WaitGroup)
@@ -110,6 +112,8 @@ func (teg *Group) Detach() {
 	bucket := teg.Parent.(Bucketeer).GetBucket()
 
 	teg.deletePropertyAllInherited()
+	teg.deleteCheckAllInherited()
+	teg.updateCheckInstances()
 	// TODO delete all inherited checks + check instances
 
 	teg.Parent.Unlink(UnlinkRequest{

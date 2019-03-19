@@ -101,6 +101,16 @@ func (teg *Group) DeleteCheck(c Check) {
 	teg.rmCheck(c)
 }
 
+func (teg *Group) deleteCheckAllInherited() {
+	for _, check := range teg.Checks {
+		if check.GetIsInherited() {
+			teg.deleteCheckInherited(check.Clone())
+		}
+
+	}
+
+}
+
 func (teg *Group) deleteCheckInherited(c Check) {
 	teg.deleteCheckOnChildren(c)
 	teg.rmCheck(c)

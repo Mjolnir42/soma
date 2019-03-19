@@ -9,8 +9,9 @@
 package tree
 
 import (
-	"github.com/satori/go.uuid"
 	"sync"
+
+	"github.com/satori/go.uuid"
 )
 
 // Implementation of the `Checker` interface
@@ -97,6 +98,16 @@ func (teb *Bucket) addCheck(c Check) {
 func (teb *Bucket) DeleteCheck(c Check) {
 	teb.deleteCheckOnChildren(c)
 	teb.rmCheck(c)
+}
+
+func (teb *Bucket) deleteCheckAllInherited() {
+	for _, check := range teb.Checks {
+		if check.GetIsInherited() {
+			teb.deleteCheckInherited(check.Clone())
+		}
+
+	}
+
 }
 
 func (teb *Bucket) deleteCheckInherited(c Check) {

@@ -57,6 +57,16 @@ func (ten *Node) DeleteCheck(c Check) {
 	ten.rmCheck(c)
 }
 
+func (ten *Node) deleteCheckAllInherited() {
+	for _, check := range ten.Checks {
+		if check.GetIsInherited() {
+			ten.deleteCheckInherited(check.Clone())
+		}
+
+	}
+
+}
+
 func (ten *Node) deleteCheckInherited(c Check) {
 	ten.rmCheck(c)
 }
