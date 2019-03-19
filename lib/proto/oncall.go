@@ -54,6 +54,11 @@ func (o *Oncall) DeepCompare(a *Oncall) bool {
 		return false
 	}
 
+ if o.Members == nil || a.Members == nil {
+         return o.Members == a.Members
+ }
+ // both are != nil, we can compare them
+
 memberloop:
 	for _, member := range *o.Members {
 		if member.DeepCompareSlice(a.Members) {
