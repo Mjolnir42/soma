@@ -39,6 +39,8 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 	}
 	request.Repository.ID = cReq.Node.Config.RepositoryID
 	request.Bucket.ID = cReq.Node.Config.BucketID
+	//XXX the information to which team the node belongs should not be set by the input of the client
+	request.Node.TeamID = cReq.Node.TeamID
 
 	// check if the user is allowed to assign nodes from this team
 	if !x.isAuthorized(&request) {

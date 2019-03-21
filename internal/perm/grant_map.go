@@ -10,6 +10,7 @@ package perm
 import (
 	"fmt"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/mjolnir42/soma/internal/msg"
 )
 
@@ -279,28 +280,30 @@ func (m *scopedGrantMap) assess(subjType, subjID, category,
 			WithField(prefix, `InvalidSubjectType`)
 		return false
 	}
-
+	if category == "team" {
+		spew.Dump(m.grants)
+	}
 	if _, ok := m.grants[subject]; !ok {
 		// subject has no grants
 		result.Super.Audit = result.Super.Audit.
 			WithField(prefix, `SubjectHasNoGrants`)
 		return false
 	}
-
+	spew.Dump("Got subject")
 	if _, ok := m.grants[subject][category]; !ok {
 		// subject has no grants in category
 		result.Super.Audit = result.Super.Audit.
 			WithField(prefix, `SubjectHasNoGrantsInCategory`)
 		return false
 	}
-
+	spew.Dump("Got category")
 	if _, ok := m.grants[subject][category][permissionID]; !ok {
 		// subject has no grants of that permission
 		result.Super.Audit = result.Super.Audit.
 			WithField(prefix, `SubjectHasNoGrantsOfPermission`)
 		return false
 	}
-
+	spew.Dump("Got permissionID")
 	// for list and similar actions, it is irrelevant on which specific
 	// object the permission was granted, only check that is what granted
 	// on some objects
