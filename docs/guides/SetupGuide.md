@@ -633,6 +633,8 @@ soma permission map predicate::show to global::browse
 soma permission map property-mgmt::list to global::browse
 soma permission map property-mgmt::search to global::browse
 soma permission map property-mgmt::show to global::browse
+soma permission map property-mgmt::add to global::browse
+soma permission map property-mgmt::remove to global::browse
 soma permission map property-native::list to global::browse
 soma permission map property-native::search to global::browse
 soma permission map property-native::show to global::browse
