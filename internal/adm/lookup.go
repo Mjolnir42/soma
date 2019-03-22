@@ -135,7 +135,7 @@ func LookupTeamByNode(s string) (string, error) {
 	)
 
 	if !IsUUID(s) {
-		if nID, err = LookupBucketID(s); err != nil {
+		if nID, err = nodeIDByName(s); err != nil {
 			return ``, err
 		}
 	} else {

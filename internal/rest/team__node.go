@@ -79,14 +79,21 @@ func (x *Rest) NodeShow(w http.ResponseWriter, r *http.Request,
 	request.Section = msg.SectionNode
 	request.Action = msg.ActionShow
 	request.Node.ID = params.ByName(`nodeID`)
-
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	// if there is no result we do not need to authorize it
+	if len(result.Node) == 0 {
+		x.send(&w, &result)
+		return
+	}
+	// set the TeamID based of the result before we authorize the request
+	// this allows authorization based on trusted information
+	request.Node.TeamID = result.Node[0].TeamID
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
 		return
 	}
 
-	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
 	x.send(&w, &result)
 }
 
@@ -97,16 +104,26 @@ func (x *Rest) NodeShowConfig(w http.ResponseWriter, r *http.Request,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionNode
-	request.Action = msg.ActionShowConfig
+	request.Action = msg.ActionShow
 	request.Node.ID = params.ByName(`nodeID`)
-
+	// we need the node details to set the correct data for authorization
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	if len(result.Node) == 0 {
+		x.send(&w, &result)
+		return
+	}
+	// set the TeamID based of the result before we authorize the request
+	// this allows authorization based on trusted information
+	request.Node.TeamID = result.Node[0].TeamID
+	request.Action = msg.ActionShowConfig
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
 		return
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
+	result = <-request.Reply
 	x.send(&w, &result)
 }
 

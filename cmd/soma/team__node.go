@@ -114,6 +114,7 @@ func nodeAssign(c *cli.Context) error {
 	req.Node.Config = &proto.NodeConfig{}
 	req.Node.Config.RepositoryID = repoID
 	req.Node.Config.BucketID = bucketID
+	req.Node.TeamID = teamIDFromNode
 
 	path := fmt.Sprintf("/node/%s/config",
 		url.QueryEscape(nodeID),

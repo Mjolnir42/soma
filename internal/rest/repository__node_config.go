@@ -23,7 +23,7 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionNode
-	request.Action = msg.ActionAssign
+	request.Action = msg.ActionShow
 
 	cReq := proto.NewNodeRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
@@ -40,7 +40,18 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 	request.Repository.ID = cReq.Node.Config.RepositoryID
 	request.Bucket.ID = cReq.Node.Config.BucketID
 
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	// if there is no result we do not need to authorize it
+	if len(result.Node) == 0 {
+		x.send(&w, &result)
+		return
+	}
+	// set the TeamID based of the result before we authorize the request
+	// this allows authorization based on trusted information
+	request.Node.TeamID = result.Node[0].TeamID
 	// check if the user is allowed to assign nodes from this team
+	request.Action = msg.ActionAssign
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
 		return
@@ -54,7 +65,7 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
+	result = <-request.Reply
 	x.send(&w, &result)
 }
 
@@ -71,9 +82,19 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 		RepositoryID: params.ByName(`repositoryID`),
 		BucketID:     params.ByName(`bucketID`),
 	}
-
-	// check if the user is allowed to unassign nodes from this team
 	request.Section = msg.SectionNode
+	request.Action = msg.ActionShow
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	// if there is no result we do not need to authorize it
+	if len(result.Node) == 0 {
+		x.send(&w, &result)
+		return
+	}
+	// set the TeamID based of the result before we authorize the request
+	// this allows authorization based on trusted information
+	request.Node.TeamID = result.Node[0].TeamID
+	// check if the user is allowed to unassign nodes from this team
 	request.Action = msg.ActionUnassign
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
@@ -90,7 +111,7 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
+	result = <-request.Reply
 	x.send(&w, &result)
 }
 
