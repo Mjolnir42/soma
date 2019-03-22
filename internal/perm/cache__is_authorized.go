@@ -10,7 +10,6 @@ package perm // import "github.com/mjolnir42/soma/internal/perm"
 import (
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/proto"
 )
@@ -134,9 +133,6 @@ func (c *Cache) isAuthorized(q *msg.Request) msg.Result {
 	case `list`, `search`:
 		any = true
 	}
-	if q.Super.Authorize.Section == msg.SectionNode && q.Super.Authorize.Action == "show" {
-		any = true
-	}
 
 	// check if the user has one the permissions that map the
 	// requested action
@@ -244,7 +240,6 @@ permloop:
 				objID = msg.InvalidObjectID
 			}
 		}
-		spew.Dump(q.Section)
 		// check authorization
 		switch q.Section {
 		case msg.SectionMonitoring, msg.SectionCapability, msg.SectionDeployment:
@@ -291,12 +286,6 @@ permloop:
 			}
 		case msg.SectionNode, msg.SectionPropertyService, msg.SectionRepository:
 			// per-team sections
-			spew.Dump("Team-Assess")
-			spew.Dump(subjectType)
-			spew.Dump(subjectID)
-			spew.Dump(category)
-			spew.Dump(objID)
-			spew.Dump(permID)
 			if c.grantTeam.assess(subjectType, subjectID,
 				category, objID, permID, any, result) {
 				return true
