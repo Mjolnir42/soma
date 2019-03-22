@@ -291,6 +291,7 @@ soma section add workflow to operation
 ```
 soma action add add to action
 soma action add add to admin-mgmt
+soma action add add to attribute
 soma action add add to capability
 soma action add add to category
 soma action add add to datacenter
