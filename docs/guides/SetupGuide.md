@@ -291,6 +291,7 @@ soma section add workflow to operation
 ```
 soma action add add to action
 soma action add add to admin-mgmt
+soma action add add to attribute
 soma action add add to capability
 soma action add add to category
 soma action add add to datacenter
@@ -601,6 +602,7 @@ soma permission add admin to permission
 ```
 soma permission map attribute::list to global::browse
 soma permission map attribute::show to global::browse
+soma permission map attribute::add to global::browse
 soma permission map datacenter::list to global::browse
 soma permission map datacenter::show to global::browse
 soma permission map entity::list to global::browse
