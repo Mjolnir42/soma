@@ -292,7 +292,7 @@ soma section add workflow to operation
 soma action add add to action
 soma action add add to admin-mgmt
 soma action add add to attribute
-soma action add add to capability
+soma action add declare to capability
 soma action add add to category
 soma action add add to datacenter
 soma action add add to entity
@@ -424,7 +424,7 @@ soma action add rebuild-repository to system
 soma action add remove to action
 soma action add remove to admin-mgmt
 soma action add remove to attribute
-soma action add remove to capability
+soma action add revoke to capability
 soma action add remove to category
 soma action add remove to datacenter
 soma action add remove to entity
