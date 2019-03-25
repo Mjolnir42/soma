@@ -166,7 +166,8 @@ WHERE  scc.configuration_id = $1::uuid
 	CheckConfigForChecksOnObject = `
 SELECT sc.configuration_id
 FROM   soma.checks sc
-WHERE  sc.object_id = $1::uuid;`
+WHERE  sc.object_id = $1::uuid
+AND NOT deleted;`
 )
 
 func init() {

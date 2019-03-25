@@ -118,7 +118,20 @@ func (x *Rest) CheckConfigCreate(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	request.CheckConfig = cReq.CheckConfig.Clone()
-
+	//Get the correct monitoringID based on the provided capability
+	request.Section = msg.SectionCapability
+	request.Action = msg.ActionShow
+	request.Capability = proto.Capability{
+		ID: request.CheckConfig.CapabilityID,
+	}
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	if len(result.Capability) == 0 {
+		x.send(&w, &result)
+	}
+	request.Monitoring.ID = result.Capability[0].MonitoringID
+	request.Section = msg.SectionMonitoring
+	request.Action = msg.ActionUse
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
 		return
@@ -133,7 +146,7 @@ func (x *Rest) CheckConfigCreate(w http.ResponseWriter, r *http.Request,
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
+	result = <-request.Reply
 	x.send(&w, &result)
 }
 
@@ -143,13 +156,28 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	request := msg.New(r, params)
-	request.Section = msg.SectionMonitoring
-	request.Action = msg.ActionUse
 	request.CheckConfig = proto.CheckConfig{
 		ID:           params.ByName(`checkID`),
 		RepositoryID: params.ByName(`repositoryID`),
 	}
-
+	request.Section = msg.SectionCheckConfig
+	request.Action = msg.ActionShow
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	if len(result.CheckConfig) == 0 {
+		x.send(&w, &result)
+	}
+	request.Capability.ID = result.CheckConfig[0].CapabilityID
+	request.Section = msg.SectionCapability
+	request.Action = msg.ActionShow
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result = <-request.Reply
+	if len(result.Capability) == 0 {
+		x.send(&w, &result)
+	}
+	request.Monitoring.ID = result.Capability[0].MonitoringID
+	request.Section = msg.SectionMonitoring
+	request.Action = msg.ActionUse
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
 		return
@@ -164,7 +192,7 @@ func (x *Rest) CheckConfigDestroy(w http.ResponseWriter, r *http.Request,
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
+	result = <-request.Reply
 	x.send(&w, &result)
 }
 
