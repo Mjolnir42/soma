@@ -122,6 +122,7 @@ func (x *Rest) CapabilityDeclare(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	request.Capability = cReq.Capability.Clone()
+	request.Monitoring.ID = request.Capability.MonitoringID
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
@@ -139,11 +140,20 @@ func (x *Rest) CapabilityRevoke(w http.ResponseWriter, r *http.Request,
 	defer panicCatcher(w)
 
 	request := msg.New(r, params)
+
 	request.Section = msg.SectionCapability
-	request.Action = msg.ActionRevoke
+	request.Action = msg.ActionShow
 	request.Capability = proto.Capability{
 		ID: params.ByName(`capabilityID`),
 	}
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	if len(result.Capability) == 0 {
+		x.send(&w, &result)
+	}
+	request.Section = msg.SectionCapability
+	request.Action = msg.ActionRevoke
+	request.Monitoring.ID = result.Capability[0].MonitoringID
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
@@ -151,7 +161,7 @@ func (x *Rest) CapabilityRevoke(w http.ResponseWriter, r *http.Request,
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
+	result = <-request.Reply
 	x.send(&w, &result)
 }
 
