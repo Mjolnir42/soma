@@ -44,6 +44,14 @@ WHERE  iu.uid = $1::varchar
 UNION
 SELECT sms.monitoring_id,
        sms.monitoring_name
+FROM   auth.admin au
+CROSS JOIN   soma.monitoring_systems sms
+WHERE  au.uid = $1::varchar
+  AND  au.is_active
+  AND  sms.monitoring_system_mode = 'private'
+UNION
+SELECT sms.monitoring_id,
+       sms.monitoring_name
 FROM   soma.monitoring_systems sms
 WHERE  sms.monitoring_system_mode = 'public';`
 
@@ -67,6 +75,15 @@ JOIN   soma.monitoring_systems sms
 WHERE  iu.uid = $1::varchar
   AND  sms.monitoring_system_mode = 'private'
   AND  sms.monitoring_name = $2::varchar
+UNION
+SELECT sms.monitoring_id,
+       sms.monitoring_name
+FROM   auth.admin au
+CROSS JOIN   soma.monitoring_systems sms
+WHERE  au.uid = $1::varchar
+  AND  sms.monitoring_name = $2::varchar
+  AND  sms.monitoring_system_mode = 'private'
+  AND  au.is_active
 UNION
 SELECT sms.monitoring_id,
        sms.monitoring_name
