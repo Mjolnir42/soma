@@ -107,6 +107,7 @@ func (x *Rest) RepositoryConfigTree(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionRepositoryConfig
 	request.Action = msg.ActionTree
+	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Tree = proto.Tree{
 		ID:   params.ByName(`repositoryID`),
 		Type: msg.EntityRepository,

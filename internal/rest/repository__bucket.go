@@ -107,6 +107,8 @@ func (x *Rest) BucketTree(w http.ResponseWriter, r *http.Request,
 	request := msg.New(r, params)
 	request.Section = msg.SectionBucket
 	request.Action = msg.ActionTree
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Bucket.RepositoryID = params.ByName(`repositoryID`)
 	request.Tree = proto.Tree{
 		ID:   params.ByName(`bucketID`),
 		Type: msg.EntityBucket,
