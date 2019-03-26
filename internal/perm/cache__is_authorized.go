@@ -264,7 +264,7 @@ permloop:
 					continue permloop
 				}
 			case msg.SectionCluster:
-				objID = q.Cluster.RepositoryID
+				objID = q.Repository.ID
 				if objID == `` {
 					continue permloop
 				}
@@ -274,7 +274,7 @@ permloop:
 					continue permloop
 				}
 			case msg.SectionGroup:
-				objID = q.Group.RepositoryID
+				objID = q.Repository.ID
 				if objID == `` {
 					continue permloop
 				}
