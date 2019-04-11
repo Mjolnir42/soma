@@ -512,7 +512,7 @@ dispatchOCTET:
 	return
 
 buildJSON:
-	if bjson, err = json.Marshal(&result); err != nil {
+	if bjson, err = json.MarshalIndent(&result, ``, `  `); err != nil {
 		x.errLog.WithField(`RequestID`, r.ID.String()).
 			WithField(`Phase`, `json`).
 			Error(err)
