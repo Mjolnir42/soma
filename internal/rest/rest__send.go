@@ -362,7 +362,7 @@ func (x *Rest) send(w *http.ResponseWriter, r *msg.Result) {
 			// Key Exchange request -- encrypted payload
 			k = r.Super.Kex
 			// special KEX payload is generated here
-			if bjson, err = json.Marshal(&k); err != nil {
+			if bjson, err = json.MarshalIndent(&k, ``, `  `); err != nil {
 				logEntry.WithField(`Code`, 500).
 					WithField(`HasError`, `true`).
 					Warn(`ServerError`)
