@@ -264,7 +264,7 @@ func rightRevoke(c *cli.Context) error {
 		if len(opts[`on`]) != 0 {
 			return fmt.Errorf("Permissions in category %s are global"+
 				" and require no 'on' keyword target.",
-				req.Grant.Category)
+				req.Filter.Grant.Category)
 		}
 	case msg.CategoryMonitoring,
 		msg.CategoryRepository,
@@ -276,7 +276,7 @@ func rightRevoke(c *cli.Context) error {
 		if len(opts[`on`]) != 1 {
 			return fmt.Errorf("Permissions in category %s require a"+
 				" target, specified via 'on' keyword.",
-				req.Grant.Category)
+				req.Filter.Grant.Category)
 		}
 	default:
 		return fmt.Errorf("Unknown category: %s", permissionSlice[0])
