@@ -179,9 +179,11 @@ func (grim *GrimReaper) process(q *msg.Request) bool {
 		`lifecycle`,
 		`deployment`,
 	} {
-		grim.soma.handlerMap.Get(h).ShutdownNow()
-		grim.soma.handlerMap.Del(h)
-		grim.appLog.Printf("GrimReaper: shut down %s", h)
+		if grim.soma.handlerMap.Exists(h) {
+			grim.soma.handlerMap.Get(h).ShutdownNow()
+			grim.soma.handlerMap.Del(h)
+			grim.appLog.Printf("GrimReaper: shut down %s", h)
+		}
 	}
 
 	// shutdown supervisor -- needs handling in BasicAuth()
