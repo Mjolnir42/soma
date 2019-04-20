@@ -154,7 +154,7 @@ func (x *Rest) NodeConfigPropertyCreate(w http.ResponseWriter,
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Node.ID = params.ByName(`nodeID`)
-	request.Property.Type = params.ByName(`propertyType`)
+	request.Property.Type = (*cReq.Node.Properties)[0].Type
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)

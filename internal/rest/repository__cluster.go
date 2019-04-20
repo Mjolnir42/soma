@@ -311,7 +311,7 @@ func (x *Rest) ClusterPropertyCreate(w http.ResponseWriter, r *http.Request,
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Cluster = cReq.Cluster.Clone()
 	request.Cluster.ID = params.ByName(`clusterID`)
-	request.Property.Type = params.ByName(`propertyType`)
+	request.Property.Type = (*cReq.Bucket.Properties)[0].Type
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
