@@ -344,7 +344,9 @@ func (x *Rest) GroupPropertyCreate(w http.ResponseWriter, r *http.Request,
 	}
 	request.TargetEntity = msg.EntityGroup
 	request.Group = cReq.Group.Clone()
-	request.Property.Type = (*cReq.Bucket.Properties)[0].Type
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Property.Type = (*cReq.Group.Properties)[0].Type
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
