@@ -7,8 +7,8 @@ GITHASH != git rev-parse --short HEAD
 
 # if GOPATH contains a symbolic link, then PWD and GOPATH can diverge
 # leading to go package loader errors
-GOPATH != /bin/realpath ${GOPATH}
-.export GOPATH
+GOPATH != /usr/bin/realpath ${GOPATH}
+.export: GOPATH
 
 all: install
 
