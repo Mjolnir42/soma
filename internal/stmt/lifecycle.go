@@ -152,6 +152,14 @@ AND    sci.deleted
 AND    scic.status = '` + proto.DeploymentDeprovisioned + `'::varchar
 AND    scic.next_status = '` + proto.DeploymentNone + `'::varchar;`
 
+	LifecycleDeleteOrphanCheckInstances = `
+UPDATE soma.check_instances sci
+SET    deleted = 'yes'::boolean
+FROM   soma.check_configurations sck
+WHERE  sci.check_configuration_id = sck.configuration_id
+AND NOT sci.deleted
+AND sck.deleted;`
+
 	LifecycleDeprovisionDeletedActive = `
 SELECT scic.check_instance_config_id,
        sci.check_instance_id
@@ -188,6 +196,7 @@ func init() {
 	m[LifecycleDeadLockResolver] = `LifecycleDeadLockResolver`
 	m[LifecycleDeleteDependency] = `LifecycleDeleteDependency`
 	m[LifecycleDeleteDeprovisioned] = `LifecycleDeleteDeprovisioned`
+	m[LifecycleDeleteOrphanCheckInstances] = `LifecycleDeleteOrphanCheckInstances`
 	m[LifecycleDeleteFailedRollouts] = `LifecycleDeleteFailedRollouts`
 	m[LifecycleDeleteGhosts] = `LifecycleDeleteGhosts`
 	m[LifecycleDeprovisionConfiguration] = `LifecycleDeprovisionConfiguration`

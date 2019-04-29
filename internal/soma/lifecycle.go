@@ -23,22 +23,23 @@ import (
 
 // LifeCycle handles the check rollout workflow
 type LifeCycle struct {
-	Shutdown          chan struct{}
-	conn              *sql.DB
-	tick              <-chan time.Time
-	stmtUnblock       *sql.Stmt
-	stmtPoke          *sql.Stmt
-	stmtClear         *sql.Stmt
-	stmtDeleteBlocked *sql.Stmt
-	stmtDeleteActive  *sql.Stmt
-	stmtDeadlock      *sql.Stmt
-	stmtReschedule    *sql.Stmt
-	stmtSetNotify     *sql.Stmt
-	appLog            *logrus.Logger
-	reqLog            *logrus.Logger
-	errLog            *logrus.Logger
-	pokers            map[string]chan string
-	soma              *Soma
+	Shutdown                  chan struct{}
+	conn                      *sql.DB
+	tick                      <-chan time.Time
+	stmtUnblock               *sql.Stmt
+	stmtPoke                  *sql.Stmt
+	stmtClear                 *sql.Stmt
+	stmtDeleteBlocked         *sql.Stmt
+	stmtDeleteActive          *sql.Stmt
+	stmtDeleteOrphanInstances *sql.Stmt
+	stmtDeadlock              *sql.Stmt
+	stmtReschedule            *sql.Stmt
+	stmtSetNotify             *sql.Stmt
+	appLog                    *logrus.Logger
+	reqLog                    *logrus.Logger
+	errLog                    *logrus.Logger
+	pokers                    map[string]chan string
+	soma                      *Soma
 }
 
 // newLifeCycle returns a new LifeCycle handler
@@ -90,6 +91,7 @@ func (lc *LifeCycle) Run() {
 		stmt.LifecycleClearUpdateFlag:                  &lc.stmtClear,
 		stmt.LifecycleBlockedConfigsForDeletedInstance: &lc.stmtDeleteBlocked,
 		stmt.LifecycleDeprovisionDeletedActive:         &lc.stmtDeleteActive,
+		stmt.LifecycleDeleteOrphanCheckInstances:       &lc.stmtDeleteOrphanInstances,
 		stmt.LifecycleDeadLockResolver:                 &lc.stmtDeadlock,
 		stmt.LifecycleRescheduleDeployments:            &lc.stmtReschedule,
 		stmt.LifecycleSetNotified:                      &lc.stmtSetNotify,
@@ -135,6 +137,7 @@ func (lc *LifeCycle) ghost() {
 	lc.conn.Exec(stmt.LifecycleDeleteGhosts)
 	lc.conn.Exec(stmt.LifecycleDeleteFailedRollouts)
 	lc.conn.Exec(stmt.LifecycleDeleteDeprovisioned)
+	lc.conn.Exec(stmt.LifecycleDeleteOrphanCheckInstances)
 }
 
 // search if there are check instance configurations in status blocked
