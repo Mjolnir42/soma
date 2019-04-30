@@ -63,8 +63,9 @@ ON     scic.monitoring_id = sms.monitoring_id
 JOIN   soma.check_instances sci
 ON     scic.check_instance_id = sci.check_instance_id
 AND    scic.check_instance_config_id = sci.current_instance_config_id
-WHERE  (  scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
-       OR scic.status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar)
+WHERE  (  ( scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
+            AND NOT sci.deleted )
+       OR scic.status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar )
 AND    sms.monitoring_callback_uri IS NOT NULL
 AND    sci.update_available;`
 
@@ -79,14 +80,13 @@ JOIN   soma.check_instances sci
 ON     scic.check_instance_id = sci.check_instance_id
 AND    scic.check_instance_config_id = sci.current_instance_config_id
 WHERE  (  scic.status = '` + proto.DeploymentRolloutInProgress + `'::varchar
-       OR scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
+       OR ( scic.status = '` + proto.DeploymentAwaitingRollout + `'::varchar
+            AND NOT sci.deleted )
        OR scic.status = '` + proto.DeploymentAwaitingDeprovision + `'::varchar
-       OR scic.status = '` + proto.DeploymentDeprovisionInProgress + `'::varchar)
+       OR scic.status = '` + proto.DeploymentDeprovisionInProgress + `'::varchar )
 AND    sms.monitoring_callback_uri IS NOT NULL
-AND    scic.status_last_updated_at IS NOT NULL
-AND    scic.notified_at IS NOT NULL
-AND    NOW() > (scic.status_last_updated_at + '5 minute'::interval)
-AND    NOW() > (scic.notified_at + '5 minute'::interval)
+AND    ( scic.status_last_updated_at IS NULL OR  ( NOW() > (scic.status_last_updated_at + '5 minute'::interval ) )  )
+AND    ( scic.notified_at IS NULL OR NOW() > (scic.notified_at + '5 minute'::interval ) )
 AND    NOT sci.update_available;`
 
 	LifecycleSetNotified = `
@@ -154,11 +154,13 @@ AND    scic.next_status = '` + proto.DeploymentNone + `'::varchar;`
 
 	LifecycleDeleteOrphanCheckInstances = `
 UPDATE soma.check_instances sci
-SET    deleted = 'yes'::boolean
-FROM   soma.check_configurations sck
+SET    deleted = 'yes'::boolean,
+       update_available = ( sci.update_available OR ( scic.status = 'awaiting_rollout'::varchar ))
+FROM   soma.check_configurations sck, soma.check_instance_configurations scic
 WHERE  sci.check_configuration_id = sck.configuration_id
-AND NOT sci.deleted
-AND sck.deleted;`
+AND    sci.check_instance_id = scic.check_instance_id
+AND    not sci.deleted
+AND    sck.deleted;`
 
 	LifecycleDeprovisionDeletedActive = `
 SELECT scic.check_instance_config_id,
