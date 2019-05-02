@@ -70,7 +70,7 @@ func (g *Group) evalCustomProp(prop string, val string, view string) (string, bo
 func (g *Group) evalServiceProp(prop string, val string, view string) (string, bool, string) {
 	for _, v := range g.PropertyService {
 		t := v.(*PropertyService)
-		if prop == "name" && (t.ServiceName == val || val == `@defined`) && (t.View == view || t.View == `any`) {
+		if ((prop == "name" && (t.ServiceName == val || val == `@defined`)) || (prop == "id" && (t.ServiceID.String() == val))) && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true, t.ServiceName
 		}
 	}
