@@ -66,19 +66,39 @@ func (tk *TreeKeeper) txPropertyNewCustom(a *tree.Action,
 	)
 	switch a.Type {
 	case msg.EntityRepository:
-		statement = stm[`RepositoryPropertyCustomCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`RepositoryPropertyCustomUpdate`]
+		} else {
+			statement = stm[`RepositoryPropertyCustomCreate`]
+		}
 		id = a.Property.Custom.RepositoryID
 	case msg.EntityBucket:
-		statement = stm[`BucketPropertyCustomCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`BucketPropertyCustomUpdate`]
+		} else {
+			statement = stm[`BucketPropertyCustomCreate`]
+		}
 		id = a.Bucket.ID
 	case msg.EntityGroup:
-		statement = stm[`GroupPropertyCustomCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`GroupPropertyCustomUpdate`]
+		} else {
+			statement = stm[`GroupPropertyCustomCreate`]
+		}
 		id = a.Group.ID
 	case msg.EntityCluster:
-		statement = stm[`ClusterPropertyCustomCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`ClusterPropertyCustomUpdate`]
+		} else {
+			statement = stm[`ClusterPropertyCustomCreate`]
+		}
 		id = a.Cluster.ID
 	case msg.EntityNode:
-		statement = stm[`NodePropertyCustomCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`NodePropertyCustomUpdate`]
+		} else {
+			statement = stm[`NodePropertyCustomCreate`]
+		}
 		id = a.Node.ID
 	}
 	_, err = statement.Exec(
@@ -104,19 +124,39 @@ func (tk *TreeKeeper) txPropertyNewSystem(a *tree.Action,
 	)
 	switch a.Type {
 	case msg.EntityRepository:
-		statement = stm[`RepositoryPropertySystemCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`RepositoryPropertySystemUpdate`]
+		} else {
+			statement = stm[`RepositoryPropertySystemCreate`]
+		}
 		id = a.Repository.ID
 	case msg.EntityBucket:
-		statement = stm[`BucketPropertySystemCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`BucketPropertySystemUpdate`]
+		} else {
+			statement = stm[`BucketPropertySystemCreate`]
+		}
 		id = a.Bucket.ID
 	case msg.EntityGroup:
-		statement = stm[`GroupPropertySystemCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`GroupPropertySystemUpdate`]
+		} else {
+			statement = stm[`GroupPropertySystemCreate`]
+		}
 		id = a.Group.ID
 	case msg.EntityCluster:
-		statement = stm[`ClusterPropertySystemCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`ClusterPropertySystemUpdate`]
+		} else {
+			statement = stm[`ClusterPropertySystemCreate`]
+		}
 		id = a.Cluster.ID
 	case msg.EntityNode:
-		statement = stm[`NodePropertySystemCreate`]
+		if a.Action == msg.ActionPropertyUpdate {
+			statement = stm[`NodePropertySystemUpdate`]
+		} else {
+			statement = stm[`NodePropertySystemCreate`]
+		}
 		id = a.Node.ID
 	}
 	_, err = statement.Exec(
@@ -286,7 +326,17 @@ func (tk *TreeKeeper) txPropertyDelete(a *tree.Action,
 func (tk *TreeKeeper) txPropertyUpdate(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
 	// XXX TODO BUG
-	return fmt.Errorf(`Not implemented: tk.txPropertyUpdate()`)
+	switch a.Property.Type {
+	case msg.PropertyCustom:
+		return tk.txPropertyNewCustom(a, stm)
+	case msg.PropertySystem:
+		return tk.txPropertyNewSystem(a, stm)
+		/*	case msg.PropertyService:
+				return tk.txPropertyNewService(a, stm)
+			case msg.PropertyOncall:
+				return tk.txPropertyNewOncall(a, stm)*/
+	}
+	return fmt.Errorf(`Impossible property type`)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

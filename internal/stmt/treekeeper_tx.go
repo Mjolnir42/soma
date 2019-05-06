@@ -294,6 +294,16 @@ SELECT $1::uuid,
        $11::boolean
 WHERE $7::uuid IS NOT NULL;`
 
+	TxRepositoryPropertySystemUpdate = `
+UPDATE soma.repository_system_properties
+SET inheritance_enabled = $8::boolean
+    value = $10::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   repository_id = $3::uuid
+AND   view = $4::varchar
+AND   system_property = $5::varchar;`
+
 	TxRepositoryPropertySystemDelete = `
 DELETE FROM soma.repository_system_properties
 WHERE       instance_id = $1::uuid;`
@@ -317,6 +327,16 @@ SELECT $1::uuid,
        $8::boolean,
        $9::text
 WHERE $6::uuid IS NOT NULL;`
+
+	TxRepositoryPropertyCustomUpdate = `
+UPDATE soma.repository_custom_properties
+SET inheritance_enabled = $7::boolean
+    value = $9::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   repository_id = $3::uuid
+AND   view = $4::varchar
+AND   custom_property_id = $5::varchar;`
 
 	TxRepositoryPropertyCustomDelete = `
 DELETE FROM soma.repository_custom_properties
@@ -406,6 +426,16 @@ SELECT $1::uuid,
        $10::text,
        $11::boolean;`
 
+	TxNodePropertySystemUpdate = `
+UPDATE soma.node_system_properties
+SET inheritance_enabled = $8::boolean
+    value = $10::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   node_id = $3::uuid
+AND   view = $4::varchar
+AND   system_property = $5::varchar;`
+
 	TxNodePropertySystemDelete = `
 DELETE FROM soma.node_system_properties
 WHERE       instance_id = $1::uuid;`
@@ -432,6 +462,16 @@ SELECT $1::uuid,
        $7::boolean,
        $8::boolean,
        $9::text;`
+
+	TxNodePropertyCustomUpdate = `
+UPDATE soma.node_custom_properties
+SET inheritance_enabled = $7::boolean
+    value = $9::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   node_id = $3::uuid
+AND   view = $4::varchar
+AND   custom_property_id = $5::varchar;`
 
 	TxNodePropertyCustomDelete = `
 DELETE FROM soma.node_custom_properties
@@ -581,6 +621,16 @@ SELECT $1::uuid,
        $10::text,
        $11::boolean;`
 
+	TxGroupPropertySystemUpdate = `
+UPDATE soma.group_system_properties
+SET inheritance_enabled = $8::boolean
+    value = $10::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   group_id = $3::uuid
+AND   view = $4::varchar
+AND   system_property = $5::varchar;`
+
 	TxGroupPropertySystemDelete = `
 DELETE FROM soma.group_system_properties
 WHERE       instance_id = $1::uuid;`
@@ -607,6 +657,16 @@ SELECT $1::uuid,
        $7::boolean,
        $8::boolean,
        $9::text;`
+
+	TxGroupPropertyCustomUpdate = `
+UPDATE soma.group_custom_properties
+SET inheritance_enabled = $7::boolean
+    value = $9::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   group_id = $3::uuid
+AND   view = $4::varchar
+AND   custom_property_id = $5::varchar;`
 
 	TxGroupPropertyCustomDelete = `
 DELETE FROM soma.group_custom_properties
@@ -728,6 +788,16 @@ SELECT $1::uuid,
        $10::text,
        $11::boolean;`
 
+	TxClusterPropertySystemUpdate = `
+UPDATE soma.cluster_system_properties
+SET inheritance_enabled = $8::boolean
+    value = $10::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   cluster_id = $3::uuid
+AND   view = $4::varchar
+AND   system_property = $5::varchar;`
+
 	TxClusterPropertySystemDelete = `
 DELETE FROM soma.cluster_system_properties
 WHERE       instance_id = $1::uuid;`
@@ -754,6 +824,16 @@ SELECT $1::uuid,
        $7::boolean,
        $8::boolean,
        $9::text;`
+
+	TxClusterPropertyCustomUpdate = `
+UPDATE soma.cluster_custom_properties
+SET inheritance_enabled = $7::boolean
+    value = $9::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   cluster_id = $3::uuid
+AND   view = $4::varchar
+AND   custom_property_id = $5::varchar;`
 
 	TxClusterPropertyCustomDelete = `
 DELETE FROM soma.cluster_custom_properties
@@ -871,6 +951,16 @@ SELECT $1::uuid,
        $10::text,
        $11::boolean;`
 
+	TxBucketPropertySystemUpdate = `
+UPDATE soma.bucket_system_properties
+SET inheritance_enabled = $8::boolean
+    value = $10::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   bucket_id = $3::uuid
+AND   view = $4::varchar
+AND   system_property = $5::varchar;`
+
 	TxBucketPropertySystemDelete = `
 DELETE FROM soma.bucket_system_properties
 WHERE       instance_id = $1::uuid;`
@@ -895,6 +985,16 @@ SELECT $1::uuid,
        $7::boolean,
        $8::boolean,
        $9::text;`
+
+	TxBucketPropertyCustomUpdate = `
+UPDATE soma.bucket_custom_properties
+SET inheritance_enabled = $7::boolean
+    value = $9::text
+WHERE instance_id = $1::uuid
+AND   source_instance_id = $2::uuid
+AND   bucket_id = $3::uuid
+AND   view = $4::varchar
+AND   custom_property_id = $5::varchar;`
 
 	TxBucketPropertyCustomDelete = `
 DELETE FROM soma.bucket_custom_properties
@@ -1272,12 +1372,14 @@ AND    server_name = 'soma-null-server';`
 func init() {
 	m[TxBucketAssignNode] = `TxBucketAssignNode`
 	m[TxBucketPropertyCustomCreate] = `TxBucketPropertyCustomCreate`
+	m[TxBucketPropertyCustomUpdate] = `TxBucketPropertyCustomUpdate`
 	m[TxBucketPropertyCustomDelete] = `TxBucketPropertyCustomDelete`
 	m[TxBucketPropertyOncallCreate] = `TxBucketPropertyOncallCreate`
 	m[TxBucketPropertyOncallDelete] = `TxBucketPropertyOncallDelete`
 	m[TxBucketPropertyServiceCreate] = `TxBucketPropertyServiceCreate`
 	m[TxBucketPropertyServiceDelete] = `TxBucketPropertyServiceDelete`
 	m[TxBucketPropertySystemCreate] = `TxBucketPropertySystemCreate`
+	m[TxBucketPropertySystemUpdate] = `TxBucketPropertySystemUpdate`
 	m[TxBucketPropertySystemDelete] = `TxBucketPropertySystemDelete`
 	m[TxBucketRemoveNode] = `TxBucketRemoveNode`
 	m[TxClusterCreate] = `TxClusterCreate`
@@ -1285,12 +1387,14 @@ func init() {
 	m[TxClusterMemberNew] = `TxClusterMemberNew`
 	m[TxClusterMemberRemove] = `TxClusterMemberRemove`
 	m[TxClusterPropertyCustomCreate] = `TxClusterPropertyCustomCreate`
+	m[TxClusterPropertyCustomUpdate] = `TxClusterPropertyCustomUpdate`
 	m[TxClusterPropertyCustomDelete] = `TxClusterPropertyCustomDelete`
 	m[TxClusterPropertyOncallCreate] = `TxClusterPropertyOncallCreate`
 	m[TxClusterPropertyOncallDelete] = `TxClusterPropertyOncallDelete`
 	m[TxClusterPropertyServiceCreate] = `TxClusterPropertyServiceCreate`
 	m[TxClusterPropertyServiceDelete] = `TxClusterPropertyServiceDelete`
 	m[TxClusterPropertySystemCreate] = `TxClusterPropertySystemCreate`
+	m[TxClusterPropertySystemUpdate] = `TxClusterPropertySystemUpdate`
 	m[TxClusterPropertySystemDelete] = `TxClusterPropertySystemDelete`
 	m[TxClusterUpdate] = `TxClusterUpdate`
 	m[TxCreateBucket] = `TxCreateBucket`
@@ -1341,35 +1445,41 @@ func init() {
 	m[TxGroupMemberRemoveGroup] = `TxGroupMemberRemoveGroup`
 	m[TxGroupMemberRemoveNode] = `TxGroupMemberRemoveNode`
 	m[TxGroupPropertyCustomCreate] = `TxGroupPropertyCustomCreate`
+	m[TxGroupPropertyCustomUpdate] = `TxGroupPropertyCustomUpdate`
 	m[TxGroupPropertyCustomDelete] = `TxGroupPropertyCustomDelete`
 	m[TxGroupPropertyOncallCreate] = `TxGroupPropertyOncallCreate`
 	m[TxGroupPropertyOncallDelete] = `TxGroupPropertyOncallDelete`
 	m[TxGroupPropertyServiceCreate] = `TxGroupPropertyServiceCreate`
 	m[TxGroupPropertyServiceDelete] = `TxGroupPropertyServiceDelete`
 	m[TxGroupPropertySystemCreate] = `TxGroupPropertySystemCreate`
+	m[TxGroupPropertySystemUpdate] = `TxGroupPropertySystemUpdate`
 	m[TxGroupPropertySystemDelete] = `TxGroupPropertySystemDelete`
 	m[TxGroupUpdate] = `TxGroupUpdate`
 	m[TxMarkCheckConfigDeleted] = `TxMarkCheckConfigDeleted`
 	m[TxMarkCheckDeleted] = `TxMarkCheckDeleted`
 	m[TxMarkCheckInstanceDeleted] = `TxMarkCheckInstanceDeleted`
 	m[TxNodePropertyCustomCreate] = `TxNodePropertyCustomCreate`
+	m[TxNodePropertyCustomUpdate] = `TxNodePropertyCustomUpdate`
 	m[TxNodePropertyCustomDelete] = `TxNodePropertyCustomDelete`
 	m[TxNodePropertyOncallCreate] = `TxNodePropertyOncallCreate`
 	m[TxNodePropertyOncallDelete] = `TxNodePropertyOncallDelete`
 	m[TxNodePropertyServiceCreate] = `TxNodePropertyServiceCreate`
 	m[TxNodePropertyServiceDelete] = `TxNodePropertyServiceDelete`
 	m[TxNodePropertySystemCreate] = `TxNodePropertySystemCreate`
+	m[TxNodePropertySystemUpdate] = `TxNodePropertySystemUpdate`
 	m[TxNodePropertySystemDelete] = `TxNodePropertySystemDelete`
 	m[TxNodeUnassignFromBucket] = `TxNodeUnassignFromBucket`
 	m[TxPropertyInstanceCreate] = `TxPropertyInstanceCreate`
 	m[TxPropertyInstanceDelete] = `TxPropertyInstanceDelete`
 	m[TxRepositoryPropertyCustomCreate] = `TxRepositoryPropertyCustomCreate`
+	m[TxRepositoryPropertyCustomUpdate] = `TxRepositoryPropertyCustomUpdate`
 	m[TxRepositoryPropertyCustomDelete] = `TxRepositoryPropertyCustomDelete`
 	m[TxRepositoryPropertyOncallCreate] = `TxRepositoryPropertyOncallCreate`
 	m[TxRepositoryPropertyOncallDelete] = `TxRepositoryPropertyOncallDelete`
 	m[TxRepositoryPropertyServiceCreate] = `TxRepositoryPropertyServiceCreate`
 	m[TxRepositoryPropertyServiceDelete] = `TxRepositoryPropertyServiceDelete`
 	m[TxRepositoryPropertySystemCreate] = `TxRepositoryPropertySystemCreate`
+	m[TxRepositoryPropertySystemUpdate] = `TxRepositoryPropertySystemUpdate`
 	m[TxRepositoryPropertySystemDelete] = `TxRepositoryPropertySystemDelete`
 	m[TxUpdateNodeState] = `TxUpdateNodeState`
 	m[TxRepositoryDestroy] = `TxRepositoryDestroy`
