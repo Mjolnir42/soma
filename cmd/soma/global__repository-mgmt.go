@@ -119,6 +119,27 @@ func registerRepository(app cli.App) *cli.App {
 								},
 							},
 							{
+								Name:        `update`,
+								Usage:       `SUBCOMMANDS to update properties`,
+								Description: help.Text(`repository-config::property-update`),
+								Subcommands: []cli.Command{
+									{
+										Name:         `system`,
+										Usage:        `Update a system property to a repository`,
+										Description:  help.Text(`repository-config::property-update`),
+										Action:       runtime(repositoryConfigPropertyUpdateSystem),
+										BashComplete: cmpl.PropertyCreateValue,
+									},
+									{
+										Name:         `custom`,
+										Usage:        `Update a custom property to a repository`,
+										Description:  help.Text(`repository-config::property-update`),
+										Action:       runtime(repositoryConfigPropertyUpdateCustom),
+										BashComplete: cmpl.PropertyCreateValue,
+									},
+								},
+							},
+							{
 								Name:        `destroy`,
 								Usage:       `SUBCOMMANDS to destroy properties`,
 								Description: help.Text(`repository-config::property-destroy`),

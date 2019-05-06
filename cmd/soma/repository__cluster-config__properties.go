@@ -19,9 +19,19 @@ func clusterConfigPropertyCreateSystem(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeSystem, proto.EntityCluster)
 }
 
+// clusterConfigPropertyUpdateSystem function
+func clusterConfigPropertyUpdateSystem(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeSystem, proto.EntityCluster)
+}
+
 // clusterConfigPropertyCreateCustom function
 func clusterConfigPropertyCreateCustom(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeCustom, proto.EntityCluster)
+}
+
+// clusterConfigPropertyUpdateCustom function
+func clusterConfigPropertyUpdateCustom(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeCustom, proto.EntityCluster)
 }
 
 // clusterConfigPropertyCreateService function

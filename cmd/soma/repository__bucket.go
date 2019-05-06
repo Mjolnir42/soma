@@ -116,6 +116,27 @@ func registerBucket(app cli.App) *cli.App {
 								},
 							},
 							{
+								Name:        `update`,
+								Usage:       `SUBCOMMANDS to update properties`,
+								Description: help.Text(`bucket::property-update`),
+								Subcommands: []cli.Command{
+									{
+										Name:         `system`,
+										Usage:        `Update a system property to a bucket`,
+										Description:  help.Text(`bucket::property-update`),
+										Action:       runtime(bucketPropertyUpdateSystem),
+										BashComplete: cmpl.PropertyCreateValue,
+									},
+									{
+										Name:         `custom`,
+										Usage:        `Update a custom property to a bucket`,
+										Description:  help.Text(`bucket::property-update`),
+										Action:       runtime(bucketPropertyUpdateCustom),
+										BashComplete: cmpl.PropertyCreateValue,
+									},
+								},
+							},
+							{
 								Name:        `destroy`,
 								Usage:       `SUBCOMMANDS to destroy properties`,
 								Description: help.Text(`bucket::property-destroy`),

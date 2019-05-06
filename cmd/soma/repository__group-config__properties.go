@@ -19,9 +19,19 @@ func groupConfigPropertyCreateSystem(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeSystem, proto.EntityGroup)
 }
 
+// groupConfigPropertyUpdateSystem function
+func groupConfigPropertyUpdateSystem(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeSystem, proto.EntityGroup)
+}
+
 // groupConfigPropertyCreateCustom function
 func groupConfigPropertyCreateCustom(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeCustom, proto.EntityGroup)
+}
+
+// groupConfigPropertyUpdateCustom function
+func groupConfigPropertyUpdateCustom(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeCustom, proto.EntityGroup)
 }
 
 // groupConfigPropertyCreateService function
