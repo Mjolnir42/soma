@@ -296,8 +296,8 @@ WHERE $7::uuid IS NOT NULL;`
 
 	TxRepositoryPropertySystemUpdate = `
 UPDATE soma.repository_system_properties
-SET inheritance_enabled = $8::boolean
-    value = $10::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   repository_id = $3::uuid
@@ -330,13 +330,13 @@ WHERE $6::uuid IS NOT NULL;`
 
 	TxRepositoryPropertyCustomUpdate = `
 UPDATE soma.repository_custom_properties
-SET inheritance_enabled = $7::boolean
-    value = $9::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   repository_id = $3::uuid
 AND   view = $4::varchar
-AND   custom_property_id = $5::varchar;`
+AND   custom_property_id = $5::uuid;`
 
 	TxRepositoryPropertyCustomDelete = `
 DELETE FROM soma.repository_custom_properties
@@ -428,8 +428,8 @@ SELECT $1::uuid,
 
 	TxNodePropertySystemUpdate = `
 UPDATE soma.node_system_properties
-SET inheritance_enabled = $8::boolean
-    value = $10::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   node_id = $3::uuid
@@ -465,13 +465,13 @@ SELECT $1::uuid,
 
 	TxNodePropertyCustomUpdate = `
 UPDATE soma.node_custom_properties
-SET inheritance_enabled = $7::boolean
-    value = $9::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   node_id = $3::uuid
 AND   view = $4::varchar
-AND   custom_property_id = $5::varchar;`
+AND   custom_property_id = $5::uuid;`
 
 	TxNodePropertyCustomDelete = `
 DELETE FROM soma.node_custom_properties
@@ -623,8 +623,8 @@ SELECT $1::uuid,
 
 	TxGroupPropertySystemUpdate = `
 UPDATE soma.group_system_properties
-SET inheritance_enabled = $8::boolean
-    value = $10::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   group_id = $3::uuid
@@ -660,13 +660,13 @@ SELECT $1::uuid,
 
 	TxGroupPropertyCustomUpdate = `
 UPDATE soma.group_custom_properties
-SET inheritance_enabled = $7::boolean
-    value = $9::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   group_id = $3::uuid
 AND   view = $4::varchar
-AND   custom_property_id = $5::varchar;`
+AND   custom_property_id = $5::uuid;`
 
 	TxGroupPropertyCustomDelete = `
 DELETE FROM soma.group_custom_properties
@@ -790,8 +790,8 @@ SELECT $1::uuid,
 
 	TxClusterPropertySystemUpdate = `
 UPDATE soma.cluster_system_properties
-SET inheritance_enabled = $8::boolean
-    value = $10::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   cluster_id = $3::uuid
@@ -827,13 +827,13 @@ SELECT $1::uuid,
 
 	TxClusterPropertyCustomUpdate = `
 UPDATE soma.cluster_custom_properties
-SET inheritance_enabled = $7::boolean
-    value = $9::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   cluster_id = $3::uuid
 AND   view = $4::varchar
-AND   custom_property_id = $5::varchar;`
+AND   custom_property_id = $5::uuid;`
 
 	TxClusterPropertyCustomDelete = `
 DELETE FROM soma.cluster_custom_properties
@@ -953,8 +953,8 @@ SELECT $1::uuid,
 
 	TxBucketPropertySystemUpdate = `
 UPDATE soma.bucket_system_properties
-SET inheritance_enabled = $8::boolean
-    value = $10::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   bucket_id = $3::uuid
@@ -988,13 +988,13 @@ SELECT $1::uuid,
 
 	TxBucketPropertyCustomUpdate = `
 UPDATE soma.bucket_custom_properties
-SET inheritance_enabled = $7::boolean
-    value = $9::text
+SET inheritance_enabled = $6::boolean,
+    value = $7::text
 WHERE instance_id = $1::uuid
 AND   source_instance_id = $2::uuid
 AND   bucket_id = $3::uuid
 AND   view = $4::varchar
-AND   custom_property_id = $5::varchar;`
+AND   custom_property_id = $5::uuid;`
 
 	TxBucketPropertyCustomDelete = `
 DELETE FROM soma.bucket_custom_properties
