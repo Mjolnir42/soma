@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"unicode/utf8"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -83,7 +82,6 @@ func (x *Rest) GroupSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Group = filtered
-	spew.Dump(result)
 	x.send(&w, &result)
 }
 
@@ -106,7 +104,6 @@ func (x *Rest) GroupShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
-	spew.Dump(result)
 	x.send(&w, &result)
 }
 
