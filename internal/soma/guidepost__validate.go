@@ -75,7 +75,7 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 
 	// listed actions are accepted, but require no further validation
 	switch q.Action {
-	case msg.ActionPropertyCreate, msg.ActionPropertyDestroy:
+	case msg.ActionPropertyCreate, msg.ActionPropertyDestroy, msg.ActionPropertyUpdate:
 		switch q.Section {
 		case
 			msg.SectionRepositoryConfig,
