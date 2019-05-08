@@ -317,7 +317,45 @@ func (x *Rest) BucketPropertyUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	// XXX BUG TODO
+	request := msg.New(r, params)
+	request.Section = msg.SectionBucket
+	request.Action = msg.ActionPropertyUpdate
+
+	cReq := proto.NewBucketRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
+	switch {
+	case params.ByName(`bucketID`) != cReq.Bucket.ID:
+		x.replyBadRequest(&w, &request,
+			fmt.Errorf("Mismatched bucket ids: %s, %s",
+				params.ByName(`bucket`),
+				cReq.Bucket.ID))
+		return
+	case len(*cReq.Bucket.Properties) != 1:
+		x.replyBadRequest(&w, &request,
+			fmt.Errorf("Expected property count 1, actual count: %d",
+				len(*cReq.Bucket.Properties)))
+		return
+	case (*cReq.Bucket.Properties)[0].Type == `service` && (*cReq.Bucket.Properties)[0].Service.Name == ``:
+		x.replyBadRequest(&w, &request,
+			fmt.Errorf(`Empty service name is invalid`))
+		return
+	}
+	request.TargetEntity = msg.EntityBucket
+	request.Bucket = cReq.Bucket.Clone()
+	request.Property.Type = (*cReq.Bucket.Properties)[0].Type
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

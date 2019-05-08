@@ -34,7 +34,14 @@ func (tk *TreeKeeper) txProperty(a *tree.Action,
 // PROPERTY NEW
 func (tk *TreeKeeper) txPropertyNew(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
-	if _, err := stm[`PropertyInstanceCreate`].Exec(
+
+	var (
+		err              error
+		statement        *sql.Stmt
+		entity, entityID string
+	)
+
+	if _, err = stm[`PropertyInstanceCreate`].Exec(
 		a.Property.InstanceID,
 		a.Property.RepositoryID,
 		a.Property.SourceInstanceID,
@@ -44,170 +51,68 @@ func (tk *TreeKeeper) txPropertyNew(a *tree.Action,
 		return err
 	}
 
+	entity, entityID = getEntityData(a)
+
 	switch a.Property.Type {
 	case msg.PropertyCustom:
-		return tk.txPropertyNewCustom(a, stm)
+		statement = stm[entity+"PropertyCustomCreate"]
+		_, err = statement.Exec(
+			a.Property.InstanceID,
+			a.Property.SourceInstanceID,
+			entityID,
+			a.Property.View,
+			a.Property.Custom.ID,
+			a.Property.RepositoryID,
+			a.Property.Inheritance,
+			a.Property.ChildrenOnly,
+			a.Property.Custom.Value,
+		)
+		return err
 	case msg.PropertySystem:
-		return tk.txPropertyNewSystem(a, stm)
+		statement = stm[entity+"PropertySystemCreate"]
+		_, err = statement.Exec(
+			a.Property.InstanceID,
+			a.Property.SourceInstanceID,
+			entityID,
+			a.Property.View,
+			a.Property.System.Name,
+			a.Property.SourceType,
+			a.Property.RepositoryID,
+			a.Property.Inheritance,
+			a.Property.ChildrenOnly,
+			a.Property.System.Value,
+			a.Property.IsInherited,
+		)
+		return err
 	case msg.PropertyService:
-		return tk.txPropertyNewService(a, stm)
+		statement = stm[entity+"PropertyServiceCreate"]
+		_, err = statement.Exec(
+			a.Property.InstanceID,
+			a.Property.SourceInstanceID,
+			entityID,
+			a.Property.View,
+			a.Property.Service.ID,
+			a.Property.Service.TeamID,
+			a.Property.RepositoryID,
+			a.Property.Inheritance,
+			a.Property.ChildrenOnly,
+		)
+		return err
 	case msg.PropertyOncall:
-		return tk.txPropertyNewOncall(a, stm)
+		statement = stm[entity+"PropertyOncallCreate"]
+		_, err = statement.Exec(
+			a.Property.InstanceID,
+			a.Property.SourceInstanceID,
+			entityID,
+			a.Property.View,
+			a.Property.Oncall.ID,
+			a.Property.RepositoryID,
+			a.Property.Inheritance,
+			a.Property.ChildrenOnly,
+		)
+		return err
 	}
 	return fmt.Errorf(`Impossible property type`)
-}
-
-func (tk *TreeKeeper) txPropertyNewCustom(a *tree.Action,
-	stm map[string]*sql.Stmt) error {
-	var (
-		err       error
-		statement *sql.Stmt
-		id        string
-	)
-	switch a.Type {
-	case msg.EntityRepository:
-		statement = stm[`RepositoryPropertyCustomCreate`]
-		id = a.Property.Custom.RepositoryID
-	case msg.EntityBucket:
-		statement = stm[`BucketPropertyCustomCreate`]
-		id = a.Bucket.ID
-	case msg.EntityGroup:
-		statement = stm[`GroupPropertyCustomCreate`]
-		id = a.Group.ID
-	case msg.EntityCluster:
-		statement = stm[`ClusterPropertyCustomCreate`]
-		id = a.Cluster.ID
-	case msg.EntityNode:
-		statement = stm[`NodePropertyCustomCreate`]
-		id = a.Node.ID
-	}
-	_, err = statement.Exec(
-		a.Property.InstanceID,
-		a.Property.SourceInstanceID,
-		id,
-		a.Property.View,
-		a.Property.Custom.ID,
-		a.Property.RepositoryID,
-		a.Property.Inheritance,
-		a.Property.ChildrenOnly,
-		a.Property.Custom.Value,
-	)
-	return err
-}
-
-func (tk *TreeKeeper) txPropertyNewSystem(a *tree.Action,
-	stm map[string]*sql.Stmt) error {
-	var (
-		err       error
-		statement *sql.Stmt
-		id        string
-	)
-	switch a.Type {
-	case msg.EntityRepository:
-		statement = stm[`RepositoryPropertySystemCreate`]
-		id = a.Repository.ID
-	case msg.EntityBucket:
-		statement = stm[`BucketPropertySystemCreate`]
-		id = a.Bucket.ID
-	case msg.EntityGroup:
-		statement = stm[`GroupPropertySystemCreate`]
-		id = a.Group.ID
-	case msg.EntityCluster:
-		statement = stm[`ClusterPropertySystemCreate`]
-		id = a.Cluster.ID
-	case msg.EntityNode:
-		statement = stm[`NodePropertySystemCreate`]
-		id = a.Node.ID
-	}
-	_, err = statement.Exec(
-		a.Property.InstanceID,
-		a.Property.SourceInstanceID,
-		id,
-		a.Property.View,
-		a.Property.System.Name,
-		a.Property.SourceType,
-		a.Property.RepositoryID,
-		a.Property.Inheritance,
-		a.Property.ChildrenOnly,
-		a.Property.System.Value,
-		a.Property.IsInherited,
-	)
-	return err
-}
-
-func (tk *TreeKeeper) txPropertyNewService(a *tree.Action,
-	stm map[string]*sql.Stmt) error {
-	var (
-		err       error
-		statement *sql.Stmt
-		id        string
-	)
-	switch a.Type {
-	case msg.EntityRepository:
-		statement = stm[`RepositoryPropertyServiceCreate`]
-		id = a.Repository.ID
-	case msg.EntityBucket:
-		statement = stm[`BucketPropertyServiceCreate`]
-		id = a.Bucket.ID
-	case msg.EntityGroup:
-		statement = stm[`GroupPropertyServiceCreate`]
-		id = a.Group.ID
-	case msg.EntityCluster:
-		statement = stm[`ClusterPropertyServiceCreate`]
-		id = a.Cluster.ID
-	case msg.EntityNode:
-		statement = stm[`NodePropertyServiceCreate`]
-		id = a.Node.ID
-	}
-	_, err = statement.Exec(
-		a.Property.InstanceID,
-		a.Property.SourceInstanceID,
-		id,
-		a.Property.View,
-		a.Property.Service.ID,
-		a.Property.Service.TeamID,
-		a.Property.RepositoryID,
-		a.Property.Inheritance,
-		a.Property.ChildrenOnly,
-	)
-	return err
-}
-
-func (tk *TreeKeeper) txPropertyNewOncall(a *tree.Action,
-	stm map[string]*sql.Stmt) error {
-	var (
-		err       error
-		statement *sql.Stmt
-		id        string
-	)
-	switch a.Type {
-	case msg.EntityRepository:
-		statement = stm[`RepositoryPropertyOncallCreate`]
-		id = a.Repository.ID
-	case msg.EntityBucket:
-		statement = stm[`BucketPropertyOncallCreate`]
-		id = a.Bucket.ID
-	case msg.EntityGroup:
-		statement = stm[`GroupPropertyOncallCreate`]
-		id = a.Group.ID
-	case msg.EntityCluster:
-		statement = stm[`ClusterPropertyOncallCreate`]
-		id = a.Cluster.ID
-	case msg.EntityNode:
-		statement = stm[`NodePropertyOncallCreate`]
-		id = a.Node.ID
-	}
-	_, err = statement.Exec(
-		a.Property.InstanceID,
-		a.Property.SourceInstanceID,
-		id,
-		a.Property.View,
-		a.Property.Oncall.ID,
-		a.Property.RepositoryID,
-		a.Property.Inheritance,
-		a.Property.ChildrenOnly,
-	)
-	return err
 }
 
 //
@@ -285,8 +190,55 @@ func (tk *TreeKeeper) txPropertyDelete(a *tree.Action,
 // PROPERTY UPDATE
 func (tk *TreeKeeper) txPropertyUpdate(a *tree.Action,
 	stm map[string]*sql.Stmt) error {
-	// XXX TODO BUG
-	return fmt.Errorf(`Not implemented: tk.txPropertyUpdate()`)
+
+	var (
+		err              error
+		statement        *sql.Stmt
+		entity, entityID string
+	)
+	entity, entityID = getEntityData(a)
+	switch a.Property.Type {
+	case msg.PropertyCustom:
+		statement = stm[entity+"PropertyCustomUpdate"]
+		_, err = statement.Exec(
+			a.Property.InstanceID,
+			a.Property.SourceInstanceID,
+			entityID,
+			a.Property.View,
+			a.Property.Custom.ID,
+			a.Property.Inheritance,
+			a.Property.Custom.Value,
+		)
+	case msg.PropertySystem:
+		statement = stm[entity+"PropertySystemUpdate"]
+		_, err = statement.Exec(
+			a.Property.InstanceID,
+			a.Property.SourceInstanceID,
+			entityID,
+			a.Property.View,
+			a.Property.System.Name,
+			a.Property.Inheritance,
+			a.Property.System.Value,
+		)
+		return err
+	}
+	return fmt.Errorf(`Impossible property type`)
+}
+
+func getEntityData(a *tree.Action) (object, id string) {
+	switch a.Type {
+	case msg.EntityRepository:
+		return "Repository", a.Repository.ID
+	case msg.EntityBucket:
+		return "Bucket", a.Bucket.ID
+	case msg.EntityGroup:
+		return "Group", a.Group.ID
+	case msg.EntityCluster:
+		return "Cluster", a.Cluster.ID
+	case msg.EntityNode:
+		return "Node", a.Node.ID
+	}
+	return "", ""
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

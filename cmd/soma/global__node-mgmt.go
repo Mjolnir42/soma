@@ -174,6 +174,27 @@ func registerNodes(app cli.App) *cli.App {
 								},
 							},
 							{
+								Name:        `update`,
+								Usage:       `SUBCOMMANDS to update properties`,
+								Description: help.Text(`node-config::property-update`),
+								Subcommands: []cli.Command{
+									{
+										Name:         `system`,
+										Usage:        `Update a system property to a node`,
+										Description:  help.Text(`node-config::property-update`),
+										Action:       runtime(nodeConfigPropertyUpdateSystem),
+										BashComplete: cmpl.PropertyCreateInValue,
+									},
+									{
+										Name:         `custom`,
+										Usage:        `Update a custom property to a node`,
+										Description:  help.Text(`node-config::property-update`),
+										Action:       runtime(nodeConfigPropertyUpdateCustom),
+										BashComplete: cmpl.PropertyCreateIn,
+									},
+								},
+							},
+							{
 								Name:        `destroy`,
 								Usage:       `SUBCOMMANDS to destroy properties`,
 								Description: help.Text(`node-config::property-destroy`),

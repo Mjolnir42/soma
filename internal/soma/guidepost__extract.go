@@ -73,6 +73,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		case msg.ActionUnassign:
 			return q.Repository.ID, q.Bucket.ID
 		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyUpdate:
 		case msg.ActionPropertyDestroy:
 		default:
 			return ``, ``
@@ -94,6 +95,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		case msg.ActionMemberAssign:
 		case msg.ActionMemberUnassign:
 		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyUpdate:
 		case msg.ActionPropertyDestroy:
 		default:
 			return ``, ``
@@ -107,6 +109,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		case msg.ActionMemberAssign:
 		case msg.ActionMemberUnassign:
 		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyUpdate:
 		case msg.ActionPropertyDestroy:
 		default:
 			return ``, ``
@@ -121,6 +124,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 		}
 		switch q.Action {
 		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyUpdate:
 		case msg.ActionPropertyDestroy:
 		default:
 			return ``, ``
@@ -129,6 +133,7 @@ func (g *GuidePost) extractID(q *msg.Request) (string, string) {
 	case msg.SectionRepositoryConfig:
 		switch q.Action {
 		case msg.ActionPropertyCreate:
+		case msg.ActionPropertyUpdate:
 		case msg.ActionPropertyDestroy:
 		default:
 			return ``, ``

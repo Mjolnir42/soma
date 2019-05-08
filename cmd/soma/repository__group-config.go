@@ -104,6 +104,27 @@ func registerGroups(app cli.App) *cli.App {
 								},
 							},
 							{
+								Name:        `update`,
+								Usage:       `SUBCOMMANDS to update properties`,
+								Description: help.Text(`group-config::property-update`),
+								Subcommands: []cli.Command{
+									{
+										Name:         `system`,
+										Usage:        `Update a system property to a group`,
+										Description:  help.Text(`group-config::property-update`),
+										Action:       runtime(groupConfigPropertyUpdateSystem),
+										BashComplete: cmpl.PropertyCreateInValue,
+									},
+									{
+										Name:         `custom`,
+										Usage:        `Update a custom property to a group`,
+										Description:  help.Text(`group-config::property-update`),
+										Action:       runtime(groupConfigPropertyCreateCustom),
+										BashComplete: cmpl.PropertyCreateIn,
+									},
+								},
+							},
+							{
 								Name:        `destroy`,
 								Usage:       `SUBCOMMANDS to destroy properties`,
 								Description: help.Text(`group-config::property-destroy`),

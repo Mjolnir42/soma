@@ -19,9 +19,19 @@ func bucketPropertyCreateSystem(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeSystem, proto.EntityBucket)
 }
 
+// bucketPropertyUpdateSystem function
+func bucketPropertyUpdateSystem(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeSystem, proto.EntityBucket)
+}
+
 // bucketPropertyCreateCustom function
 func bucketPropertyCreateCustom(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeCustom, proto.EntityBucket)
+}
+
+// bucketPropertyUpdateCustom function
+func bucketPropertyUpdateCustom(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeCustom, proto.EntityBucket)
 }
 
 // bucketPropertyCreateService function
