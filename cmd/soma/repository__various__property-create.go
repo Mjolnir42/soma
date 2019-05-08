@@ -50,7 +50,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 	}
 
 	switch entity {
-	case proto.EntityGroup, proto.EntityCluster:
+	case proto.EntityGroup, proto.EntityCluster, proto.EntityNode:
 		uniqueOptions = append(uniqueOptions, `in`)
 		mandatoryOptions = append(mandatoryOptions, `in`)
 	}
