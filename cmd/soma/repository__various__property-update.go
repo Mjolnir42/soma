@@ -155,6 +155,7 @@ func variousPropertyUpdate(c *cli.Context, propertyType, entity string) error {
 	} else {
 		prop.Inheritance = true
 	}
+	property = c.Args().First()
 	switch propertyType {
 	case proto.PropertyTypeSystem:
 		prop.System = &proto.PropertySystem{
@@ -215,36 +216,6 @@ func variousPropertyUpdate(c *cli.Context, propertyType, entity string) error {
 			RepositoryID: repoID,
 			Value:        opts[`value`][0],
 		}
-	}
-
-	// request assembly
-	switch entity {
-	case proto.EntityNode:
-		req = proto.NewNodeRequest()
-		req.Node.ID = objectID
-		req.Node.Config = config
-		req.Node.Properties = &[]proto.Property{prop}
-	case proto.EntityCluster:
-		req = proto.NewClusterRequest()
-		req.Cluster.ID = objectID
-		req.Cluster.RepositoryID = repoID
-		req.Cluster.BucketID = bucketID
-		req.Cluster.Properties = &[]proto.Property{prop}
-	case proto.EntityGroup:
-		req = proto.NewGroupRequest()
-		req.Group.ID = objectID
-		req.Group.RepositoryID = repoID
-		req.Group.BucketID = bucketID
-		req.Group.Properties = &[]proto.Property{prop}
-	case proto.EntityBucket:
-		req = proto.NewBucketRequest()
-		req.Bucket.ID = objectID
-		req.Bucket.RepositoryID = repoID
-		req.Bucket.Properties = &[]proto.Property{prop}
-	case proto.EntityRepository:
-		req = proto.NewRepositoryRequest()
-		req.Repository.ID = repoID
-		req.Repository.Properties = &[]proto.Property{prop}
 	}
 
 	switch entity {
@@ -308,6 +279,37 @@ func variousPropertyUpdate(c *cli.Context, propertyType, entity string) error {
 	default:
 		return fmt.Errorf("Unknown entity: %s", entity)
 	}
+	prop.SourceInstanceID = sourceID
+	// request assembly
+	switch entity {
+	case proto.EntityNode:
+		req = proto.NewNodeRequest()
+		req.Node.ID = objectID
+		req.Node.Config = config
+		req.Node.Properties = &[]proto.Property{prop}
+	case proto.EntityCluster:
+		req = proto.NewClusterRequest()
+		req.Cluster.ID = objectID
+		req.Cluster.RepositoryID = repoID
+		req.Cluster.BucketID = bucketID
+		req.Cluster.Properties = &[]proto.Property{prop}
+	case proto.EntityGroup:
+		req = proto.NewGroupRequest()
+		req.Group.ID = objectID
+		req.Group.RepositoryID = repoID
+		req.Group.BucketID = bucketID
+		req.Group.Properties = &[]proto.Property{prop}
+	case proto.EntityBucket:
+		req = proto.NewBucketRequest()
+		req.Bucket.ID = objectID
+		req.Bucket.RepositoryID = repoID
+		req.Bucket.Properties = &[]proto.Property{prop}
+	case proto.EntityRepository:
+		req = proto.NewRepositoryRequest()
+		req.Repository.ID = repoID
+		req.Repository.Properties = &[]proto.Property{prop}
+	}
+
 	command := fmt.Sprintf("%s-config::property-update", entity)
 	return adm.Perform(`putbody`, path, command, req, c)
 }
