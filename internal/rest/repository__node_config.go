@@ -231,7 +231,50 @@ func (x *Rest) NodeConfigPropertyUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	// XXX BUG TODO
+	request := msg.New(r, params)
+	request.Section = msg.SectionNodeConfig
+	request.Action = msg.ActionPropertyUpdate
+
+	cReq := proto.NewNodeRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
+	switch {
+	case params.ByName(`nodeID`) != cReq.Node.ID:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			"Mismatched node ids: %s, %s",
+			params.ByName(`nodeID`),
+			cReq.Node.ID))
+		return
+	case len(*cReq.Node.Properties) != 1:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			"Expected property count 1, actual count: %d",
+			len(*cReq.Node.Properties)))
+		return
+	case (*cReq.Node.Properties)[0].Type == "service":
+		if (*cReq.Node.Properties)[0].Service.Name == `` {
+			x.replyBadRequest(&w, &request, fmt.Errorf(
+				"Empty service name is invalid"))
+			return
+		}
+	}
+	request.TargetEntity = msg.EntityNode
+	request.Node = cReq.Node.Clone()
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Node.ID = params.ByName(`nodeID`)
+	request.Property.Type = (*cReq.Node.Properties)[0].Type
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
 }
 
 // NodeConfigTree function

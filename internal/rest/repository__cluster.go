@@ -364,7 +364,51 @@ func (x *Rest) ClusterPropertyUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	// XXX BUG TODO
+	request := msg.New(r, params)
+	request.Section = msg.SectionCluster
+	request.Action = msg.ActionPropertyUpdate
+
+	cReq := proto.NewClusterRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
+	switch {
+	case params.ByName(`clusterID`) != cReq.Cluster.ID:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			"Mismatched cluster ids: %s, %s",
+			params.ByName(`clusterID`),
+			cReq.Cluster.ID,
+		))
+		return
+	case len(*cReq.Cluster.Properties) != 1:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			"Expected property count 1, actual count: %d",
+			len(*cReq.Cluster.Properties),
+		))
+		return
+	case (*cReq.Cluster.Properties)[0].Type == `service` && (*cReq.Cluster.Properties)[0].Service.Name == ``:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`Invalid empty service name`,
+		))
+		return
+	}
+	request.TargetEntity = msg.EntityCluster
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Cluster = cReq.Cluster.Clone()
+	request.Cluster.ID = params.ByName(`clusterID`)
+	request.Property.Type = (*cReq.Cluster.Properties)[0].Type
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
 }
 
 // ClusterRename function

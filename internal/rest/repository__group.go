@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"unicode/utf8"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/lib/proto"
@@ -82,6 +83,7 @@ func (x *Rest) GroupSearch(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	result.Group = filtered
+	spew.Dump(result)
 	x.send(&w, &result)
 }
 
@@ -104,6 +106,7 @@ func (x *Rest) GroupShow(w http.ResponseWriter, r *http.Request,
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
 	result := <-request.Reply
+	spew.Dump(result)
 	x.send(&w, &result)
 }
 
@@ -396,7 +399,47 @@ func (x *Rest) GroupPropertyUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	// XXX BUG TODO
+	request := msg.New(r, params)
+	request.Section = msg.SectionGroup
+	request.Action = msg.ActionPropertyUpdate
+
+	cReq := proto.NewGroupRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
+	switch {
+	case params.ByName(`groupID`) != cReq.Group.ID:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			"Mismatched group ids: %s, %s",
+			params.ByName(`groupID`),
+			cReq.Group.ID))
+		return
+	case len(*cReq.Group.Properties) != 1:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			"Expected property count 1, actual count: %d",
+			len(*cReq.Group.Properties)))
+		return
+	case (*cReq.Group.Properties)[0].Type == `service` && (*cReq.Group.Properties)[0].Service.Name == ``:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			`Empty service name is invalid`))
+		return
+	}
+	request.TargetEntity = msg.EntityGroup
+	request.Group = cReq.Group.Clone()
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Property.Type = (*cReq.Group.Properties)[0].Type
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
