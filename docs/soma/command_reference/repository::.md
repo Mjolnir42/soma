@@ -17,6 +17,8 @@ soma repository property create system ${system} on ${repository} view ${view} v
 soma repository property create custom ${custom} on ${repository} view ${view} value ${value} [inheritance ${inherit}] [childrenonly ${child}]
 soma repository property create service ${service} on ${repository} view ${view} [inheritance ${inherit}] [childrenonly ${child}]
 soma repository property create oncall ${oncall} on ${repository} view ${view} [inheritance ${inherit}] [childrenonly ${child}]
+soma repository property update system ${system} on ${repository} view ${view} value ${value} [inheritance ${inherit}] [childrenonly ${child}]
+soma repository property update custom ${custom} on ${repository} view ${view} value ${value} [inheritance ${inherit}] [childrenonly ${child}]
 soma repository property destroy system ${system} on ${repository} view ${view}
 soma repository property destroy custom ${custom} on ${repository} view ${view}
 soma repository property destroy service ${service} on ${repository} view ${view}
