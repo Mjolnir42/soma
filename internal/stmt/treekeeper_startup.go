@@ -130,7 +130,7 @@ WHERE  configuration_id = $1::uuid;`
 	TkStartLoadCheckConstraintService = `
 SELECT team_id,
        name,
-       'squirrel'
+       service_property_id
 FROM   soma.constraints_service_property
 WHERE  configuration_id = $1::uuid;`
 
