@@ -13,6 +13,7 @@ import (
 	"fmt"
 
 	"github.com/Sirupsen/logrus"
+
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
@@ -22,36 +23,41 @@ import (
 
 // PropertyWrite handles write requests for properties
 type PropertyWrite struct {
-	Input                  chan msg.Request
-	Shutdown               chan struct{}
-	handlerName            string
-	conn                   *sql.DB
-	stmtAddCustom          *sql.Stmt
-	stmtAddNative          *sql.Stmt
-	stmtAddService         *sql.Stmt
-	stmtAddServiceAttr     *sql.Stmt
-	stmtAddSystem          *sql.Stmt
-	stmtAddTemplate        *sql.Stmt
-	stmtAddTemplateAttr    *sql.Stmt
-	stmtRemoveCustom       *sql.Stmt
-	stmtRemoveNative       *sql.Stmt
-	stmtRemoveService      *sql.Stmt
-	stmtRemoveServiceAttr  *sql.Stmt
-	stmtRemoveSystem       *sql.Stmt
-	stmtRemoveTemplate     *sql.Stmt
-	stmtRemoveTemplateAttr *sql.Stmt
-	appLog                 *logrus.Logger
-	reqLog                 *logrus.Logger
-	errLog                 *logrus.Logger
+	Input                      chan msg.Request
+	Shutdown                   chan struct{}
+	handlerName                string
+	conn                       *sql.DB
+	stmtAddCustom              *sql.Stmt
+	stmtAddNative              *sql.Stmt
+	stmtAddService             *sql.Stmt
+	stmtServiceGetAllInstances *sql.Stmt
+	stmtAddServiceAttr         *sql.Stmt
+	stmtCleanupServiceAttr     *sql.Stmt
+	stmtAddSystem              *sql.Stmt
+	stmtAddTemplate            *sql.Stmt
+	stmtAddTemplateAttr        *sql.Stmt
+	stmtCleanupTemplateAttr    *sql.Stmt
+	stmtRemoveCustom           *sql.Stmt
+	stmtRemoveNative           *sql.Stmt
+	stmtRemoveService          *sql.Stmt
+	stmtRemoveServiceAttr      *sql.Stmt
+	stmtRemoveSystem           *sql.Stmt
+	stmtRemoveTemplate         *sql.Stmt
+	stmtRemoveTemplateAttr     *sql.Stmt
+	appLog                     *logrus.Logger
+	reqLog                     *logrus.Logger
+	errLog                     *logrus.Logger
+	handlerMap                 *handler.Map
 }
 
 // newPropertyWrite return a new PropertyWrite handler with input
 // buffer of length
-func newPropertyWrite(length int) (string, *PropertyWrite) {
+func newPropertyWrite(length int, appHandlerMap *handler.Map) (string, *PropertyWrite) {
 	w := &PropertyWrite{}
 	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
+	w.handlerMap = appHandlerMap
 	return w.handlerName, w
 }
 
@@ -76,6 +82,7 @@ func (w *PropertyWrite) RegisterRequests(hmap *handler.Map) {
 	} {
 		for _, action := range []string{
 			msg.ActionAdd,
+			msg.ActionUpdate,
 			msg.ActionRemove,
 		} {
 			hmap.Request(section, action, w.handlerName)
@@ -98,20 +105,23 @@ func (w *PropertyWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.PropertyCustomAdd:            &w.stmtAddCustom,
-		stmt.PropertyCustomDel:            &w.stmtRemoveCustom,
-		stmt.PropertyNativeAdd:            &w.stmtAddNative,
-		stmt.PropertyNativeDel:            &w.stmtRemoveNative,
-		stmt.PropertyServiceAdd:           &w.stmtAddService,
-		stmt.PropertyServiceAttributeAdd:  &w.stmtAddServiceAttr,
-		stmt.PropertyServiceAttributeDel:  &w.stmtRemoveServiceAttr,
-		stmt.PropertyServiceDel:           &w.stmtRemoveService,
-		stmt.PropertySystemAdd:            &w.stmtAddSystem,
-		stmt.PropertySystemDel:            &w.stmtRemoveSystem,
-		stmt.PropertyTemplateAdd:          &w.stmtAddTemplate,
-		stmt.PropertyTemplateAttributeAdd: &w.stmtAddTemplateAttr,
-		stmt.PropertyTemplateAttributeDel: &w.stmtRemoveTemplateAttr,
-		stmt.PropertyTemplateDel:          &w.stmtRemoveTemplate,
+		stmt.PropertyCustomAdd:                &w.stmtAddCustom,
+		stmt.PropertyCustomDel:                &w.stmtRemoveCustom,
+		stmt.PropertyNativeAdd:                &w.stmtAddNative,
+		stmt.PropertyNativeDel:                &w.stmtRemoveNative,
+		stmt.PropertyServiceAdd:               &w.stmtAddService,
+		stmt.PropertyServiceAttributeAdd:      &w.stmtAddServiceAttr,
+		stmt.PropertyServiceAttributeCleanup:  &w.stmtCleanupServiceAttr,
+		stmt.PropertyServiceGetAllInstances:   &w.stmtServiceGetAllInstances,
+		stmt.PropertyServiceAttributeDel:      &w.stmtRemoveServiceAttr,
+		stmt.PropertyServiceDel:               &w.stmtRemoveService,
+		stmt.PropertySystemAdd:                &w.stmtAddSystem,
+		stmt.PropertySystemDel:                &w.stmtRemoveSystem,
+		stmt.PropertyTemplateAdd:              &w.stmtAddTemplate,
+		stmt.PropertyTemplateAttributeAdd:     &w.stmtAddTemplateAttr,
+		stmt.PropertyTemplateAttributeCleanup: &w.stmtCleanupTemplateAttr,
+		stmt.PropertyTemplateAttributeDel:     &w.stmtRemoveTemplateAttr,
+		stmt.PropertyTemplateDel:              &w.stmtRemoveTemplate,
 	} {
 		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`property`, err, stmt.Name(statement))
@@ -140,6 +150,8 @@ func (w *PropertyWrite) process(q *msg.Request) {
 		w.add(q, &result)
 	case msg.ActionRemove:
 		w.remove(q, &result)
+	case msg.ActionUpdate:
+		w.update(q, &result)
 	default:
 		result.UnknownRequest(q)
 	}
@@ -295,6 +307,183 @@ func (w *PropertyWrite) addService(q *msg.Request, mr *msg.Result) {
 		return
 	}
 	mr.Property = append(mr.Property, q.Property)
+}
+
+func (w *PropertyWrite) update(q *msg.Request, mr *msg.Result) {
+	switch q.Property.Type {
+	case `service`, `template`:
+		w.updateService(q, mr)
+	default:
+		mr.NotImplemented(fmt.Errorf("Unknown property type: %s",
+			q.Property.Type))
+	}
+}
+
+func (w *PropertyWrite) updateService(q *msg.Request, mr *msg.Result) {
+	var (
+		res                                                                    sql.Result
+		rows                                                                   *sql.Rows
+		err                                                                    error
+		tx                                                                     *sql.Tx
+		attr                                                                   proto.ServiceAttribute
+		repositoryID, bucketID, entityID, entityType, propertyInstanceID, view string
+		inheritance                                                            bool
+	)
+
+	if tx, err = w.conn.Begin(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	switch q.Property.Type {
+	case `service`:
+		if res, err = tx.Stmt(w.stmtCleanupServiceAttr).Exec(
+			q.Property.Service.ID,
+			q.Property.Service.TeamID,
+		); err != nil {
+			mr.ServerError(err, q.Section)
+			tx.Rollback()
+			return
+		}
+	case msg.PropertyTemplate:
+		if res, err = tx.Stmt(w.stmtCleanupTemplateAttr).Exec(
+			q.Property.Service.ID,
+		); err != nil {
+			mr.ServerError(err, q.Section)
+			tx.Rollback()
+			return
+		}
+	}
+	if !mr.RowCntMany(res.RowsAffected()) {
+		tx.Rollback()
+		return
+	}
+	for _, attr = range q.Property.Service.Attributes {
+		switch q.Property.Type {
+		case msg.PropertyService:
+			if res, err = tx.Stmt(w.stmtAddServiceAttr).Exec(
+				q.Property.Service.TeamID,
+				q.Property.Service.ID,
+				attr.Name,
+				attr.Value,
+			); err != nil {
+				mr.ServerError(err, q.Section)
+				tx.Rollback()
+				return
+			}
+		case msg.PropertyTemplate:
+			if res, err = tx.Stmt(w.stmtAddTemplateAttr).Exec(
+				q.Property.Service.ID,
+				attr.Name,
+				attr.Value,
+			); err != nil {
+				mr.ServerError(err, q.Section)
+				tx.Rollback()
+				return
+			}
+		}
+		if !mr.RowCnt(res.RowsAffected()) {
+			tx.Rollback()
+			return
+		}
+	}
+	if err = tx.Commit(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+	// Update was successful, we have to update the treekeepers
+	if rows, err = w.stmtServiceGetAllInstances.Query(
+		q.Property.Service.ID,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(&bucketID, &entityID, &entityType, &repositoryID, &propertyInstanceID, &view, &inheritance); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		//send a request to the treekeeper to update the property within the tree
+		w.updateTreekeeper(q.AuthUser, q.Property.Service.ID, q.Property.Service.Name, view, q.Property.Service.TeamID, repositoryID, bucketID, entityID, entityType, propertyInstanceID, inheritance, q.Property.Service.Attributes)
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	mr.Property = append(mr.Property, q.Property)
+}
+
+func (w *PropertyWrite) updateTreekeeper(authUser, serviceID, serviceName, view, teamID, repositoryID, bucketID, entityID, entityType, propertyInstanceID string, inheritance bool, attributes []proto.ServiceAttribute) error {
+	returnChannel := make(chan msg.Result, 1)
+	request := msg.Request{}
+	request.Reply = returnChannel
+	request.AuthUser = authUser
+	request.Action = msg.ActionPropertyUpdate
+	request.Property.Type = proto.PropertyTypeService
+	//Create Service object
+	prop := proto.Property{
+		Type:        proto.PropertyTypeService,
+		View:        view,
+		Inheritance: inheritance,
+	}
+	prop.Service = &proto.PropertyService{
+		ID:         serviceID,
+		Name:       serviceName,
+		TeamID:     teamID,
+		Attributes: attributes,
+	}
+	prop.SourceInstanceID = propertyInstanceID
+	//Forge the request
+	switch entityType {
+	case msg.EntityRepository:
+		request.Section = msg.SectionRepositoryConfig
+		request.TargetEntity = msg.EntityRepository
+		req := proto.NewRepositoryRequest()
+		req.Repository.ID = entityID
+		req.Repository.Properties = &[]proto.Property{prop}
+		request.Repository = req.Repository.Clone()
+	case msg.EntityBucket:
+		request.Section = msg.SectionBucket
+		request.TargetEntity = msg.EntityBucket
+		req := proto.NewBucketRequest()
+		req.Bucket.ID = entityID
+		req.Bucket.RepositoryID = repositoryID
+		req.Bucket.Properties = &[]proto.Property{prop}
+		request.Bucket = req.Bucket.Clone()
+	case msg.EntityGroup:
+		request.Section = msg.SectionGroup
+		request.TargetEntity = msg.EntityGroup
+		req := proto.NewGroupRequest()
+		req.Group.ID = entityID
+		req.Group.RepositoryID = repositoryID
+		req.Group.BucketID = bucketID
+		req.Group.Properties = &[]proto.Property{prop}
+		request.Group = req.Group.Clone()
+	case msg.EntityCluster:
+		request.Section = msg.SectionCluster
+		request.TargetEntity = msg.EntityCluster
+		req := proto.NewClusterRequest()
+		req.Cluster.ID = entityID
+		req.Cluster.RepositoryID = repositoryID
+		req.Cluster.BucketID = bucketID
+		req.Cluster.Properties = &[]proto.Property{prop}
+		request.Cluster = req.Cluster.Clone()
+	case msg.EntityNode:
+		request.Section = msg.SectionNode
+		request.TargetEntity = msg.EntityNode
+		req := proto.NewNodeRequest()
+		req.Node.ID = entityID
+		req.Node.Properties = &[]proto.Property{prop}
+		request.Node = req.Node.Clone()
+	}
+	w.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	if !result.IsOK() {
+		return result.Error
+	}
+	return nil
 }
 
 // remove deletes a property

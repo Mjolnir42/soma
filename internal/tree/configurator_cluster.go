@@ -70,7 +70,7 @@ func (c *Cluster) evalCustomProp(prop string, val string, view string) (string, 
 func (c *Cluster) evalServiceProp(prop string, val string, view string) (string, bool, string) {
 	for _, v := range c.PropertyService {
 		t := v.(*PropertyService)
-		if prop == "name" && (t.ServiceName == val || val == `@defined`) && (t.View == view || t.View == `any`) {
+		if ((prop == "name" && (t.ServiceName == val || val == `@defined`)) || (prop == "id" && (t.ServiceID.String() == val))) && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true, t.ServiceName
 		}
 	}
@@ -723,8 +723,8 @@ func (c *Cluster) createPerServiceCheckInstances(ctx *checkContext) {
 func (c *Cluster) pruneOldCheckInstances(ctx *checkContext) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-
-	for _, oldInstanceID := range c.CheckInstances[ctx.uuid] {
+	Instances := c.CheckInstances[ctx.uuid]
+	for _, oldInstanceID := range Instances {
 		if _, ok := ctx.newInstances[oldInstanceID]; !ok {
 			// there is no new version for oldInstanceID
 			c.actionCheckInstanceDelete(c.Instances[oldInstanceID].MakeAction())
@@ -733,6 +733,7 @@ func (c *Cluster) pruneOldCheckInstances(ctx *checkContext) {
 				c.GetRepositoryName(), `DeleteInstance`, `cluster`, c.ID.String(),
 				ctx.uuid, oldInstanceID,
 			)
+			c.CheckInstances[ctx.uuid] = removeFromArray(c.CheckInstances[ctx.uuid], oldInstanceID)
 			delete(c.Instances, oldInstanceID)
 		}
 	}

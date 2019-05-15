@@ -275,71 +275,8 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 					cstrRows.Close()
 					goto fail
 				}
-				switch cstrType {
-				case `custom`:
-					victim.Constraints = append(victim.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Custom: &proto.PropertyCustom{
-								ID:           value1,
-								Name:         value2,
-								RepositoryID: tk.meta.repoID,
-								Value:        value3,
-							},
-						},
-					)
-				case `native`:
-					victim.Constraints = append(victim.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Native: &proto.PropertyNative{
-								Name:  value1,
-								Value: value2,
-							},
-						},
-					)
-				case `oncall`:
-					victim.Constraints = append(victim.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Oncall: &proto.PropertyOncall{
-								ID:     value1,
-								Name:   value2,
-								Number: value3,
-							},
-						},
-					)
-				case `attribute`:
-					victim.Constraints = append(victim.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Attribute: &proto.ServiceAttribute{
-								Name:  value1,
-								Value: value2,
-							},
-						},
-					)
-				case `service`:
-					victim.Constraints = append(victim.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Service: &proto.PropertyService{
-								Name:   value2,
-								TeamID: value1,
-							},
-						},
-					)
-				case `system`:
-					victim.Constraints = append(victim.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							System: &proto.PropertySystem{
-								Name:  value1,
-								Value: value2,
-							},
-						},
-					)
-				} // switch cstrType
+				//replace and deduplicate this huge switch statement..
+				addConstraint(cstrType, value1, value2, value3, tk.meta.repoID, &victim)
 			} // for cstrRows.Next()
 			if cstrRows.Err() != nil {
 				goto fail
@@ -347,7 +284,6 @@ func (tk *TreeKeeper) startupScopedChecks(typ string, stMap map[string]*sql.Stmt
 		}
 		cfgMap[checkID] = victim
 	}
-
 	// iterate over the checks, convert them to tree.Check. Then load
 	// the inherited IDs via loadItems and populate tree.Check.Items.
 	// Save in datastructure: ckOrder, map[string]map[string]tree.Check
@@ -697,7 +633,6 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 	if tk.status.isBroken {
 		return
 	}
-
 	var (
 		err                                         error
 		configRows, threshRows, cstrRows            *sql.Rows
@@ -805,71 +740,8 @@ func (tk *TreeKeeper) startupScopedReapplyCheckConfig(typ string, stMap map[stri
 					cstrRows.Close()
 					goto fail
 				}
-				switch cstrType {
-				case `custom`:
-					conf.Constraints = append(conf.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Custom: &proto.PropertyCustom{
-								ID:           value1,
-								Name:         value2,
-								RepositoryID: tk.meta.repoID,
-								Value:        value3,
-							},
-						},
-					)
-				case `native`:
-					conf.Constraints = append(conf.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Native: &proto.PropertyNative{
-								Name:  value1,
-								Value: value2,
-							},
-						},
-					)
-				case `oncall`:
-					conf.Constraints = append(conf.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Oncall: &proto.PropertyOncall{
-								ID:     value1,
-								Name:   value2,
-								Number: value3,
-							},
-						},
-					)
-				case `attribute`:
-					conf.Constraints = append(conf.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Attribute: &proto.ServiceAttribute{
-								Name:  value1,
-								Value: value2,
-							},
-						},
-					)
-				case `service`:
-					conf.Constraints = append(conf.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							Service: &proto.PropertyService{
-								Name:   value2,
-								TeamID: value1,
-							},
-						},
-					)
-				case `system`:
-					conf.Constraints = append(conf.Constraints,
-						proto.CheckConfigConstraint{
-							ConstraintType: cstrType,
-							System: &proto.PropertySystem{
-								Name:  value1,
-								Value: value2,
-							},
-						},
-					)
-				} // switch cstrType
+				//deduplicate this huge switch statement..
+				addConstraint(cstrType, value1, value2, value3, tk.meta.repoID, &conf)
 			} // for cstrRows.Next()
 			if cstrRows.Err() != nil {
 				goto fail
@@ -1046,3 +918,72 @@ orderloop:
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
+
+func addConstraint(cstrType, value1, value2, value3, repoid string, config *proto.CheckConfig) {
+	switch cstrType {
+	case `custom`:
+		config.Constraints = append(config.Constraints,
+			proto.CheckConfigConstraint{
+				ConstraintType: cstrType,
+				Custom: &proto.PropertyCustom{
+					ID:           value1,
+					Name:         value2,
+					RepositoryID: repoid,
+					Value:        value3,
+				},
+			},
+		)
+	case `native`:
+		config.Constraints = append(config.Constraints,
+			proto.CheckConfigConstraint{
+				ConstraintType: cstrType,
+				Native: &proto.PropertyNative{
+					Name:  value1,
+					Value: value2,
+				},
+			},
+		)
+	case `oncall`:
+		config.Constraints = append(config.Constraints,
+			proto.CheckConfigConstraint{
+				ConstraintType: cstrType,
+				Oncall: &proto.PropertyOncall{
+					ID:     value1,
+					Name:   value2,
+					Number: value3,
+				},
+			},
+		)
+	case `attribute`:
+		config.Constraints = append(config.Constraints,
+			proto.CheckConfigConstraint{
+				ConstraintType: cstrType,
+				Attribute: &proto.ServiceAttribute{
+					Name:  value1,
+					Value: value2,
+				},
+			},
+		)
+	case `service`:
+		config.Constraints = append(config.Constraints,
+			proto.CheckConfigConstraint{
+				ConstraintType: cstrType,
+				Service: &proto.PropertyService{
+					ID:     value3,
+					Name:   value2,
+					TeamID: value1,
+				},
+			},
+		)
+	case `system`:
+		config.Constraints = append(config.Constraints,
+			proto.CheckConfigConstraint{
+				ConstraintType: cstrType,
+				System: &proto.PropertySystem{
+					Name:  value1,
+					Value: value2,
+				},
+			},
+		)
+	} // switch cstrType
+}

@@ -79,7 +79,7 @@ JOIN        soma.action
 JOIN        soma.buckets
   ON        soma.authorizations_repository.repository_id = soma.buckets.repository_id
 JOIN        soma.clusters
-  ON        soma.buckets.bucket_id = soma.clusters.cluster_id
+  ON        soma.buckets.bucket_id = soma.clusters.bucket_id
 WHERE       inventory.user.uid = $3::varchar
   AND       inventory.user.is_active
   AND NOT   inventory.user.is_deleted

@@ -152,6 +152,27 @@ INSERT INTO soma.service_property_value (
             value)
 SELECT $1::uuid, $2::uuid, $3::varchar, $4::varchar;`
 
+	PropertyServiceAttributeCleanup = `
+DELETE FROM soma.service_property_value
+WHERE service_id = $1::uuid
+AND team_id = $2::uuid;`
+
+	PropertyServiceGetAllInstances = `
+	select DISTINCT bucket_id,pi.source_object_id,pi.source_object_type,pi.repository_id,pi.source_instance_id,view,inheritance_enabled from (
+        select null as bucket_id,service_id,view,source_instance_id,inheritance_enabled from repository_service_property
+        union all
+        select bucket_id,service_id,view,source_instance_id,inheritance_enabled from bucket_service_property
+        union all
+        select bucket_id,service_id,view,source_instance_id,inheritance_enabled from groups g join group_service_property gsp on g.group_id = gsp.group_id
+        union all
+        select bucket_id,service_id,view,source_instance_id,inheritance_enabled from clusters c join cluster_service_property csp on c.cluster_id = csp.cluster_id
+        union all
+        select bucket_id,service_id,view,source_instance_id,inheritance_enabled from node_bucket_assignment n join node_service_property nsp on n.node_id = nsp.node_id
+	) as garbage
+	join property_instances pi on garbage.source_instance_id = pi.instance_id
+	where service_id = $1::uuid;
+	`
+
 	PropertyTemplateAdd = `
 INSERT INTO soma.template_property (
             id,
@@ -168,6 +189,10 @@ INSERT INTO soma.template_property_value (
             attribute,
             value)
 SELECT $1::uuid, $2::varchar, $3::varchar;`
+
+	PropertyTemplateAttributeCleanup = `
+DELETE FROM soma.template_property_value
+WHERE template_id = $1::uuid;`
 
 	PropertySystemDel = `
 DELETE FROM soma.system_properties
@@ -210,6 +235,8 @@ func init() {
 	m[PropertyNativeShow] = `PropertyNativeShow`
 	m[PropertyServiceAdd] = `PropertyServiceAdd`
 	m[PropertyServiceAttributeAdd] = `PropertyServiceAttributeAdd`
+	m[PropertyServiceAttributeCleanup] = `PropertyServiceAttributeCleanup`
+	m[PropertyServiceGetAllInstances] = `PropertyServiceGetAllInstances`
 	m[PropertyServiceAttributeDel] = `PropertyServiceAttributeDel`
 	m[PropertyServiceDel] = `PropertyServiceDel`
 	m[PropertyServiceList] = `PropertyServiceList`
@@ -220,6 +247,7 @@ func init() {
 	m[PropertySystemShow] = `PropertySystemShow`
 	m[PropertyTemplateAdd] = `PropertyTemplateAdd`
 	m[PropertyTemplateAttributeAdd] = `PropertyTemplateAttributeAdd`
+	m[PropertyTemplateAttributeCleanup] = `PropertyTemplateAttributeCleanup`
 	m[PropertyTemplateAttributeDel] = `PropertyTemplateAttributeDel`
 	m[PropertyTemplateDel] = `PropertyTemplateDel`
 	m[PropertyTemplateList] = `PropertyTemplateList`

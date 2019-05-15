@@ -240,7 +240,6 @@ permloop:
 				objID = msg.InvalidObjectID
 			}
 		}
-
 		// check authorization
 		switch q.Section {
 		case msg.SectionMonitoring, msg.SectionCapability, msg.SectionDeployment:
@@ -257,18 +256,33 @@ permloop:
 				category, objID, permID, any, result) {
 				return true
 			}
+			// permission could be on the repository
 			switch q.Section {
-			case msg.SectionBucket, msg.SectionCluster, msg.SectionCheckConfig,
-				msg.SectionGroup:
-				// permission could be on the repository
-				objID = c.object.repoForBucket(q.Bucket.ID)
+			case msg.SectionBucket:
+				objID = q.Bucket.RepositoryID
 				if objID == `` {
 					continue permloop
 				}
-				if c.grantRepository.assess(subjectType, subjectID,
-					category, objID, permID, any, result) {
-					return true
+			case msg.SectionCluster:
+				objID = q.Repository.ID
+				if objID == `` {
+					continue permloop
 				}
+			case msg.SectionCheckConfig:
+				objID = q.CheckConfig.RepositoryID
+				if objID == `` {
+					continue permloop
+				}
+			case msg.SectionGroup:
+				objID = q.Repository.ID
+				if objID == `` {
+					continue permloop
+				}
+			}
+
+			if c.grantRepository.assess(subjectType, subjectID,
+				category, objID, permID, any, result) {
+				return true
 			}
 		case msg.SectionNode, msg.SectionPropertyService, msg.SectionRepository:
 			// per-team sections

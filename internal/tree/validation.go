@@ -82,7 +82,7 @@ func specGroupCheck(spec GroupSpec) bool {
 	}
 	l := utf8.RuneCountInString(spec.Name)
 	switch {
-	case l < 4:
+	case l < 2:
 		return false
 	case l > 256:
 		return false
@@ -107,7 +107,7 @@ func specClusterCheck(spec ClusterSpec) bool {
 	}
 	l := utf8.RuneCountInString(spec.Name)
 	switch {
-	case l < 4:
+	case l < 2:
 		return false
 	case l > 256:
 		return false

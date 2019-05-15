@@ -305,6 +305,8 @@ func (x *Rest) setupRouter() *httprouter.Router {
 			router.PUT(rtNodeID, x.Authenticated(x.NodeMgmtUpdate))
 			router.PUT(rtNodePropertyID, x.Authenticated(x.NodeConfigPropertyUpdate))
 			router.PUT(rtRepositoryPropertyID, x.Authenticated(x.RepositoryConfigPropertyUpdate))
+			router.PUT(rtTeamPropertyMgmtID, x.Authenticated(x.PropertyMgmtServiceUpdate))
+
 		}
 	}
 	return router

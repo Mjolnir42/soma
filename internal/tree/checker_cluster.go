@@ -94,6 +94,16 @@ func (tec *Cluster) deleteCheckInherited(c Check) {
 	tec.rmCheck(c)
 }
 
+func (tec *Cluster) deleteCheckAllInherited() {
+	for _, check := range tec.Checks {
+		if check.GetIsInherited() {
+			tec.deleteCheckInherited(check.Clone())
+		}
+
+	}
+
+}
+
 func (tec *Cluster) deleteCheckOnChildren(c Check) {
 	switch deterministicInheritanceOrder {
 	case true:

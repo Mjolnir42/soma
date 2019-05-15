@@ -110,7 +110,7 @@ create table if not exists soma.permission_grant_map (
 	queryMap["createTableGlobalAuthorizations"] = `
 create table if not exists soma.authorizations_global (
     grant_id                    uuid            PRIMARY KEY,
-    admin_id                    uuid            REFERENCES auth.admin ( id ) DEFERRABLE,
+    admin_id                    uuid            REFERENCES auth.admin ( id ) ON DELETE CASCADE DEFERRABLE,
     user_id                     uuid            REFERENCES inventory.user ( id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
     team_id                     uuid            REFERENCES inventory.team ( id ) DEFERRABLE,
@@ -156,12 +156,19 @@ create unique index _unique_tool_global_authoriz
 	queries[idx] = `createUniqueIndexToolGlobalAuthorization`
 	idx++
 
+	queryMap[`createUniqueIndexTeamGlobalAuthorization`] = `
+create unique index _unique_team_global_authoriz
+    on soma.authorizations_global ( team_id, permission_id )
+    where team_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexTeamGlobalAuthorization`
+	idx++
+
 	queryMap["createTableRepoAuthorizations"] = `
 create table if not exists soma.authorizations_repository (
     grant_id                    uuid            PRIMARY KEY,
     user_id                     uuid            REFERENCES inventory.user ( id ) DEFERRABLE,
     tool_id                     uuid            REFERENCES auth.tools ( tool_id ) DEFERRABLE,
-    admin_id                    uuid            REFERENCES auth.admin ( id ) DEFERRABLE,
+    admin_id                    uuid            REFERENCES auth.admin ( id ) ON DELETE CASCADE DEFERRABLE,
     team_id                     uuid            REFERENCES inventory.team ( id ) DEFERRABLE,
     object_type                 varchar(64)     NOT NULL REFERENCES soma.object_types ( object_type ) DEFERRABLE,
     repository_id               uuid            REFERENCES soma.repository (id) DEFERRABLE,
@@ -201,6 +208,34 @@ create table if not exists soma.authorizations_repository (
 	queries[idx] = "createTableRepoAuthorizations"
 	idx++
 
+	queryMap[`createUniqueIndexAdminRepoAuthorizations`] = `
+create unique index _unique_admin_repo_authoriz
+    on soma.authorizations_repository ( admin_id, permission_id, repository_id )
+    where admin_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexAdminRepoAuthorizations`
+	idx++
+
+	queryMap[`createUniqueIndexUserRepoAuthorizations`] = `
+create unique index _unique_user_repo_authoriz
+    on soma.authorizations_repository ( user_id, permission_id, repository_id )
+    where user_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexUserRepoAuthorizations`
+	idx++
+
+	queryMap[`createUniqueIndexToolRepoAuthorizations`] = `
+create unique index _unique_tool_repo_authoriz
+    on soma.authorizations_repository ( tool_id, permission_id, repository_id )
+    where tool_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexToolRepoAuthorizations`
+	idx++
+
+	queryMap[`createUniqueIndexTeamRepoAuthorizations`] = `
+create unique index _unique_team_repo_authoriz
+    on soma.authorizations_repository ( team_id, permission_id, repository_id )
+    where team_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexTeamRepoAuthorizations`
+	idx++
+
 	queryMap["createTableMonitoringAuthorizations"] = `
 create table if not exists soma.authorizations_monitoring (
     grant_id                    uuid            PRIMARY KEY,
@@ -222,6 +257,27 @@ create table if not exists soma.authorizations_monitoring (
 	queries[idx] = "createTableMonitoringAuthorizations"
 	idx++
 
+	queryMap[`createUniqueIndexUserMonitoringAuthorizations`] = `
+create unique index _unique_user_monitoring_authoriz
+    on soma.authorizations_monitoring ( user_id, permission_id, monitoring_id )
+    where user_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexUserMonitoringAuthorizations`
+	idx++
+
+	queryMap[`createUniqueIndexToolMonitoringAuthorizations`] = `
+create unique index _unique_tool_monitoring_authoriz
+    on soma.authorizations_monitoring ( tool_id, permission_id, monitoring_id )
+    where tool_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexToolMonitoringAuthorizations`
+	idx++
+
+	queryMap[`createUniqueIndexTeamMonitoringAuthorizations`] = `
+create unique index _unique_team_monitoring_authoriz
+    on soma.authorizations_monitoring ( team_id, permission_id, monitoring_id )
+    where team_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexTeamMonitoringAuthorizations`
+	idx++
+
 	queryMap["createTableTeamAuthorizations"] = `
 create table if not exists soma.authorizations_team (
     grant_id                    uuid            PRIMARY KEY,
@@ -241,6 +297,27 @@ create table if not exists soma.authorizations_team (
     UNIQUE ( user_id, tool_id, team_id, category, permission_id, authorized_team_id )
 );`
 	queries[idx] = "createTableTeamAuthorizations"
+
+	queryMap[`createUniqueIndexUserTeamAuthorizations`] = `
+create unique index _unique_user_team_authoriz
+    on soma.authorizations_team ( user_id, permission_id, authorized_team_id )
+    where user_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexUserTeamAuthorizations`
+	idx++
+
+	queryMap[`createUniqueIndexToolTeamAuthorizations`] = `
+create unique index _unique_tool_team_authoriz
+    on soma.authorizations_team ( tool_id, permission_id, authorized_team_id )
+    where tool_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexToolTeamAuthorizations`
+	idx++
+
+	queryMap[`createUniqueIndexTeamTeamAuthorizations`] = `
+create unique index _unique_team_team_authoriz
+    on soma.authorizations_team ( team_id, permission_id, authorized_team_id )
+    where team_id IS NOT NULL;`
+	queries[idx] = `createUniqueIndexTeamTeamAuthorizations`
+	idx++
 
 	performDatabaseTask(printOnly, verbose, queries, queryMap)
 }

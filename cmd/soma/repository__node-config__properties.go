@@ -19,6 +19,11 @@ func nodeConfigPropertyCreateSystem(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeSystem, proto.EntityNode)
 }
 
+// nodeConfigPropertyUpdateSystem function
+func nodeConfigPropertyUpdateSystem(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeSystem, proto.EntityNode)
+}
+
 // nodeConfigPropertyCreateService function
 func nodeConfigPropertyCreateService(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeService, proto.EntityNode)
@@ -32,6 +37,11 @@ func nodeConfigPropertyCreateOncall(c *cli.Context) error {
 // nodeConfigPropertyCreateCustom function
 func nodeConfigPropertyCreateCustom(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeCustom, proto.EntityNode)
+}
+
+// nodeConfigPropertyUpdateCustom function
+func nodeConfigPropertyUpdateCustom(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeCustom, proto.EntityNode)
 }
 
 // nodeConfigPropertyDestroySystem function

@@ -156,7 +156,7 @@ func (f *ForestCustodian) spawnTreeKeeper(q *msg.Request, s *tree.Tree,
 		return err
 	}
 
-	keeperName := fmt.Sprintf("repository_%s", q.Repository.Name)
+	keeperName := fmt.Sprintf("repository_%s_%s", q.Repository.Name, q.Repository.ID)
 	if lfh, err = reopen.NewFileWriter(filepath.Join(
 		f.soma.conf.LogPath,
 		`repository`,

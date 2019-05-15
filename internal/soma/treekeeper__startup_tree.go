@@ -80,9 +80,9 @@ bucketloop:
 			Action:  msg.ActionCreate,
 			Bucket:  bucket.Clone(),
 		}
-		go func(q *msg.Request) {
-			super.Update <- msg.CacheUpdateFromRequest(q)
-		}(&req)
+
+		super.Update <- msg.CacheUpdateFromRequest(&req)
+
 	}
 }
 
@@ -150,9 +150,9 @@ grouploop:
 			Action:  msg.ActionCreate,
 			Group:   group.Clone(),
 		}
-		go func(q *msg.Request) {
-			super.Update <- msg.CacheUpdateFromRequest(q)
-		}(&req)
+
+		super.Update <- msg.CacheUpdateFromRequest(&req)
+
 	}
 }
 
@@ -271,9 +271,9 @@ clusterloop:
 			Action:  msg.ActionCreate,
 			Cluster: cluster.Clone(),
 		}
-		go func(q *msg.Request) {
-			super.Update <- msg.CacheUpdateFromRequest(q)
-		}(&req)
+
+		super.Update <- msg.CacheUpdateFromRequest(&req)
+
 	}
 }
 
@@ -340,9 +340,9 @@ clusterloop:
 			Action:  msg.ActionCreate,
 			Cluster: cluster.Clone(),
 		}
-		go func(q *msg.Request) {
-			super.Update <- msg.CacheUpdateFromRequest(q)
-		}(&req)
+
+		super.Update <- msg.CacheUpdateFromRequest(&req)
+
 	}
 }
 
@@ -425,25 +425,24 @@ nodeloop:
 		tk.drain(`action`)
 		tk.drain(`error`)
 
-		go func() {
-			super.Update <- msg.CacheUpdateFromRequest(&msg.Request{
-				Section: msg.SectionNodeConfig,
-				Action:  msg.ActionAssign,
-				Node: proto.Node{
-					ID:        nodeID,
-					AssetID:   uint64(assetID),
-					Name:      nodeName,
-					TeamID:    teamID,
-					ServerID:  serverID,
-					IsOnline:  nodeOnline,
-					IsDeleted: nodeDeleted,
-					Config: &proto.NodeConfig{
-						RepositoryID: tk.meta.repoID,
-						BucketID:     bucketID,
-					},
+		super.Update <- msg.CacheUpdateFromRequest(&msg.Request{
+			Section: msg.SectionNodeConfig,
+			Action:  msg.ActionAssign,
+			Node: proto.Node{
+				ID:        nodeID,
+				AssetID:   uint64(assetID),
+				Name:      nodeName,
+				TeamID:    teamID,
+				ServerID:  serverID,
+				IsOnline:  nodeOnline,
+				IsDeleted: nodeDeleted,
+				Config: &proto.NodeConfig{
+					RepositoryID: tk.meta.repoID,
+					BucketID:     bucketID,
 				},
-			})
-		}()
+			},
+		})
+
 	}
 }
 

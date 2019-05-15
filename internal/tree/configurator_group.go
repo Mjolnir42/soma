@@ -70,7 +70,7 @@ func (g *Group) evalCustomProp(prop string, val string, view string) (string, bo
 func (g *Group) evalServiceProp(prop string, val string, view string) (string, bool, string) {
 	for _, v := range g.PropertyService {
 		t := v.(*PropertyService)
-		if prop == "name" && (t.ServiceName == val || val == `@defined`) && (t.View == view || t.View == `any`) {
+		if ((prop == "name" && (t.ServiceName == val || val == `@defined`)) || (prop == "id" && (t.ServiceID.String() == val))) && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true, t.ServiceName
 		}
 	}
@@ -723,8 +723,8 @@ func (g *Group) createPerServiceCheckInstances(ctx *checkContext) {
 func (g *Group) pruneOldCheckInstances(ctx *checkContext) {
 	g.lock.Lock()
 	defer g.lock.Unlock()
-
-	for _, oldInstanceID := range g.CheckInstances[ctx.uuid] {
+	Instances := g.CheckInstances[ctx.uuid]
+	for _, oldInstanceID := range Instances {
 		if _, ok := ctx.newInstances[oldInstanceID]; !ok {
 			// there is no new version for oldInstanceID
 			g.actionCheckInstanceDelete(g.Instances[oldInstanceID].MakeAction())
@@ -733,6 +733,7 @@ func (g *Group) pruneOldCheckInstances(ctx *checkContext) {
 				g.GetRepositoryName(), `DeleteInstance`, `group`, g.ID.String(),
 				ctx.uuid, oldInstanceID,
 			)
+			g.CheckInstances[ctx.uuid] = removeFromArray(g.CheckInstances[ctx.uuid], oldInstanceID)
 			delete(g.Instances, oldInstanceID)
 		}
 	}

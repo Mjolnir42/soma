@@ -291,7 +291,8 @@ soma section add workflow to operation
 ```
 soma action add add to action
 soma action add add to admin-mgmt
-soma action add add to capability
+soma action add add to attribute
+soma action add declare to capability
 soma action add add to category
 soma action add add to datacenter
 soma action add add to entity
@@ -423,7 +424,7 @@ soma action add rebuild-repository to system
 soma action add remove to action
 soma action add remove to admin-mgmt
 soma action add remove to attribute
-soma action add remove to capability
+soma action add revoke to capability
 soma action add remove to category
 soma action add remove to datacenter
 soma action add remove to entity
@@ -601,6 +602,7 @@ soma permission add admin to permission
 ```
 soma permission map attribute::list to global::browse
 soma permission map attribute::show to global::browse
+soma permission map attribute::add to global::browse
 soma permission map datacenter::list to global::browse
 soma permission map datacenter::show to global::browse
 soma permission map entity::list to global::browse
@@ -631,6 +633,8 @@ soma permission map predicate::show to global::browse
 soma permission map property-mgmt::list to global::browse
 soma permission map property-mgmt::search to global::browse
 soma permission map property-mgmt::show to global::browse
+soma permission map property-mgmt::add to global::browse
+soma permission map property-mgmt::remove to global::browse
 soma permission map property-native::list to global::browse
 soma permission map property-native::search to global::browse
 soma permission map property-native::show to global::browse

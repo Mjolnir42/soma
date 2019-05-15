@@ -38,7 +38,9 @@ func (tec *Cluster) ReAttach(a AttachRequest) {
 		panic(`Cluster.ReAttach: not attached`)
 	}
 	tec.deletePropertyAllInherited()
-	// TODO delete all inherited checks + check instances
+	tec.deleteCheckAllInherited()
+	tec.deleteCheckAllInherited()
+	tec.updateCheckInstances()
 
 	tec.Parent.Unlink(UnlinkRequest{
 		ParentType: tec.Parent.(Builder).GetType(),
@@ -77,6 +79,7 @@ func (tec *Cluster) Destroy() {
 	tec.deletePropertyAllLocal()
 	tec.deletePropertyAllInherited()
 	tec.deleteCheckLocalAll()
+	tec.deleteCheckAllInherited()
 	tec.updateCheckInstances()
 
 	wg := new(sync.WaitGroup)
@@ -110,6 +113,8 @@ func (tec *Cluster) Detach() {
 	bucket := tec.Parent.(Bucketeer).GetBucket()
 
 	tec.deletePropertyAllInherited()
+	tec.deleteCheckAllInherited()
+	tec.updateCheckInstances()
 	// TODO delete all inherited checks + check instances
 
 	tec.Parent.Unlink(UnlinkRequest{

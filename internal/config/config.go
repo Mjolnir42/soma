@@ -112,7 +112,10 @@ func (c *Config) ReadConfigFile(fname string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	json.Unmarshal([]byte(uclJSON), &c)
+	err = json.Unmarshal([]byte(uclJSON), c)
+	if err != nil {
+		log.Fatal("Error reading config file: ", err)
+	}
 
 	if c.InstanceName == `` {
 		log.Println(`Setting default value for instance.name: huxley`)

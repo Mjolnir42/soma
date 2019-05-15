@@ -358,7 +358,7 @@ func ValidateCheckConstraints(repoID, teamID string,
 
 		case `attribute`:
 			if _, err := fetchObjList(
-				fmt.Sprintf("/attributes/%s", prop.Attribute.Name),
+				fmt.Sprintf("/attribute/%s", prop.Attribute.Name),
 			); err != nil {
 				return nil, err
 			}

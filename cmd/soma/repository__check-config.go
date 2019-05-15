@@ -24,8 +24,9 @@ func registerChecks(app cli.App) *cli.App {
 	app.Commands = append(app.Commands,
 		[]cli.Command{
 			{
-				Name:  `check-config`,
-				Usage: `SUBCOMMANDS for check configuration management`,
+				Name:        `check-config`,
+				Description: help.Text(`check-config::`),
+				Usage:       `SUBCOMMANDS for check configuration management`,
 				Subcommands: []cli.Command{
 					{
 						Name:         `create`,
@@ -50,7 +51,7 @@ func registerChecks(app cli.App) *cli.App {
 					},
 					{
 						Name:         `show`,
-						Usage:        `Show details about a check configuration`,
+						Usage:        `Show details about a check configuration in a repository`,
 						Description:  help.Text(`check-config::show`),
 						Action:       runtime(checkConfigShow),
 						BashComplete: cmpl.In,

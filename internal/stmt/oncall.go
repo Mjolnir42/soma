@@ -108,6 +108,21 @@ FROM   inventory.oncall_membership
 JOIN   inventory.user
   ON   inventory.oncall_membership.user_id = inventory.user.id
 WHERE  inventory.oncall_membership.oncall_id = $1::uuid;`
+
+	OncallGetAllInstances = `
+	select DISTINCT bucket_id,pi.source_object_id,pi.source_object_type,pi.repository_id,pi.source_instance_id,view,inheritance_enabled from (
+        select null as bucket_id,oncall_duty_id,view,source_instance_id,inheritance_enabled from repository_oncall_properties
+        union all
+        select bucket_id,oncall_duty_id,view,source_instance_id,inheritance_enabled from bucket_oncall_properties
+        union all
+        select bucket_id,oncall_duty_id,view,source_instance_id,inheritance_enabled from groups g join group_oncall_properties gsp on g.group_id = gsp.group_id
+        union all
+        select bucket_id,oncall_duty_id,view,source_instance_id,inheritance_enabled from clusters c join cluster_oncall_properties csp on c.cluster_id = csp.cluster_id
+        union all
+        select bucket_id,oncall_duty_id,view,source_instance_id,inheritance_enabled from node_bucket_assignment n join node_oncall_property nsp on n.node_id = nsp.node_id
+	) as garbage
+	join property_instances pi on garbage.source_instance_id = pi.instance_id
+	where oncall_duty_id = $1::uuid;`
 )
 
 func init() {
@@ -120,6 +135,7 @@ func init() {
 	m[OncallSearch] = `OncallSearch`
 	m[OncallShow] = `OncallShow`
 	m[OncallUpdate] = `OncallUpdate`
+	m[OncallGetAllInstances] = `OncallGetAllInstances`
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

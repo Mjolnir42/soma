@@ -322,6 +322,7 @@ func (m *objectLookup) rmNode(nodeID string) {
 			m.byBucket[bucketID][`node`][:i],
 			m.byBucket[bucketID][`node`][i+1:]...)
 		m.compactionCounter++
+		break
 	}
 
 	// remove node from repository
@@ -333,6 +334,7 @@ func (m *objectLookup) rmNode(nodeID string) {
 			m.byRepository[repoID][`node`][:i],
 			m.byRepository[repoID][`node`][i+1:]...)
 		m.compactionCounter++
+		break
 	}
 
 	// remove node

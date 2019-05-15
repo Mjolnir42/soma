@@ -201,24 +201,24 @@ func (tk *TreeKeeper) Run() {
 	// close the startup logfile
 	func() {
 		fh := tk.soma.logMap.Get(
-			fmt.Sprintf("startup_repository_%s", tk.meta.repoName),
+			fmt.Sprintf("startup_repository_%s_%s", tk.meta.repoName, tk.meta.repoID),
 		)
 		if fh == nil {
 			return
 		}
 		tk.soma.logMap.Del(fmt.Sprintf(
-			"startup_repository_%s", tk.meta.repoName,
+			"startup_repository_%s_%s", tk.meta.repoName, tk.meta.repoID,
 		))
 		fh.Close()
 	}()
 
 	// deferred close the regular logfile
 	defer func() {
-		fh := tk.soma.logMap.Get(fmt.Sprintf("repository_%s", tk.meta.repoName))
+		fh := tk.soma.logMap.Get(fmt.Sprintf("repository__%s_%s", tk.meta.repoName, tk.meta.repoID))
 		if fh == nil {
 			return
 		}
-		tk.soma.logMap.Del(fmt.Sprintf("repository_%s", tk.meta.repoName))
+		tk.soma.logMap.Del(fmt.Sprintf("repository__%s_%s", tk.meta.repoName, tk.meta.repoID))
 		fh.Close()
 	}()
 
@@ -700,7 +700,7 @@ actionloop:
 	switch {
 	case q.Section == msg.SectionRepository && q.Action == msg.ActionDestroy:
 		tk.ShutdownNow()
-		keeper := fmt.Sprintf("repository_%s", tk.meta.repoName)
+		keeper := fmt.Sprintf("repository_%s_%s", tk.meta.repoName, tk.meta.repoID)
 		tk.soma.handlerMap.Del(keeper)
 	}
 	return
@@ -792,40 +792,50 @@ func (tk *TreeKeeper) startTx() (
 		`RepositoryPropertyServiceCreate`: stmt.TxRepositoryPropertyServiceCreate,
 		`RepositoryPropertyServiceDelete`: stmt.TxRepositoryPropertyServiceDelete,
 		`RepositoryPropertySystemCreate`:  stmt.TxRepositoryPropertySystemCreate,
+		`RepositoryPropertySystemUpdate`:  stmt.TxRepositoryPropertySystemUpdate,
 		`RepositoryPropertySystemDelete`:  stmt.TxRepositoryPropertySystemDelete,
 		`RepositoryPropertyCustomCreate`:  stmt.TxRepositoryPropertyCustomCreate,
+		`RepositoryPropertyCustomUpdate`:  stmt.TxRepositoryPropertyCustomUpdate,
 		`RepositoryPropertyCustomDelete`:  stmt.TxRepositoryPropertyCustomDelete,
 		`BucketPropertyOncallCreate`:      stmt.TxBucketPropertyOncallCreate,
 		`BucketPropertyOncallDelete`:      stmt.TxBucketPropertyOncallDelete,
 		`BucketPropertyServiceCreate`:     stmt.TxBucketPropertyServiceCreate,
 		`BucketPropertyServiceDelete`:     stmt.TxBucketPropertyServiceDelete,
 		`BucketPropertySystemCreate`:      stmt.TxBucketPropertySystemCreate,
+		`BucketPropertySystemUpdate`:      stmt.TxBucketPropertySystemUpdate,
 		`BucketPropertySystemDelete`:      stmt.TxBucketPropertySystemDelete,
 		`BucketPropertyCustomCreate`:      stmt.TxBucketPropertyCustomCreate,
+		`BucketPropertyCustomUpdate`:      stmt.TxBucketPropertyCustomUpdate,
 		`BucketPropertyCustomDelete`:      stmt.TxBucketPropertyCustomDelete,
 		`GroupPropertyOncallCreate`:       stmt.TxGroupPropertyOncallCreate,
 		`GroupPropertyOncallDelete`:       stmt.TxGroupPropertyOncallDelete,
 		`GroupPropertyServiceCreate`:      stmt.TxGroupPropertyServiceCreate,
 		`GroupPropertyServiceDelete`:      stmt.TxGroupPropertyServiceDelete,
 		`GroupPropertySystemCreate`:       stmt.TxGroupPropertySystemCreate,
+		`GroupPropertySystemUpdate`:       stmt.TxGroupPropertySystemUpdate,
 		`GroupPropertySystemDelete`:       stmt.TxGroupPropertySystemDelete,
 		`GroupPropertyCustomCreate`:       stmt.TxGroupPropertyCustomCreate,
+		`GroupPropertyCustomUpdate`:       stmt.TxGroupPropertyCustomUpdate,
 		`GroupPropertyCustomDelete`:       stmt.TxGroupPropertyCustomDelete,
 		`ClusterPropertyOncallCreate`:     stmt.TxClusterPropertyOncallCreate,
 		`ClusterPropertyOncallDelete`:     stmt.TxClusterPropertyOncallDelete,
 		`ClusterPropertyServiceCreate`:    stmt.TxClusterPropertyServiceCreate,
 		`ClusterPropertyServiceDelete`:    stmt.TxClusterPropertyServiceDelete,
 		`ClusterPropertySystemCreate`:     stmt.TxClusterPropertySystemCreate,
+		`ClusterPropertySystemUpdate`:     stmt.TxClusterPropertySystemUpdate,
 		`ClusterPropertySystemDelete`:     stmt.TxClusterPropertySystemDelete,
 		`ClusterPropertyCustomCreate`:     stmt.TxClusterPropertyCustomCreate,
+		`ClusterPropertyCustomUpdate`:     stmt.TxClusterPropertyCustomUpdate,
 		`ClusterPropertyCustomDelete`:     stmt.TxClusterPropertyCustomDelete,
 		`NodePropertyOncallCreate`:        stmt.TxNodePropertyOncallCreate,
 		`NodePropertyOncallDelete`:        stmt.TxNodePropertyOncallDelete,
 		`NodePropertyServiceCreate`:       stmt.TxNodePropertyServiceCreate,
 		`NodePropertyServiceDelete`:       stmt.TxNodePropertyServiceDelete,
 		`NodePropertySystemCreate`:        stmt.TxNodePropertySystemCreate,
+		`NodePropertySystemUpdate`:        stmt.TxNodePropertySystemUpdate,
 		`NodePropertySystemDelete`:        stmt.TxNodePropertySystemDelete,
 		`NodePropertyCustomCreate`:        stmt.TxNodePropertyCustomCreate,
+		`NodePropertyCustomUpdate`:        stmt.TxNodePropertyCustomUpdate,
 		`NodePropertyCustomDelete`:        stmt.TxNodePropertyCustomDelete,
 	} {
 		if stMap[name], err = tx.Prepare(statement); err != nil {

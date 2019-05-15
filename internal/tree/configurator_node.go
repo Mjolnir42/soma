@@ -71,7 +71,7 @@ func (n *Node) evalCustomProp(prop string, val string, view string) (string, boo
 func (n *Node) evalServiceProp(prop string, val string, view string) (string, bool, string) {
 	for _, v := range n.PropertyService {
 		t := v.(*PropertyService)
-		if prop == "name" && (t.ServiceName == val || val == `@defined`) && (t.View == view || t.View == `any`) {
+		if ((prop == "name" && (t.ServiceName == val || val == `@defined`)) || (prop == "id" && (t.ServiceID.String() == val))) && (t.View == view || t.View == `any`) {
 			return t.ID.String(), true, t.ServiceName
 		}
 	}
@@ -265,7 +265,6 @@ func (n *Node) processCheckForUpdates(chkName string, startup bool) {
 
 	ctx := newCheckContext(chkName, n.Checks[chkName].View, startup)
 	n.lock.RUnlock()
-
 	n.constraintCheck(ctx)
 	n.log.Printf(
 		"TK[%s]: Action=%s, ObjectType=%s, ObjectID=%s, CheckID=%s, Match=%t",
@@ -351,6 +350,7 @@ func (n *Node) constraintCheck(ctx *checkContext) {
 			ctx.brokeConstraint = true
 			return
 		case msg.ConstraintService:
+
 			ctx.hasServiceConstraint = true
 			if id, hit, bind := n.evalServiceProp(cc.Key, cc.Value, ctx.view); hit {
 				ctx.serviceConstr[id] = bind
@@ -436,7 +436,6 @@ func (n *Node) constraintCheck(ctx *checkContext) {
 func (n *Node) createNoServiceCheckInstance(ctx *checkContext) {
 	n.lock.RLock()
 	defer n.lock.RUnlock()
-
 	inst := CheckInstance{
 		InstanceID: uuid.UUID{},
 		CheckID: func(id string) uuid.UUID {
@@ -467,7 +466,6 @@ func (n *Node) createNoServiceCheckInstance(ctx *checkContext) {
 		n.lock.RUnlock()
 		n.lock.Lock()
 		matched := false
-
 		for loadedID, loadedInst := range n.loadedInstances[ctx.uuid] {
 			if loadedInst.InstanceSvcCfgHash != `` {
 				continue
@@ -549,7 +547,6 @@ func (n *Node) createNoServiceCheckInstance(ctx *checkContext) {
 func (n *Node) createPerServiceCheckInstances(ctx *checkContext) {
 	n.lock.RLock()
 	defer n.lock.RUnlock()
-
 	for svcID := range ctx.serviceConstr {
 		svcCfg := n.getServiceMap(svcID)
 
@@ -710,8 +707,8 @@ func (n *Node) createPerServiceCheckInstances(ctx *checkContext) {
 func (n *Node) pruneOldCheckInstances(ctx *checkContext) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
-
-	for _, oldInstanceID := range n.CheckInstances[ctx.uuid] {
+	Instances := n.CheckInstances[ctx.uuid]
+	for _, oldInstanceID := range Instances {
 		if _, ok := ctx.newInstances[oldInstanceID]; !ok {
 			// there is no new version for this instance id
 			n.actionCheckInstanceDelete(n.Instances[oldInstanceID].MakeAction())
@@ -720,6 +717,7 @@ func (n *Node) pruneOldCheckInstances(ctx *checkContext) {
 				n.GetRepositoryName(), `DeleteInstance`, `node`, n.ID.String(),
 				ctx.uuid, oldInstanceID,
 			)
+			n.CheckInstances[ctx.uuid] = removeFromArray(n.CheckInstances[ctx.uuid], oldInstanceID)
 			delete(n.Instances, oldInstanceID)
 		}
 	}

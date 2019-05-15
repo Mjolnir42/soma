@@ -17,9 +17,18 @@ import (
 	"github.com/mjolnir42/soma/lib/proto"
 )
 
-// variousPropertyCreate is the generic function for creating properties
-// on tree objects
-func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
+// variousPropertyUpdate is the generic function for updating
+// properties on tree objects
+func variousPropertyUpdate(c *cli.Context, propertyType, entity string) error {
+	var (
+		repositoryID, bucketID     string
+		groupID, clusterID, nodeID string
+		property, sourceID, path   string
+		config                     *proto.NodeConfig
+		req                        proto.Request
+		err                        error
+	)
+
 	switch entity {
 	case proto.EntityRepository, proto.EntityBucket, proto.EntityGroup, proto.EntityCluster, proto.EntityNode:
 	default:
@@ -72,33 +81,27 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		}
 	}
 
-	var (
-		objectID, repoID, bucketID string
-		config                     *proto.NodeConfig
-		req                        proto.Request
-		err                        error
-	)
 	// id lookup
 	switch entity {
 	case proto.EntityNode:
-		if objectID, err = adm.LookupNodeID(opts[`on`][0]); err != nil {
+		if nodeID, err = adm.LookupNodeID(opts[`on`][0]); err != nil {
 			return err
 		}
-		if config, err = adm.LookupNodeConfig(objectID); err != nil {
+		if config, err = adm.LookupNodeConfig(nodeID); err != nil {
 			return err
 		}
-		repoID = config.RepositoryID
+		repositoryID = config.RepositoryID
 		bucketID = config.BucketID
 	case proto.EntityCluster:
 		bucketID, err = adm.LookupBucketID(opts[`in`][0])
 		if err != nil {
 			return err
 		}
-		if objectID, err = adm.LookupClusterID(opts[`on`][0],
+		if clusterID, err = adm.LookupClusterID(opts[`on`][0],
 			bucketID); err != nil {
 			return err
 		}
-		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
+		if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
 	case proto.EntityGroup:
@@ -106,11 +109,13 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		if err != nil {
 			return err
 		}
-		if objectID, err = adm.LookupGroupID(opts[`on`][0],
+
+		if groupID, err = adm.LookupGroupID(opts[`on`][0],
 			bucketID); err != nil {
 			return err
 		}
-		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
+
+		if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
 	case proto.EntityBucket:
@@ -118,16 +123,14 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		if err != nil {
 			return err
 		}
-		objectID = bucketID
-		if repoID, err = adm.LookupRepoByBucket(bucketID); err != nil {
+		if repositoryID, err = adm.LookupRepoByBucket(bucketID); err != nil {
 			return err
 		}
 	case proto.EntityRepository:
-		repoID, err = adm.LookupRepoID(opts[`on`][0])
+		repositoryID, err = adm.LookupRepoID(opts[`on`][0])
 		if err != nil {
 			return err
 		}
-		objectID = repoID
 	}
 
 	// property assembly
@@ -152,6 +155,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 	} else {
 		prop.Inheritance = true
 	}
+	property = c.Args().First()
 	switch propertyType {
 	case proto.PropertyTypeSystem:
 		prop.System = &proto.PropertySystem{
@@ -162,7 +166,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		var serviceID, teamID string
 		switch entity {
 		case proto.EntityRepository:
-			if err = adm.LookupTeamByRepo(repoID, &teamID); err != nil {
+			if err = adm.LookupTeamByRepo(repositoryID, &teamID); err != nil {
 				return err
 			}
 		default:
@@ -201,7 +205,7 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		}
 	case proto.PropertyTypeCustom:
 		customID, err := adm.LookupCustomPropertyID(
-			c.Args().First(), repoID)
+			c.Args().First(), repositoryID)
 		if err != nil {
 			return err
 		}
@@ -209,62 +213,105 @@ func variousPropertyCreate(c *cli.Context, propertyType, entity string) error {
 		prop.Custom = &proto.PropertyCustom{
 			ID:           customID,
 			Name:         c.Args().First(),
-			RepositoryID: repoID,
+			RepositoryID: repositoryID,
 			Value:        opts[`value`][0],
 		}
 	}
 
+	switch entity {
+	case proto.EntityRepository:
+		if err = adm.FindRepoPropSrcID(propertyType, property,
+			opts[`view`][0], repositoryID, &sourceID); err != nil {
+			return err
+		}
+		path = fmt.Sprintf("/repository/%s/property/%s/%s",
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
+		)
+	case proto.EntityBucket:
+		if err = adm.FindBucketPropSrcID(propertyType, property,
+			opts[`view`][0], repositoryID, bucketID, &sourceID); err != nil {
+			return err
+		}
+		path = fmt.Sprintf("/repository/%s/bucket/%s/property/%s/%s",
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
+		)
+	case proto.EntityGroup:
+		if err = adm.FindGroupPropSrcID(propertyType, property,
+			opts[`view`][0], repositoryID, bucketID, groupID, &sourceID); err != nil {
+			return err
+		}
+		path = fmt.Sprintf("/repository/%s/bucket/%s/group/%s/property/%s/%s",
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(groupID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
+		)
+	case proto.EntityCluster:
+		if err = adm.FindClusterPropSrcID(propertyType, property,
+			opts[`view`][0], repositoryID, bucketID, clusterID, &sourceID); err != nil {
+			return err
+		}
+		path = fmt.Sprintf("/repository/%s/bucket/%s/cluster/%s/property/%s/%s",
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(clusterID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
+		)
+	case proto.EntityNode:
+		if err = adm.FindNodePropSrcID(propertyType, property,
+			opts[`view`][0], nodeID, &sourceID); err != nil {
+			return err
+		}
+		path = fmt.Sprintf("/repository/%s/bucket/%s/node/%s/property/%s/%s",
+			url.QueryEscape(repositoryID),
+			url.QueryEscape(bucketID),
+			url.QueryEscape(nodeID),
+			url.QueryEscape(propertyType),
+			url.QueryEscape(sourceID),
+		)
+	default:
+		return fmt.Errorf("Unknown entity: %s", entity)
+	}
+	prop.SourceInstanceID = sourceID
 	// request assembly
 	switch entity {
 	case proto.EntityNode:
 		req = proto.NewNodeRequest()
-		req.Node.ID = objectID
+		req.Node.ID = nodeID
 		req.Node.Config = config
 		req.Node.Properties = &[]proto.Property{prop}
 	case proto.EntityCluster:
 		req = proto.NewClusterRequest()
-		req.Cluster.ID = objectID
-		req.Cluster.RepositoryID = repoID
+		req.Cluster.ID = clusterID
+		req.Cluster.RepositoryID = repositoryID
 		req.Cluster.BucketID = bucketID
 		req.Cluster.Properties = &[]proto.Property{prop}
 	case proto.EntityGroup:
 		req = proto.NewGroupRequest()
-		req.Group.ID = objectID
-		req.Group.RepositoryID = repoID
+		req.Group.ID = groupID
+		req.Group.RepositoryID = repositoryID
 		req.Group.BucketID = bucketID
 		req.Group.Properties = &[]proto.Property{prop}
 	case proto.EntityBucket:
 		req = proto.NewBucketRequest()
-		req.Bucket.ID = objectID
-		req.Bucket.RepositoryID = repoID
+		req.Bucket.ID = bucketID
+		req.Bucket.RepositoryID = repositoryID
 		req.Bucket.Properties = &[]proto.Property{prop}
 	case proto.EntityRepository:
 		req = proto.NewRepositoryRequest()
-		req.Repository.ID = repoID
+		req.Repository.ID = repositoryID
 		req.Repository.Properties = &[]proto.Property{prop}
 	}
 
-	var path string
-	switch entity {
-	case proto.EntityGroup, proto.EntityCluster, proto.EntityNode:
-		path = fmt.Sprintf("/repository/%s/bucket/%s/%s/%s/property/",
-			url.QueryEscape(repoID),
-			url.QueryEscape(bucketID),
-			url.QueryEscape(entity),
-			url.QueryEscape(objectID),
-		)
-	case proto.EntityBucket:
-		path = fmt.Sprintf("/repository/%s/bucket/%s/property/",
-			url.QueryEscape(repoID),
-			url.QueryEscape(objectID),
-		)
-	case proto.EntityRepository:
-		path = fmt.Sprintf("/repository/%s/property/",
-			url.QueryEscape(objectID),
-		)
-	}
-	command := fmt.Sprintf("%s-config::property-create", entity)
-	return adm.Perform(`postbody`, path, command, req, c)
+	command := fmt.Sprintf("%s-config::property-update", entity)
+	return adm.Perform(`putbody`, path, command, req, c)
 }
 
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix

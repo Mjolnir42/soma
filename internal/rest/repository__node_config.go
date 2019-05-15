@@ -23,7 +23,7 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 
 	request := msg.New(r, params)
 	request.Section = msg.SectionNode
-	request.Action = msg.ActionAssign
+	request.Action = msg.ActionShow
 
 	cReq := proto.NewNodeRequest()
 	if err := decodeJSONBody(r, &cReq); err != nil {
@@ -40,7 +40,18 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 	request.Repository.ID = cReq.Node.Config.RepositoryID
 	request.Bucket.ID = cReq.Node.Config.BucketID
 
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	// if there is no result we do not need to authorize it
+	if len(result.Node) == 0 {
+		x.send(&w, &result)
+		return
+	}
+	// set the TeamID based of the result before we authorize the request
+	// this allows authorization based on trusted information
+	request.Node.TeamID = result.Node[0].TeamID
 	// check if the user is allowed to assign nodes from this team
+	request.Action = msg.ActionAssign
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
 		return
@@ -54,7 +65,7 @@ func (x *Rest) NodeConfigAssign(w http.ResponseWriter,
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
+	result = <-request.Reply
 	x.send(&w, &result)
 }
 
@@ -71,9 +82,19 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 		RepositoryID: params.ByName(`repositoryID`),
 		BucketID:     params.ByName(`bucketID`),
 	}
-
-	// check if the user is allowed to unassign nodes from this team
 	request.Section = msg.SectionNode
+	request.Action = msg.ActionShow
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	// if there is no result we do not need to authorize it
+	if len(result.Node) == 0 {
+		x.send(&w, &result)
+		return
+	}
+	// set the TeamID based of the result before we authorize the request
+	// this allows authorization based on trusted information
+	request.Node.TeamID = result.Node[0].TeamID
+	// check if the user is allowed to unassign nodes from this team
 	request.Action = msg.ActionUnassign
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
@@ -90,7 +111,7 @@ func (x *Rest) NodeConfigUnassign(w http.ResponseWriter,
 	}
 
 	x.handlerMap.MustLookup(&request).Intake() <- request
-	result := <-request.Reply
+	result = <-request.Reply
 	x.send(&w, &result)
 }
 
@@ -133,7 +154,7 @@ func (x *Rest) NodeConfigPropertyCreate(w http.ResponseWriter,
 	request.Repository.ID = params.ByName(`repositoryID`)
 	request.Bucket.ID = params.ByName(`bucketID`)
 	request.Node.ID = params.ByName(`nodeID`)
-	request.Property.Type = params.ByName(`propertyType`)
+	request.Property.Type = (*cReq.Node.Properties)[0].Type
 
 	if !x.isAuthorized(&request) {
 		x.replyForbidden(&w, &request)
@@ -210,7 +231,50 @@ func (x *Rest) NodeConfigPropertyUpdate(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {
 	defer panicCatcher(w)
 
-	// XXX BUG TODO
+	request := msg.New(r, params)
+	request.Section = msg.SectionNodeConfig
+	request.Action = msg.ActionPropertyUpdate
+
+	cReq := proto.NewNodeRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
+	switch {
+	case params.ByName(`nodeID`) != cReq.Node.ID:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			"Mismatched node ids: %s, %s",
+			params.ByName(`nodeID`),
+			cReq.Node.ID))
+		return
+	case len(*cReq.Node.Properties) != 1:
+		x.replyBadRequest(&w, &request, fmt.Errorf(
+			"Expected property count 1, actual count: %d",
+			len(*cReq.Node.Properties)))
+		return
+	case (*cReq.Node.Properties)[0].Type == "service":
+		if (*cReq.Node.Properties)[0].Service.Name == `` {
+			x.replyBadRequest(&w, &request, fmt.Errorf(
+				"Empty service name is invalid"))
+			return
+		}
+	}
+	request.TargetEntity = msg.EntityNode
+	request.Node = cReq.Node.Clone()
+	request.Repository.ID = params.ByName(`repositoryID`)
+	request.Bucket.ID = params.ByName(`bucketID`)
+	request.Node.ID = params.ByName(`nodeID`)
+	request.Property.Type = (*cReq.Node.Properties)[0].Type
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
 }
 
 // NodeConfigTree function

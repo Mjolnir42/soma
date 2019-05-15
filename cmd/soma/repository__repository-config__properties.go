@@ -21,11 +21,25 @@ func repositoryConfigPropertyCreateSystem(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeSystem, proto.EntityRepository)
 }
 
+// repositoryConfigPropertyUpdateSystem function
+// soma repository property create system ${system} on ${repository} view ${view} \
+//      value ${value} [inheritance ${inherit}] [childrenonly ${child}]
+func repositoryConfigPropertyUpdateSystem(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeSystem, proto.EntityRepository)
+}
+
 // repositoryConfigPropertyCreateCustom function
 // soma repository property create custom ${custom} on ${repository} view ${view} \
 //      value ${value} [inheritance ${inherit}] [childrenonly ${child}]
 func repositoryConfigPropertyCreateCustom(c *cli.Context) error {
 	return variousPropertyCreate(c, proto.PropertyTypeCustom, proto.EntityRepository)
+}
+
+// repositoryConfigPropertyUpdateCustom function
+// soma repository property create custom ${custom} on ${repository} view ${view} \
+//      value ${value} [inheritance ${inherit}] [childrenonly ${child}]
+func repositoryConfigPropertyUpdateCustom(c *cli.Context) error {
+	return variousPropertyUpdate(c, proto.PropertyTypeCustom, proto.EntityRepository)
 }
 
 // repositoryConfigPropertyCreateService function

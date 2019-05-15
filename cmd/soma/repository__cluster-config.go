@@ -132,6 +132,27 @@ func registerClusters(app cli.App) *cli.App {
 								},
 							},
 							{
+								Name:        `update`,
+								Usage:       `SUBCOMMANDS to update properties`,
+								Description: help.Text(`cluster-config::property-update`),
+								Subcommands: []cli.Command{
+									{
+										Name:         `system`,
+										Usage:        `Update a system property to a cluster`,
+										Description:  help.Text(`cluster-config::property-update`),
+										Action:       runtime(clusterConfigPropertyUpdateSystem),
+										BashComplete: cmpl.PropertyCreateInValue,
+									},
+									{
+										Name:         `custom`,
+										Usage:        `Update a custom property to a cluster`,
+										Description:  help.Text(`cluster-config::property-update`),
+										Action:       runtime(clusterConfigPropertyUpdateCustom),
+										BashComplete: cmpl.PropertyCreateIn,
+									},
+								},
+							},
+							{
 								Name:        `destroy`,
 								Usage:       `SUBCOMMANDS to destroy properties`,
 								Description: help.Text(`cluster-config::property-destroy`),

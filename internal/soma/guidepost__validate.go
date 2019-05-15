@@ -75,7 +75,7 @@ func (g *GuidePost) validateRequest(q *msg.Request) (bool, error) {
 
 	// listed actions are accepted, but require no further validation
 	switch q.Action {
-	case msg.ActionPropertyCreate, msg.ActionPropertyDestroy:
+	case msg.ActionPropertyCreate, msg.ActionPropertyDestroy, msg.ActionPropertyUpdate:
 		switch q.Section {
 		case
 			msg.SectionRepositoryConfig,
@@ -466,9 +466,9 @@ func (g *GuidePost) validateBucketName(q *msg.Request) (bool, error) {
 }
 
 // validate current treekeeper state
-func (g *GuidePost) validateKeeper(repoName string) (bool, error) {
+func (g *GuidePost) validateKeeper(repoName, repoID string) (bool, error) {
 	// check we have a treekeeper for that repository
-	keeper := fmt.Sprintf("repository_%s", repoName)
+	keeper := fmt.Sprintf("repository_%s_%s", repoName, repoID)
 	if _, ok := g.soma.handlerMap.Get(keeper).(*TreeKeeper); !ok {
 		return true, fmt.Errorf(
 			"No handler for repository %s currently registered.",

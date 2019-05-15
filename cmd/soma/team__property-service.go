@@ -102,6 +102,95 @@ attrConversionLoop:
 	return adm.Perform(`postbody`, path, `command`, req, c)
 }
 
+// propertyMgmtServiceAdd function
+// soma property service add ${property} team ${team} [${attribute} ${attrValue}, ...]
+func propertyMgmtServiceUpdate(c *cli.Context) error {
+	var (
+		teamID string
+		err    error
+	)
+	opts := map[string][]string{}
+	multipleAllowed := []string{}
+	uniqueOptions := []string{`team`}
+	mandatoryOptions := []string{`team`}
+
+	// sort attributes based on their cardinality so we can use them
+	// for command line parsing
+	for _, attr := range attributeFetch() {
+		switch attr.Cardinality {
+		case `once`:
+			uniqueOptions = append(uniqueOptions, attr.Name)
+		case `multi`:
+			multipleAllowed = append(multipleAllowed, attr.Name)
+		default:
+			return fmt.Errorf("Unknown attribute cardinality: %s",
+				attr.Cardinality)
+		}
+	}
+
+	// check deferred errors
+	if err = popError(); err != nil {
+		return err
+	}
+
+	if err = adm.ParseVariadicArguments(
+		opts,
+		multipleAllowed,
+		uniqueOptions,
+		mandatoryOptions,
+		c.Args().Tail(),
+	); err != nil {
+		return err
+	}
+
+	if err = adm.LookupTeamID(opts[`team`][0], &teamID); err != nil {
+		return err
+	}
+
+	// construct request body
+	req := proto.NewServicePropertyRequest()
+	req.Property.Service.Name = c.Args().First()
+	req.Property.Service.TeamID = teamID
+
+	if err = adm.ValidateRuneCount(
+		req.Property.Service.Name, 128); err != nil {
+		return err
+	}
+	serviceID, err := adm.LookupServicePropertyID(req.Property.Service.Name, teamID)
+	if err != nil {
+		return err
+	}
+	req.Property.Service.ID = serviceID
+	// fill attributes into request body
+attrConversionLoop:
+	for oName := range opts {
+		if oName == `team` {
+			continue attrConversionLoop
+		}
+		for _, oVal := range opts[oName] {
+			if err := adm.ValidateRuneCount(oName, 128); err != nil {
+				return err
+			}
+			if err := adm.ValidateRuneCount(oVal, 128); err != nil {
+				return err
+			}
+			req.Property.Service.Attributes = append(
+				req.Property.Service.Attributes,
+				proto.ServiceAttribute{
+					Name:  oName,
+					Value: oVal,
+				},
+			)
+		}
+	}
+	path := fmt.Sprintf("/team/%s/property-mgmt/%s/%s",
+		url.QueryEscape(teamID),
+		url.QueryEscape(proto.PropertyTypeService),
+		url.QueryEscape(serviceID),
+	)
+	return adm.Perform(`putbody`, path, `command`, req, c)
+}
+
 // propertyMgmtServiceRemove function
 // soma property service remove ${property} team ${team}
 func propertyMgmtServiceRemove(c *cli.Context) error {

@@ -61,7 +61,8 @@ AND NOT EXISTS (
 	SELECT  id
 	FROM    soma.repository
 	WHERE   id   = $1::uuid
-	  OR    name = $2::varchar);`
+	  OR    name = $2::varchar
+	AND NOT is_deleted);`
 )
 
 func init() {

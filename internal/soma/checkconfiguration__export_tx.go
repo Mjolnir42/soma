@@ -10,7 +10,6 @@ import (
 
 func exportCheckConfigObjectTX(tx *sql.Tx, objectID string) (
 	*[]proto.CheckConfig, error) {
-
 	var (
 		err           error
 		checkconfigs  []proto.CheckConfig
@@ -56,7 +55,9 @@ func exportCheckConfigObjectTX(tx *sql.Tx, objectID string) (
 			rows.Close()
 			return nil, err
 		}
-
+		// the current row needs to be closed before we issue the next query
+		// within the same transaction https://github.com/lib/pq/issues/81
+		rows.Close()
 		if checkConfig, err = exportCheckConfig(
 			txMap[`base`],
 			checkConfigID,
@@ -119,7 +120,6 @@ func exportCheckConfig(prepStmt *sql.Stmt, queryID string) (
 		bucketIDOrNull                                 sql.NullString
 		interval                                       int64
 	)
-
 	if err := prepStmt.QueryRow(queryID).Scan(
 		&checkConfigID,
 		&repositoryID,
@@ -175,11 +175,9 @@ func exportCheckConfigThresholds(prepStmt *sql.Stmt, queryID string) (
 		levelNumeric, thresholdValue              int64
 		thresholds                                []proto.CheckConfigThreshold
 	)
-
 	if rows, err = prepStmt.Query(queryID); err != nil {
 		return nil, err
 	}
-
 	for rows.Next() {
 		if err = rows.Scan(
 			&checkConfigID,
