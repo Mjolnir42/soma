@@ -221,6 +221,8 @@ func (tk *TreeKeeper) txPropertyUpdate(a *tree.Action,
 			a.Property.System.Value,
 		)
 		return err
+	case msg.PropertyService, msg.PropertyOncall:
+		return err
 	}
 	return fmt.Errorf(`Impossible property type`)
 }
