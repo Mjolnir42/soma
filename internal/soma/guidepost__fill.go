@@ -23,6 +23,8 @@ func (g *GuidePost) fillReqData(q *msg.Request) (bool, error) {
 	switch {
 	case q.Action == msg.ActionPropertyCreate && q.Property.Type == `service`:
 		return g.fillServiceAttributes(q)
+	case q.Action == msg.ActionPropertyUpdate && q.Property.Type == `service`:
+		return g.fillServiceAttributes(q)
 	case q.Section == msg.SectionNodeConfig && q.Action == msg.ActionAssign:
 		return g.fillNode(q)
 	case q.Section == msg.SectionCheckConfig && q.Action == msg.ActionDestroy:

@@ -1139,6 +1139,32 @@ func upgradeSomaTo201903130001(curr int, tool string, printOnly bool) int {
 	return 201903130001
 }
 
+//This is work in progess
+func upgradeSomaTo201905130001(curr int, tool string, printOnly bool) int {
+	if curr != 201905130001 {
+		return 0
+	}
+	stmts := []string{
+		`ALTER TABLE soma.constraints_service_property ADD service_property_id uuid NOT NULL REFERENCES service_property(id);`,
+		`ALTER TABLE soma.authorizations_global ADD unique index _unique_team_global_authoriz ( team_id, permission_id ) where team_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_repository ADD unique index _unique_admin_repo_authoriz ( admin_id, permission_id, repository_id ) where admin_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_repository ADD unique index _unique_user_repo_authoriz ( user_id, permission_id, repository_id ) where user_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_repository ADD unique index _unique_tool_repo_authoriz ( tool_id, permission_id, repository_id ) where tool_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_repository ADD unique index _unique_team_repo_authoriz ( team_id, permission_id, repository_id ) where team_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_monitoring ADD unique index _unique_user_monitoring_authoriz ( user_id, permission_id, monitoring_id ) where user_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_monitoring ADD unique index _unique_tool_monitoring_authoriz ( tool_id, permission_id, monitoring_id ) where tool_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_monitoring ADD unique index _unique_team_monitoring_authoriz ( team_id, permission_id, monitoring_id ) where team_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_team ADD unique index _unique_user_team_authoriz ( user_id, permission_id, authorized_team_id ) where user_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_team ADD unique index _unique_tool_team_authoriz ( tool_id, permission_id, authorized_team_id ) where tool_id IS NOT NULL;`,
+		`ALTER TABLE soma.authorizations_team ADD unique index _unique_team_team_authoriz ( team_id, permission_id, authorized_team_id ) where team_id IS NOT NULL;`,
+	}
+	stmts = append(stmts,
+		fmt.Sprintf("INSERT INTO public.schema_versions (schema, version, description) VALUES ('soma', 201905130001, 'Upgrade - somadbctl %s');", tool),
+	)
+	executeUpgrades(stmts, printOnly)
+	return 201905130001
+}
+
 func installRoot201605150001(curr int, tool string, printOnly bool) int {
 	if curr != 000000000001 {
 		return 0

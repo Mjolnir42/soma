@@ -16,6 +16,8 @@ soma bucket property create system  ${system}  on ${bucket} view ${view} value $
 soma bucket property create custom  ${custom}  on ${bucket} view ${view} value ${value} [inheritance ${inherit}] [childrenonly ${child}]
 soma bucket property create service ${service} on ${bucket} view ${view} [inheritance ${inherit}] [childrenonly ${child}]
 soma bucket property create oncall  ${oncall}  on ${bucket} view ${view} [inheritance ${inherit}] [childrenonly ${child}]
+soma bucket property update system  ${system}  on ${bucket} view ${view} value ${value} [inheritance ${inherit}] [childrenonly ${child}]
+soma bucket property update custom  ${custom}  on ${bucket} view ${view} value ${value} [inheritance ${inherit}] [childrenonly ${child}]
 soma bucket property destroy system  ${system}  on ${bucket} view ${view}
 soma bucket property destroy custom  ${custom}  on ${bucket} view ${view}
 soma bucket property destroy service ${service} on ${bucket} view ${view}

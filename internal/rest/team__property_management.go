@@ -66,6 +66,55 @@ func (x *Rest) PropertyMgmtServiceAdd(w http.ResponseWriter, r *http.Request,
 	x.send(&w, &result)
 }
 
+// PropertyMgmtServiceUpdate function
+func (x *Rest) PropertyMgmtServiceUpdate(w http.ResponseWriter, r *http.Request,
+	params httprouter.Params) {
+	defer panicCatcher(w)
+
+	request := msg.New(r, params)
+	request.Section = msg.SectionPropertyMgmt
+	request.Action = msg.ActionUpdate
+
+	cReq := proto.NewPropertyRequest()
+	if err := decodeJSONBody(r, &cReq); err != nil {
+		x.replyBadRequest(&w, &request, err)
+		return
+	}
+
+	switch {
+	case params.ByName(`propertyType`) != msg.PropertyService:
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
+		return
+	case cReq.Property.Type != msg.PropertyService:
+		x.replyBadRequest(&w, &request, fmt.Errorf("Invalid property type: %s", params.ByName(`propertyType`)))
+		return
+	case cReq.Property.Service.TeamID != params.ByName(`teamID`):
+		x.replyBadRequest(&w, &request, fmt.Errorf("Mismatching team IDs: %s vs %s",
+			cReq.Property.Service.TeamID, params.ByName(`teamID`)))
+		return
+	case cReq.Property.Service.Name == ``:
+		x.replyBadRequest(&w, &request, fmt.Errorf(`Invalid empty service property name`))
+		return
+	}
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	request.Section = msg.SectionPropertyService
+	request.Property = cReq.Property.Clone()
+
+	if !x.isAuthorized(&request) {
+		x.replyForbidden(&w, &request)
+		return
+	}
+
+	x.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	x.send(&w, &result)
+}
+
 // PropertyMgmtServiceRemove function
 func (x *Rest) PropertyMgmtServiceRemove(w http.ResponseWriter, r *http.Request,
 	params httprouter.Params) {

@@ -17,32 +17,36 @@ import (
 	"github.com/mjolnir42/soma/internal/handler"
 	"github.com/mjolnir42/soma/internal/msg"
 	"github.com/mjolnir42/soma/internal/stmt"
+	"github.com/mjolnir42/soma/lib/proto"
 	uuid "github.com/satori/go.uuid"
 )
 
 // OncallWrite handles write requests for oncall
 type OncallWrite struct {
-	Input        chan msg.Request
-	Shutdown     chan struct{}
-	handlerName  string
-	conn         *sql.DB
-	stmtAdd      *sql.Stmt
-	stmtAssign   *sql.Stmt
-	stmtRemove   *sql.Stmt
-	stmtUnassign *sql.Stmt
-	stmtUpdate   *sql.Stmt
-	appLog       *logrus.Logger
-	reqLog       *logrus.Logger
-	errLog       *logrus.Logger
+	Input               chan msg.Request
+	Shutdown            chan struct{}
+	handlerName         string
+	conn                *sql.DB
+	stmtAdd             *sql.Stmt
+	stmtAssign          *sql.Stmt
+	stmtRemove          *sql.Stmt
+	stmtUnassign        *sql.Stmt
+	stmtUpdate          *sql.Stmt
+	stmtGetAllInstances *sql.Stmt
+	appLog              *logrus.Logger
+	reqLog              *logrus.Logger
+	errLog              *logrus.Logger
+	handlerMap          *handler.Map
 }
 
 // newOncallWrite return a new OncallWrite handler with input buffer of
 // length
-func newOncallWrite(length int) (string, *OncallWrite) {
+func newOncallWrite(length int, appHandlerMap *handler.Map) (string, *OncallWrite) {
 	w := &OncallWrite{}
 	w.handlerName = generateHandlerName() + `_w`
 	w.Input = make(chan msg.Request, length)
 	w.Shutdown = make(chan struct{})
+	w.handlerMap = appHandlerMap
 	return w.handlerName, w
 }
 
@@ -83,11 +87,12 @@ func (w *OncallWrite) Run() {
 	var err error
 
 	for statement, prepStmt := range map[string]**sql.Stmt{
-		stmt.OncallAdd:            &w.stmtAdd,
-		stmt.OncallMemberAssign:   &w.stmtAssign,
-		stmt.OncallMemberUnassign: &w.stmtUnassign,
-		stmt.OncallRemove:         &w.stmtRemove,
-		stmt.OncallUpdate:         &w.stmtUpdate,
+		stmt.OncallAdd:             &w.stmtAdd,
+		stmt.OncallMemberAssign:    &w.stmtAssign,
+		stmt.OncallMemberUnassign:  &w.stmtUnassign,
+		stmt.OncallRemove:          &w.stmtRemove,
+		stmt.OncallUpdate:          &w.stmtUpdate,
+		stmt.OncallGetAllInstances: &w.stmtGetAllInstances,
 	} {
 		if *prepStmt, err = w.conn.Prepare(statement); err != nil {
 			w.errLog.Fatal(`oncall`, err, stmt.Name(statement))
@@ -206,11 +211,14 @@ func (w *OncallWrite) remove(q *msg.Request, mr *msg.Result) {
 // update refreshes an oncall entry
 func (w *OncallWrite) update(q *msg.Request, mr *msg.Result) {
 	var (
-		name   sql.NullString
-		number sql.NullInt64
-		res    sql.Result
-		n      int // ensure err not redeclared in if block
-		err    error
+		name                                                                   sql.NullString
+		number                                                                 sql.NullInt64
+		res                                                                    sql.Result
+		rows                                                                   *sql.Rows
+		n                                                                      int // ensure err not redeclared in if block
+		err                                                                    error
+		repositoryID, bucketID, entityID, entityType, propertyInstanceID, view string
+		inheritance                                                            bool
 	)
 
 	// our update statement uses NULL to check which of the values
@@ -241,6 +249,99 @@ func (w *OncallWrite) update(q *msg.Request, mr *msg.Result) {
 	if mr.RowCnt(res.RowsAffected()) {
 		mr.Oncall = append(mr.Oncall, q.Oncall)
 	}
+
+	if rows, err = w.stmtGetAllInstances.Query(
+		q.Oncall.ID,
+	); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+	for rows.Next() {
+		if err = rows.Scan(&bucketID, &entityID, &entityType, &repositoryID, &propertyInstanceID, &view, &inheritance); err != nil {
+			rows.Close()
+			mr.ServerError(err, q.Section)
+			return
+		}
+		//send a request to the treekeeper to update the property within the tree
+		w.updateTreekeeper(q.AuthUser, q.Oncall.ID, q.Oncall.Name, q.Oncall.Number, view, repositoryID, bucketID, entityID, entityType, propertyInstanceID, inheritance)
+	}
+	if err = rows.Err(); err != nil {
+		mr.ServerError(err, q.Section)
+		return
+	}
+
+}
+
+func (w *OncallWrite) updateTreekeeper(authUser, oncallID, oncallName, oncallNumber, view, repositoryID, bucketID, entityID, entityType, propertyInstanceID string, inheritance bool) error {
+	returnChannel := make(chan msg.Result, 1)
+	request := msg.Request{}
+	request.Reply = returnChannel
+	request.AuthUser = authUser
+	request.Action = msg.ActionPropertyUpdate
+	request.Property.Type = proto.PropertyTypeOncall
+
+	//Create Service object
+	prop := proto.Property{
+		Type:        proto.PropertyTypeOncall,
+		View:        view,
+		Inheritance: inheritance,
+	}
+	prop.Oncall = &proto.PropertyOncall{
+		ID:     oncallID,
+		Name:   oncallName,
+		Number: oncallNumber,
+	}
+	prop.SourceInstanceID = propertyInstanceID
+	//Forge the request
+	switch entityType {
+	case msg.EntityRepository:
+		request.Section = msg.SectionRepositoryConfig
+		request.TargetEntity = msg.EntityRepository
+		req := proto.NewRepositoryRequest()
+		req.Repository.ID = entityID
+		req.Repository.Properties = &[]proto.Property{prop}
+		request.Repository = req.Repository.Clone()
+	case msg.EntityBucket:
+		request.Section = msg.SectionBucket
+		request.TargetEntity = msg.EntityBucket
+		req := proto.NewBucketRequest()
+		req.Bucket.ID = entityID
+		req.Bucket.RepositoryID = repositoryID
+		req.Bucket.Properties = &[]proto.Property{prop}
+		request.Bucket = req.Bucket.Clone()
+	case msg.EntityGroup:
+		request.Section = msg.SectionGroup
+		request.TargetEntity = msg.EntityGroup
+		req := proto.NewGroupRequest()
+		req.Group.ID = entityID
+		req.Group.RepositoryID = repositoryID
+		req.Group.BucketID = bucketID
+		req.Group.Properties = &[]proto.Property{prop}
+		request.Group = req.Group.Clone()
+	case msg.EntityCluster:
+		request.Section = msg.SectionCluster
+		request.TargetEntity = msg.EntityCluster
+		req := proto.NewClusterRequest()
+		req.Cluster.ID = entityID
+		req.Cluster.RepositoryID = repositoryID
+		req.Cluster.BucketID = bucketID
+		req.Cluster.Properties = &[]proto.Property{prop}
+		request.Cluster = req.Cluster.Clone()
+	case msg.EntityNode:
+		request.Section = msg.SectionNode
+		request.TargetEntity = msg.EntityNode
+		req := proto.NewNodeRequest()
+		req.Node.ID = entityID
+		req.Node.Properties = &[]proto.Property{prop}
+		request.Node = req.Node.Clone()
+	}
+	w.handlerMap.MustLookup(&request).Intake() <- request
+	result := <-request.Reply
+	if !result.IsOK() {
+		return result.Error
+	}
+	return nil
 }
 
 // ShutdownNow signals the handler to shut down
