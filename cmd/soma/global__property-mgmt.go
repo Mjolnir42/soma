@@ -106,6 +106,13 @@ func registerProperty(app cli.App) *cli.App {
 								BashComplete: comptime(bashCompServiceAdd),
 							},
 							{
+								Name:         `update`,
+								Usage:        `Update a per-team service property`,
+								Description:  help.Text(`property-service::update`),
+								Action:       runtime(propertyMgmtServiceUpdate),
+								BashComplete: cmpl.Team,
+							},
+							{
 								Name:         `remove`,
 								Usage:        `Remove a per-team service property`,
 								Description:  help.Text(`property-service::remove`),
