@@ -37,4 +37,13 @@ func countAttributeConstraints(attributeC map[string][]string) int {
 	return count
 }
 
+func removeFromArray(s []string, r string) []string {
+	for i, v := range s {
+		if v == r {
+			return append(s[:i], s[i+1:]...)
+		}
+	}
+	return s
+}
+
 // vim: ts=4 sw=4 sts=4 noet fenc=utf-8 ffs=unix
